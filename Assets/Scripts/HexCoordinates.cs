@@ -67,6 +67,6 @@ public struct HexCoordinates {
 	}
 
 	public string ToStringOnSeparateLines () {
-		return X.ToString() + "\n" + Y.ToString() + "\n" + Z.ToString();
+		return X.ToString() + "\n" + this.Y + "\n" + Z.ToString();
 	}
 }
