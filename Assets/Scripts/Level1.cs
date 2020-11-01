@@ -19,7 +19,7 @@ public class Level1 : HexArray
         {'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'}, // G 
         {'e', 'e', 'e', 'b', 'e', 'e', 'e', 'e', 'e', 'e'}, // H 
         {'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e'}, // I 
-        {'e', 'b', 'b', 'e', 'e', 'e', 'e', 'e', 'e', 'e'}, // J
+        {'e', 'd', 'd', 'e', 'e', 'e', 'e', 'e', 'e', 'e'}, // J
     };
 
     public ref int getWidth()

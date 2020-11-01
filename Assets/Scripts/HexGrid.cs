@@ -1,18 +1,24 @@
-﻿using UnityEngine;
+﻿// Possible Optimizations:
+//     - Delete empty cells (requires more edge cases in the
+//       Neighbor-finding methods)
+//
+
+using UnityEngine;
 using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
-
     public Color defaultColor = Color.white;
 
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
+    public GameObject b_Hex;
+    public GameObject default_Hex;
 
     HexCell[] cells;
     public Level1 level = new Level1();
-    public int width = 0;  
-    public int height = 0; 
+    private int width = 0;
+    private int height = 0;
 
     Canvas gridCanvas;
     HexMesh hexMesh;
@@ -22,11 +28,14 @@ public class HexGrid : MonoBehaviour
         if (level == null
             || cellPrefab == null
             || cellLabelPrefab == null
-            )
+        )
         {
             Debug.Log("hexArray not assigned");
             Application.Quit();
         }
+
+        if (b_Hex == null) Debug.LogError("b_Hex is not defined.");
+
         this.width = level.getWidth();
         this.height = level.getHeight();
         this.gridCanvas = GetComponentInChildren<Canvas>();
@@ -34,18 +43,16 @@ public class HexGrid : MonoBehaviour
 
         cells = new HexCell[height * width];
 
+        int counter = 0;
         for (int z = 0, i = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
-                if (level.getArray()[z, x] == 'b')
-                {
-                    CreateCell(x, z, i);
-                }
-                else
-                {
-                    
-                }
+                // Debug.Log(i);
+                CreateModelByCellKey(
+                    level.getArray()[z, x],
+                    CreateCell(x, z, i)
+                );
                 i++;
             }
         }
@@ -56,17 +63,14 @@ public class HexGrid : MonoBehaviour
         switch (key)
         {
             case 'd':
-                // Instantiate(BaseHex, parent.transform, Quaternion.identity, parent.transform);
-                // I think we create a new prefab BaseHex, which is a subclass ef HexCell
-                Instantiate(BaseHex, parent.transform);
-                // Instantiate hexCell type, which is a hexCell subclass
-                // Using Instantiates argument param
+                Instantiate(b_Hex, parent.transform);
+                break;
             default:
-                Instantiate(EmptyHex, parent.transform);
+                Instantiate(default_Hex, parent.transform);
                 return;
         }
     }
-    
+
 
     void Start()
     {
@@ -89,12 +93,12 @@ public class HexGrid : MonoBehaviour
     //     part of the axial coordinates system).
     //     
     // 
-    void CreateCell(int x, int z, int i, char key)
+    HexCell CreateCell(int x, int z, int i)
     {
         Vector3 position;
-        position.x = (x + 
-                      z * 0.5f  // Creates a staircase-like effect
-                      - z / 2)  // This int division creates the zigging back every other line
+        position.x = (x +
+                      z * 0.5f // Creates a staircase-like effect
+                      - z / 2) // This int division creates the zigging back every other line
                      * (HexMetrics.innerRadius * 2f);
         position.y = 0f;
         position.z = z * (HexMetrics.outerRadius * 1.5f);
@@ -103,7 +107,6 @@ public class HexGrid : MonoBehaviour
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        CreateModelByCellKey(key, cell);
         // cell.createModel();
 
         if (x > 0) // Skips first vertical axis
@@ -137,5 +140,6 @@ public class HexGrid : MonoBehaviour
             new Vector2(position.x, position.z);
         label.text = cell.coordinates.ToStringOnSeparateLines();
 
+        return cell;
     }
 }
