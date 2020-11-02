@@ -2,17 +2,23 @@
 //     - Delete empty cells (requires more edge cases in the
 //       Neighbor-finding methods)
 //
+// TODO:
+//     - When raycast collides with tile model, get the parent hexcell object,
+//       have it delete the model, and then do createModel by passing in the key in the held slot, and take that key into nlot
 
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
-    public Color defaultColor = Color.white;
-
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
+    public GameObject r_Hex;
+    public GameObject g_Hex;
     public GameObject b_Hex;
+    public GameObject y_Hex;
     public GameObject default_Hex;
 
     HexCell[] cells;
@@ -34,7 +40,8 @@ public class HexGrid : MonoBehaviour
             Application.Quit();
         }
 
-        if (b_Hex == null) Debug.LogError("b_Hex is not defined.");
+        if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null) 
+            Debug.LogError("Error: a Hex is not assigned.");
 
         this.width = level.getWidth();
         this.height = level.getHeight();
@@ -48,26 +55,32 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                // Debug.Log(i);
-                CreateModelByCellKey(
-                    level.getArray()[z, x],
-                    CreateCell(x, z, i)
-                );
+                CreateCell(x, z, i, 
+                    returnModelByCellKey(level.getArray()[z, x])
+                    );
                 i++;
             }
         }
     }
 
-    void CreateModelByCellKey(char key, HexCell parent)
+    GameObject returnModelByCellKey(char key)
     {
         switch (key)
         {
-            case 'd':
-                Instantiate(b_Hex, parent.transform);
+            case 'r':
+                return r_Hex;
+                break;
+            case 'g':
+                return g_Hex;
+                break;
+            case 'b':
+                return b_Hex;
+                break;
+            case 'y':
+                return y_Hex;
                 break;
             default:
-                Instantiate(default_Hex, parent.transform);
-                return;
+                return default_Hex;
         }
     }
 
@@ -77,14 +90,15 @@ public class HexGrid : MonoBehaviour
         hexMesh.Triangulate(cells);
     }
 
-    public void ColorCell(Vector3 position, Color color)
+    private void Update()
     {
-        position = transform.InverseTransformPoint(position);
-        HexCoordinates coordinates = HexCoordinates.FromPosition(position);
-        int index = coordinates.X + coordinates.Z * width + coordinates.Z / 2;
-        HexCell cell = cells[index];
-        cell.color = color;
-        hexMesh.Triangulate(cells);
+		if (
+			Input.GetMouseButton(0) &&
+			!EventSystem.current.IsPointerOverGameObject()
+		) {
+			HandleInput();
+		}
+
     }
 
     //
@@ -93,7 +107,7 @@ public class HexGrid : MonoBehaviour
     //     part of the axial coordinates system).
     //     
     // 
-    HexCell CreateCell(int x, int z, int i)
+    HexCell CreateCell(int x, int z, int i, GameObject model)
     {
         Vector3 position;
         position.x = (x +
@@ -104,10 +118,11 @@ public class HexGrid : MonoBehaviour
         position.z = z * (HexMetrics.outerRadius * 1.5f);
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
+        cell.setSpawnCoords(x,z);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        // cell.createModel();
+        cell.createModel(model);
 
         if (x > 0) // Skips first vertical axis
         {
@@ -141,5 +156,12 @@ public class HexGrid : MonoBehaviour
         label.text = cell.coordinates.ToStringOnSeparateLines();
 
         return cell;
+    }
+    void HandleInput () {
+        Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(inputRay, out hit)) {
+            Debug.Log(hit.point);
+        }
     }
 }
