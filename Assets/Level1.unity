@@ -197,13 +197,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 390544154}
-  m_LocalRotation: {x: 0.248136, y: -0, z: -0, w: 0.96872526}
-  m_LocalPosition: {x: 24.7, y: 33.1, z: -10}
+  m_LocalRotation: {x: 0.5301746, y: -0, z: -0, w: 0.8478885}
+  m_LocalPosition: {x: 72.3, y: 107.2, z: -13.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 28.734001, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 64.035, y: 0, z: 0}
 --- !u!1 &493971881
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,11 +233,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414a0fc06528949a0baff4f719b04a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultColor: {r: 1, g: 1, b: 1, a: 1}
   cellPrefab: {fileID: 2770079146010531154, guid: 94c2312396697489abc866a188f80152,
     type: 3}
   cellLabelPrefab: {fileID: 11470134, guid: f68794ca03b6f4510b9a5bd6ee9ba2f4, type: 3}
-  b_Hex: {fileID: 2533799085109067181, guid: bafc4176153c6d74aace487d16e95f50, type: 3}
+  r_Hex: {fileID: 8684346608785658774, guid: c6e50edf6b4b16c4a9e5e1cbb55505a3, type: 3}
+  g_Hex: {fileID: 4462118913960602758, guid: d3e61d0ca11762b46a36f0e4cd9b5f37, type: 3}
+  b_Hex: {fileID: 8389509474827286045, guid: cca635703901c4749affb9dd1f3981e3, type: 3}
+  y_Hex: {fileID: 8415657477851256028, guid: c936b6a4a2bfa454c8f4c78df88a83b6, type: 3}
   default_Hex: {fileID: 3574846304584204012, guid: f3c50f8915d60f146bc61f6b26e52f14,
     type: 3}
 --- !u!4 &493971883
@@ -449,7 +451,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.06}
+  m_AnchoredPosition: {x: 0, y: 0.001}
   m_SizeDelta: {x: 5, y: 15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1137320579
