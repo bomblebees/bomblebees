@@ -55,9 +55,12 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                CreateCell(x, z, i, 
+                CreateCell(
+                    x, 
+                    z, 
+                    i, 
                     returnModelByCellKey(level.getArray()[z, x])
-                    );
+                );
                 i++;
             }
         }

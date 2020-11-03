@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 223594715321064568}
   - component: {fileID: 223594715321064571}
   m_Layer: 0
-  m_Name: char_low
+  m_Name: CharacterModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -151,7 +151,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.71, z: 0}
 --- !u!114 &223594715321064571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,7 +166,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 223594715321064568}
   speed: 6
-  gravity: -9.81
   turnSmoothness: 0.1
 --- !u!1 &2090302488182436559
 GameObject:
