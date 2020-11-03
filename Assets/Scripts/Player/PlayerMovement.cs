@@ -23,9 +23,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
         if (!controller.isGrounded){
-            Debug.Log("down");
             controller.Move(gravityVector);
         }
         

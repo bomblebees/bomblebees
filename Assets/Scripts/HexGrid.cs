@@ -20,6 +20,7 @@ public class HexGrid : MonoBehaviour
     public GameObject b_Hex;
     public GameObject y_Hex;
     public GameObject default_Hex;
+    public bool enableCoords = false;
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -31,34 +32,45 @@ public class HexGrid : MonoBehaviour
 
     void Awake()
     {
-        if (level == null
-            || cellPrefab == null
-            || cellLabelPrefab == null
-        )
-        {
-            Debug.Log("hexArray not assigned");
-            Application.Quit();
-        }
-
-        if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null) 
-            Debug.LogError("Error: a Hex is not assigned.");
-
-        this.width = level.getWidth();
-        this.height = level.getHeight();
+        checkErrors();
+        getGridDimensions();
+        
         this.gridCanvas = GetComponentInChildren<Canvas>();
         this.hexMesh = GetComponentInChildren<HexMesh>();
 
-        cells = new HexCell[height * width];
+        generateHexGrid();
+    }
 
-        int counter = 0;
+    void checkErrors()
+    {
+        if (level == null
+            || cellPrefab == null
+            || cellLabelPrefab == null
+        ) {
+            Debug.Log("hexArray not assigned");
+        }
+
+        if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null)
+            Debug.LogError("Error: a Hex is not assigned.");
+    }
+
+    void getGridDimensions()
+    {
+        this.width = level.getWidth();
+        this.height = level.getHeight();
+        cells = new HexCell[height * width];
+    }
+
+    void generateHexGrid()
+    {
         for (int z = 0, i = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
                 CreateCell(
-                    x, 
-                    z, 
-                    i, 
+                    x,
+                    z,
+                    i,
                     returnModelByCellKey(level.getArray()[z, x])
                 );
                 i++;
@@ -95,13 +107,13 @@ public class HexGrid : MonoBehaviour
 
     private void Update()
     {
-		if (
-			Input.GetMouseButton(0) &&
-			!EventSystem.current.IsPointerOverGameObject()
-		) {
-			HandleInput();
-		}
-
+        if (
+            Input.GetMouseButton(0) &&
+            !EventSystem.current.IsPointerOverGameObject()
+        )
+        {
+            HandleInput();
+        }
     }
 
     //
@@ -121,7 +133,7 @@ public class HexGrid : MonoBehaviour
         position.z = z * (HexMetrics.outerRadius * 1.5f);
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
-        cell.setSpawnCoords(x,z);
+        cell.setSpawnCoords(x, z);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
@@ -157,13 +169,17 @@ public class HexGrid : MonoBehaviour
         label.rectTransform.anchoredPosition =
             new Vector2(position.x, position.z);
         label.text = cell.coordinates.ToStringOnSeparateLines();
+        if (!enableCoords) label.enabled = false;
 
         return cell;
     }
-    void HandleInput () {
+
+    void HandleInput()
+    {
         Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(inputRay, out hit)) {
+        if (Physics.Raycast(inputRay, out hit))
+        {
             Debug.Log(hit.point);
         }
     }
