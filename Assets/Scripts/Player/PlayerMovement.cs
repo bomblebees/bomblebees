@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
     public float speed;
     public float turnSmoothness = 1f;
-    private Vector3 gravityVector = new Vector3(0f, -0.1f, 0f);
+    private Vector3 gravityVector = new Vector3(0f, -0.1f, 0f);  // currently not used
 
     float turnSmoothVelocity;
 
@@ -23,9 +23,6 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!controller.isGrounded){
-            controller.Move(gravityVector);
-        }
         
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -39,6 +36,13 @@ public class PlayerMovement : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
             controller.Move(direction * speed * Time.deltaTime);
+        }
+    }
+
+    void runGravity()
+    {
+        if (!controller.isGrounded){
+            controller.Move(gravityVector);
         }
     }
 }

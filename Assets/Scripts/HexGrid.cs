@@ -3,16 +3,21 @@
 //       Neighbor-finding methods)
 //
 // TODO:
+//     - return level array by ref, when using level.getArray()
 //     - When raycast collides with tile model, get the parent hexcell object,
 //       have it delete the model, and then do createModel by passing in the key in the held slot, and take that key into nlot
+//     - Add ienum timer for handleinput in order to slow down swap
 
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
+    public int mouseTimer = 0; // temp for handling repeated mouse click
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
     public GameObject r_Hex;
@@ -21,6 +26,7 @@ public class HexGrid : MonoBehaviour
     public GameObject y_Hex;
     public GameObject default_Hex;
     public bool enableCoords = false;
+    public char heldKey = 'b';
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -71,7 +77,7 @@ public class HexGrid : MonoBehaviour
                     x,
                     z,
                     i,
-                    returnModelByCellKey(level.getArray()[z, x])
+                    level.getArray()[z, x]
                 );
                 i++;
             }
@@ -114,6 +120,7 @@ public class HexGrid : MonoBehaviour
         {
             HandleInput();
         }
+        mouseTimer++;
     }
 
     //
@@ -122,7 +129,7 @@ public class HexGrid : MonoBehaviour
     //     part of the axial coordinates system).
     //     
     // 
-    HexCell CreateCell(int x, int z, int i, GameObject model)
+    HexCell CreateCell(int x, int z, int i, char key)
     {
         Vector3 position;
         position.x = (x +
@@ -137,7 +144,8 @@ public class HexGrid : MonoBehaviour
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.createModel(model);
+        cell.createModel(returnModelByCellKey(key));
+        cell.setKey(key);
 
         if (x > 0) // Skips first vertical axis
         {
@@ -178,9 +186,24 @@ public class HexGrid : MonoBehaviour
     {
         Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(inputRay, out hit))
+        int tilesLayerMask = 8;
+
+        // TODO change distance
+        if ((Physics.Raycast(inputRay, out hit, 500f, 1 << LayerMask.NameToLayer("BaseTiles"))
+        && this.mouseTimer > 30))
         {
-            Debug.Log(hit.point);
+            SwapHex(hit); // A coroutine because mouse activates quickly.
+            mouseTimer = 0;
         }
+    }
+
+    void SwapHex(RaycastHit hit)
+    {
+        Debug.Log("inside");
+            char temp = hit.transform.gameObject.GetComponentInParent<HexCell>().getKey();
+            HexCell parent = hit.transform.gameObject.GetComponentInParent<HexCell>().getThis();
+            Destroy(hit.transform.gameObject, 0f);
+            parent.createModel(this.returnModelByCellKey(heldKey));
+            this.heldKey = temp;
     }
 }

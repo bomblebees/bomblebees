@@ -7,6 +7,8 @@ public class HexCell : MonoBehaviour {
 	public GameObject hexModel;
 	public float spawnX = 0;
 	public float spawnZ = 0;
+	public char key = 'e';
+	private GameObject parent;
 
 	public Color color;
 	[SerializeField]
@@ -37,6 +39,20 @@ public class HexCell : MonoBehaviour {
 
 	public void createModel(GameObject model)
     {
-	    Instantiate(model, this.gameObject.transform);
+	    model = Instantiate(model, this.gameObject.transform);
     }
+
+	public void setKey(char key)
+	{
+		this.key = key;
+	}
+	public char getKey()
+	{
+		return this.key;
+	}
+
+	public HexCell getThis()
+	{
+		return this;
+	}
 }

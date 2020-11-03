@@ -198,7 +198,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 390544154}
   m_LocalRotation: {x: 0.4848096, y: 0, z: 0, w: 0.8746197}
-  m_LocalPosition: {x: 80, y: 97, z: -30}
+  m_LocalPosition: {x: 136.1, y: 107.8, z: -30}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -214,9 +214,9 @@ GameObject:
   m_Component:
   - component: {fileID: 493971883}
   - component: {fileID: 493971882}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Hex Grid
-  m_TagString: Untagged
+  m_TagString: Mesh
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -233,15 +233,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414a0fc06528949a0baff4f719b04a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mouseTimer: 0
   cellPrefab: {fileID: 2770079146010531154, guid: 94c2312396697489abc866a188f80152,
     type: 3}
   cellLabelPrefab: {fileID: 11470134, guid: f68794ca03b6f4510b9a5bd6ee9ba2f4, type: 3}
-  r_Hex: {fileID: 8684346608785658774, guid: c6e50edf6b4b16c4a9e5e1cbb55505a3, type: 3}
-  g_Hex: {fileID: 4462118913960602758, guid: d3e61d0ca11762b46a36f0e4cd9b5f37, type: 3}
-  b_Hex: {fileID: 8389509474827286045, guid: cca635703901c4749affb9dd1f3981e3, type: 3}
-  y_Hex: {fileID: 8415657477851256028, guid: c936b6a4a2bfa454c8f4c78df88a83b6, type: 3}
+  r_Hex: {fileID: 8299963178485543512, guid: c6e50edf6b4b16c4a9e5e1cbb55505a3, type: 3}
+  g_Hex: {fileID: 7567766404054765310, guid: d3e61d0ca11762b46a36f0e4cd9b5f37, type: 3}
+  b_Hex: {fileID: 3353043427499192660, guid: 1149e6dbb89db8947865e9d79f66fb69, type: 3}
+  y_Hex: {fileID: 32179397214527739, guid: c936b6a4a2bfa454c8f4c78df88a83b6, type: 3}
   default_Hex: {fileID: 3574846304584204012, guid: f3c50f8915d60f146bc61f6b26e52f14,
     type: 3}
+  enableCoords: 0
+  heldKey: 98
 --- !u!4 &493971883
 Transform:
   m_ObjectHideFlags: 0
@@ -336,9 +339,9 @@ GameObject:
   - component: {fileID: 597715955}
   - component: {fileID: 597715954}
   - component: {fileID: 597715953}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Hex Mesh
-  m_TagString: Untagged
+  m_TagString: Mesh
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -351,7 +354,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 597715951}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.0001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 493971883}
@@ -428,9 +431,9 @@ GameObject:
   - component: {fileID: 1137320581}
   - component: {fileID: 1137320580}
   - component: {fileID: 1137320579}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Hex Grid Canvas
-  m_TagString: Untagged
+  m_TagString: Mesh
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -526,7 +529,7 @@ GameObject:
   - component: {fileID: 1987843441}
   m_Layer: 0
   m_Name: Directional Light
-  m_TagString: Untagged
+  m_TagString: Mesh
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -631,7 +634,7 @@ PrefabInstance:
     - target: {fileID: 329017071006951778, guid: ed7e04182063748439f12785862add50,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 20
+      value: 0.2818091
       objectReference: {fileID: 0}
     - target: {fileID: 329017071006951778, guid: ed7e04182063748439f12785862add50,
         type: 3}
