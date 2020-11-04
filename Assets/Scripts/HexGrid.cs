@@ -6,7 +6,6 @@
 //     - return level array by ref, when using level.getArray()
 //     - When raycast collides with tile model, get the parent hexcell object,
 //       have it delete the model, and then do createModel by passing in the key in the held slot, and take that key into nlot
-//     - Add ienum timer for handleinput in order to slow down swap
 
 using System;
 using System.Collections;
@@ -26,7 +25,7 @@ public class HexGrid : MonoBehaviour
     public GameObject y_Hex;
     public GameObject default_Hex;
     public bool enableCoords = false;
-    public char heldKey = 'b';
+    public char heldKey = 'r';
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -60,6 +59,7 @@ public class HexGrid : MonoBehaviour
             Debug.LogError("Error: a Hex is not assigned.");
     }
 
+    // getGridDimensions: used once at the start of the level
     void getGridDimensions()
     {
         this.width = level.getWidth();
