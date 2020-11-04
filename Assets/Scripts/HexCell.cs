@@ -56,32 +56,63 @@ public class HexCell : MonoBehaviour {
 		return this;
 	}
 
-	public bool isSameColorAs(HexDirection direction)
+	public bool isInTailCombo(HexDirection direction)
 	{
-		return this.key == this.GetNeighbor(direction).getKey();
+		HexCell firstNeighbor = this.GetNeighbor(direction);
+		HexCell secondNeighbor = firstNeighbor.GetNeighbor(direction);
+		return this.getKey() == firstNeighbor.getKey() 
+		       && firstNeighbor.getKey() == secondNeighbor.getKey();
 	}
 
-	public bool isInComboBetween(HexDirection direction1, HexDirection direction2)
+	// public void isInMiddleComboAnywhere(System.Action callback)
+	public void isIn3ComboAnywhere()
 	{
-		return this.isSameColorAs(direction1) == this.isSameColorAs(direction2);
+		for (var direction = 0; direction < 5; direction++)
+		{
+			HexDirection hexDirection = (HexDirection) direction;
+			HexCell neighbor = this.GetNeighbor(hexDirection);
+			
+			if (this.isSameColorAs(neighbor))
+			{
+				// check if in middle
+				// TODO remove redundancy by only performing this for 3
+				HexCell oppositeNeighbor = this.GetNeighbor(hexDirection.Opposite());
+				if (this.isSameColorAs(oppositeNeighbor))
+				{
+					// do smth
+					// callback();
+					Debug.Log("middle");
+				}
+
+				// check if at tail. 
+				HexCell outer = neighbor.GetNeighbor(hexDirection);
+				if (this.isSameColorAs(outer))
+				{
+					// do smth
+					Debug.Log("outer");
+				}
+			}
+		}
 	}
 
-	public void getComboTiles()
+	public bool isSameColorAs(HexCell cell)
 	{
-		if (this.isInComboBetween(HexDirection.NW, HexDirection.NW.Opposite()))
-		{
-			// do something with all 3 of the tiles
-			Debug.Log("hi");
-		}
-		if (this.isInComboBetween(HexDirection.W, HexDirection.NW.Opposite()))
-		{
-			// do something with all 3 of the tiles
-			Debug.Log("hi");
-		}
-		if (this.isInComboBetween(HexDirection.SW, HexDirection.NW.Opposite()))  
-		{
-			// do something with all 3 of the tiles
-			Debug.Log("hi");
-		}
-	}
+		if (cell == null) return false;
+		return this.key == cell.getKey();
+	} 
+	// public bool isSameColorAsOpposite(HexDirection direction)
+	// {
+	// 	return this.key == this.GetNeighbor(direction.Opposite()).getKey();
+	// } 
+	//
+	// public bool isSameColorAsAdjacent(HexDirection direction)
+	// {
+	// 	return this.key == this.GetNeighbor(direction).getKey();
+	// }
+	//
+	// public HexCell getSecondaryNeighbor(HexDirection direction)
+	// {
+	//
+	// 	return this.GetNeighbor(direction).GetNeighbor(direction);
+	// }
 }

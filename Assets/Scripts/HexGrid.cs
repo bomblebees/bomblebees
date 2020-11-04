@@ -114,7 +114,7 @@ public class HexGrid : MonoBehaviour
     private void Update()
     {
         if (
-            Input.GetMouseButton(0) &&
+            Input.GetMouseButtonDown(0) &&
             !EventSystem.current.IsPointerOverGameObject()
         )
         {
@@ -190,21 +190,27 @@ public class HexGrid : MonoBehaviour
 
         // TODO change distance
         if ((Physics.Raycast(inputRay, out hit, 500f, 1 << LayerMask.NameToLayer("BaseTiles"))
-        && this.mouseTimer > 30))
+        && this.mouseTimer > 60))
         {
             GameObject modelHit = hit.transform.gameObject;
+            Debug.Log("found color: " +(modelHit.GetComponentInParent<HexCell>().getKey()));
+            HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
             SwapHex(modelHit); // A coroutine because mouse activates quickly.
+
+            hexCell.isIn3ComboAnywhere();
+            
             mouseTimer = 0;
         }
     }
 
     void SwapHex(GameObject modelHit)
     {
-        Debug.Log("inside");
+        Debug.Log("swapped");
             char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
             HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
             Destroy(modelHit , 0f);
             parent.createModel(this.returnModelByCellKey(heldKey));
+            parent.setKey(this.heldKey);
             this.heldKey = tempKey;
     }
 }
