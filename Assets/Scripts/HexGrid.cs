@@ -192,18 +192,19 @@ public class HexGrid : MonoBehaviour
         if ((Physics.Raycast(inputRay, out hit, 500f, 1 << LayerMask.NameToLayer("BaseTiles"))
         && this.mouseTimer > 30))
         {
-            SwapHex(hit); // A coroutine because mouse activates quickly.
+            GameObject modelHit = hit.transform.gameObject;
+            SwapHex(modelHit); // A coroutine because mouse activates quickly.
             mouseTimer = 0;
         }
     }
 
-    void SwapHex(RaycastHit hit)
+    void SwapHex(GameObject modelHit)
     {
         Debug.Log("inside");
-            char temp = hit.transform.gameObject.GetComponentInParent<HexCell>().getKey();
-            HexCell parent = hit.transform.gameObject.GetComponentInParent<HexCell>().getThis();
-            Destroy(hit.transform.gameObject, 0f);
+            char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
+            HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
+            Destroy(modelHit , 0f);
             parent.createModel(this.returnModelByCellKey(heldKey));
-            this.heldKey = temp;
+            this.heldKey = tempKey;
     }
 }
