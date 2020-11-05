@@ -16,6 +16,7 @@ using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
+    public Text testHeldKeyUI;
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
     public GameObject r_Hex;
@@ -220,5 +221,8 @@ public class HexGrid : MonoBehaviour
             parent.createModel(this.returnModelByCellKey(heldKey));
             parent.setKey(this.heldKey);
             this.heldKey = tempKey;
+            
+            // temp test stuff
+            testHeldKeyUI.GetComponent<HeldKey>().setText();
     }
 }
