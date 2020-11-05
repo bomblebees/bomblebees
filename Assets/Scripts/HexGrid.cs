@@ -25,10 +25,12 @@ public class HexGrid : MonoBehaviour
     public GameObject y_Hex;
     public GameObject default_Hex;
     public bool enableCoords = false;
+    public bool enableRandomGen = false;
     public char heldKey = 'r';
 
     HexCell[] cells;
     public Level1 level = new Level1();
+    public RandomLevelGeneration randLevel = new RandomLevelGeneration();
     private int width = 0;
     private int height = 0;
 
@@ -62,13 +64,27 @@ public class HexGrid : MonoBehaviour
     // getGridDimensions: used once at the start of the level
     void getGridDimensions()
     {
-        this.width = level.getWidth();
-        this.height = level.getHeight();
+        // If random generation is enabled, use its width/height instead
+        if (enableRandomGen) {
+            this.width = randLevel.getWidth();
+            this.height = randLevel.getHeight();
+        } else {
+            this.width = level.getWidth();
+            this.height = level.getHeight();
+        }
         cells = new HexCell[height * width];
     }
 
     void generateHexGrid()
     {
+
+        char[,] testLevel = level.getArray();
+
+        // If random generation is enabled, generate a random array
+        if (enableRandomGen) {
+            testLevel = randLevel.generateArray();
+        }
+
         for (int z = 0, i = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
@@ -77,7 +93,7 @@ public class HexGrid : MonoBehaviour
                     x,
                     z,
                     i,
-                    level.getArray()[z, x]
+                    testLevel[z, x]
                 );
                 i++;
             }
