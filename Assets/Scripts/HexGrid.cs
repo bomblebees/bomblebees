@@ -16,7 +16,6 @@ using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
-    public int mouseTimer = 0; // temp for handling repeated mouse click
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
     public GameObject r_Hex;
@@ -120,7 +119,6 @@ public class HexGrid : MonoBehaviour
         {
             HandleInput();
         }
-        mouseTimer++;
     }
 
     //
@@ -189,18 +187,28 @@ public class HexGrid : MonoBehaviour
         int tilesLayerMask = 8;
 
         // TODO change distance
-        if ((Physics.Raycast(inputRay, out hit, 500f, 1 << LayerMask.NameToLayer("BaseTiles"))
-        && this.mouseTimer > 60))
+        if ((Physics.Raycast(inputRay, out hit, 500f, 1 << LayerMask.NameToLayer("BaseTiles")) ))
         {
             GameObject modelHit = hit.transform.gameObject;
             Debug.Log("found color: " +(modelHit.GetComponentInParent<HexCell>().getKey()));
             HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
             SwapHex(modelHit); // A coroutine because mouse activates quickly.
 
-            hexCell.isIn3ComboAnywhere();
-            
-            mouseTimer = 0;
+            hexCell.isIn3ComboAnywhere(RegenerateTiles);
         }
+    }
+
+    void RegenerateTiles(HexCell tile1, HexCell tile2, HexCell tile3)
+    {
+        Destroy(tile1.getModel());
+        Destroy(tile2.getModel());
+        Destroy(tile3.getModel());
+        // Do effects here
+    }
+
+    void JustSayHi()
+    {
+        Debug.Log("Hi this is a test function");
     }
 
     void SwapHex(GameObject modelHit)
@@ -208,7 +216,7 @@ public class HexGrid : MonoBehaviour
         Debug.Log("swapped");
             char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
             HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
-            Destroy(modelHit , 0f);
+            Destroy(modelHit , 0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
             parent.createModel(this.returnModelByCellKey(heldKey));
             parent.setKey(this.heldKey);
             this.heldKey = tempKey;
