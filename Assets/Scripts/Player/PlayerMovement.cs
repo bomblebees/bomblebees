@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     float turnSmoothVelocity;
 
+    public bool useArrowKeys = false;
 
     private void Start()
     {
@@ -23,17 +24,34 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+        // By default, use WASD keys for input
+        Vector3 direction = new Vector3(
+            Input.GetAxisRaw("HorizontalPlayer1"), 
+            0f, 
+            Input.GetAxisRaw("VerticalPlayer1")
+        ).normalized;
 
+        // If enabled, use arrow keys for input instead
+        if (useArrowKeys)
+        {
+            // Player 1 movement (WASD)
+            direction = new Vector3(
+                Input.GetAxisRaw("HorizontalPlayer2"), 
+                0f, 
+                Input.GetAxisRaw("VerticalPlayer2")
+            ).normalized;
+
+        }
+
+        // Movement and rotations
         if (direction.magnitude >= 0.1f)
         {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity,
+            float angleP1 = Mathf.SmoothDampAngle(
+                transform.eulerAngles.y, 
+                Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg, 
+                ref turnSmoothVelocity,
                 turnSmoothness);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            transform.rotation = Quaternion.Euler(0f, angleP1, 0f);
 
             controller.Move(direction * speed * Time.deltaTime);
         }
