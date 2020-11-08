@@ -106,16 +106,12 @@ public class HexGrid : MonoBehaviour
         {
             case 'r':
                 return r_Hex;
-                break;
             case 'g':
                 return g_Hex;
-                break;
             case 'b':
                 return b_Hex;
-                break;
             case 'y':
                 return y_Hex;
-                break;
             default:
                 return default_Hex;
         }
@@ -217,9 +213,9 @@ public class HexGrid : MonoBehaviour
 
     void RegenerateTiles(HexCell tile1, HexCell tile2, HexCell tile3)
     {
-        Destroy(tile1.getModel());
-        Destroy(tile2.getModel());
-        Destroy(tile3.getModel());
+        if(tile1.getModel() != null) Destroy(tile1.getModel());
+        if(tile2.getModel() != null) Destroy(tile2.getModel());
+        if(tile3.getModel() != null) Destroy(tile3.getModel());
         // Do effects here
     }
 
