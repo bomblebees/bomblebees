@@ -24,9 +24,11 @@ public class HexGrid : MonoBehaviour
     public GameObject b_Hex;
     public GameObject y_Hex;
     public GameObject default_Hex;
+    [SerializeField]
     public int minTilesInCombo = 3;
     public bool enableCoords = false;
     public bool enableRandomGen = false;
+    private List<HexCell> hexCellList = new List<HexCell>();
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -41,7 +43,7 @@ public class HexGrid : MonoBehaviour
     {
         checkErrors();
         getGridDimensions();
-        
+
         this.gridCanvas = GetComponentInChildren<Canvas>();
         this.hexMesh = GetComponentInChildren<HexMesh>();
 
@@ -53,7 +55,8 @@ public class HexGrid : MonoBehaviour
         if (level == null
             || cellPrefab == null
             || cellLabelPrefab == null
-        ) {
+        )
+        {
             Debug.Log("hexArray not assigned");
         }
 
@@ -65,23 +68,27 @@ public class HexGrid : MonoBehaviour
     void getGridDimensions()
     {
         // If random generation is enabled, use its width/height instead
-        if (enableRandomGen) {
+        if (enableRandomGen)
+        {
             this.width = randLevel.getWidth();
             this.height = randLevel.getHeight();
-        } else {
+        }
+        else
+        {
             this.width = level.getWidth();
             this.height = level.getHeight();
         }
+
         cells = new HexCell[height * width];
     }
 
     void generateHexGrid()
     {
-
         char[,] testLevel = level.getArray();
 
         // If random generation is enabled, generate a random array
-        if (enableRandomGen) {
+        if (enableRandomGen)
+        {
             testLevel = randLevel.generateArray();
         }
 
@@ -89,14 +96,22 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                CreateCell(
-                    x,
-                    z,
-                    i,
-                    testLevel[z, x]
-                );
+                hexCellList.Add(CreateCell(
+                        x,
+                        z,
+                        i,
+                        testLevel[z, x]
+                ));
                 i++;
             }
+        }
+    }
+
+    private void scanListForGlow()
+    {
+        foreach (HexCell cell in hexCellList)
+        {
+            // Collect
         }
     }
 
@@ -142,7 +157,6 @@ public class HexGrid : MonoBehaviour
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
         cell.setSpawnCoords(x, z);
-        cell.setMinTilesInCombo(minTilesInCombo);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
@@ -180,7 +194,6 @@ public class HexGrid : MonoBehaviour
             new Vector2(position.x, position.z);
         label.text = cell.coordinates.ToStringOnSeparateLines();
         if (!enableCoords) label.enabled = false;
-
         return cell;
     }
 
@@ -200,11 +213,17 @@ public class HexGrid : MonoBehaviour
     public char SwapHex(GameObject modelHit, char heldKey)
     {
         Debug.Log("swapped");
-            char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
-            HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
-            Destroy(modelHit , 0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
-            parent.createModel(this.returnModelByCellKey(heldKey));
-            parent.setKey(heldKey);
-            return(tempKey);
+        char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
+        HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
+        Destroy(modelHit,
+            0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
+        parent.createModel(this.returnModelByCellKey(heldKey));
+        parent.setKey(heldKey);
+        return (tempKey);
+    }
+
+    public int getMinTilesInCombo()
+    {
+        return minTilesInCombo;
     }
 }

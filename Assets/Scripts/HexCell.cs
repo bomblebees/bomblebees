@@ -9,7 +9,6 @@ public class HexCell : MonoBehaviour
     public float spawnX = 0;
     public float spawnZ = 0;
     public char key = 'e'; // tile color key
-    private int minTilesInCombo = 3;
     private GameObject parent;
 
     public Color color;
@@ -63,13 +62,7 @@ public class HexCell : MonoBehaviour
         return this;
     }
 
-    public void setMinTilesInCombo(int minimum)
-    {
-        this.minTilesInCombo = minimum;
-    }
-
-
-    public void isInCombo(System.Action<List<HexCell>> callback)
+    public void isInCombo(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
         bool hasAtLeastOneCombo = false;
         List<HexCell> ComboList = new List<HexCell>(15); // To reduce array-doubling

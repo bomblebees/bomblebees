@@ -81,7 +81,7 @@ public class Player : MonoBehaviour
                 GameObject modelHit = hit.transform.gameObject;
                 HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 this.heldKey = hexGrid.SwapHex(modelHit, this.heldKey); 
-                hexCell.isInCombo(hexGrid.ComboCallback);
+                hexCell.isInCombo(hexGrid.ComboCallback, hexGrid.getMinTilesInCombo());
 
                 // Set UI to new held tile
                 testHeldKeyUI.GetComponent<HeldKey>().setText(this.heldKey);
