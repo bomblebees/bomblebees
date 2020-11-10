@@ -577,10 +577,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 8036243695569975044}
-  speed: 50
+  movementSpeed: 50
   turnSmoothness: 0.1
-  forOfflineTesting: 0
   useArrowKeys: 0
+  forOfflineTesting: 0
+  hexGrid: {fileID: 0}
+  testHeldKeyUI: {fileID: 0}
+  heldKey: 103
 --- !u!114 &6014018630625453646
 MonoBehaviour:
   m_ObjectHideFlags: 0
