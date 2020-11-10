@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.PlayerLoop;
@@ -23,6 +24,7 @@ public class HexGrid : MonoBehaviour
     public GameObject b_Hex;
     public GameObject y_Hex;
     public GameObject default_Hex;
+    public int minTilesInCombo = 3;
     public bool enableCoords = false;
     public bool enableRandomGen = false;
 
@@ -122,9 +124,10 @@ public class HexGrid : MonoBehaviour
     }
 
     //
-    // CreateCell: Creates a cell at the given x & z (where x is the 
+    // CreateCell: Creates a hexCell at the given x & z (where x is the 
     //     vertical axis. z is the horizontal axis. These are NOT
     //     part of the axial coordinates system).
+    //     Note: This is only used for in the initial board generation.
     //     
     // 
     HexCell CreateCell(int x, int z, int i, char key)
@@ -139,6 +142,7 @@ public class HexGrid : MonoBehaviour
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
         cell.setSpawnCoords(x, z);
+        cell.setMinTilesInCombo(minTilesInCombo);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
@@ -180,17 +184,12 @@ public class HexGrid : MonoBehaviour
         return cell;
     }
 
-    public void RegenerateTiles(HexCell tile1, HexCell tile2, HexCell tile3)
+    public void ComboCallback(List<HexCell> list)
     {
-        if(tile1.getModel() != null) Destroy(tile1.getModel());
-        if(tile2.getModel() != null) Destroy(tile2.getModel());
-        if(tile3.getModel() != null) Destroy(tile3.getModel());
-        // Do effects here
-    }
-
-    void JustSayHi()
-    {
-        Debug.Log("Hi this is a test function");
+        foreach (HexCell hexCell in list)
+        {
+            Destroy(hexCell.getModel());
+        }
     }
 
     /*  Swaps the given hex with a new hex of key heldKey

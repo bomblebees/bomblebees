@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.XR;
 
 public class HexCell : MonoBehaviour
@@ -8,6 +9,7 @@ public class HexCell : MonoBehaviour
     public float spawnX = 0;
     public float spawnZ = 0;
     public char key = 'e'; // tile color key
+    private int minTilesInCombo = 3;
     private GameObject parent;
 
     public Color color;
@@ -61,34 +63,45 @@ public class HexCell : MonoBehaviour
         return this;
     }
 
-    public void isIn3ComboAnywhere(System.Action<HexCell, HexCell, HexCell> callback)
+    public void setMinTilesInCombo(int minimum)
     {
-        for (var direction = 0; direction < 5; direction++)
+        this.minTilesInCombo = minimum;
+    }
+
+
+    public void isInCombo(System.Action<List<HexCell>> callback)
+    {
+        bool hasAtLeastOneCombo = false;
+        List<HexCell> ComboList = new List<HexCell>(15); // To reduce array-doubling
+        for (var direction = 0; direction < 3; direction++)
         {
             HexDirection hexDirection = (HexDirection) direction;
-            HexCell neighbor = this.GetNeighbor(hexDirection);
-
-            if (this.isSameColorAs(neighbor))
+            HexDirection oppositeDirection = hexDirection.Opposite();
+            CollectSameColorNeighbors(this.GetNeighbor(hexDirection), hexDirection, ComboList);
+            CollectSameColorNeighbors(this.GetNeighbor(oppositeDirection), oppositeDirection, ComboList);
+            if (ComboList.Count >= minTilesInCombo - 1)
             {
-                // check if at tail. 
-                HexCell outer = neighbor.GetNeighbor(hexDirection);
-                if (this.isSameColorAs(outer))
+                if (!hasAtLeastOneCombo) // Stops "this" from being in callback() twice
                 {
-                    callback(this, neighbor, outer);
-                    break;
+                    ComboList.Add(this);
+                    hasAtLeastOneCombo = true;
                 }
-                
-                // check if in middle
-                if (direction < 3) { // Removes redundancy
-                    HexCell oppositeNeighbor = this.GetNeighbor(hexDirection.Opposite());
-                    if (this.isSameColorAs(oppositeNeighbor))
-                    {
-                        callback(this, neighbor, oppositeNeighbor);
-                        break;
-                    }
-                }
+                callback(ComboList);
             }
+
+            ComboList.Clear();
         }
+    }
+
+    public void CollectSameColorNeighbors(HexCell neighbor, HexDirection hexDirection, List<HexCell> list)
+    {
+        if (neighbor && this.isSameColorAs(neighbor))
+        {
+            list.Add(neighbor);
+            CollectSameColorNeighbors(neighbor.GetNeighbor(hexDirection), hexDirection, list);
+        }
+
+        return;
     }
 
     public bool isSameColorAs(HexCell cell)
@@ -106,7 +119,7 @@ public class HexCell : MonoBehaviour
     {
         if (this.model == null)
         {
-            Debug.LogError("Error: Model not set");
+            Debug.LogWarning("Error: hexCell model not set. Not a big deal.");
         }
 
         return this.model;

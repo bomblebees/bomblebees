@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
-using Photon.Pun;
 
 public class Player : MonoBehaviour
 {
@@ -29,7 +28,6 @@ public class Player : MonoBehaviour
     void Update()
     {
         ApplyMovement();
-        // ApplyGravity(); // Disabled, player clips on destroyed hex nodes
         ListenForSwapping();
     }
 
@@ -72,19 +70,18 @@ public class Player : MonoBehaviour
     // Listens for key press and swaps the tile beneath the player
     void ListenForSwapping()
     {
-        // If space key is pressed
         if (Input.GetKeyDown("space"))
         {
             RaycastHit hit;
+            Debug.Log("press space");
             
-            // Check the tile directly under the player
-            if ((Physics.Raycast(transform.position, Vector3.down, out hit, 10f, 1 << LayerMask.NameToLayer("BaseTiles")) ))
+            if ((Physics.Raycast(this.gameObject.transform.position, Vector3.down, out hit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")) ))
             {
+                Debug.Log("hit");
                 GameObject modelHit = hit.transform.gameObject;
-                // Debug.Log("found color: " +(modelHit.GetComponentInParent<HexCell>().getKey()));
                 HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
-                this.heldKey = hexGrid.SwapHex(modelHit, this.heldKey); // A coroutine because input activates quickly.
-                hexCell.isIn3ComboAnywhere(hexGrid.RegenerateTiles);
+                this.heldKey = hexGrid.SwapHex(modelHit, this.heldKey); 
+                hexCell.isInCombo(hexGrid.ComboCallback);
 
                 // Set UI to new held tile
                 testHeldKeyUI.GetComponent<HeldKey>().setText(this.heldKey);
