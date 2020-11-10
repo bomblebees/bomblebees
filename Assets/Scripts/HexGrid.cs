@@ -16,7 +16,6 @@ using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
-    public Text testHeldKeyUI;
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
     public GameObject r_Hex;
@@ -26,7 +25,6 @@ public class HexGrid : MonoBehaviour
     public GameObject default_Hex;
     public bool enableCoords = false;
     public bool enableRandomGen = false;
-    public char heldKey = 'r';
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -123,17 +121,6 @@ public class HexGrid : MonoBehaviour
         hexMesh.Triangulate(cells);
     }
 
-    private void Update()
-    {
-        if (
-            Input.GetMouseButtonDown(0) &&
-            !EventSystem.current.IsPointerOverGameObject()
-        )
-        {
-            HandleInput();
-        }
-    }
-
     //
     // CreateCell: Creates a cell at the given x & z (where x is the 
     //     vertical axis. z is the horizontal axis. These are NOT
@@ -193,25 +180,7 @@ public class HexGrid : MonoBehaviour
         return cell;
     }
 
-    void HandleInput()
-    {
-        Ray inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        int tilesLayerMask = 8;
-
-        // TODO change distance
-        if ((Physics.Raycast(inputRay, out hit, 500f, 1 << LayerMask.NameToLayer("BaseTiles")) ))
-        {
-            GameObject modelHit = hit.transform.gameObject;
-            Debug.Log("found color: " +(modelHit.GetComponentInParent<HexCell>().getKey()));
-            HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
-            SwapHex(modelHit); // A coroutine because mouse activates quickly.
-
-            hexCell.isIn3ComboAnywhere(RegenerateTiles);
-        }
-    }
-
-    void RegenerateTiles(HexCell tile1, HexCell tile2, HexCell tile3)
+    public void RegenerateTiles(HexCell tile1, HexCell tile2, HexCell tile3)
     {
         if(tile1.getModel() != null) Destroy(tile1.getModel());
         if(tile2.getModel() != null) Destroy(tile2.getModel());
@@ -224,17 +193,19 @@ public class HexGrid : MonoBehaviour
         Debug.Log("Hi this is a test function");
     }
 
-    void SwapHex(GameObject modelHit)
+    /*  Swaps the given hex with a new hex of key heldKey
+        @param modelHit - the hex tile we want to swap
+        @param heldKey - the color key we want the hex to be
+        @return char - the original color key of the hex before swapping occurs
+    */
+    public char SwapHex(GameObject modelHit, char heldKey)
     {
         Debug.Log("swapped");
             char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
             HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
             Destroy(modelHit , 0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
             parent.createModel(this.returnModelByCellKey(heldKey));
-            parent.setKey(this.heldKey);
-            this.heldKey = tempKey;
-            
-            // temp test stuff
-            testHeldKeyUI.GetComponent<HeldKey>().setText();
+            parent.setKey(heldKey);
+            return(tempKey);
     }
 }

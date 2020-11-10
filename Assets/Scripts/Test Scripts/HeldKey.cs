@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class HeldKey : MonoBehaviour
 {
-    public void setText()
+    public void setText(char newKey)
     {
-        this.gameObject.GetComponent<Text>().text = FindObjectOfType<HexGrid>().heldKey.ToString();
+        this.gameObject.GetComponent<Text>().text = newKey.ToString();
     }
 
 }
