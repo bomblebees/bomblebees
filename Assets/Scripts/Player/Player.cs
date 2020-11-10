@@ -14,13 +14,8 @@ public class Player : MonoBehaviour
     public float movementSpeed = 50;
     public float turnSmoothness = 1f;
     float turnSmoothVelocity;
-    private Vector3 gravityVector = new Vector3(0f, -0.1f, 0f);  // currently not used
-
 
     public bool useArrowKeys = false;
-
-    private PhotonView PV;
-    public bool forOfflineTesting = false;
 
     public HexGrid hexGrid;
     public Text testHeldKeyUI;
@@ -28,36 +23,14 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        PV = GetComponent<PhotonView>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!forOfflineTesting)
-        {
-            if (PV.IsMine)
-            {
-                UpdateLoop();
-            }
-        }
-        else 
-                UpdateLoop();
-    }
-
-    void UpdateLoop()
-    {
         ApplyMovement();
         // ApplyGravity(); // Disabled, player clips on destroyed hex nodes
         ListenForSwapping();
-    }
-
-    // Apply gravity to the player
-    void ApplyGravity()
-    {
-        if (!controller.isGrounded){
-            controller.Move(gravityVector);
-        }
     }
 
     // Apply movement to the player, using WASD or Arrow keys
