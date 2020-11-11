@@ -9,8 +9,8 @@ public class HexCell : MonoBehaviour
     public float spawnX = 0;
     public float spawnZ = 0;
     public char key = 'e'; // tile color key
-    private int minTilesInCombo = 3;
     private GameObject parent;
+    public bool isGlowing = false; // Im thinking we connect the glowing by finding samecolorneighbors in each dir
 
     public Color color;
     [SerializeField] HexCell[] neighbors;
@@ -63,13 +63,7 @@ public class HexCell : MonoBehaviour
         return this;
     }
 
-    public void setMinTilesInCombo(int minimum)
-    {
-        this.minTilesInCombo = minimum;
-    }
-
-
-    public void isInCombo(System.Action<List<HexCell>> callback)
+    public bool FindCombos(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
         bool hasAtLeastOneCombo = false;
         List<HexCell> ComboList = new List<HexCell>(15); // To reduce array-doubling
@@ -86,11 +80,14 @@ public class HexCell : MonoBehaviour
                     ComboList.Add(this);
                     hasAtLeastOneCombo = true;
                 }
+
                 callback(ComboList);
             }
 
             ComboList.Clear();
         }
+
+        return hasAtLeastOneCombo;
     }
 
     public void CollectSameColorNeighbors(HexCell neighbor, HexDirection hexDirection, List<HexCell> list)
@@ -123,5 +120,51 @@ public class HexCell : MonoBehaviour
         }
 
         return this.model;
+    }
+
+    public void setGlow(bool val)
+    {
+        this.isGlowing = val;
+        Behaviour halo =(Behaviour)this.getModel().GetComponent ("Halo");
+        if (halo)
+        halo.enabled = val;
+    }
+
+    // Im thinking whenever the glow goes changes, recalculate for its neighbors too
+
+    public bool getGlow()
+    {
+        return this.isGlowing;
+    }
+
+    public bool isEmpty()
+    {
+        return key == 'e';
+    }
+
+    // public void RecalculateGlowForSelf(int minTilesInCombo)
+    // {
+    //     // findcombo for self
+    //     // find combos for every neighbor up to minCombo
+    //     RecalculateGlowForNeighbors(2, minTilesInCombo);
+    // }
+
+    public void RecalculateGlowForNeighbors(
+        System.Action<List<HexCell>> callback, int tileCountFromStarter, int minTilesInCombo, int minTilesForGlow)
+    {
+        if (tileCountFromStarter >= minTilesInCombo + minTilesForGlow) return; // Don't check for tiles that would have
+        // been popped by a combo.
+        this.setGlow(false);
+        this.FindCombos(callback, minTilesForGlow);
+        for (var direction = 0; direction < 6; direction++)
+        {
+            HexDirection hexDirection = (HexDirection) direction;
+            HexCell neighbor = this.GetNeighbor(hexDirection);
+            if (neighbor)
+            {
+                RecalculateGlowForNeighbors(
+                    callback, tileCountFromStarter + 1, minTilesInCombo, minTilesForGlow);
+            }
+        }
     }
 }

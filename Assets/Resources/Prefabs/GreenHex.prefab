@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6188526753282956257}
   - component: {fileID: 8216508569558609707}
   - component: {fileID: 2568690489547453800}
+  - component: {fileID: 4201427026187774540}
   m_Layer: 8
   m_Name: GreenHex
   m_TagString: BaseTile
@@ -94,3 +95,15 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 6099800089077584851, guid: e931c1c0417776542aac00d7edc28bff, type: 3}
+--- !u!122 &4201427026187774540
+Halo:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7567766404054765310}
+  m_Enabled: 0
+  m_Color:
+    serializedVersion: 2
+    rgba: 4286611584
+  m_Size: 8

@@ -84,8 +84,14 @@ public class Player : NetworkBehaviour
                 Debug.Log("hit");
                 GameObject modelHit = hit.transform.gameObject;
                 HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
-                this.heldKey = hexGrid.SwapHex(modelHit, this.heldKey); 
-                hexCell.isInCombo(hexGrid.ComboCallback);
+                this.heldKey = hexGrid.SwapHexAndKey(modelHit, this.heldKey);
+                if (hexCell.FindCombos(hexGrid.ComboCallback, hexGrid.GetMinTilesInCombo()) == true)
+                    // todo change key of these tiles
+                {
+                    hexGrid.ScanListForGlow();
+                }
+                else
+                hexGrid.RecalculateGlowForNonCombo(hexCell);
 
                 // Set UI to new held tile
                 testHeldKeyUI.GetComponent<HeldKey>().setText(this.heldKey);
