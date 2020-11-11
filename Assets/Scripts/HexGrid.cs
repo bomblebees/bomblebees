@@ -1,11 +1,7 @@
-﻿// Possible Optimizations:
-//     - Delete empty cells (requires more edge cases in the
-//       Neighbor-finding methods)
-//
-// TODO:
-//     - return level array by ref, when using level.getArray()
-//     - When raycast collides with tile model, get the parent hexcell object,
-//       have it delete the model, and then do createModel by passing in the key in the held slot, and take that key into nlot
+﻿// Performance Optimization Possibilities (POP):
+//     @0 Double check everything passes by ref
+//     @1 Instead of scanning whole grid, scan the tiles adjacent to each
+//         popped tile up to minTilesToCombo per direction.
 
 using System;
 using System.Collections;
@@ -24,11 +20,11 @@ public class HexGrid : MonoBehaviour
     public GameObject b_Hex;
     public GameObject y_Hex;
     public GameObject default_Hex;
-    [SerializeField]
-    public int minTilesInCombo = 3;
+    [SerializeField] public int minTilesInCombo = 3;
+    [SerializeField] public int minTilesForGlow = 2;
     public bool enableCoords = false;
     public bool enableRandomGen = false;
-    private List<HexCell> hexCellList = new List<HexCell>();
+    private List<HexCell> gridList = new List<HexCell>();
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -41,16 +37,17 @@ public class HexGrid : MonoBehaviour
 
     void Awake()
     {
-        checkErrors();
-        getGridDimensions();
+        CheckErrors();
+        GetGridDimensions();
 
         this.gridCanvas = GetComponentInChildren<Canvas>();
         this.hexMesh = GetComponentInChildren<HexMesh>();
 
-        generateHexGrid();
+        GenerateHexGrid();
+        ScanListForGlow(gridList);
     }
 
-    void checkErrors()
+    void CheckErrors()
     {
         if (level == null
             || cellPrefab == null
@@ -62,10 +59,15 @@ public class HexGrid : MonoBehaviour
 
         if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null)
             Debug.LogError("Error: a Hex is not assigned.");
+
+        if (minTilesForGlow >= minTilesInCombo)
+        {
+            Debug.LogError("minTilesForGlow is >= to minTilesInCombo");
+        }
     }
 
     // getGridDimensions: used once at the start of the level
-    void getGridDimensions()
+    void GetGridDimensions()
     {
         // If random generation is enabled, use its width/height instead
         if (enableRandomGen)
@@ -82,7 +84,7 @@ public class HexGrid : MonoBehaviour
         cells = new HexCell[height * width];
     }
 
-    void generateHexGrid()
+    void GenerateHexGrid()
     {
         char[,] testLevel = level.getArray();
 
@@ -96,26 +98,57 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                hexCellList.Add(CreateCell(
+                gridList.Add(
+                    CreateCell(
                         x,
                         z,
                         i,
                         testLevel[z, x]
-                ));
+                    ));
                 i++;
             }
         }
     }
 
-    private void scanListForGlow()
+    // ScanListForGlow: Iterate through each tile in the list, checking whether they're
+    //     in a combo with a given minimum, and performing a callback on them.
+    public void ScanListForGlow(List<HexCell> list)
     {
-        foreach (HexCell cell in hexCellList)
+        foreach (HexCell cell in list) cell.setGlow(false);
+        foreach (HexCell cell in list)
         {
-            // Collect
+            if (cell.getGlow() == true) continue;
+            FindGlowCombos(cell);  // TODO Double check this is being passed by reference
+        }
+    }
+    
+    public void ScanListForGlow()
+    {
+        foreach (HexCell cell in gridList) cell.setGlow(false);
+        foreach (HexCell cell in gridList)
+        {
+            if (cell.getGlow() == true) continue;
+            FindGlowCombos(cell);
         }
     }
 
-    GameObject returnModelByCellKey(char key)
+    private void SetListToGlow(List<HexCell> list)
+    {
+        foreach (HexCell cell in list)
+        {
+            cell.setGlow(true);
+        }
+    }
+
+    private void UnSetListToGlow(List<HexCell> list)
+    {
+        foreach (HexCell cell in list)
+        {
+            cell.setGlow(false);
+        }
+    }
+
+    GameObject ReturnModelByCellKey(char key)
     {
         switch (key)
         {
@@ -160,7 +193,7 @@ public class HexGrid : MonoBehaviour
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.createModel(returnModelByCellKey(key));
+        cell.createModel(ReturnModelByCellKey(key));
         cell.setKey(key);
 
         if (x > 0) // Skips first vertical axis
@@ -199,10 +232,15 @@ public class HexGrid : MonoBehaviour
 
     public void ComboCallback(List<HexCell> list)
     {
-        foreach (HexCell hexCell in list)
+        foreach (HexCell cell in list)
         {
-            Destroy(hexCell.getModel());
+            Destroy(cell.getModel());
+            cell.setKey('e');  // Temp, remove when tile regeneration is implemented
+            cell.setGlow(false);
         }
+
+        ScanListForGlow(list);  // @1: instead of scanning whole grid, scan the tiles adjacent to each
+                                //     popped tile up to minTilesToCombo per direction.
     }
 
     /*  Swaps the given hex with a new hex of key heldKey
@@ -210,20 +248,60 @@ public class HexGrid : MonoBehaviour
         @param heldKey - the color key we want the hex to be
         @return char - the original color key of the hex before swapping occurs
     */
-    public char SwapHex(GameObject modelHit, char heldKey)
+    public char SwapHexAndKey(GameObject modelHit, char heldKey)
     {
         Debug.Log("swapped");
         char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
         HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
         Destroy(modelHit,
             0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
-        parent.createModel(this.returnModelByCellKey(heldKey));
+        parent.createModel(this.ReturnModelByCellKey(heldKey));
         parent.setKey(heldKey);
         return (tempKey);
     }
 
-    public int getMinTilesInCombo()
+    public int GetMinTilesInCombo()
     {
         return minTilesInCombo;
+    }
+
+    public int GetMinTilesForGlow()
+    {
+        return minTilesForGlow;
+    }
+
+    public bool FindGlowCombos(HexCell cell)
+    {
+        return cell.FindCombos(this.SetListToGlow, this.minTilesForGlow);
+    }
+
+    /* RecalculateGlowForNonCombo: Recalculates isGlowing for a newly-swapped cell and for other cells
+                                   in each direction, minTilesInCombo-times. This function 
+                                   is really just a slight performance optimization over
+                                   rescanning whole grid. */
+    public void RecalculateGlowForNonCombo(HexCell swappedCell)
+    {
+        swappedCell.setGlow(false);
+        FindGlowCombos(swappedCell);
+        for (var direction = 0; direction < 6; direction++)
+        {
+            HexDirection hexDirection = (HexDirection) direction;
+            HexCell neighbor = swappedCell.GetNeighbor(hexDirection);
+            if (neighbor)
+            {
+                RecalculateGlowInDirection(neighbor, hexDirection, 1);
+            }
+        }
+    }
+    
+    // RecalculateGlowInDirection: Recursive call for RecalculateGlowForNonCombo.
+    public void RecalculateGlowInDirection(HexCell cell, HexDirection direction, int count)
+    {
+        if (count >= this.minTilesInCombo) return;
+        
+        cell.setGlow(false);
+        FindGlowCombos(cell);
+        HexCell neighbor = cell.GetNeighbor(direction);
+        if (neighbor) RecalculateGlowInDirection(neighbor, direction, count+1);
     }
 }
