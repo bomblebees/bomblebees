@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
 
     public CharacterController controller;
@@ -34,6 +35,9 @@ public class Player : MonoBehaviour
     // Apply movement to the player, using WASD or Arrow keys
     void ApplyMovement()
     {
+        // Only local players can ApplyMovement() their local character
+        if (!isLocalPlayer){return;}
+        
         // By default, use WASD keys for input
         Vector3 direction = new Vector3(
             Input.GetAxisRaw("HorizontalPlayer1"),
