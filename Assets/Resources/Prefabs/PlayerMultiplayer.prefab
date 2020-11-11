@@ -34,6 +34,27 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
+--- !u!114 &-5681104624975275514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112577491399379812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daf0016c2191cd141b7512e281fd3f1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  controller: {fileID: 0}
+  movementSpeed: 50
+  turnSmoothness: 1
+  useArrowKeys: 0
+  hexGrid: {fileID: 0}
+  testHeldKeyUI: {fileID: 0}
+  heldKey: 103
 --- !u!1001 &7797907527661392832
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -101,7 +122,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8036243695569975047, guid: 4cd3f68eb93fbfa48963748841c2c1d2, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 4cd3f68eb93fbfa48963748841c2c1d2, type: 3}
 --- !u!1 &1112577491399379812 stripped
 GameObject:
