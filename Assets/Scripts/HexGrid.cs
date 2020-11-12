@@ -234,7 +234,7 @@ public class HexGrid : MonoBehaviour
     {
         foreach (HexCell cell in list)
         {
-            Destroy(cell.getModel());
+            if (cell.getModel()) Destroy(cell.getModel());
             cell.setKey('e');  // Temp, remove when tile regeneration is implemented
             cell.setGlow(false);
         }

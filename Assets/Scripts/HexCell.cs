@@ -125,9 +125,12 @@ public class HexCell : MonoBehaviour
     public void setGlow(bool val)
     {
         this.isGlowing = val;
-        Behaviour halo =(Behaviour)this.getModel().GetComponent ("Halo");
-        if (halo)
-        halo.enabled = val;
+        if (model)
+        {
+            Behaviour halo = (Behaviour) this.getModel().GetComponent("Halo");
+            if (halo)
+                halo.enabled = val;
+        }
     }
 
     // Im thinking whenever the glow goes changes, recalculate for its neighbors too
