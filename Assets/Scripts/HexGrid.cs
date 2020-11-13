@@ -236,10 +236,10 @@ public class HexGrid : MonoBehaviour
         {
             Destroy(cell.getModel());
             cell.setKey('e');  // Temp, remove when tile regeneration is implemented
-            cell.setGlow(false);
+            // cell.setGlow(false);
         }
 
-        ScanListForGlow(list);  // @1: instead of scanning whole grid, scan the tiles adjacent to each
+        // ScanListForGlow(list);  // @1: instead of scanning whole grid, scan the tiles adjacent to each
                                 //     popped tile up to minTilesToCombo per direction.
     }
 

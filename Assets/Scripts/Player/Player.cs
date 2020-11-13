@@ -85,7 +85,6 @@ public class Player : NetworkBehaviour
                 HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 this.heldKey = hexGrid.SwapHexAndKey(modelHit, this.heldKey);
                 if (hexCell.FindCombos(hexGrid.ComboCallback, hexGrid.GetMinTilesInCombo()) == true)
-                    // todo change key of these tiles
                 {
                     hexGrid.ScanListForGlow();
                 }

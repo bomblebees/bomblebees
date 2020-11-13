@@ -73,11 +73,10 @@ public class HexCell : MonoBehaviour
             HexDirection oppositeDirection = hexDirection.Opposite();
             CollectSameColorNeighbors(this.GetNeighbor(hexDirection), hexDirection, ComboList);
             CollectSameColorNeighbors(this.GetNeighbor(oppositeDirection), oppositeDirection, ComboList);
-            if (ComboList.Count >= minTilesInCombo - 1)
+            if (ComboList.Count >= minTilesInCombo - 1) // - 1 because of the this tile
             {
                 if (!hasAtLeastOneCombo) // Stops "this" from being in callback() twice
                 {
-                    ComboList.Add(this);
                     hasAtLeastOneCombo = true;
                 }
 
@@ -85,6 +84,12 @@ public class HexCell : MonoBehaviour
             }
 
             ComboList.Clear();
+        }
+        // Kill off this tilei
+        if (hasAtLeastOneCombo)
+        {
+            ComboList.Add(this);
+            callback(ComboList);
         }
 
         return hasAtLeastOneCombo;
@@ -125,9 +130,12 @@ public class HexCell : MonoBehaviour
     public void setGlow(bool val)
     {
         this.isGlowing = val;
-        Behaviour halo =(Behaviour)this.getModel().GetComponent ("Halo");
-        if (halo)
-        halo.enabled = val;
+        if (model)
+        {
+            Behaviour halo = (Behaviour) this.getModel().GetComponent("Halo");
+            if (halo)
+                halo.enabled = val;
+        }
     }
 
     // Im thinking whenever the glow goes changes, recalculate for its neighbors too
