@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+using NetworkBehaviour = Mirror.NetworkBehaviour;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
 
     public CharacterController controller;
@@ -32,7 +34,7 @@ public class Player : MonoBehaviour
     }
 
     // Apply movement to the player, using WASD or Arrow keys
-    void ApplyMovement()
+    protected virtual void ApplyMovement()
     {
 
         // By default, use WASD keys for input

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class LocalhostNetworkManager : NetworkManager
+public class CustomNetworkManager : NetworkManager
 {
-
+    
 }
