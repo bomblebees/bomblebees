@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         ApplyMovement();
         ListenForSwapping();
@@ -71,7 +71,7 @@ public class Player : NetworkBehaviour
     }
 
     // Listens for key press and swaps the tile beneath the player
-    void ListenForSwapping()
+    protected virtual void ListenForSwapping()
     {
         if (Input.GetKeyDown("space"))
         {
