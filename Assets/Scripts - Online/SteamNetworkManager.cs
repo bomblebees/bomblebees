@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class SteamworksNetworkManager : NetworkManager
+public class SteamNetworkManager : NetworkManager
 {
     
 }
