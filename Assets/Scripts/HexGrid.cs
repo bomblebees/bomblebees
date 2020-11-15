@@ -19,6 +19,8 @@ public class HexGrid : MonoBehaviour
     public GameObject g_Hex;
     public GameObject b_Hex;
     public GameObject y_Hex;
+    public GameObject p_Hex;
+    public GameObject w_Hex;
     public GameObject default_Hex;
     [SerializeField] public int minTilesInCombo = 3;
     [SerializeField] public int minTilesForGlow = 2;
@@ -148,7 +150,7 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    GameObject ReturnModelByCellKey(char key)
+    public GameObject ReturnModelByCellKey(char key)
     {
         switch (key)
         {
@@ -160,6 +162,10 @@ public class HexGrid : MonoBehaviour
                 return b_Hex;
             case 'y':
                 return y_Hex;
+            case 'p':
+                return p_Hex;
+            case 'w':
+                return w_Hex;
             default:
                 return default_Hex;
         }
@@ -257,6 +263,13 @@ public class HexGrid : MonoBehaviour
             0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
         parent.createModel(this.ReturnModelByCellKey(heldKey));
         parent.setKey(heldKey);
+        if (parent.FindCombos(this.ComboCallback, this.GetMinTilesInCombo()) == true)
+        {
+            this.ScanListForGlow();
+        } else
+        {
+            this.RecalculateGlowForNonCombo(parent);
+        }
         return (tempKey);
     }
 

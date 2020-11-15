@@ -48,6 +48,14 @@ public class HexCell : MonoBehaviour
         this.setModel(model);
     }
 
+    // Returns a reference to the model object that is created
+    public GameObject createModel(GameObject model, Vector3 position, Quaternion rotation, Transform parent)
+    {
+        model = Instantiate(model, position, rotation, parent);
+        this.setModel(model);
+        return model;
+    }
+
     public void setKey(char key)
     {
         this.key = key;

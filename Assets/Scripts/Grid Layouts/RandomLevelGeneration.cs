@@ -7,12 +7,14 @@ public class RandomLevelGeneration
     private int width = 19;
     private int height = 11;
 
+    private char[] tileTypes = { 'r', 'b', 'g', 'y', 'p', 'w' };
+
     void Awake() {
         generateArray();
     }
 
     public char[,] generateArray() {
-        char[] tileTypes = {'r','b','g','y'};
+        
         char[,] result = new char[height,width];
 
         for (int i = 0; i < height; i++) {
