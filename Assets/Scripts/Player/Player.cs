@@ -3,23 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
+using Castle.Components.DictionaryAdapter.Xml;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Rendering.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using NetworkBehaviour = Mirror.NetworkBehaviour;
 
 public class Player : NetworkBehaviour
 {
 
+    private HexGrid hexGrid;
+    private HexCell cellPrefab;
+    
     public CharacterController controller;
+    public bool useArrowKeys = false;
     public float movementSpeed = 50;
-    public float turnSmoothness = 1f;
+    public float turnSmoothness = 0.1f;
     float turnSmoothVelocity;
 
-    public bool useArrowKeys = false;
-
-    public HexGrid hexGrid;
-    public HexCell cellPrefab;
     public char heldKey = 'g';
 
     // Cache raycast refs for optimization
@@ -27,11 +31,12 @@ public class Player : NetworkBehaviour
     private RaycastHit tileHit;
 
     private GameObject heldHexModel;
-    public float swapDistance = 20;
+     float swapDistance = 15;
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
 
     private void Start()
     {
+        LinkAssets();
         UpdateHeldHex();
     }
 
@@ -44,6 +49,15 @@ public class Player : NetworkBehaviour
         // Debug ray for swapping
         Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
+    }
+
+    protected virtual void LinkAssets()
+    {
+        cellPrefab = Resources.Load<HexCell>(String.Concat("Prefabs/", HexMetrics.GetHexCellPrefabName()));  // The return type is enclosed by <>
+        if (!cellPrefab) Debug.LogError("Player.cs: No cellPrefab found.");
+
+        hexGrid = GameObject.FindGameObjectWithTag("HexGrid").GetComponent<HexGrid>();  // Make sure hexGrid is created before the player
+        if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
     protected virtual void UpdateHeldHex()

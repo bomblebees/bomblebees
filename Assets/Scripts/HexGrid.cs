@@ -15,13 +15,14 @@ public class HexGrid : MonoBehaviour
 {
     public HexCell cellPrefab;
     public Text cellLabelPrefab;
-    public GameObject r_Hex;
-    public GameObject g_Hex;
-    public GameObject b_Hex;
-    public GameObject y_Hex;
-    public GameObject p_Hex;
-    public GameObject w_Hex;
-    public GameObject default_Hex;
+    private string cellPrefabName = "Hex Cell Label";
+    public GameObject r_Hex; private string r_Hex_Name = "RedHex";
+    public GameObject g_Hex; private string g_Hex_Name = "GreenHex"; 
+    public GameObject b_Hex; private string b_Hex_Name = "BlueHex";
+    public GameObject y_Hex; private string y_Hex_Name = "YellowHex";
+    public GameObject p_Hex; private string p_Hex_Name = "PurpleHex";
+    public GameObject w_Hex; private string w_Hex_Name = "WhiteHex";
+    public GameObject default_Hex; private string default_Hex_Name = "EmptyHex";
     [SerializeField] public int minTilesInCombo = 3;
     [SerializeField] public int minTilesForGlow = 2;
     public bool enableCoords = false;
@@ -39,6 +40,7 @@ public class HexGrid : MonoBehaviour
 
     void Awake()
     {
+        LinkAssets();
         CheckErrors();
         GetGridDimensions();
 
@@ -49,18 +51,36 @@ public class HexGrid : MonoBehaviour
         ScanListForGlow(gridList);
     }
 
+    private void LinkAssets()
+    {
+        // cellPrefab = Resources.Load<HexCell>(String.Concat("Prefabs/", HexMetrics.GetHexCellPrefabName())); 
+        
+        
+        // r_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",r_Hex_Name));
+        // g_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",g_Hex_Name));
+        // b_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",b_Hex_Name));
+        // y_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",y_Hex_Name));
+        // p_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",p_Hex_Name));
+        // w_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",w_Hex_Name));
+        // default_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",default_Hex_Name));
+        
+        // Development
+        // cellLabelPrefab = Resources.Load<Text>(String.Concat("/Hexes/",cellPrefabName));
+    }
+
     void CheckErrors()
     {
         if (level == null
             || cellPrefab == null
-            || cellLabelPrefab == null
+            // || cellLabelPrefab == null
         )
         {
-            Debug.Log("hexArray not assigned");
+            Debug.Log("HexGrid.cs: A Hex Asset is not assigned");
         }
 
-        if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null)
-            Debug.LogError("Error: a Hex is not assigned.");
+        if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null || p_Hex == null
+        || w_Hex == null || default_Hex == null)
+            Debug.LogError("HexGrid.cs: a Hex is not assigned.");
 
         if (minTilesForGlow >= minTilesInCombo)
         {
@@ -260,14 +280,16 @@ public class HexGrid : MonoBehaviour
         char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
         HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
         Destroy(modelHit,
-            0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
+            0f); 
         parent.createModel(this.ReturnModelByCellKey(heldKey));
         parent.setKey(heldKey);
         if (parent.FindCombos(this.ComboCallback, this.GetMinTilesInCombo()) == true)
         {
+            // Unoptimized Scan TODO optimize it
             this.ScanListForGlow();
         } else
         {
+            // Optimized scan
             this.RecalculateGlowForNonCombo(parent);
         }
         return (tempKey);

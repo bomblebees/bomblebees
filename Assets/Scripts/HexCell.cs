@@ -71,6 +71,7 @@ public class HexCell : MonoBehaviour
         return this;
     }
 
+    // TODO: create a default callback that does nothing, or overload function to have 1 param
     public bool FindCombos(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
         bool hasAtLeastOneCombo = false;
@@ -158,29 +159,4 @@ public class HexCell : MonoBehaviour
         return key == 'e';
     }
 
-    // public void RecalculateGlowForSelf(int minTilesInCombo)
-    // {
-    //     // findcombo for self
-    //     // find combos for every neighbor up to minCombo
-    //     RecalculateGlowForNeighbors(2, minTilesInCombo);
-    // }
-
-    public void RecalculateGlowForNeighbors(
-        System.Action<List<HexCell>> callback, int tileCountFromStarter, int minTilesInCombo, int minTilesForGlow)
-    {
-        if (tileCountFromStarter >= minTilesInCombo + minTilesForGlow) return; // Don't check for tiles that would have
-        // been popped by a combo.
-        this.setGlow(false);
-        this.FindCombos(callback, minTilesForGlow);
-        for (var direction = 0; direction < 6; direction++)
-        {
-            HexDirection hexDirection = (HexDirection) direction;
-            HexCell neighbor = this.GetNeighbor(hexDirection);
-            if (neighbor)
-            {
-                RecalculateGlowForNeighbors(
-                    callback, tileCountFromStarter + 1, minTilesInCombo, minTilesForGlow);
-            }
-        }
-    }
 }
