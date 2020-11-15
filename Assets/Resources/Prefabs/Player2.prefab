@@ -69,10 +69,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfe3a0bc0a9cea44a5b4a663774ff57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   controller: {fileID: 620710787818647722}
-  speed: 50
+  movementSpeed: 50
   turnSmoothness: 0.1
   useArrowKeys: 1
+  hexGrid: {fileID: 0}
+  cellPrefab: {fileID: 0}
+  heldKey: 103
+  swapDistance: 15
+  heldHexScale: {x: 800, y: 800, z: 800}
 --- !u!1 &665283641121618222
 GameObject:
   m_ObjectHideFlags: 0

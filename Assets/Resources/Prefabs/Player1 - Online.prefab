@@ -53,9 +53,10 @@ MonoBehaviour:
   turnSmoothness: 0.1
   useArrowKeys: 0
   hexGrid: {fileID: 2016077839272539088, guid: 7d7f6de4667036944ab4771d29be25f1, type: 3}
-  testHeldKeyUI: {fileID: 5047065679278893866, guid: 372fc7fb7fce68e4d99630bc01537569,
-    type: 3}
+  cellPrefab: {fileID: 0}
   heldKey: 103
+  swapDistance: 15
+  heldHexScale: {x: 800, y: 800, z: 800}
 --- !u!1001 &9059697066047991541
 PrefabInstance:
   m_ObjectHideFlags: 0

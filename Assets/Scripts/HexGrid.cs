@@ -148,7 +148,7 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    GameObject ReturnModelByCellKey(char key)
+    public GameObject ReturnModelByCellKey(char key)
     {
         switch (key)
         {
@@ -257,6 +257,13 @@ public class HexGrid : MonoBehaviour
             0f); // TODO this doesn't update model to be null but i don't think it matters. Maybe create a HexCell.destroyModel()
         parent.createModel(this.ReturnModelByCellKey(heldKey));
         parent.setKey(heldKey);
+        if (parent.FindCombos(this.ComboCallback, this.GetMinTilesInCombo()) == true)
+        {
+            this.ScanListForGlow();
+        } else
+        {
+            this.RecalculateGlowForNonCombo(parent);
+        }
         return (tempKey);
     }
 
