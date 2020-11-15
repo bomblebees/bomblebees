@@ -19,6 +19,8 @@ public class HexGrid : MonoBehaviour
     public GameObject g_Hex;
     public GameObject b_Hex;
     public GameObject y_Hex;
+    public GameObject p_Hex;
+    public GameObject w_Hex;
     public GameObject default_Hex;
     [SerializeField] public int minTilesInCombo = 3;
     [SerializeField] public int minTilesForGlow = 2;
@@ -160,6 +162,10 @@ public class HexGrid : MonoBehaviour
                 return b_Hex;
             case 'y':
                 return y_Hex;
+            case 'p':
+                return p_Hex;
+            case 'w':
+                return w_Hex;
             default:
                 return default_Hex;
         }
