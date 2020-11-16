@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WhiteHighlight
+  m_Name: PurpleHighlight
   m_Shader: {fileID: -6465566751694194690, guid: 4baf340cb7bb4bf4ca45dc7081a5bc89,
     type: 3}
   m_ShaderKeywords: 
@@ -65,7 +65,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Boolean_11CD7E77: 0
     - Boolean_CC1856D2: 0
+    - Vector1_A0D05F1A: 2.5
     - Vector1_DC861F03: 0.2
     - Vector1_E2EAB420: 5
     - _AlphaClip: 0
@@ -94,8 +96,8 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_1410E0CE: {r: 0.78431374, g: 0.78039217, b: 0.78039217, a: 0}
-    - Color_2CB71714: {r: 1, g: 1, b: 1, a: 0}
+    - Color_1410E0CE: {r: 0.89411765, g: 0.45490196, b: 0.93333334, a: 0}
+    - Color_2CB71714: {r: 0.9447107, g: 0.3254717, b: 1, a: 0}
     - _BaseColor: {r: 0.9339623, g: 0.374466, b: 0.4566297, a: 1}
     - _Color: {r: 0.8, g: 0.24000001, b: 0.32000023, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
