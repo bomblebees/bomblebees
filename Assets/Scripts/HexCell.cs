@@ -12,8 +12,6 @@ public class HexCell : MonoBehaviour
     private GameObject parent;
     public bool isGlowing = false; // Im thinking we connect the glowing by finding samecolorneighbors in each dir
 
-    //public Material material; // this is new, used for highlight toggling - terence
-
     public Color color;
     [SerializeField] HexCell[] neighbors;
 
@@ -146,10 +144,10 @@ public class HexCell : MonoBehaviour
             if (halo)
                 halo.enabled = val;
 
-            // toggle highlight field on shader - terence
-                // Unfortunately, current shader is not instanced, so either all or no tiles get highlighted.
-                // Currently looking into ways to instance this, or 
-            //material.SetFloat("Boolean_CC1856D2", val ? 1.0f : 0.0f);
+            // toggles exposed field of shader appropriately
+                // apparently, this is not very efficient way to instance materials
+                // we should look into Material Property Blocks
+            this.getModel().GetComponent<Renderer>().material.SetFloat("Boolean_CC1856D2", val ? 1f : 0f);
         }
     }
 
