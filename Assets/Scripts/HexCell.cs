@@ -144,6 +144,11 @@ public class HexCell : MonoBehaviour
             Behaviour halo = (Behaviour) this.getModel().GetComponent("Halo");
             if (halo)
                 halo.enabled = val;
+
+            // toggles exposed field of shader appropriately
+                // apparently, this is not very efficient way to instance materials
+                // we should look into Material Property Blocks
+            this.getModel().GetComponent<Renderer>().material.SetFloat("Boolean_CC1856D2", val ? 1f : 0f);
         }
     }
 
