@@ -102,17 +102,15 @@ public class HexGrid : MonoBehaviour
 
     void GenerateHexGrid()
     {
-        char[,] gridArray = level.getArray();
-
         for (int z = 0, i = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
                 if (!enableRandomGen)
                 {
-                    this.gridList.Add(CreateCell(x, z, i, gridArray[z,x]));
+                    this.gridList.Add(CreateCell(x, z, i, level.getArray()[z,x]));
                     i++;
-                    break;
+                    continue;
                 }
 
                 List<char> listTileTypes = new List<char>(tileTypes);
