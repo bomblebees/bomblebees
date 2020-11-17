@@ -11,6 +11,7 @@ public class HexCell : MonoBehaviour
     public char key = 'e'; // tile color key
     private GameObject parent;
     public bool isGlowing = false; // Im thinking we connect the glowing by finding samecolorneighbors in each dir
+    public bool isSelected = false;
 
     public Color color;
     [SerializeField] HexCell[] neighbors;

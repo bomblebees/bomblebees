@@ -30,6 +30,7 @@ public class Player : NetworkBehaviour
     private Ray tileRay;
     private RaycastHit tileHit;
 
+    private GameObject selectedTile;
     private GameObject heldHexModel;
      float swapDistance = 15;
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
@@ -79,7 +80,7 @@ public class Player : NetworkBehaviour
 
         this.heldHexModel.gameObject.transform.localScale = heldHexScale;
     }
- 
+
     // Apply movement to the player, using WASD or Arrow keys
     protected virtual void ApplyMovement()
     {
@@ -127,7 +128,11 @@ public class Player : NetworkBehaviour
         {
             // Debug.Log("hit");
 
-            // TODO: Apply shader or some indicator to hex tile to show the tile selected
+            // Apply indicator to hex tile to show the tile selected
+            if (selectedTile)
+                selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+            selectedTile = tileHit.transform.gameObject;
+            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
 
             // When swap key is pressed, swap held tile with selected tile
             if (Input.GetKeyDown("space"))
