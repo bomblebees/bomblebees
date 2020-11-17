@@ -4,11 +4,8 @@
 //         popped tile up to minTilesToCombo per direction.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
@@ -32,11 +29,13 @@ public class HexGrid : MonoBehaviour
     HexCell[] cells;
     public Level1 level = new Level1();
     public RandomLevelGeneration randLevel = new RandomLevelGeneration();
-    private int width = 0;
-    private int height = 0;
+    public int width = 19;
+    public int height = 11;
 
     Canvas gridCanvas;
     HexMesh hexMesh;
+
+    private char[] tileTypes = { 'r', 'b', 'g', 'y', 'p', 'w' };
 
     void Awake()
     {
@@ -91,13 +90,8 @@ public class HexGrid : MonoBehaviour
     // getGridDimensions: used once at the start of the level
     void GetGridDimensions()
     {
-        // If random generation is enabled, use its width/height instead
-        if (enableRandomGen)
-        {
-            this.width = randLevel.getWidth();
-            this.height = randLevel.getHeight();
-        }
-        else
+        // Use preset level if random gen disabled
+        if (!enableRandomGen)
         {
             this.width = level.getWidth();
             this.height = level.getHeight();
@@ -108,25 +102,36 @@ public class HexGrid : MonoBehaviour
 
     void GenerateHexGrid()
     {
-        char[,] testLevel = level.getArray();
-
-        // If random generation is enabled, generate a random array
-        if (enableRandomGen)
-        {
-            testLevel = randLevel.generateArray();
-        }
-
         for (int z = 0, i = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
-                gridList.Add(
-                    CreateCell(
-                        x,
-                        z,
-                        i,
-                        testLevel[z, x]
-                    ));
+                if (!enableRandomGen)
+                {
+                    this.gridList.Add(CreateCell(x, z, i, level.getArray()[z,x]));
+                    i++;
+                    continue;
+                }
+
+                List<char> listTileTypes = new List<char>(tileTypes);
+                char randomType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
+                HexCell newCell = CreateCell(x, z, i, randomType);
+
+                // While a combo exists with this tile type, randomly generate a different tile type.
+                // Note: This could be further optimized by searching neighboring colors and directly
+                //       returning a random color NOT the same as those neighboring colors, this will
+                //       save time when running FindCombos() on each new cell, since there will be less
+                //       chance of combo being made. (Not sure how this will affect randomness of board)
+                while (newCell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
+                {
+                    newCell.deleteModel();
+                    // Remove the tile type from list and generate new tile type
+                    listTileTypes.Remove(randomType);
+                    randomType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
+                    newCell = CreateCell(x, z, i, randomType);
+                }
+   
+                this.gridList.Add(newCell);
                 i++;
             }
         }
