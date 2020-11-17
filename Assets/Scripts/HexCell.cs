@@ -55,6 +55,15 @@ public class HexCell : MonoBehaviour
         this.setModel(model);
         return model;
     }
+    public void deleteModel()
+    {
+        if (getModel())
+        {
+            Destroy(getModel(), 0f);
+        }
+        else
+            Debug.LogError("Deletion of model without model reference!");
+    }
 
     public void setKey(char key)
     {
@@ -71,7 +80,14 @@ public class HexCell : MonoBehaviour
         return this;
     }
 
-    // TODO: create a default callback that does nothing, or overload function to have 1 param
+    /* FindCombos(): Check for possible combos in neighboring cells
+    * [arg] callback - a function that is called when a combo is found, the 
+    *                  argument passed to it is a list of HexCells that make up a combo.
+    *                  
+    * [arg] minTilesInCombo - the minimum number of tiles (in a row) that makes up a combo
+    * returns 
+    * TODO: create a default callback that does nothing, or overload function to have 1 param
+    */
     public bool FindCombos(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
         bool hasAtLeastOneCombo = false;
