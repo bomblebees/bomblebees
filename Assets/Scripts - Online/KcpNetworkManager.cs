@@ -1,31 +1,26 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class KcpNetworkManager : NetworkManager
 {
-    public override void OnStartServer()
+    [Header("Custom Features")]
+    public GameObject _HexGrid;
+
+    private void Update()
     {
-        Debug.Log("server started.");
-        base.OnStartServer();
+        if (Input.GetKeyDown("1"))
+        {
+            SpawnHexGrid();
+        }
     }
 
-    public override void OnStopServer()
+    [Server]
+    void SpawnHexGrid()
     {
-        Debug.Log("server stopped.");
-        base.OnStopServer();
-    }
-
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        Debug.Log("connected to server.");
-        base.OnClientConnect(conn);
-    }
-
-    public override void OnClientDisconnect(NetworkConnection conn)
-    {
-        Debug.Log("disconnected from server.");
-        base.OnClientDisconnect(conn);
+        NetworkServer.Spawn(Instantiate(_HexGrid));
     }
 }

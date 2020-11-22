@@ -14,13 +14,9 @@ public class MainMenu_EventSystem : MonoBehaviour
     [SerializeField] private Button buttonInstantiateKcpNetworkManager = null;
     [SerializeField] private Button buttonInstantiateSteamNetworkManager = null;
     [SerializeField] private Button buttonInstantiateOfflineMode = null;
-    
-    private bool _activeNetworkManager;
 
     private void Start()
     {
-        _activeNetworkManager = false;
-        
         buttonInstantiateKcpNetworkManager.onClick.AddListener(() => InstantiateKcpNetworkManager());
         buttonInstantiateSteamNetworkManager.onClick.AddListener(() => InstantiateSteamNetworkManager());
         buttonInstantiateOfflineMode.onClick.AddListener(() => InstantiateOfflineMode());
@@ -28,37 +24,42 @@ public class MainMenu_EventSystem : MonoBehaviour
 
     private void InstantiateKcpNetworkManager()
     {
-        if (_activeNetworkManager is true)
-        {
-            return;
-        }
         Instantiate(kcpNetworkManager, new Vector3(0,0,0), Quaternion.identity);
-        _activeNetworkManager = true;
-        
-        GameObject.Find("Buttons").SetActive(false);
+
+        ToggleInstantiateKcpNetworkManagerButton();
+        ToggleInstantiateSteamNetworkManagerButton();
+        ToggleInstantiateOfflineModeButton();
     }
 
     private void InstantiateSteamNetworkManager()
     {
-        if (_activeNetworkManager is true)
-        {
-            return;
-        }
         Instantiate(steamNetworkManager, new Vector3(0, 0, 0), Quaternion.identity);
-        _activeNetworkManager = true;
         
-        GameObject.Find("Buttons").SetActive(false);
+        ToggleInstantiateKcpNetworkManagerButton();
+        ToggleInstantiateSteamNetworkManagerButton();
+        ToggleInstantiateOfflineModeButton();
     }
 
     private void InstantiateOfflineMode()
     {
-        if (_activeNetworkManager is true)
-        {
-            return;
-        }
         SceneManager.LoadScene("Level1");
-        _activeNetworkManager = true;
-        
-        GameObject.Find("Buttons").SetActive(false);
+    }
+    
+    private void ToggleInstantiateKcpNetworkManagerButton()
+    {
+        GameObject.Find("InstantiateKcpNetworkManagerButton")
+            .SetActive(!GameObject.Find("InstantiateKcpNetworkManagerButton").activeSelf);
+    }
+    
+    private void ToggleInstantiateSteamNetworkManagerButton()
+    {
+        GameObject.Find("InstantiateSteamNetworkManagerButton")
+            .SetActive(!GameObject.Find("InstantiateSteamNetworkManagerButton").activeSelf);
+    }
+    
+    private void ToggleInstantiateOfflineModeButton()
+    {
+        GameObject.Find("InstantiateOfflineModeButton")
+            .SetActive(!GameObject.Find("InstantiateOfflineModeButton").activeSelf);
     }
 }

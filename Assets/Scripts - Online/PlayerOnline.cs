@@ -14,35 +14,42 @@ public class PlayerOnline : Player
 {
    protected override void ApplyMovement()
    {
-      if (!isLocalPlayer){return;}
-
+      if (!isLocalPlayer)
+      {
+         return;
+      }
       base.ApplyMovement();
    }
 
    protected override void ListenForSwapping()
    {
+      if (!isLocalPlayer)
+      {
+         return;
+      }
+      base.ListenForSwapping();
    }
    
    protected override void Update()
    {
-      if (isLocalPlayer && Input.GetKeyDown("y"))
-      {
-         CmdYahallo();
-      }
       base.Update();
-   }
 
-   //test
-   [Command]
-   void CmdYahallo()
-   {
-      Debug.Log("Cmd: Yahallo");
-      RpcYahallo();
+      if (Input.GetKeyDown("2"))
+      { 
+         RpcLinkAssets();
+      }
    }
 
    [ClientRpc]
-   void RpcYahallo()
+   private void RpcListenForSwapping()
    {
-      Debug.Log("C Rpc: Yahallo");
+      base.ListenForSwapping();
+   }
+
+   [ClientRpc]
+   private void RpcLinkAssets()
+   {
+      LinkAssets();
+      UpdateHeldHex();
    }
 }
