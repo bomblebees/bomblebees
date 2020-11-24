@@ -4,6 +4,7 @@
 //         popped tile up to minTilesToCombo per direction.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,9 +23,11 @@ public class HexGrid : MonoBehaviour
     public GameObject default_Hex; private string default_Hex_Name = "EmptyHex";
     [SerializeField] public int minTilesInCombo = 3;
     [SerializeField] public int minTilesForGlow = 2;
+    private List<HexCell> gridList = new List<HexCell>();
+
     public bool enableCoords = false;
     public bool enableRandomGen = false;
-    private List<HexCell> gridList = new List<HexCell>();
+    public bool enableChainRegen = false;
 
     HexCell[] cells;
     public Level1 level = new Level1();
@@ -36,6 +39,8 @@ public class HexGrid : MonoBehaviour
     HexMesh hexMesh;
 
     private char[] tileTypes = { 'r', 'b', 'g', 'y', 'p', 'w' };
+    public float tileRegenDuration = 1.5f;
+    
 
     void Awake()
     {
@@ -113,27 +118,32 @@ public class HexGrid : MonoBehaviour
                     continue;
                 }
 
-                List<char> listTileTypes = new List<char>(tileTypes);
-                char randomType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
+                char randomType = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
                 HexCell newCell = CreateCell(x, z, i, randomType);
 
-                // While a combo exists with this tile type, randomly generate a different tile type.
-                // Note: This could be further optimized by searching neighboring colors and directly
-                //       returning a random color NOT the same as those neighboring colors, this will
-                //       save time when running FindCombos() on each new cell, since there will be less
-                //       chance of combo being made. (Not sure how this will affect randomness of board)
-                while (newCell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
-                {
-                    newCell.deleteModel();
-                    // Remove the tile type from list and generate new tile type
-                    listTileTypes.Remove(randomType);
-                    randomType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
-                    newCell = CreateCell(x, z, i, randomType);
-                }
+                MakeCellUnique(newCell);
    
                 this.gridList.Add(newCell);
                 i++;
             }
+        }
+    }
+
+    // MakeCellUnique: Updates a hex color to not generate a combo with its neighbors
+    void MakeCellUnique(HexCell cell)
+    {
+        List<char> listTileTypes = new List<char>(tileTypes);
+
+        // While a combo exists with this tile type, randomly generate a different tile type
+        while (cell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
+        {
+            cell.deleteModel();
+            // Remove the tile type from list and generate new tile type
+            listTileTypes.Remove(cell.getKey());
+
+            char newType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
+            cell.createModel(ReturnModelByCellKey(newType));
+            cell.setKey(newType);
         }
     }
 
@@ -261,12 +271,38 @@ public class HexGrid : MonoBehaviour
         return cell;
     }
 
+    IEnumerator RegenerateCell(HexCell cell)
+    {
+        Destroy(cell.getModel());
+        yield return new WaitForSeconds(tileRegenDuration);
+
+        char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+        cell.setKey(newKey);
+        cell.createModel(ReturnModelByCellKey(newKey));
+
+        // TODO: Add shader effects here for tile regen 
+
+        // If chain regeneration enabled, check for new combos
+        if (enableChainRegen)
+        {
+            if (cell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
+            {
+                // Wait one second, so combo not instantly executed
+                yield return new WaitForSeconds(1);
+                cell.FindCombos(ComboCallback, GetMinTilesInCombo());
+            }
+        } else
+        {
+            MakeCellUnique(cell);
+        }
+    }
+
     public void ComboCallback(List<HexCell> list)
     {
         foreach (HexCell cell in list)
         {
-            Destroy(cell.getModel());
-            cell.setKey('e');  // Temp, remove when tile regeneration is implemented
+            // Start a coroutine that regenerates the tile
+            StartCoroutine(RegenerateCell(cell));
             // cell.setGlow(false);
         }
 
