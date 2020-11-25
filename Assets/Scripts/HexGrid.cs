@@ -26,7 +26,12 @@ public class HexGrid : MonoBehaviour
     private List<HexCell> gridList = new List<HexCell>();
 
     public bool enableCoords = false;
+
+    // Whether the map will generate randomly on start
     public bool enableRandomGen = false;
+
+    // If enabled: regenerated tiles can (by random chance) form its own combos.
+    // If disabled: regenerated tiles will never form combos with its neighbors
     public bool enableChainRegen = false;
 
     HexCell[] cells;
@@ -273,6 +278,11 @@ public class HexGrid : MonoBehaviour
 
     IEnumerator RegenerateCell(HexCell cell)
     {
+        if (cell.getKey() == 'e')
+        {
+            yield break;
+        }
+        cell.setKey('e');
         Destroy(cell.getModel());
         yield return new WaitForSeconds(tileRegenDuration);
 
