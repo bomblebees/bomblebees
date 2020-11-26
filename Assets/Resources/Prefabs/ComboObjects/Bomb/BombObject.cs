@@ -7,7 +7,7 @@ public class BombObject : MonoBehaviour
 {
     public float tickDuration = 2f;
 
-    private void Awake()
+    private void Start()
     {
         StartCoroutine(TickDown());
     }

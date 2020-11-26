@@ -27,7 +27,7 @@ public class HexCell : MonoBehaviour
         cell.neighbors[(int) direction.Opposite()] = this;
     }
 
-    public void setSpawnCoords(int x, int z)
+    public void SetSpawnCoords(int x, int z)
     {
         spawnX = x;
         spawnZ = z;
@@ -43,40 +43,40 @@ public class HexCell : MonoBehaviour
         return spawnZ;
     }
 
-    public void createModel(GameObject model)
+    public void CreateModel(GameObject model)
     {
         model = Instantiate(model, this.gameObject.transform);
-        this.setModel(model);
+        this.SetModel(model);
     }
 
     // Returns a reference to the model object that is created
-    public GameObject createModel(GameObject model, Vector3 position, Quaternion rotation, Transform parent)
+    public GameObject CreateModel(GameObject model, Vector3 position, Quaternion rotation, Transform parent)
     {
         model = Instantiate(model, position, rotation, parent);
-        this.setModel(model);
+        this.SetModel(model);
         return model;
     }
-    public void deleteModel()
+    public void DeleteModel()
     {
-        if (getModel())
+        if (GetModel())
         {
-            Destroy(getModel(), 0f);
+            Destroy(GetModel(), 0f);
         }
         else
             Debug.LogError("Deletion of model without model reference!");
     }
 
-    public void setKey(char key)
+    public void SetKey(char key)
     {
         this.key = key;
     }
 
-    public char getKey()
+    public char GetKey()
     {
         return this.key;
     }
 
-    public HexCell getThis()
+    public HexCell GetThis()
     {
         return this;
     }
@@ -92,7 +92,7 @@ public class HexCell : MonoBehaviour
     public bool FindCombos(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
         // No combos can be found when its empty
-        if (this.getKey() == 'e') return false;
+        if (this.GetKey() == 'e') return false;
 
         bool hasAtLeastOneCombo = false;
         List<HexCell> ComboList = new List<HexCell>(15); // To reduce array-doubling
@@ -126,7 +126,7 @@ public class HexCell : MonoBehaviour
 
     public void CollectSameColorNeighbors(HexCell neighbor, HexDirection hexDirection, List<HexCell> list)
     {
-        if (neighbor && this.isSameColorAs(neighbor))
+        if (neighbor && this.IsSameColorAs(neighbor))
         {
             list.Add(neighbor);
             CollectSameColorNeighbors(neighbor.GetNeighbor(hexDirection), hexDirection, list);
@@ -135,18 +135,18 @@ public class HexCell : MonoBehaviour
         return;
     }
 
-    public bool isSameColorAs(HexCell cell)
+    public bool IsSameColorAs(HexCell cell)
     {
         if (cell == null) return false;
-        return this.key == cell.getKey();
+        return this.key == cell.GetKey();
     }
 
-    public void setModel(GameObject model)
+    public void SetModel(GameObject model)
     {
         this.model = model;
     }
 
-    public GameObject getModel()
+    public GameObject GetModel()
     {
         if (this.model == null)
         {
@@ -156,30 +156,30 @@ public class HexCell : MonoBehaviour
         return this.model;
     }
 
-    public void setGlow(bool val)
+    public void SetGlow(bool val)
     {
         this.isGlowing = val;
         if (model)
         {
-            Behaviour halo = (Behaviour) this.getModel().GetComponent("Halo");
+            Behaviour halo = (Behaviour) this.GetModel().GetComponent("Halo");
             if (halo)
                 halo.enabled = val;
 
             // toggles exposed field of shader appropriately
                 // apparently, this is not very efficient way to instance materials
                 // we should look into Material Property Blocks
-            this.getModel().GetComponent<Renderer>().material.SetFloat("Boolean_CC1856D2", val ? 1f : 0f);
+            this.GetModel().GetComponent<Renderer>().material.SetFloat("Boolean_CC1856D2", val ? 1f : 0f);
         }
     }
 
     // Im thinking whenever the glow goes changes, recalculate for its neighbors too
 
-    public bool getGlow()
+    public bool GetGlow()
     {
         return this.isGlowing;
     }
 
-    public bool isEmpty()
+    public bool IsEmpty()
     {
         return key == 'e';
     }

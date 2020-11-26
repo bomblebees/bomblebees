@@ -124,13 +124,13 @@ public class HexGrid : MonoBehaviour
         // While a combo exists with this tile type, randomly generate a different tile type
         while (cell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
         {
-            cell.deleteModel();
+            cell.DeleteModel();
             // Remove the tile type from list and generate new tile type
-            listTileTypes.Remove(cell.getKey());
+            listTileTypes.Remove(cell.GetKey());
 
             char newType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
-            cell.createModel(ReturnModelByCellKey(newType));
-            cell.setKey(newType);
+            cell.CreateModel(ReturnModelByCellKey(newType));
+            cell.SetKey(newType);
         }
     }
 
@@ -138,20 +138,20 @@ public class HexGrid : MonoBehaviour
     //     in a combo with a given minimum, and performing a callback on them.
     public void ScanListForGlow(List<HexCell> list)
     {
-        foreach (HexCell cell in list) cell.setGlow(false);
+        foreach (HexCell cell in list) cell.SetGlow(false);
         foreach (HexCell cell in list)
         {
-            if (cell.getGlow() == true) continue;
+            if (cell.GetGlow() == true) continue;
             FindGlowCombos(cell);  // TODO Double check this is being passed by reference
         }
     }
     
     public void ScanListForGlow()
     {
-        foreach (HexCell cell in gridList) cell.setGlow(false);
+        foreach (HexCell cell in gridList) cell.SetGlow(false);
         foreach (HexCell cell in gridList)
         {
-            if (cell.getGlow() == true) continue;
+            if (cell.GetGlow() == true) continue;
             FindGlowCombos(cell);
         }
     }
@@ -160,7 +160,7 @@ public class HexGrid : MonoBehaviour
     {
         foreach (HexCell cell in list)
         {
-            cell.setGlow(true);
+            cell.SetGlow(true);
         }
     }
 
@@ -168,7 +168,7 @@ public class HexGrid : MonoBehaviour
     {
         foreach (HexCell cell in list)
         {
-            cell.setGlow(false);
+            cell.SetGlow(false);
         }
     }
 
@@ -217,12 +217,12 @@ public class HexGrid : MonoBehaviour
         position.z = z * (HexMetrics.outerRadius * 1.5f);
 
         HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
-        cell.setSpawnCoords(x, z);
+        cell.SetSpawnCoords(x, z);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.createModel(ReturnModelByCellKey(key));
-        cell.setKey(key);
+        cell.CreateModel(ReturnModelByCellKey(key));
+        cell.SetKey(key);
 
         if (x > 0) // Skips first vertical axis
         {
@@ -260,17 +260,17 @@ public class HexGrid : MonoBehaviour
 
     IEnumerator RegenerateCell(HexCell cell)
     {
-        if (cell.getKey() == 'e')
+        if (cell.GetKey() == 'e')
         {
             yield break;
         }
-        cell.setKey('e');
-        Destroy(cell.getModel());
+        cell.SetKey('e');
+        Destroy(cell.GetModel());
         yield return new WaitForSeconds(tileRegenDuration);
 
         char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-        cell.setKey(newKey);
-        cell.createModel(ReturnModelByCellKey(newKey));
+        cell.SetKey(newKey);
+        cell.CreateModel(ReturnModelByCellKey(newKey));
 
         // TODO: Add shader effects here for tile regen 
 
@@ -289,10 +289,52 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    GameObject SpawnComboObjByKey(char key, Transform spawnCoords)
+    {
+        var bombObjPath = Resources.Load("Prefabs/ComboObjects/Bomb/Bomb Object");
+        var laserObjPath = Resources.Load("Prefabs/ComboObjects/Laser/Laser Object");
+        Vector3 offset = new Vector3(0f, 2f, 0f);
+        GameObject result;
+        switch (key)
+        {
+            case 'b':
+                Debug.Log("Blue");
+                result = (GameObject) Instantiate(laserObjPath, spawnCoords);
+                result.GetComponent<LaserObject>().SetDirection(HexDirection.SW);
+                break;
+            case 'g':
+                result = (GameObject) Instantiate(laserObjPath, spawnCoords);
+                result.GetComponent<LaserObject>().SetDirection(HexDirection.W);
+                break;
+            case 'y':
+                result = (GameObject) Instantiate(laserObjPath, spawnCoords);
+                result.GetComponent<LaserObject>().SetDirection(HexDirection.SE);
+                break;
+            case 'r':
+                result = (GameObject) Instantiate(bombObjPath, spawnCoords);
+                break;
+            case 'p':
+                result = (GameObject) Instantiate(bombObjPath, spawnCoords);
+                break;
+            case 'w':
+                result = (GameObject) Instantiate(bombObjPath, spawnCoords);
+                break;
+            default:
+                result = (GameObject) Instantiate(bombObjPath, spawnCoords);
+                break;
+        }
+
+        result.transform.localPosition += offset;
+        return result;
+    }
+
     public void ComboCallback(List<HexCell> list)
     {
         foreach (HexCell cell in list)
         {
+            var ComboObj = SpawnComboObjByKey(cell.GetKey(), cell.transform);
+            Debug.Log("count");
+            // SpawnComboObj(cell.transform, comboObject);
             // Start a coroutine that regenerates the tile
             StartCoroutine(RegenerateCell(cell));
             // cell.setGlow(false);
@@ -310,12 +352,12 @@ public class HexGrid : MonoBehaviour
     public char SwapHexAndKey(GameObject modelHit, char heldKey)
     {
         Debug.Log("swapped");
-        char tempKey = modelHit.GetComponentInParent<HexCell>().getKey();
-        HexCell parent = modelHit.GetComponentInParent<HexCell>().getThis(); // The parent of the model
+        char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+        HexCell parent = modelHit.GetComponentInParent<HexCell>().GetThis(); // The parent of the model
         Destroy(modelHit,
             0f); 
-        parent.createModel(this.ReturnModelByCellKey(heldKey));
-        parent.setKey(heldKey);
+        parent.CreateModel(this.ReturnModelByCellKey(heldKey));
+        parent.SetKey(heldKey);
         if (parent.FindCombos(this.ComboCallback, this.GetMinTilesInCombo()) == true)
         {
             // Unoptimized Scan TODO optimize it
@@ -349,7 +391,7 @@ public class HexGrid : MonoBehaviour
                                    rescanning whole grid. */
     public void RecalculateGlowForNonCombo(HexCell swappedCell)
     {
-        swappedCell.setGlow(false);
+        swappedCell.SetGlow(false);
         FindGlowCombos(swappedCell);
         for (var direction = 0; direction < 6; direction++)
         {
@@ -367,7 +409,7 @@ public class HexGrid : MonoBehaviour
     {
         if (count >= this.minTilesInCombo) return;
         
-        cell.setGlow(false);
+        cell.SetGlow(false);
         FindGlowCombos(cell);
         HexCell neighbor = cell.GetNeighbor(direction);
         if (neighbor) RecalculateGlowInDirection(neighbor, direction, count+1);

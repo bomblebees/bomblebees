@@ -70,7 +70,7 @@ public class Player : NetworkBehaviour
         }
 
         // Create the hex model in the player's hand
-        this.heldHexModel = cellPrefab.createModel
+        this.heldHexModel = cellPrefab.CreateModel
             (
                 hexGrid.ReturnModelByCellKey(heldKey),
                 transform.position + transform.up * 18 + transform.forward * 10,

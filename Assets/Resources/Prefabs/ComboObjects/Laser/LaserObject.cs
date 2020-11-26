@@ -6,18 +6,54 @@ using UnityEngine;
 
 public class LaserObject : MonoBehaviour
 {
-    private float tickDuration = 2f;
-    public HexDirection hexDirection;  
-    
+    public float tickDuration = 2f;
+    private HexDirection hexDirection;
+
     /* SetDirection:
         Called (separately) when LaserObject is Instantiated.
-    */ 
+    */
     public void SetDirection(HexDirection dir)
     {
         this.hexDirection = dir;
     }
 
+    public Quaternion GetRotationFromDirection(HexDirection dir)
+    {
+        Vector3 newDirVec;
+        switch (dir)
+        {
+            case HexDirection.NW:
+                newDirVec = new Vector3(90f, 0f, 30f);
+                break;
+            case HexDirection.SE:
+                newDirVec = new Vector3(90f, 0f, 30f);
+                break;
+            case HexDirection.W:
+                newDirVec = new Vector3(90f, 0f, 90f);
+                break;
+            case HexDirection.E:
+                newDirVec = new Vector3(90f, 0f, 90f);
+                break;
+            case HexDirection.SW:
+                newDirVec = new Vector3(90f, 0f, 150f);
+                break;
+            case HexDirection.NE:
+                newDirVec = new Vector3(90f, 0f, 150f);
+                break;
+            default:
+                Debug.LogError("LaserObject.cs: This should not be happening.");
+                newDirVec = new Vector3(90f, 0f, 150f);
+                break;
+        }
+
+        return Quaternion.Euler(newDirVec);
+    }
+
     private void Awake()
+    {
+    }
+
+    private void Start()
     {
         StartCoroutine(TickDown());
     }
@@ -40,7 +76,8 @@ public class LaserObject : MonoBehaviour
         Debug.Log("Creating Bomb Explosion");
         var laser = Instantiate(Resources.Load("Prefabs/ComboObjects/Laser/Laser Beam"),
             new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
-            Quaternion.identity) as GameObject;
+            GetRotationFromDirection(hexDirection)
+            ) as GameObject;
         if (!laser) Debug.Log("LaserObject.cs: could not instantiate laser beam.");
         else
         {
