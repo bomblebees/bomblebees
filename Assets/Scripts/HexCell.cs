@@ -91,6 +91,9 @@ public class HexCell : MonoBehaviour
     */
     public bool FindCombos(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
+        // No combos can be found when its empty
+        if (this.getKey() == 'e') return false;
+
         bool hasAtLeastOneCombo = false;
         List<HexCell> ComboList = new List<HexCell>(15); // To reduce array-doubling
         for (var direction = 0; direction < 3; direction++)

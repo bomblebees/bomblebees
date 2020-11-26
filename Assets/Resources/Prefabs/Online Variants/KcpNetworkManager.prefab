@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3510917899506566898}
   - component: {fileID: 3510917899506566897}
   m_Layer: 0
-  m_Name: KCPNetworkManager
+  m_Name: KcpNetworkManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,11 +58,14 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 2233102320158045777, guid: bbe4963acdb88df45927f6eff617742f,
+  playerPrefab: {fileID: 6960933389867461814, guid: d578136045194c84f98ec671bdc555eb,
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 2056255080063121997, guid: 848b2ba1a0c39a542baf93bad479e9d5, type: 3}
+  _HexGrid: {fileID: 2056255080063121997, guid: 848b2ba1a0c39a542baf93bad479e9d5,
+    type: 3}
 --- !u!114 &3510917899506566898
 MonoBehaviour:
   m_ObjectHideFlags: 0
