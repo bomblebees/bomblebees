@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BombObject : MonoBehaviour
 {
-    private float tickDuration = 2f;
+    public float tickDuration = 2f;
 
     private void Awake()
     {

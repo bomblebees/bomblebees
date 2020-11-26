@@ -39,7 +39,6 @@ public class HexGrid : MonoBehaviour
 
     void Awake()
     {
-        LinkAssets();
         CheckErrors();
         GetGridDimensions();
 
@@ -48,23 +47,6 @@ public class HexGrid : MonoBehaviour
 
         GenerateHexGrid();
         ScanListForGlow(gridList);
-    }
-
-    private void LinkAssets()
-    {
-        // cellPrefab = Resources.Load<HexCell>(String.Concat("Prefabs/", HexMetrics.GetHexCellPrefabName())); 
-        
-        
-        // r_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",r_Hex_Name));
-        // g_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",g_Hex_Name));
-        // b_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",b_Hex_Name));
-        // y_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",y_Hex_Name));
-        // p_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",p_Hex_Name));
-        // w_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",w_Hex_Name));
-        // default_Hex = Resources.Load<GameObject>(String.Concat("Prefabs/Hexes/",default_Hex_Name));
-        
-        // Development
-        // cellLabelPrefab = Resources.Load<Text>(String.Concat("/Hexes/",cellPrefabName));
     }
 
     void CheckErrors()
