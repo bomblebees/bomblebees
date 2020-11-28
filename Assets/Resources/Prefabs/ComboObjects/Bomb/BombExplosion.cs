@@ -8,6 +8,9 @@ public class BombExplosion : MonoBehaviour
 {
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
+
+	private int defaultDamage = 50;
+
     // Start is called before the first frame update
     private void Awake()
     {
@@ -33,9 +36,10 @@ public class BombExplosion : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            Destroy(other.gameObject);
-        }
-    }
+
+		if (other.gameObject.GetComponent<Health>() != null)
+		{
+			other.gameObject.GetComponent<Health>().DealDamage(defaultDamage);
+		}
+	}
 }

@@ -9,6 +9,9 @@ public class LaserBeam : MonoBehaviour
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
 
+	private int defaultDamage = 50;
+	private int testCounter = 0;
+
     // Start is called before the first frame update
     private void Rotate(HexDirection dir)
     {
@@ -54,14 +57,20 @@ public class LaserBeam : MonoBehaviour
 
     private void DestroySelf()
     {
+		Debug.Log("destroying self, collider went " + testCounter + " times");
         Destroy(this.gameObject);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            Destroy(other.gameObject);
-        }
+		//if (other.gameObject.CompareTag("Player"))
+		//{
+		//    Destroy(other.gameObject);
+		//}
+		testCounter++;
+		if (other.gameObject.GetComponent<Health>() != null)
+		{
+			other.gameObject.GetComponent<Health>().DealDamage(defaultDamage);
+		}
     }
 }
