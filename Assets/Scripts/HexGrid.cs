@@ -1,7 +1,5 @@
 ﻿// Performance Optimization Possibilities (POP):
 //     @0 Double check everything passes by ref
-//     @1 Instead of scanning whole grid, scan the tiles adjacent to each
-//         popped tile up to minTilesToCombo per direction.
 
 using System;
 using System.Collections;

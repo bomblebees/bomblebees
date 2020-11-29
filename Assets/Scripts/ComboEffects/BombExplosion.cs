@@ -20,15 +20,10 @@ public class BombExplosion : ComboEffect
         this.transform.localScale *= sizeScalar;
     }
 
-    IEnumerator TickDown()
+    protected override IEnumerator TickDown()
     {
         yield return new WaitForSeconds(lifeDuration);
         DestroySelf();
-    }
-
-    private void DestroySelf()
-    {
-        Destroy(this.gameObject);
     }
 
     private void OnTriggerEnter(Collider other)

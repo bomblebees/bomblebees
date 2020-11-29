@@ -46,7 +46,7 @@ public class LaserBeam : ComboEffect
         StartCoroutine(TickDown());
     }
 
-    IEnumerator TickDown()
+   protected override IEnumerator TickDown()
     {
         yield return new WaitForSeconds(lifeDuration);
         this.DestroySelf();

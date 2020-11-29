@@ -59,7 +59,7 @@ public class LaserObject : ComboObject
         StartCoroutine(TickDown());
     }
 
-    IEnumerator TickDown()
+    protected override IEnumerator TickDown()
     {
         Debug.Log(String.Concat("LaserObject is ticking for ", tickDuration));
         yield return new WaitForSeconds(tickDuration);

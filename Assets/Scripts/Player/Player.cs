@@ -46,26 +46,39 @@ public class Player : NetworkBehaviour
     {
         ApplyMovement();
         ListenForSwapping();
-        ListenForPunching();
 
         // Debug ray for swapping
         Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
     }
 
+    private void LateUpdate()
+    {
+        ListenForPunching();
+    }
+
     protected virtual void ListenForPunching()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Punch();
+            StartCoroutine(this.Punch());
         }
     }
 
-    protected virtual void Punch()
+    protected virtual IEnumerator Punch()
     {
         // enable punch object for a given number of frames
-        var punchHitbox = GetComponentInChildren<BoxCollider>();
-        punchHitbox.enabled = true;
+        var punchHitbox = gameObject.transform.Find("PunchHitbox");
+        if (!punchHitbox)
+        {
+            Debug.LogError("punchHitbox collider not found");
+        }
+        else
+        {
+            punchHitbox.gameObject.SetActive(true);
+            yield return null; // Wait 1 frame, but before ListenForPunching in LateUpdate so Players can have persistent punch
+            punchHitbox.gameObject.SetActive(false);
+        }
     }
 
     protected virtual void LinkAssets()

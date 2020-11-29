@@ -13,9 +13,8 @@ public class BombObject : ComboObject
         StartCoroutine(TickDown());
     }
 
-    IEnumerator TickDown()
+    protected override IEnumerator TickDown()
     {
-        Debug.Log(String.Concat("Bomb is ticking for ", tickDuration));
         yield return new WaitForSeconds(tickDuration);
 
         this.Explode();
@@ -24,7 +23,6 @@ public class BombObject : ComboObject
 
     private void Explode()
     {
-        Debug.Log("Creating Bomb Explosion");
         new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
         if (!Instantiate(Resources.Load(effectPath),
             new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
