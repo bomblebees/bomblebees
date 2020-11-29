@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using Castle.Components.DictionaryAdapter.Xml;
 using UnityEngine;
 
-public class LaserObject : MonoBehaviour
+public class LaserObject : ComboObject
 {
     public float tickDuration = 2f;
     private HexDirection hexDirection;
+    public string effectPath = "Prefabs/ComboEffects/Laser Beam";
 
     /* SetDirection:
         Called (separately) when LaserObject is Instantiated.
@@ -66,7 +67,7 @@ public class LaserObject : MonoBehaviour
         this.DestroySelf();
     }
 
-    private void DestroySelf()
+    protected override void DestroySelf() 
     {
         Destroy(this.gameObject);
     }
@@ -74,7 +75,7 @@ public class LaserObject : MonoBehaviour
     private void Lase(HexDirection hexDirection)
     {
         Debug.Log("Creating Bomb Explosion");
-        var laser = Instantiate(Resources.Load("Prefabs/ComboObjects/Laser/Laser Beam"),
+        var laser = Instantiate(Resources.Load(effectPath),
             new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
             GetRotationFromDirection(hexDirection)
             ) as GameObject;

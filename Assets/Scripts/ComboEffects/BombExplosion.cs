@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class BombExplosion : MonoBehaviour
+public class BombExplosion : ComboEffect
 {
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;

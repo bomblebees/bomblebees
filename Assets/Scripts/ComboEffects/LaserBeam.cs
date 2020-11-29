@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-public class LaserBeam : MonoBehaviour
+public class LaserBeam : ComboEffect
 {
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
@@ -42,19 +42,14 @@ public class LaserBeam : MonoBehaviour
 
     public void SpawnInDirection(HexDirection direction)
     {
-        Rotate(direction);
+        this.Rotate(direction);
         StartCoroutine(TickDown());
     }
 
     IEnumerator TickDown()
     {
         yield return new WaitForSeconds(lifeDuration);
-        DestroySelf();
-    }
-
-    private void DestroySelf()
-    {
-        Destroy(this.gameObject);
+        this.DestroySelf();
     }
 
     private void OnTriggerEnter(Collider other)

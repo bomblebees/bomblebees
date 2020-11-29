@@ -46,10 +46,26 @@ public class Player : NetworkBehaviour
     {
         ApplyMovement();
         ListenForSwapping();
+        ListenForPunching();
 
         // Debug ray for swapping
         Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
+    }
+
+    protected virtual void ListenForPunching()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Punch();
+        }
+    }
+
+    protected virtual void Punch()
+    {
+        // enable punch object for a given number of frames
+        var punchHitbox = GetComponentInChildren<BoxCollider>();
+        punchHitbox.enabled = true;
     }
 
     protected virtual void LinkAssets()

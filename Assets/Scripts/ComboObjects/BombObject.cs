@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BombObject : MonoBehaviour
+public class BombObject : ComboObject
 {
     public float tickDuration = 2f;
+    public string effectPath = "Prefabs/ComboEffects/Bomb Explosion";
 
     private void Start()
     {
@@ -21,16 +22,11 @@ public class BombObject : MonoBehaviour
         this.DestroySelf();
     }
 
-    private void DestroySelf()
-    {
-        Destroy(this.gameObject);
-    }
-
     private void Explode()
     {
         Debug.Log("Creating Bomb Explosion");
         new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
-        if (!Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb/Bomb Explosion"),
+        if (!Instantiate(Resources.Load(effectPath),
             new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
             Quaternion.identity))
         {

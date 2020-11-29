@@ -291,8 +291,8 @@ public class HexGrid : MonoBehaviour
 
     GameObject SpawnComboObjByKey(char key, Transform spawnCoords)
     {
-        var bombObjPath = Resources.Load("Prefabs/ComboObjects/Bomb/Bomb Object");
-        var laserObjPath = Resources.Load("Prefabs/ComboObjects/Laser/Laser Object");
+        var bombObjPath = Resources.Load("Prefabs/ComboObjects/Bomb Object");
+        var laserObjPath = Resources.Load("Prefabs/ComboObjects/Laser Object");
         Vector3 offset = new Vector3(0f, 2f, 0f);
         GameObject result;
         switch (key)
@@ -333,7 +333,6 @@ public class HexGrid : MonoBehaviour
         foreach (HexCell cell in list)
         {
             var ComboObj = SpawnComboObjByKey(cell.GetKey(), cell.transform);
-            Debug.Log("count");
             // SpawnComboObj(cell.transform, comboObject);
             // Start a coroutine that regenerates the tile
             StartCoroutine(RegenerateCell(cell));
