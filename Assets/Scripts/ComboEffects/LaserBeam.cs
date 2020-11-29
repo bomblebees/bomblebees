@@ -9,6 +9,9 @@ public class LaserBeam : ComboEffect
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
 
+	private int defaultDamage = 50;
+	private int testCounter = 0;
+
     // Start is called before the first frame update
     private void Rotate(HexDirection dir)
     {
@@ -49,14 +52,15 @@ public class LaserBeam : ComboEffect
    protected override IEnumerator TickDown()
     {
         yield return new WaitForSeconds(lifeDuration);
-        this.DestroySelf();
+        DestroySelf();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            Destroy(other.gameObject);
-        }
+		testCounter++;
+		if (other.gameObject.GetComponent<Health>() != null)
+		{
+			other.gameObject.GetComponent<Health>().DealDamage(defaultDamage);
+		}
     }
 }

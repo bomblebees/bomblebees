@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 94709753153883346}
   - component: {fileID: 493922037362194888}
   - component: {fileID: 493922037362194891}
+  - component: {fileID: -8900185448856423588}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Player
@@ -167,6 +168,19 @@ MonoBehaviour:
   turnSmoothness: 0.1
   heldKey: 103
   heldHexScale: {x: 800, y: 800, z: 800}
+--- !u!114 &-8900185448856423588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728363404677404264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bcd292a62d0a3e46bb37a383d23bc6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingHealth: 100
 --- !u!1 &1784166821286549375
 GameObject:
   m_ObjectHideFlags: 0
