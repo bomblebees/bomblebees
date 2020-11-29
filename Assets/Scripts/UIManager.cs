@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
 	// Start is called before the first frame update
+
+	// Maybe if we put in the Health component here directly, we won't even need a reference to the Player object?
 	[SerializeField]
 	private Text Player1HealthText;
 
@@ -14,8 +16,6 @@ public class UIManager : MonoBehaviour
 
 	private void OnEnable()
 	{
-
-		
 
 	}
 

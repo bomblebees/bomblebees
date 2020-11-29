@@ -99,7 +99,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: 1cc85f3bcaf39fa47b6e26d119e169d8,
     type: 2}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -511,3 +511,72 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e0786bfa9ed875347b832b26827077d3, type: 3}
+--- !u!1001 &8505791286262732343
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 202.65445
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 388.7127
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 33.946503
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204484, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8505791286045204486, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
+        type: 3}
+      propertyPath: m_Name
+      value: HealthManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e0dabb84bba3a7f4ca2713e52d7919fd, type: 3}
