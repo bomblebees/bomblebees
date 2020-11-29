@@ -14,15 +14,17 @@ using NetworkBehaviour = Mirror.NetworkBehaviour;
 
 public class Player : NetworkBehaviour
 {
-
     private HexGrid hexGrid;
     private HexCell cellPrefab;
-    
+
     public CharacterController controller;
     public bool useArrowKeys = false;
     public float movementSpeed = 50;
     public float turnSmoothness = 0.1f;
     float turnSmoothVelocity;
+
+    public float punchDuration = 0.5f;
+    private bool canPunch = true;
 
     public char heldKey = 'g';
 
@@ -32,7 +34,7 @@ public class Player : NetworkBehaviour
 
     private GameObject selectedTile;
     private GameObject heldHexModel;
-     float swapDistance = 15;
+    float swapDistance = 15;
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
 
     private void Start()
@@ -48,7 +50,8 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
 
         // Debug ray for swapping
-        Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
+        Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10,
+            Color.green);
         //Debug.Log(heldHexModel.transform.position);
     }
 
@@ -67,26 +70,34 @@ public class Player : NetworkBehaviour
 
     protected virtual IEnumerator Punch()
     {
-        // enable punch object for a given number of frames
-        var punchHitbox = gameObject.transform.Find("PunchHitbox");
-        if (!punchHitbox)
+        if (canPunch)
         {
-            Debug.LogError("punchHitbox collider not found");
-        }
-        else
-        {
-            punchHitbox.gameObject.SetActive(true);
-            yield return null; // Wait 1 frame, but before ListenForPunching in LateUpdate so Players can have persistent punch
-            punchHitbox.gameObject.SetActive(false);
+            // enable punch object for a given number of frames
+            var punchHitbox = gameObject.transform.Find("PunchHitbox");
+            if (!punchHitbox)
+            {
+                Debug.LogError("punchHitbox collider not found");
+            }
+            else
+            {
+                canPunch = false;
+                punchHitbox.gameObject.SetActive(true);
+                yield return new WaitForSeconds(punchDuration);
+                canPunch = true;
+                punchHitbox.gameObject.SetActive(false);
+            }
         }
     }
 
     protected virtual void LinkAssets()
     {
-        cellPrefab = Resources.Load<HexCell>(String.Concat("Prefabs/", HexMetrics.GetHexCellPrefabName()));  // The return type is enclosed by <>
+        cellPrefab =
+            Resources.Load<HexCell>(String.Concat("Prefabs/",
+                HexMetrics.GetHexCellPrefabName())); // The return type is enclosed by <>
         if (!cellPrefab) Debug.LogError("Player.cs: No cellPrefab found.");
 
-        hexGrid = GameObject.FindGameObjectWithTag("HexGrid").GetComponent<HexGrid>();  // Make sure hexGrid is created before the player
+        hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
+            .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
@@ -100,12 +111,12 @@ public class Player : NetworkBehaviour
 
         // Create the hex model in the player's hand
         this.heldHexModel = cellPrefab.CreateModel
-            (
-                hexGrid.ReturnModelByCellKey(heldKey),
-                transform.position + transform.up * 18 + transform.forward * 10,
-                transform.rotation,
-                transform
-            );
+        (
+            hexGrid.ReturnModelByCellKey(heldKey),
+            transform.position + transform.up * 18 + transform.forward * 10,
+            transform.rotation,
+            transform
+        );
 
         this.heldHexModel.gameObject.transform.localScale = heldHexScale;
     }
@@ -113,7 +124,6 @@ public class Player : NetworkBehaviour
     // Apply movement to the player, using WASD or Arrow keys
     protected virtual void ApplyMovement()
     {
-
         // By default, use WASD keys for input
         Vector3 direction = new Vector3(
             Input.GetAxisRaw("HorizontalPlayer1"),
@@ -130,7 +140,6 @@ public class Player : NetworkBehaviour
                 0f,
                 Input.GetAxisRaw("VerticalPlayer2")
             ).normalized;
-
         }
 
         // Movement and rotations
@@ -150,7 +159,6 @@ public class Player : NetworkBehaviour
     // Listens for key press and swaps the tile beneath the player
     protected virtual void ListenForSwapping()
     {
-
         tileRay = new Ray(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10);
 
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
@@ -178,9 +186,7 @@ public class Player : NetworkBehaviour
                     setHeldKey(newKey);
                     UpdateHeldHex();
                 }
-
             }
-
         }
     }
 

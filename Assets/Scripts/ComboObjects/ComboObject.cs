@@ -50,7 +50,7 @@ public class ComboObject : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Punch"))
         {
-            this.SetPuncherPosition(other.gameObject.GetComponent<Transform>().position);
+            this.SetPuncherPosition(other.gameObject.GetComponentInParent<Transform>().position);
             this.PunchedAction();
         }
     }
