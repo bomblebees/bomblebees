@@ -34,7 +34,6 @@ public class ComboObject : MonoBehaviour
         {
             Vector3 distVector = this.gameObject.transform.position - puncherPosition;
             distVector.Normalize();
-            Debug.Log(distVector);
             distVector.x *= pushedSpeed; distVector.y = 0; distVector.z *= pushedSpeed;
             rigidBody.velocity = Vector3.zero; rigidBody.angularVelocity = Vector3.zero;  // reset force
             rigidBody.AddForce(distVector);
