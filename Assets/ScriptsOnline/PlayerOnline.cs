@@ -14,36 +14,55 @@ public class PlayerOnline : Player
 {
    protected override void ApplyMovement()
    {
-      if (!isLocalPlayer)
+      if (!hasAuthority)
       {
          return;
       }
-      base.ApplyMovement();
-   }
-
-   protected override void ListenForSwapping()
-   {
-      if (!isLocalPlayer)
-      {
-         return;
-      }
-      base.ListenForSwapping();
+      CmdApplyMovement();
    }
    
+   protected override void ListenForSwapping()
+   {
+      if (!hasAuthority)
+      {
+         return;
+      }
+      CmdListenForSwapping();
+      //base.ListenForSwapping();
+   }
+
    protected override void Update()
    {
       base.Update();
-
-      if (Input.GetKeyDown("2"))
-      { 
+      
+      if (isServer && Input.GetKeyDown("2"))
+      {
          RpcLinkAssets();
       }
    }
 
-   [ClientRpc]
-   private void RpcListenForSwapping()
+   [Command]
+   private void CmdListenForSwapping()
+   {
+      RpcListenForSwapping(connectionToClient);
+   }
+
+   [TargetRpc]
+   private void RpcListenForSwapping(NetworkConnection target)
    {
       base.ListenForSwapping();
+   }
+
+   [Command]
+   private void CmdApplyMovement()
+   {
+      RpcApplyMovement(connectionToClient);
+   }
+
+   [TargetRpc]
+   private void RpcApplyMovement(NetworkConnection target)
+   {
+      base.ApplyMovement();
    }
 
    [ClientRpc]
