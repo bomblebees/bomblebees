@@ -35,8 +35,6 @@ public class HealthManager : MonoBehaviour
 	{
 		// cleanup code for when a thing dies; if UI stuff is listening, emit SceneSpawner's own event here that UI is listening to
 
-		Debug.Log("THING DIED!");
-
 		// unsubscribe the SceneSpawner from this dead thing's events before "killing"
 		Player.GetComponent<Health>().Died -= HandleDeath;
 		Destroy(thingToKill);
