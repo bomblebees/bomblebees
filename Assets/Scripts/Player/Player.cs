@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour
     public CharacterController controller;
     public bool useArrowKeys = false;
     public float movementSpeed = 50;
-    public float turnSmoothness = 0.1f;
+    public float turnSpeed = 17f;
     float turnSmoothVelocity;
 
     public float punchDuration = 0.5f;
@@ -143,14 +143,13 @@ public class Player : NetworkBehaviour
         }
 
         // Movement and rotations
-        if (direction.magnitude >= 0.1f)
+        if (direction != Vector3.zero)
         {
-            float angleP1 = Mathf.SmoothDampAngle(
-                transform.eulerAngles.y,
-                Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg,
-                ref turnSmoothVelocity,
-                turnSmoothness);
-            transform.rotation = Quaternion.Euler(0f, angleP1, 0f);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                Quaternion.LookRotation(direction),
+                turnSpeed * Time.deltaTime
+            );
 
             controller.Move(direction * movementSpeed * Time.deltaTime);
         }
