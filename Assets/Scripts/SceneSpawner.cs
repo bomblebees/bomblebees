@@ -11,10 +11,10 @@ public class SceneSpawner : MonoBehaviour
 
 	// is it right to store a reference to the player like this as an object?
 	// or should we make an explicit Player class?
-	[SerializeField]
-	GameObject PlayerPrefab;
+	//[SerializeField]
+	//GameObject PlayerPrefab;
 
-	private GameObject Player;
+	private Player Player;
 
 	void Awake()
     {
@@ -24,13 +24,16 @@ public class SceneSpawner : MonoBehaviour
 		Instantiate(Resources.Load("Prefabs/Hex Grid"));
 
 
-		Player = Instantiate(PlayerPrefab);
 
 
-        Instantiate(Resources.Load("Prefabs/Development UI"));
+        // Instantiate(Resources.Load("Prefabs/Development UI"));
+		Instantiate(Resources.Load("Prefabs/Managers/EventManager"));
+		Instantiate(Resources.Load("Prefabs/SceneObjects/PlayUI"));
+		Player = Instantiate(Resources.Load<Player>("Prefabs/Player1") );
 
-        // Instantiate(Resources.Load("Prefabs/SceneObjects/Level1/Main Camera"));
-        // Instantiate(Resources.Load("Prefabs/SceneObjects/Level1/Directional Light"));
-    }
+		Instantiate(Resources.Load("Prefabs/Managers/HealthManager"));
+		// Instantiate(Resources.Load("Prefabs/SceneObjects/Level1/Main Camera"));
+		// Instantiate(Resources.Load("Prefabs/SceneObjects/Level1/Directional Light"));
+	}
 
 }

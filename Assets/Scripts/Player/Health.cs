@@ -20,30 +20,24 @@ public class Health : MonoBehaviour
 		set { }
 	}
 
-	// https://learn.unity.com/tutorial/c-actions
-	public event Action<GameObject> Died;
-	public event Action<int> HealthChanged;
-
-    // Start is called before the first frame update
-    void Awake()
+	// Start is called before the first frame update
+	void Awake()
     {
 		currentHealth = startingHealth;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	void Start()
+	{
+
+	}
 
 	public void DealDamage(int amount)
 	{
-		Debug.Log(currentHealth);
 		if (currentHealth > 0)
 		{
 			// change currentHealth by amount (and emit damage dealt event)
 			currentHealth -= amount;
-			HealthChanged?.Invoke(currentHealth);
+			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = currentHealth });
 		}
 
 		if (currentHealth <= 0)
@@ -55,12 +49,7 @@ public class Health : MonoBehaviour
 
 	private void OnHealthZero()
 	{
-		Died?.Invoke(gameObject);
-		
-		// For now, just delete the gameobject this script is stuck to
-		// Later we might use events for game state stuff, so that functionality can be split into more intuitive ways
-		
-		
-		//Destroy(gameObject);
+		// when health hits 0, call death event thru EventManager singleton which listeners can react to and use custom args
+		EventManager.TriggerEvent("healthObjectDied", this, new CustomEventArgs { EventObject = gameObject });
 	}
 }

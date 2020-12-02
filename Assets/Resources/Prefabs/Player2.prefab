@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 620710787818647721}
   m_Layer: 0
   m_Name: Player2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,13 +72,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   controller: {fileID: 620710787818647722}
+  useArrowKeys: 1
   movementSpeed: 50
   turnSmoothness: 0.1
-  useArrowKeys: 1
-  hexGrid: {fileID: 0}
-  cellPrefab: {fileID: 0}
   heldKey: 103
-  swapDistance: 15
   heldHexScale: {x: 800, y: 800, z: 800}
 --- !u!1 &665283641121618222
 GameObject:
