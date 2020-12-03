@@ -4,6 +4,8 @@
  * https://docs.microsoft.com/en-us/dotnet/api/system.eventhandler?view=net-5.0 <- microsoft c# docs
  * https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/events/how-to-publish-events-that-conform-to-net-framework-guidelines <- microsoft c# docs
  * 
+ * more advanced singleton implementations: https://wiki.unity3d.com/index.php/Singleton
+ * 
  * Creates a Dictionary of events other classes can subscribe to using this singleton instance
  * 
  * Subscribing to a non-existent event creates it and stores it in the Dictionary, which other classes can Trigger
@@ -28,7 +30,8 @@ public class EventManager : MonoBehaviour
 	public static EventManager instance
 	{
 		// "true" singleton ensures that no other instance can be found in scene at one time
-		// when other classes use the singleton instance (EventManager.instance) this method returns 
+		// when other classes use the singleton instance (EventManager.instance) this method returns
+
 		get
 		{
 			if (!eventManager)

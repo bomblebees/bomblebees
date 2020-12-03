@@ -7,12 +7,23 @@ using System;
 
 public class UIManager : MonoBehaviour
 {
-	// Start is called before the first frame update
+	private static UIManager uiManager;
+	public static UIManager Instance { get { return uiManager; } }
 
 	[SerializeField]
 	private TextMeshProUGUI Player1HealthText;
-
 	private EventHandler<CustomEventArgs> updateUIListener;
+
+	private void Awake()
+	{
+		if (uiManager != null && uiManager != this)
+		{
+			Destroy(gameObject);
+		} else
+		{
+			uiManager = this;
+		}
+	}
 
 	private void OnEnable()
 	{
