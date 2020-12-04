@@ -9,41 +9,64 @@ using UnityEngine.UI;
 
 public class HexGrid : MonoBehaviour
 {
+    /// <summary>
+    /// cellPrefab: The Hex Cell prefab to be instantiated by HexGrid at runtime
+    /// </summary>
     public HexCell cellPrefab;
+    
+    /// Debug tools
     public Text cellLabelPrefab;
     private string cellPrefabName = "Hex Cell Label";
-    public GameObject r_Hex; private string r_Hex_Name = "RedHex";
-    public GameObject g_Hex; private string g_Hex_Name = "GreenHex"; 
-    public GameObject b_Hex; private string b_Hex_Name = "BlueHex";
-    public GameObject y_Hex; private string y_Hex_Name = "YellowHex";
-    public GameObject p_Hex; private string p_Hex_Name = "PurpleHex";
-    public GameObject w_Hex; private string w_Hex_Name = "WhiteHex";
-    public GameObject default_Hex; private string default_Hex_Name = "EmptyHex";
-    [SerializeField] public int minTilesInCombo = 3;
-    [SerializeField] public int minTilesForGlow = 2;
-    private List<HexCell> gridList = new List<HexCell>();
+    
+    // Runtime Instantiation Tools
+    public GameObject r_Hex;
+    private string r_Hex_Name = "RedHex";
+    public GameObject g_Hex;
+    private string g_Hex_Name = "GreenHex";
+    public GameObject b_Hex;
+    private string b_Hex_Name = "BlueHex";
+    public GameObject y_Hex;
+    private string y_Hex_Name = "YellowHex";
+    public GameObject p_Hex;
+    private string p_Hex_Name = "PurpleHex";
+    public GameObject w_Hex;
+    private string w_Hex_Name = "WhiteHex";
+    public GameObject default_Hex;
+    private string default_Hex_Name = "EmptyHex";
+    
+    public int minTilesForCombo = 3;
+    public int minTilesForGlow = 2;
+    
+    /// <summary>
+    /// gridList: Stores every Hex Cell on the board
+    /// </summary>
+    private List<HexCell> gridList = new List<HexCell>(); 
 
     public bool enableCoords = false;
 
     // Whether the map will generate randomly on start
     public bool enableRandomGen = false;
 
+    /// <summary>
+    /// ignoreRandomGenOnE: if true, use preset map's 'e' tiles as default. Otherwise, ignore.
+    /// </summary>
+    public bool ignoreRandomGenOnE = true;
+
     // If enabled: regenerated tiles can (by random chance) form its own combos.
     // If disabled: regenerated tiles will never form combos with its neighbors
     public bool enableChainRegen = false;
 
-    HexCell[] cells;
     public Level1 level = new Level1();
     public RandomLevelGeneration randLevel = new RandomLevelGeneration();
-    public int width = 19;
-    public int height = 11;
+    private int width;
+    private int height;
 
     Canvas gridCanvas;
     HexMesh hexMesh;
 
-    private char[] tileTypes = { 'r', 'b', 'g', 'y', 'p', 'w' };
+    private char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
     public float tileRegenDuration = 1.5f;
-    
+
 
     void Awake()
     {
@@ -68,10 +91,10 @@ public class HexGrid : MonoBehaviour
         }
 
         if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null || p_Hex == null
-        || w_Hex == null || default_Hex == null)
+            || w_Hex == null || default_Hex == null)
             Debug.LogError("HexGrid.cs: a Hex is not assigned.");
 
-        if (minTilesForGlow >= minTilesInCombo)
+        if (minTilesForGlow >= minTilesForCombo)
         {
             Debug.LogError("minTilesForGlow is >= to minTilesInCombo");
         }
@@ -80,14 +103,11 @@ public class HexGrid : MonoBehaviour
     // getGridDimensions: used once at the start of the level
     void GetGridDimensions()
     {
-        // Use preset level if random gen disabled
-        if (!enableRandomGen)
-        {
-            this.width = level.getWidth();
-            this.height = level.getHeight();
-        }
+        this.width = level.getWidth();
+        this.height = level.getHeight();
+        if (width == null || height == null) Debug.LogError("GetGridDimensions: could not get level dimensions.");
 
-        cells = new HexCell[height * width];
+        // cells = new HexCell[height * width];
     }
 
     void GenerateHexGrid()
@@ -98,7 +118,7 @@ public class HexGrid : MonoBehaviour
             {
                 if (!enableRandomGen)
                 {
-                    this.gridList.Add(CreateCell(x, z, i, level.getArray()[z,x]));
+                    this.gridList.Add(CreateCell(x, z, i, level.getArray()[z, x]));
                     i++;
                     continue;
                 }
@@ -107,8 +127,8 @@ public class HexGrid : MonoBehaviour
                 HexCell newCell = CreateCell(x, z, i, randomType);
 
                 MakeCellUnique(newCell);
-   
-                this.gridList.Add(newCell);
+
+                // this.gridList.Add(newCell);
                 i++;
             }
         }
@@ -140,10 +160,10 @@ public class HexGrid : MonoBehaviour
         foreach (HexCell cell in list)
         {
             if (cell.GetGlow() == true) continue;
-            FindGlowCombos(cell);  // TODO Double check this is being passed by reference
+            FindGlowCombos(cell); // TODO Double check this is being passed by reference
         }
     }
-    
+
     public void ScanListForGlow()
     {
         foreach (HexCell cell in gridList) cell.SetGlow(false);
@@ -194,7 +214,7 @@ public class HexGrid : MonoBehaviour
 
     void Start()
     {
-        hexMesh.Triangulate(cells);
+        hexMesh.Triangulate(gridList);
     }
 
     //
@@ -214,7 +234,9 @@ public class HexGrid : MonoBehaviour
         position.y = 0f;
         position.z = z * (HexMetrics.outerRadius * 1.5f);
 
-        HexCell cell = cells[i] = Instantiate<HexCell>(cellPrefab);
+        HexCell cell = Instantiate<HexCell>(cellPrefab);
+        gridList.Add(cell);
+        
         cell.SetSpawnCoords(x, z);
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
@@ -224,25 +246,25 @@ public class HexGrid : MonoBehaviour
 
         if (x > 0) // Skips first vertical axis
         {
-            cell.SetNeighbor(HexDirection.W, cells[i - 1]);
+            cell.SetNeighbor(HexDirection.W, gridList[i - 1]);
         }
 
         if (z > 0) // Skips first horizontal axis
         {
             if ((z & 1) == 0) // For every odd z
             {
-                cell.SetNeighbor(HexDirection.SE, cells[i - width]);
+                cell.SetNeighbor(HexDirection.SE, gridList[i - width]);
                 if (x > 0)
                 {
-                    cell.SetNeighbor(HexDirection.SW, cells[i - width - 1]);
+                    cell.SetNeighbor(HexDirection.SW, gridList[i - width - 1]);
                 }
             }
             else
             {
-                cell.SetNeighbor(HexDirection.SW, cells[i - width]);
+                cell.SetNeighbor(HexDirection.SW, gridList[i - width]);
                 if (x < width - 1)
                 {
-                    cell.SetNeighbor(HexDirection.SE, cells[i - width + 1]);
+                    cell.SetNeighbor(HexDirection.SE, gridList[i - width + 1]);
                 }
             }
         }
@@ -262,6 +284,7 @@ public class HexGrid : MonoBehaviour
         {
             yield break;
         }
+
         cell.SetKey('e');
         Destroy(cell.GetModel());
         yield return new WaitForSeconds(tileRegenDuration);
@@ -281,7 +304,8 @@ public class HexGrid : MonoBehaviour
                 yield return new WaitForSeconds(1);
                 cell.FindCombos(ComboCallback, GetMinTilesInCombo());
             }
-        } else
+        }
+        else
         {
             MakeCellUnique(cell);
         }
@@ -338,7 +362,7 @@ public class HexGrid : MonoBehaviour
         }
 
         // ScanListForGlow(list);  // @1: instead of scanning whole grid, scan the tiles adjacent to each
-                                //     popped tile up to minTilesToCombo per direction.
+        //     popped tile up to minTilesToCombo per direction.
     }
 
     /*  Swaps the given hex with a new hex of key heldKey
@@ -352,24 +376,26 @@ public class HexGrid : MonoBehaviour
         char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
         HexCell parent = modelHit.GetComponentInParent<HexCell>().GetThis(); // The parent of the model
         Destroy(modelHit,
-            0f); 
+            0f);
         parent.CreateModel(this.ReturnModelByCellKey(heldKey));
         parent.SetKey(heldKey);
         if (parent.FindCombos(this.ComboCallback, this.GetMinTilesInCombo()) == true)
         {
             // Unoptimized Scan TODO optimize it
             this.ScanListForGlow();
-        } else
+        }
+        else
         {
             // Optimized scan
             this.RecalculateGlowForNonCombo(parent);
         }
+
         return (tempKey);
     }
 
     public int GetMinTilesInCombo()
     {
-        return minTilesInCombo;
+        return minTilesForCombo;
     }
 
     public int GetMinTilesForGlow()
@@ -400,15 +426,15 @@ public class HexGrid : MonoBehaviour
             }
         }
     }
-    
+
     // RecalculateGlowInDirection: Recursive call for RecalculateGlowForNonCombo.
     public void RecalculateGlowInDirection(HexCell cell, HexDirection direction, int count)
     {
-        if (count >= this.minTilesInCombo) return;
-        
+        if (count >= this.minTilesForCombo) return;
+
         cell.SetGlow(false);
         FindGlowCombos(cell);
         HexCell neighbor = cell.GetNeighbor(direction);
-        if (neighbor) RecalculateGlowInDirection(neighbor, direction, count+1);
+        if (neighbor) RecalculateGlowInDirection(neighbor, direction, count + 1);
     }
 }

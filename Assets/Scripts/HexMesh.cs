@@ -20,12 +20,12 @@ public class HexMesh : MonoBehaviour {
 		triangles = new List<int>();
 	}
 
-	public void Triangulate (HexCell[] cells) {
+	public void Triangulate (List<HexCell> cells) {
 		hexMesh.Clear();
 		vertices.Clear();
 		colors.Clear();
 		triangles.Clear();
-		for (int i = 0; i < cells.Length; i++) {
+		for (int i = 0; i < cells.Count; i++) {
 			Triangulate(cells[i]);
 		}
 		hexMesh.vertices = vertices.ToArray();
