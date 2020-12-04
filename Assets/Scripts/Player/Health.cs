@@ -8,8 +8,9 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
+	// it's a serializefield rn, but later on when we start prototyping it might get annoying editing other values in code
 	[SerializeField]
-	protected int startingHealth = 100;
+	protected int startingHealth = 3;
 
 	private int currentHealth;
 
@@ -17,13 +18,13 @@ public class Health : MonoBehaviour
 	public int CurrentHealth
 	{
 		get { return currentHealth; }
-		set { }
+		set { currentHealth = value; }
 	}
 
 	// Start is called before the first frame update
 	void Awake()
     {
-		currentHealth = startingHealth;
+		currentHealth = startingHealth; 
     }
 
 	void Start()

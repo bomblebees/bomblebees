@@ -8,4 +8,6 @@ public class CustomEventArgs : EventArgs
 {
 	public int Amount { get; set; }
 	public GameObject EventObject { get; set; }
+	public GameStartData DataObject { get; set; }
 }
+

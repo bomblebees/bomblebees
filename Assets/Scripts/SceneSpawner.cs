@@ -28,11 +28,9 @@ public class SceneSpawner : MonoBehaviour
 
         // Instantiate(Resources.Load("Prefabs/Development UI"));
 		Instantiate(Resources.Load("Prefabs/Managers/EventManager"));
-		Instantiate(Resources.Load("Prefabs/SceneObjects/PlayUI"));
-		
-
 		Instantiate(Resources.Load("Prefabs/Managers/LevelManager"));
 		Instantiate(Resources.Load("Prefabs/Managers/HealthManager"));
+		Instantiate(Resources.Load("Prefabs/SceneObjects/PlayUI"));
 		// Instantiate(Resources.Load("Prefabs/SceneObjects/Level1/Main Camera"));
 		// Instantiate(Resources.Load("Prefabs/SceneObjects/Level1/Directional Light"));
 	}
