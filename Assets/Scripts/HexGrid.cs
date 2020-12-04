@@ -57,7 +57,6 @@ public class HexGrid : MonoBehaviour
     public bool enableChainRegen = false;
 
     public Level1 level = new Level1();
-    public RandomLevelGeneration randLevel = new RandomLevelGeneration();
     private int width;
     private int height;
 
@@ -118,17 +117,21 @@ public class HexGrid : MonoBehaviour
             {
                 if (!enableRandomGen)
                 {
-                    this.gridList.Add(CreateCell(x, z, i, level.getArray()[z, x]));
+                    CreateCell(x, z, i, level.getArray()[z, x]);
                     i++;
                     continue;
                 }
 
-                char randomType = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-                HexCell newCell = CreateCell(x, z, i, randomType);
-
-                MakeCellUnique(newCell);
-
-                // this.gridList.Add(newCell);
+                if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
+                {
+                    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+                    HexCell newCell = CreateCell(x, z, i, newTileKey);
+                    MakeCellUnique(newCell);
+                }
+                else
+                {
+                    CreateCell(x, z, i, 'e');
+                }
                 i++;
             }
         }
@@ -140,7 +143,7 @@ public class HexGrid : MonoBehaviour
         List<char> listTileTypes = new List<char>(tileTypes);
 
         // While a combo exists with this tile type, randomly generate a different tile type
-        while (cell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
+        while (cell.FindSameColorTiles((List<HexCell> _) => { }, GetMinTilesInCombo()))
         {
             cell.DeleteModel();
             // Remove the tile type from list and generate new tile type
@@ -152,8 +155,12 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    // ScanListForGlow: Iterate through each tile in the list, checking whether they're
-    //     in a combo with a given minimum, and performing a callback on them.
+    
+    /// <summary>
+    /// ScanListForGlow: Iterate through each tile in the list, checking whether they're
+    ///     in a combo with a given minimum, and performing a callback on them.         
+    /// <param name="list"></param>
+    /// </summary>
     public void ScanListForGlow(List<HexCell> list)
     {
         foreach (HexCell cell in list) cell.SetGlow(false);
@@ -164,6 +171,10 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ScanListForGlow: Iterate through each tile in the list, checking whether they're
+    ///     in a combo with a given minimum, and performing a callback on them.         
+    /// </summary>
     public void ScanListForGlow()
     {
         foreach (HexCell cell in gridList) cell.SetGlow(false);
@@ -174,6 +185,10 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// SetListToGlow: Set every Hex Cell in given list to glow.
+    /// </summary>
+    /// <param name="list"></param>
     private void SetListToGlow(List<HexCell> list)
     {
         foreach (HexCell cell in list)
@@ -181,7 +196,7 @@ public class HexGrid : MonoBehaviour
             cell.SetGlow(true);
         }
     }
-
+    
     private void UnSetListToGlow(List<HexCell> list)
     {
         foreach (HexCell cell in list)
@@ -214,16 +229,20 @@ public class HexGrid : MonoBehaviour
 
     void Start()
     {
-        hexMesh.Triangulate(gridList);
+        // hexMesh.Triangulate(gridList);
     }
 
-    //
-    // CreateCell: Creates a hexCell at the given x & z (where x is the 
-    //     vertical axis. z is the horizontal axis. These are NOT
-    //     part of the axial coordinates system).
-    //     Note: This is only used for in the initial board generation.
-    //     
-    // 
+    /// <summary>
+    /// CreateCell: Creates a hexCell at the given x & z (where x is the 
+    ///     vertical axis. z is the horizontal axis. These are NOT
+    ///     part of the axial coordinates system).
+    ///     Note: This is only used for in the initial board generation.
+    /// <param name="x"></param>
+    /// <param name="z"></param>
+    /// <param name="i"></param>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    /// </summary>
     HexCell CreateCell(int x, int z, int i, char key)
     {
         Vector3 position;
@@ -298,11 +317,11 @@ public class HexGrid : MonoBehaviour
         // If chain regeneration enabled, check for new combos
         if (enableChainRegen)
         {
-            if (cell.FindCombos((List<HexCell> _) => { }, GetMinTilesInCombo()))
+            if (cell.FindSameColorTiles((List<HexCell> _) => { }, GetMinTilesInCombo()))
             {
                 // Wait one second, so combo not instantly executed
                 yield return new WaitForSeconds(1);
-                cell.FindCombos(ComboCallback, GetMinTilesInCombo());
+                cell.FindSameColorTiles(ComboCallback, GetMinTilesInCombo());
             }
         }
         else
@@ -311,6 +330,13 @@ public class HexGrid : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// SpawnComboObjByKey: Returns a Combo Object determined by param 'key' and whose position
+    /// is at param 'spawnCoords'
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="spawnCoords"></param>
+    /// <returns></returns>
     GameObject SpawnComboObjByKey(char key, Transform spawnCoords)
     {
         var bombObjPath = Resources.Load("Prefabs/ComboObjects/Bomb Object");
@@ -350,26 +376,27 @@ public class HexGrid : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// ComboCallback: Given a list of same-color neighboring tiles, do something. Usually given as an argument to
+    /// HexCell.FindSameColorTiles()
+    /// </summary>
+    /// <param name="list"></param>
     public void ComboCallback(List<HexCell> list)
     {
         foreach (HexCell cell in list)
         {
             var ComboObj = SpawnComboObjByKey(cell.GetKey(), cell.transform);
-            // SpawnComboObj(cell.transform, comboObject);
             // Start a coroutine that regenerates the tile
             StartCoroutine(RegenerateCell(cell));
-            // cell.setGlow(false);
         }
-
-        // ScanListForGlow(list);  // @1: instead of scanning whole grid, scan the tiles adjacent to each
-        //     popped tile up to minTilesToCombo per direction.
     }
 
-    /*  Swaps the given hex with a new hex of key heldKey
-        @param modelHit - the hex tile we want to swap
-        @param heldKey - the color key we want the hex to be
-        @return char - the original color key of the hex before swapping occurs
-    */
+    /// <summary>
+    /// Swaps the given hex with a new hex of key heldKey
+    /// @param modelHit - the hex tile we want to swap
+    /// @param heldKey - the color key we want the hex to be
+    /// @return char - the original color key of the hex before swapping occurs
+    /// </summary>
     public char SwapHexAndKey(GameObject modelHit, char heldKey)
     {
         Debug.Log("swapped");
@@ -379,7 +406,7 @@ public class HexGrid : MonoBehaviour
             0f);
         parent.CreateModel(this.ReturnModelByCellKey(heldKey));
         parent.SetKey(heldKey);
-        if (parent.FindCombos(this.ComboCallback, this.GetMinTilesInCombo()) == true)
+        if (parent.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
         {
             // Unoptimized Scan TODO optimize it
             this.ScanListForGlow();
@@ -405,7 +432,7 @@ public class HexGrid : MonoBehaviour
 
     public bool FindGlowCombos(HexCell cell)
     {
-        return cell.FindCombos(this.SetListToGlow, this.minTilesForGlow);
+        return cell.FindSameColorTiles(this.SetListToGlow, this.minTilesForGlow);
     }
 
     /* RecalculateGlowForNonCombo: Recalculates isGlowing for a newly-swapped cell and for other cells

@@ -19,7 +19,11 @@ public class HexMesh : MonoBehaviour {
 		colors = new List<Color>();
 		triangles = new List<int>();
 	}
-
+	
+	/// <summary>
+	/// Triangulate: Build a meshes for the tiles, in place or along with the models.
+	/// </summary>
+	/// <param name="cells"></param>
 	public void Triangulate (List<HexCell> cells) {
 		hexMesh.Clear();
 		vertices.Clear();

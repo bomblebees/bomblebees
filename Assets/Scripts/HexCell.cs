@@ -89,7 +89,7 @@ public class HexCell : MonoBehaviour
     * returns 
     * TODO: create a default callback that does nothing, or overload function to have 1 param
     */
-    public bool FindCombos(System.Action<List<HexCell>> callback, int minTilesInCombo)
+    public bool FindSameColorTiles(System.Action<List<HexCell>> callback, int minTilesInCombo)
     {
         // No combos can be found when its empty
         if (this.GetKey() == 'e') return false;
