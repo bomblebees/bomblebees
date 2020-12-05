@@ -14,18 +14,27 @@ using NetworkBehaviour = Mirror.NetworkBehaviour;
 
 public class Player : NetworkBehaviour
 {
+    // Assets
     private HexGrid hexGrid;
     private HexCell cellPrefab;
 
-    public CharacterController controller;
-    public bool useArrowKeys = false;
-    public float movementSpeed = 50;
-    public float turnSpeed = 17f;
-    float turnSmoothVelocity;
+    [Header("Input")]
+    [SerializeField] private bool isPlayer2 = false;
+    [SerializeField] private string swapKey = "space";
+    [SerializeField] private string punchKey = "p";
+    private float horizontalAxis;
+    private float verticalAxis;
+
+    [Header("Movement")]
+    [SerializeField] private CharacterController controller;
+    [SerializeField] private float movementSpeed = 50;
+    [SerializeField] private float turnSpeed = 17f;
 
     public float punchDuration = 0.5f;
     private bool canPunch = true;
 
+
+    [Header("HexTiles")]
     public char heldKey = 'g';
 
     // Cache raycast refs for optimization
@@ -46,12 +55,11 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        GetPlayerInputs();
         ApplyMovement();
         ListenForSwapping();
 
-        // Debug ray for swapping
-        Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10,
-            Color.green);
+        //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
     }
 
@@ -62,7 +70,7 @@ public class Player : NetworkBehaviour
 
     protected virtual void ListenForPunching()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(punchKey))
         {
             StartCoroutine(this.Punch());
         }
@@ -101,6 +109,19 @@ public class Player : NetworkBehaviour
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
+    protected virtual void GetPlayerInputs()
+    {
+        if (!isPlayer2)
+        {
+            horizontalAxis = Input.GetAxisRaw("HorizontalPlayer1");
+            verticalAxis = Input.GetAxisRaw("VerticalPlayer1");
+        } else
+        {
+            horizontalAxis = Input.GetAxisRaw("HorizontalPlayer2");
+            verticalAxis = Input.GetAxisRaw("VerticalPlayer2");
+        }
+    }
+
     protected virtual void UpdateHeldHex()
     {
         if (this.heldHexModel)
@@ -124,25 +145,7 @@ public class Player : NetworkBehaviour
     // Apply movement to the player, using WASD or Arrow keys
     protected virtual void ApplyMovement()
     {
-        // By default, use WASD keys for input
-        Vector3 direction = new Vector3(
-            Input.GetAxisRaw("HorizontalPlayer1"),
-            0f,
-            Input.GetAxisRaw("VerticalPlayer1")
-        ).normalized;
-
-        // If enabled, use arrow keys for input instead
-        if (useArrowKeys)
-        {
-            // Player 1 movement (WASD)
-            direction = new Vector3(
-                Input.GetAxisRaw("HorizontalPlayer2"),
-                0f,
-                Input.GetAxisRaw("VerticalPlayer2")
-            ).normalized;
-        }
-
-        // Movement and rotations
+        Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         {
             transform.rotation = Quaternion.Slerp(
@@ -171,7 +174,7 @@ public class Player : NetworkBehaviour
             selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
 
             // When swap key is pressed, swap held tile with selected tile
-            if (Input.GetKeyDown("space"))
+            if (Input.GetKeyDown(swapKey))
             {
                 Debug.Log("space pressed");
                 GameObject modelHit = tileHit.transform.gameObject;

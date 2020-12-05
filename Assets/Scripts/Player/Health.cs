@@ -55,12 +55,12 @@ public class Health : MonoBehaviour
 
 	private void OnHealthZero()
 	{
-		Died?.Invoke(gameObject);
-		
-		// For now, just delete the gameobject this script is stuck to
-		// Later we might use events for game state stuff, so that functionality can be split into more intuitive ways
-		
-		
-		//Destroy(gameObject);
-	}
+		//Died?.Invoke(gameObject);
+
+        // For now, just delete the gameobject this script is stuck to
+        // Later we might use events for game state stuff, so that functionality can be split into more intuitive ways
+
+
+        Destroy(gameObject);
+    }
 }
