@@ -19,6 +19,7 @@ public class HealthManager : MonoBehaviour
 		EventManager.Subscribe("healthChanged", new EventHandler<CustomEventArgs>(HandleHealthChangeEvent));
 	}
 
+	// EventHandler listeners
 	private void HandleHealthChangeEvent(object thingWithHealth, CustomEventArgs args)
 	{
 		if (args.EventObject.CompareTag("Player"))

@@ -85,7 +85,6 @@ public class LevelManager : MonoBehaviour
 		gameSettings = args.DataObject;
 		numLives = gameSettings.NumLives;
 
-
 		roundRunning = true;
 		
 		AddPlayers();
@@ -104,13 +103,18 @@ public class LevelManager : MonoBehaviour
 				if (playerComponent.NumLives > 1)
 				{
 					// player has one or more lives left, do respawn thing (we can standardize "resetting" a new life in a new method later)
-					EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = gameSettings.MaxHP, EventObject = args.EventObject });
+					// EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = gameSettings.MaxHP, EventObject = args.EventObject });
 
+					// right now, we set the player state to invulnerable and set it to false using coroutine upon dying
+					// later, we would probably use a proper finite state machine for this sorts of stuff
 					healthComponent.CurrentHealth = gameSettings.MaxHP;
 					healthComponent.Invulnerable = true;
+					playerComponent.NumLives--;
+
 					args.EventObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 1f);
 					StartCoroutine(InvulnUntilEnd(invulnTime, healthComponent));
-					playerComponent.NumLives--;
+					
+					UIManager.Instance.PlayerDeathUIChange(playerComponent);
 
 					if (i == 0)
 					{
@@ -123,9 +127,13 @@ public class LevelManager : MonoBehaviour
 				}
 				else
 				{
-					// player has no lives left, do end game thing
+					// player has no lives left, do end game thing, process wins match results and stuff
 					Debug.Log("out of lives, ending match");
+					playerComponent.NumLives--;
+					UIManager.Instance.PlayerDeathUIChange(playerComponent);
+
 					args.EventObject.SetActive(false);
+					roundRunning = false;
 				}
 			}
 		}

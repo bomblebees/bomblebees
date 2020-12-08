@@ -17,6 +17,11 @@ public class UIManager : MonoBehaviour
 	[SerializeField]
 	private TextMeshProUGUI Player2HealthText;
 	[SerializeField]
+	private TextMeshProUGUI Player1LivesText;
+	[SerializeField]
+	private TextMeshProUGUI Player2LivesText;
+
+	[SerializeField]
 	private GameObject pregamePanel;
 	[SerializeField]
 	private TextMeshProUGUI NumLivesSliderText;
@@ -31,7 +36,9 @@ public class UIManager : MonoBehaviour
 
 	private GameStartData gameData = new GameStartData();
 	private List<Player> playerList;
+
 	private List<TextMeshProUGUI> playerHealthUIList;
+	private List<TextMeshProUGUI> playerLivesUIList;
 
 	private void Awake()
 	{
@@ -51,11 +58,17 @@ public class UIManager : MonoBehaviour
 		EventManager.Subscribe("playerHealthChanged", new EventHandler<CustomEventArgs>(UpdatePlayerHealthEvent));
 		Player1HealthText.gameObject.SetActive(false);
 		Player2HealthText.gameObject.SetActive(false);
+		Player1LivesText.gameObject.SetActive(false);
+		Player2LivesText.gameObject.SetActive(false);
 
-		// add HP text fields to list so we dont need conditionals on receiving health update events
+		// add HP and Lives Remaining text fields to list so we dont need conditionals on receiving health update events
 		playerHealthUIList = new List<TextMeshProUGUI>();
 		playerHealthUIList.Add(Player1HealthText);
 		playerHealthUIList.Add(Player2HealthText);
+
+		playerLivesUIList = new List<TextMeshProUGUI>();
+		playerLivesUIList.Add(Player1LivesText);
+		playerLivesUIList.Add(Player2LivesText);
 
 		gameData.NumLives = (int)numLivesSlider.GetComponent<Slider>().value;
 		gameData.MaxHP = (int)maxHPSlider.GetComponent<Slider>().value;
@@ -99,16 +112,15 @@ public class UIManager : MonoBehaviour
 
 	}
 
-	private void UpdatePlayerHealthEvent(object healthComponent, CustomEventArgs args)
+	public void PlayerDeathUIChange(Player player)
 	{
-		int playerNumber = 0;
-		int changedHealthAmount = args.Amount;
-		for(int i = 0; i < playerList.Count; i++)
+		// change number of lives and reset hp UI
+		for (int i = 0; i < playerList.Count; i++)
 		{
-			if (playerList[i].gameObject != null && playerList[i].gameObject == args.EventObject)
+			if (playerList[i].gameObject != null && playerList[i].gameObject == player.gameObject)
 			{
-				playerNumber = i + 1;
-				playerHealthUIList[i].text = changedHealthAmount.ToString();
+				playerHealthUIList[i].text = player.GetComponent<Health>().CurrentHealth.ToString();
+				playerLivesUIList[i].text = player.NumLives.ToString();
 			}
 		}
 	}
@@ -116,12 +128,30 @@ public class UIManager : MonoBehaviour
 	private void initialGameUIRefresh()
 	{
 		Player1HealthText.gameObject.SetActive(true);
+		Player1LivesText.gameObject.SetActive(true);
+
 		if (gameData.NumPlayers == 2)
 		{
 			Player2HealthText.gameObject.SetActive(true);
+			Player2LivesText.gameObject.SetActive(true);
 		}
 		Debug.Log("max hp is " + gameData.MaxHP);
 		Player1HealthText.text = gameData.MaxHP.ToString();
 		Player2HealthText.text = gameData.MaxHP.ToString();
+		Player1LivesText.text = gameData.NumLives.ToString();
+		Player2LivesText.text = gameData.NumLives.ToString();
+	}
+
+	// EventManager listeners
+	private void UpdatePlayerHealthEvent(object healthComponent, CustomEventArgs args)
+	{
+		int changedHealthAmount = args.Amount;
+		for(int i = 0; i < playerList.Count; i++)
+		{
+			if (playerList[i].gameObject != null && playerList[i].gameObject == args.EventObject)
+			{
+				playerHealthUIList[i].text = changedHealthAmount.ToString();
+			}
+		}
 	}
 }
