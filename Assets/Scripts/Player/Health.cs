@@ -1,4 +1,4 @@
-﻿// Referencing Jason Weimann's YouTube video "Unity Architecture - Composition or Inheritance?"
+// Referencing Jason Weimann's YouTube video "Unity Architecture - Composition or Inheritance?"
 // https://www.youtube.com/watch?v=8TIkManpEu4
 
 using System;
