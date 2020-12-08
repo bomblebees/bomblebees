@@ -38,7 +38,7 @@ public class Health : MonoBehaviour
 		{
 			// change currentHealth by amount (and emit damage dealt event)
 			currentHealth -= amount;
-			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = currentHealth });
+			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = currentHealth, EventObject = gameObject });
 		}
 
 		if (currentHealth <= 0)

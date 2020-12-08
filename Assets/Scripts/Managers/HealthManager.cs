@@ -16,17 +16,34 @@ public class HealthManager : MonoBehaviour
 	{
 		// subscribe to event which gets triggered when an object with a Health component dies
 		EventManager.Subscribe("healthObjectDied", new EventHandler<CustomEventArgs>(HandleDeathEvent));
+		EventManager.Subscribe("healthChanged", new EventHandler<CustomEventArgs>(HandleHealthChangeEvent));
+	}
+
+	private void HandleHealthChangeEvent(object thingWithHealth, CustomEventArgs args)
+	{
+		if (args.EventObject.CompareTag("Player"))
+		{
+			EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = args.Amount, EventObject = args.EventObject });
+		}
+		else
+		{
+			
+		}
 	}
 
 	private void HandleDeathEvent(object thingToKill, CustomEventArgs args)
 	{
 		// destroy the object that the health component was attached to, when this listener sees event trigger
-		Destroy(args.EventObject);
+		
 		if (args.EventObject.CompareTag("Player"))
 		{
-			Debug.Log("dead health component parent was a player");
+			// for player deaths, we hide the gameobject instead of destroying it. 
 			// trigger event of name playerDeath from class HealthManager with custom arg of player that just died
-			EventManager.TriggerEvent("playerDeath", this, new CustomEventArgs { EventObject = args.EventObject });
+			EventManager.TriggerEvent("playerDied", this, new CustomEventArgs { EventObject = args.EventObject });
+		}
+		else
+		{
+			Destroy(args.EventObject);
 		}
 
 		// in the future, before destroying the game object maybe this manager communicates some state changes and stuff here too

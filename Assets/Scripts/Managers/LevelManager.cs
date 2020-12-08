@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-	private List<Player> playerList;
+	public static LevelManager Instance { get; private set; }
+
+	public List<Player> PlayerList { get; private set; }
 
 	private bool isTwoPlayer = false;
 	private bool roundRunning = false;
@@ -15,14 +17,21 @@ public class LevelManager : MonoBehaviour
 	// Start is called before the first frame update
 	private void Awake()
 	{
-
+		if (Instance != null && Instance != this)
+		{
+			Destroy(this.gameObject);
+		}
+		else
+		{
+			Instance = this;
+		}
 	}
 
 	private void OnEnable()
 	{
-		playerList = new List<Player>();
+		PlayerList = new List<Player>();
 
-		EventManager.Subscribe("healthObjectDied", new EventHandler<CustomEventArgs>(HandlePlayerDeath));
+		EventManager.Subscribe("playerDied", new EventHandler<CustomEventArgs>(HandlePlayerDeath));
 		EventManager.Subscribe("gameStart", new EventHandler<CustomEventArgs>(GameStart));
 	}
 
@@ -40,18 +49,26 @@ public class LevelManager : MonoBehaviour
 
 	void AddPlayers()
 	{
-		if (!isTwoPlayer)
+		if (gameSettings.NumPlayers == 1)
 		{
 			// add for one player mode
 			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"));
 			Health playerHealth = temp.GetComponent<Health>();
 			playerHealth.CurrentHealth = gameSettings.MaxHP;
-		} else
-		{
-			playerList.Add(Instantiate(Resources.Load<Player>("Prefabs/Player1")));
-			playerList.Add(Instantiate(Resources.Load<Player>("Prefabs/Player1")));
+			PlayerList.Add(temp);
 		}
-		
+		else if (gameSettings.NumPlayers == 2)
+		{
+			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"));
+			Health playerHealth = temp.GetComponent<Health>();
+			playerHealth.CurrentHealth = gameSettings.MaxHP;
+			PlayerList.Add(temp);
+
+			Player temp2 = Instantiate(Resources.Load<Player>("Prefabs/Player2"));
+			Health playerHealth2 = temp2.GetComponent<Health>();
+			playerHealth2.CurrentHealth = gameSettings.MaxHP;
+			PlayerList.Add(temp2);
+		}
 	}
 
 	void GameStart(object uiManager, CustomEventArgs args)
@@ -65,7 +82,8 @@ public class LevelManager : MonoBehaviour
 
 	void HandlePlayerDeath(object player, CustomEventArgs args)
 	{
-		// Process death of a Player object, change game state, etc
-		Destroy(args.EventObject);
+		// Process death of a Player object, change game state, subtract from lives, etc
+		// Destroy(args.EventObject);
+		args.EventObject.SetActive(false);
 	}
 }
