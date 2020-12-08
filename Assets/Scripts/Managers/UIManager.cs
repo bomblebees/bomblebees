@@ -19,9 +19,9 @@ public class UIManager : MonoBehaviour
 	[SerializeField]
 	private GameObject pregamePanel;
 	[SerializeField]
-	private TextMeshProUGUI LivesNumberText;
+	private TextMeshProUGUI NumLivesSliderText;
 	[SerializeField]
-	private TextMeshProUGUI HPNumberText;
+	private TextMeshProUGUI MaxHPNumberSliderText;
 	[SerializeField]
 	private GameObject numLivesSlider;
 	[SerializeField]
@@ -82,13 +82,13 @@ public class UIManager : MonoBehaviour
 
 	public void UpdateLivesSliderText(float value)
 	{
-		LivesNumberText.text = value.ToString();
+		NumLivesSliderText.text = value.ToString();
 		gameData.NumLives = (int)value;
 	}
 
 	public void UpdateMaxHPSliderText(float value)
 	{
-		HPNumberText.text = value.ToString();
+		MaxHPNumberSliderText.text = value.ToString();
 		gameData.MaxHP = (int)value;
 	}
 
@@ -109,10 +109,8 @@ public class UIManager : MonoBehaviour
 			{
 				playerNumber = i + 1;
 				playerHealthUIList[i].text = changedHealthAmount.ToString();
-				Debug.Log("found matching player in levelmanager list");
 			}
 		}
-		Debug.Log("player hit was player number " + playerNumber);
 	}
 
 	private void initialGameUIRefresh()

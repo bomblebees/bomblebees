@@ -14,6 +14,10 @@ public class LevelManager : MonoBehaviour
 	private int numLives;
 	private GameStartData gameSettings;
 
+	private Vector3 player1SpawnPos = new Vector3(85, 5, -15);
+	private Vector3 player2SpawnPos = new Vector3(184, 5, 46);
+	private float invulnTime = 2.0f;
+
 	// Start is called before the first frame update
 	private void Awake()
 	{
@@ -52,19 +56,22 @@ public class LevelManager : MonoBehaviour
 		if (gameSettings.NumPlayers == 1)
 		{
 			// add for one player mode
-			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"));
+			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
+			temp.NumLives = numLives;
 			Health playerHealth = temp.GetComponent<Health>();
 			playerHealth.CurrentHealth = gameSettings.MaxHP;
 			PlayerList.Add(temp);
 		}
 		else if (gameSettings.NumPlayers == 2)
 		{
-			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"));
+			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
+			temp.NumLives = numLives;
 			Health playerHealth = temp.GetComponent<Health>();
 			playerHealth.CurrentHealth = gameSettings.MaxHP;
 			PlayerList.Add(temp);
 
-			Player temp2 = Instantiate(Resources.Load<Player>("Prefabs/Player2"));
+			Player temp2 = Instantiate(Resources.Load<Player>("Prefabs/Player2"), player2SpawnPos, new Quaternion());
+			temp2.NumLives = numLives;
 			Health playerHealth2 = temp2.GetComponent<Health>();
 			playerHealth2.CurrentHealth = gameSettings.MaxHP;
 			PlayerList.Add(temp2);
@@ -75,15 +82,62 @@ public class LevelManager : MonoBehaviour
 	{
 		// later we can add some kind of coroutine for a round start countdown or something
 		// but the round start functionality for scene gets defined here
-		roundRunning = true;
 		gameSettings = args.DataObject;
+		numLives = gameSettings.NumLives;
+
+
+		roundRunning = true;
+		
 		AddPlayers();
 	}
 
 	void HandlePlayerDeath(object player, CustomEventArgs args)
 	{
+		Player playerComponent = args.EventObject.GetComponent<Player>();
+		Health healthComponent = args.EventObject.GetComponent<Health>();
+		// int indexInList;
+		for (int i = 0; i < PlayerList.Count; i++)
+		{
+			if (PlayerList[i].gameObject != null && PlayerList[i].gameObject == args.EventObject)
+			{
+				//indexInList = i;
+				if (playerComponent.NumLives > 1)
+				{
+					// player has one or more lives left, do respawn thing (we can standardize "resetting" a new life in a new method later)
+					EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = gameSettings.MaxHP, EventObject = args.EventObject });
+
+					healthComponent.CurrentHealth = gameSettings.MaxHP;
+					healthComponent.Invulnerable = true;
+					args.EventObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 1f);
+					StartCoroutine(InvulnUntilEnd(invulnTime, healthComponent));
+					playerComponent.NumLives--;
+
+					if (i == 0)
+					{
+						args.EventObject.transform.position = player1SpawnPos;
+					}
+					else if (i == 1)
+					{
+						args.EventObject.transform.position = player2SpawnPos;
+					}
+				}
+				else
+				{
+					// player has no lives left, do end game thing
+					Debug.Log("out of lives, ending match");
+					args.EventObject.SetActive(false);
+				}
+			}
+		}
 		// Process death of a Player object, change game state, subtract from lives, etc
-		// Destroy(args.EventObject);
-		args.EventObject.SetActive(false);
+	}
+
+	private IEnumerator InvulnUntilEnd(float timer, Health health)
+	{
+		Debug.Log("timer started for invuln");
+		yield return new WaitForSeconds(timer);
+		Debug.Log("timer ended.");
+		health.Invulnerable = false;
+		health.gameObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 0f);
 	}
 }

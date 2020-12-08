@@ -25,10 +25,6 @@ public class HealthManager : MonoBehaviour
 		{
 			EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = args.Amount, EventObject = args.EventObject });
 		}
-		else
-		{
-			
-		}
 	}
 
 	private void HandleDeathEvent(object thingToKill, CustomEventArgs args)
@@ -39,7 +35,7 @@ public class HealthManager : MonoBehaviour
 		{
 			// for player deaths, we hide the gameobject instead of destroying it. 
 			// trigger event of name playerDeath from class HealthManager with custom arg of player that just died
-			EventManager.TriggerEvent("playerDied", this, new CustomEventArgs { EventObject = args.EventObject });
+			EventManager.TriggerEvent("playerDied", this, new CustomEventArgs { EventObject = args.EventObject.gameObject });
 		}
 		else
 		{

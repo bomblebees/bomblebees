@@ -93,7 +93,7 @@ public class EventManager : MonoBehaviour
 
 	public static void TriggerEvent (string eventName, object eventObject, CustomEventArgs args)
 	{
-		Debug.Log("event id " + eventName + " emitted from " + eventObject);
+		// Debug.Log("event id " + eventName + " emitted from " + eventObject);
 		EventHandler<CustomEventArgs> thisEvent = null;
 		if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
 		{
