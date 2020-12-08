@@ -9,7 +9,7 @@ public class BombExplosion : ComboEffect
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
 
-	private int defaultDamage = 50;
+	private int defaultDamage = 1;
 
     // Start is called before the first frame update
     private void Awake()
