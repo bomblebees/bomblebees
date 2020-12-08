@@ -12,19 +12,15 @@ public class Health : MonoBehaviour
 	[SerializeField]
 	protected int startingHealth = 3;
 
-	private int currentHealth;
-
 	// read only (is this the right way to do this lol?)
-	public int CurrentHealth
-	{
-		get { return currentHealth; }
-		set { currentHealth = value; }
-	}
+	public int CurrentHealth { get; set; }
+	public bool Invulnerable { get; set; }
 
 	// Start is called before the first frame update
 	void Awake()
     {
-		currentHealth = startingHealth; 
+		CurrentHealth = startingHealth;
+		Invulnerable = false;
     }
 
 	void Start()
@@ -34,14 +30,14 @@ public class Health : MonoBehaviour
 
 	public void DealDamage(int amount)
 	{
-		if (currentHealth > 0)
+		if (CurrentHealth > 0)
 		{
 			// change currentHealth by amount (and emit damage dealt event)
-			currentHealth -= amount;
-			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = currentHealth });
+			CurrentHealth -= amount;
+			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = CurrentHealth, EventObject = gameObject });
 		}
 
-		if (currentHealth <= 0)
+		if (CurrentHealth <= 0)
 		{
 			// call method for when currentHealth hits 0 (and emit death event)
 			OnHealthZero();

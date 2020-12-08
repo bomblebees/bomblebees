@@ -17,6 +17,7 @@ public class Player : NetworkBehaviour
     // Assets
     private HexGrid hexGrid;
     private HexCell cellPrefab;
+	public int NumLives { get; set; }
 
     [Header("Input")]
     [SerializeField] private bool isPlayer2 = false;
@@ -31,7 +32,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private float turnSpeed = 17f;
 
     public float punchDuration = 0.5f;
-    private bool canPunch = true;
+	private bool canPunch = true;
 
 
     [Header("HexTiles")]

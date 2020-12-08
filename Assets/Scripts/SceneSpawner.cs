@@ -25,7 +25,7 @@ public class SceneSpawner : MonoBehaviour
 		Instantiate(Resources.Load("Prefabs/Hex Grid"));
 
 
-    Instantiate(Resources.Load("Prefabs/Development UI"));
+		Instantiate(Resources.Load("Prefabs/Development UI"));
 		Instantiate(Resources.Load("Prefabs/Managers/EventManager"));
 		Instantiate(Resources.Load("Prefabs/Managers/LevelManager"));
 		Instantiate(Resources.Load("Prefabs/Managers/HealthManager"));
