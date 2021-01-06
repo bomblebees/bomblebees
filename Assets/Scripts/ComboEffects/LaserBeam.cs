@@ -9,7 +9,7 @@ public class LaserBeam : ComboEffect
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
 
-	private int defaultDamage = 50;
+	private int defaultDamage = 1;
 	private int testCounter = 0;
 
     // Start is called before the first frame update
@@ -58,7 +58,7 @@ public class LaserBeam : ComboEffect
     private void OnTriggerEnter(Collider other)
     {
 		testCounter++;
-		if (other.gameObject.GetComponent<Health>() != null)
+		if (other.gameObject.GetComponent<Health>() != null && !other.gameObject.GetComponent<Health>().Invulnerable)
 		{
 			other.gameObject.GetComponent<Health>().DealDamage(defaultDamage);
 		}

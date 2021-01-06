@@ -1,4 +1,4 @@
-﻿// Referencing Jason Weimann's YouTube video "Unity Architecture - Composition or Inheritance?"
+// Referencing Jason Weimann's YouTube video "Unity Architecture - Composition or Inheritance?"
 // https://www.youtube.com/watch?v=8TIkManpEu4
 
 using System;
@@ -8,45 +8,36 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
+	// it's a serializefield rn, but later on when we start prototyping it might get annoying editing other values in code
 	[SerializeField]
-	protected int startingHealth = 100;
-
-	private int currentHealth;
+	protected int startingHealth = 3;
 
 	// read only (is this the right way to do this lol?)
-	public int CurrentHealth
+	public int CurrentHealth { get; set; }
+	public bool Invulnerable { get; set; }
+
+	// Start is called before the first frame update
+	void Awake()
+    {
+		CurrentHealth = startingHealth;
+		Invulnerable = false;
+    }
+
+	void Start()
 	{
-		get { return currentHealth; }
-		set { }
+
 	}
-
-	// https://learn.unity.com/tutorial/c-actions
-	public event Action<GameObject> Died;
-	public event Action<int> HealthChanged;
-
-    // Start is called before the first frame update
-    void Awake()
-    {
-		currentHealth = startingHealth;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
 	public void DealDamage(int amount)
 	{
-		Debug.Log(currentHealth);
-		if (currentHealth > 0)
+		if (CurrentHealth > 0)
 		{
 			// change currentHealth by amount (and emit damage dealt event)
-			currentHealth -= amount;
-			HealthChanged?.Invoke(currentHealth);
+			CurrentHealth -= amount;
+			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = CurrentHealth, EventObject = gameObject });
 		}
 
-		if (currentHealth <= 0)
+		if (CurrentHealth <= 0)
 		{
 			// call method for when currentHealth hits 0 (and emit death event)
 			OnHealthZero();
@@ -55,12 +46,7 @@ public class Health : MonoBehaviour
 
 	private void OnHealthZero()
 	{
-		//Died?.Invoke(gameObject);
-
-        // For now, just delete the gameobject this script is stuck to
-        // Later we might use events for game state stuff, so that functionality can be split into more intuitive ways
-
-
-        Destroy(gameObject);
-    }
+		// when health hits 0, call death event thru EventManager singleton which listeners can react to and use custom args
+		EventManager.TriggerEvent("healthObjectDied", this, new CustomEventArgs { EventObject = gameObject });
+	}
 }
