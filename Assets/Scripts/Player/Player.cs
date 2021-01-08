@@ -250,11 +250,25 @@ public class Player : NetworkBehaviour
                 // Only update models and grids if it is a new key
                 if (!this.heldKey.Equals(newKey))
                 {
-                    setHeldKey(newKey);
-                    UpdateHeldHex();
+                    /*setHeldKey(newKey);
+                    UpdateHeldHex();*/
+                    CmdSetHeldKeyUpdateHeldHex(newKey);
                 }
             }
         }
+    }
+
+    [Command]
+    void CmdSetHeldKeyUpdateHeldHex(char newKey)
+    {
+        RpcSetHeldKeyUpdateHeldHex(newKey);
+    }
+
+    [ClientRpc]
+    void RpcSetHeldKeyUpdateHeldHex(char newKey)
+    {
+        setHeldKey(newKey);
+        UpdateHeldHex();
     }
 
     public void setHeldKey(char key)
