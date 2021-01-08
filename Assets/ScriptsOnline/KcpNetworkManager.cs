@@ -1,32 +1,35 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
-using Zenject;
 
 public class KcpNetworkManager : NetworkManager
 {
-    private void Update()
+    [Header("Spawnable GameObject")]
+    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject hexGrid;
+    [SerializeField] private GameObject developmentUI;
+    [SerializeField] private GameObject eventManager;
+    [SerializeField] private GameObject levelManager;
+    [SerializeField] private GameObject healthManager;
+    [SerializeField] private GameObject playUI;
+    
+    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
+
+    public override void OnStartClient()
     {
-        if (Input.GetKeyDown("1"))
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
+
+        foreach (var prefab in spawnablePrefabs)
         {
-            SpawnHexGrid();
-        }
-        
-        if (Input.GetKeyDown("3"))
-        {
-            SpawnLaserObject();
-        }
-        
-        if (Input.GetKeyDown("4"))
-        {
-            SpawnBombObject();
+            ClientScene.RegisterPrefab(prefab);
         }
     }
-
+    
     public override void OnClientConnect(NetworkConnection conn)
     {
         if (!clientLoadedScene)
@@ -38,35 +41,34 @@ public class KcpNetworkManager : NetworkManager
         }
     }
 
-    [Header("Test")]
-    [SerializeField] private GameObject _player;
-    [SerializeField] private GameObject _hexGrid;
-    [SerializeField] private GameObject _laserObject;
-    [SerializeField] private GameObject _bombObject;
-    
-    
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        GameObject player = Instantiate(_player);
-        NetworkServer.Spawn(player);
-        NetworkServer.AddPlayerForConnection(conn, player);
+        GameObject instantiatePlayer = Instantiate(player);
+        NetworkServer.Spawn(instantiatePlayer);
+        NetworkServer.AddPlayerForConnection(conn, instantiatePlayer);
     }
 
-    [ServerCallback]
-    void SpawnHexGrid()
+    private void Update()
     {
-        NetworkServer.Spawn(Instantiate(_hexGrid));
-    }
+        if (Input.GetKeyDown("1"))
+        {
+            SpawnScene(); // temporary method
+        }
 
-    [ServerCallback]
-    void SpawnLaserObject()
-    {
-        NetworkServer.Spawn(Instantiate(_laserObject));
+        if (Input.GetKeyDown("2"))
+        {
+            //SpawnPlayer();
+        }
     }
-
+    
     [ServerCallback]
-    void SpawnBombObject()
+    void SpawnScene()
     {
-        NetworkServer.Spawn(Instantiate(_bombObject));
+        NetworkServer.Spawn(Instantiate(hexGrid));
+        NetworkServer.Spawn(Instantiate(developmentUI));
+        NetworkServer.Spawn(Instantiate(eventManager));
+        NetworkServer.Spawn(Instantiate(levelManager));
+        NetworkServer.Spawn(Instantiate(healthManager));
+        NetworkServer.Spawn(Instantiate(playUI));
     }
 }

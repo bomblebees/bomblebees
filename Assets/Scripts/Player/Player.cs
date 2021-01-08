@@ -6,11 +6,10 @@ using System.Threading;
 using Castle.Components.DictionaryAdapter.Xml;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.Rendering.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using NetworkBehaviour = Mirror.NetworkBehaviour;
+using Mirror;
 
 public class Player : NetworkBehaviour
 {
@@ -49,6 +48,13 @@ public class Player : NetworkBehaviour
 
     private void Start()
     {
+        //LinkAssets();
+        //UpdateHeldHex();
+    }
+
+    [ClientRpc]
+    void RpcStart()
+    {
         LinkAssets();
         UpdateHeldHex();
     }
@@ -56,20 +62,76 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        GetPlayerInputs();
-        ApplyMovement();
-        ListenForSwapping();
-
+        if (Input.GetKeyDown("2"))
+        {
+            RpcStart(); // temporary method
+        }
+        
+        if (!hasAuthority) return;
+        
+        CmdGetPlayerInputs();
+        CmdApplyMovement();
+        CmdListenForSwapping();
         //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
     }
-
+    
     private void LateUpdate()
+    {
+        if (!hasAuthority) return;
+        
+        CmdListenForPunching();
+    }
+    
+    [Command]
+    void CmdGetPlayerInputs()
+    {
+        RpcPlayerInputs(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcPlayerInputs(NetworkConnection target)
+    {
+        GetPlayerInputs();
+    }
+
+    [Command]
+    void CmdApplyMovement()
+    {
+        RpcApplyMovement(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcApplyMovement(NetworkConnection target)
+    {
+        ApplyMovement();
+    }
+
+    [Command]
+    void CmdListenForSwapping()
+    {
+        RpcListenForSwapping(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcListenForSwapping(NetworkConnection target)
+    {
+        ListenForSwapping();
+    }
+
+    [Command]
+    void CmdListenForPunching()
+    {
+        RpcListenForPunching(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcListenForPunching(NetworkConnection target)
     {
         ListenForPunching();
     }
-
-    protected virtual void ListenForPunching()
+    
+    void ListenForPunching()
     {
         if (Input.GetKeyDown(punchKey))
         {
@@ -77,7 +139,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    protected virtual IEnumerator Punch()
+    IEnumerator Punch()
     {
         if (canPunch)
         {
@@ -98,7 +160,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    protected virtual void LinkAssets()
+    void LinkAssets()
     {
         cellPrefab =
             Resources.Load<HexCell>(String.Concat("Prefabs/",
@@ -110,7 +172,7 @@ public class Player : NetworkBehaviour
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
-    protected virtual void GetPlayerInputs()
+    void GetPlayerInputs()
     {
         if (!isPlayer2)
         {
@@ -123,7 +185,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    protected virtual void UpdateHeldHex()
+    void UpdateHeldHex()
     {
         if (this.heldHexModel)
         {
@@ -144,7 +206,7 @@ public class Player : NetworkBehaviour
     }
 
     // Apply movement to the player, using WASD or Arrow keys
-    protected virtual void ApplyMovement()
+    void ApplyMovement()
     {
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
@@ -160,7 +222,7 @@ public class Player : NetworkBehaviour
     }
 
     // Listens for key press and swaps the tile beneath the player
-    protected virtual void ListenForSwapping()
+    void ListenForSwapping()
     {
         tileRay = new Ray(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10);
 

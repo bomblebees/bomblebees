@@ -102,6 +102,7 @@ GameObject:
   m_Component:
   - component: {fileID: 157543588881523652}
   - component: {fileID: 157543588881523653}
+  - component: {fileID: 6450618751315917604}
   m_Layer: 2
   m_Name: Hex Grid
   m_TagString: HexGrid
@@ -148,14 +149,29 @@ MonoBehaviour:
   w_Hex: {fileID: 1105639704548485360, guid: 2ffe5189a68dcff4281118e4c6b08486, type: 3}
   default_Hex: {fileID: 3574846304584204012, guid: f3c50f8915d60f146bc61f6b26e52f14,
     type: 3}
-  minTilesInCombo: 3
+  minTilesForCombo: 3
   minTilesForGlow: 2
   enableCoords: 0
   enableRandomGen: 1
+  ignoreRandomGenOnE: 1
   enableChainRegen: 0
-  width: 19
-  height: 11
   tileRegenDuration: 1.5
+--- !u!114 &6450618751315917604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 157543588881523654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &157543589844822254
 GameObject:
   m_ObjectHideFlags: 0

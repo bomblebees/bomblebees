@@ -4,10 +4,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HexGrid : MonoBehaviour
+public class HexGrid : NetworkBehaviour
 {
     /// <summary>
     /// cellPrefab: The Hex Cell prefab to be instantiated by HexGrid at runtime
@@ -67,7 +68,7 @@ public class HexGrid : MonoBehaviour
     public float tileRegenDuration = 1.5f;
 
 
-    void Awake()
+    void Start()
     {
         CheckErrors();
         GetGridDimensions();
@@ -117,7 +118,7 @@ public class HexGrid : MonoBehaviour
             {
                 if (!enableRandomGen)
                 {
-                    CreateCell(x, z, i, level.getArray()[z, x]);
+                    RpcCreateCell(x, z, i, level.getArray()[z, x]);
                     i++;
                     continue;
                 }
@@ -125,16 +126,28 @@ public class HexGrid : MonoBehaviour
                 if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
                 {
                     char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-                    HexCell newCell = CreateCell(x, z, i, newTileKey);
-                    MakeCellUnique(newCell);
+                    RpcCreateCellMakeCellUnique(x, z, i, newTileKey);
                 }
                 else
                 {
-                    CreateCell(x, z, i, 'e');
+                    RpcCreateCell(x, z, i, 'e');
                 }
                 i++;
             }
         }
+    }
+
+    [ClientRpc]
+    void RpcCreateCell(int x, int z, int i, char tileKey)
+    {
+        CreateCell(x, z, i, tileKey);
+    }
+
+    [ClientRpc]
+    void RpcCreateCellMakeCellUnique(int x, int z, int i, char tileKey)
+    {
+        HexCell newCell = CreateCell(x, z, i, tileKey);
+        MakeCellUnique(newCell);
     }
 
     // MakeCellUnique: Updates a hex color to not generate a combo with its neighbors
@@ -225,13 +238,7 @@ public class HexGrid : MonoBehaviour
                 return default_Hex;
         }
     }
-
-
-    void Start()
-    {
-        // hexMesh.Triangulate(gridList);
-    }
-
+    
     /// <summary>
     /// CreateCell: Creates a hexCell at the given x & z (where x is the 
     ///     vertical axis. z is the horizontal axis. These are NOT
