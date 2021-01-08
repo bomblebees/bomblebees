@@ -295,12 +295,6 @@ public class HexGrid : NetworkBehaviour
             }
         }
 
-        Text label = Instantiate<Text>(cellLabelPrefab);
-        label.rectTransform.SetParent(gridCanvas.transform, false);
-        label.rectTransform.anchoredPosition =
-            new Vector2(position.x, position.z);
-        label.text = cell.coordinates.ToStringOnSeparateLines();
-        if (!enableCoords) label.enabled = false;
         return cell;
     }
 

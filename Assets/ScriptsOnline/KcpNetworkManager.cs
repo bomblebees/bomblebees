@@ -54,21 +54,16 @@ public class KcpNetworkManager : NetworkManager
         {
             SpawnScene(); // temporary method
         }
-
-        if (Input.GetKeyDown("2"))
-        {
-            //SpawnPlayer();
-        }
     }
     
     [ServerCallback]
     void SpawnScene()
     {
         NetworkServer.Spawn(Instantiate(hexGrid));
-        NetworkServer.Spawn(Instantiate(developmentUI));
-        NetworkServer.Spawn(Instantiate(eventManager));
-        NetworkServer.Spawn(Instantiate(levelManager));
-        NetworkServer.Spawn(Instantiate(healthManager));
-        NetworkServer.Spawn(Instantiate(playUI));
+        //NetworkServer.Spawn(Instantiate(developmentUI));
+        //NetworkServer.Spawn(Instantiate(eventManager));
+        //NetworkServer.Spawn(Instantiate(levelManager));
+        //NetworkServer.Spawn(Instantiate(healthManager));
+        //NetworkServer.Spawn(Instantiate(playUI));
     }
 }

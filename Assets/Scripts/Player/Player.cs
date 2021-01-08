@@ -72,6 +72,7 @@ public class Player : NetworkBehaviour
         CmdGetPlayerInputs();
         CmdApplyMovement();
         CmdListenForSwapping();
+
         //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
     }
@@ -110,6 +111,7 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdListenForSwapping()
     {
+        Debug.Log("CmdListenForSwapping");
         RpcListenForSwapping(connectionToClient);
     }
 
