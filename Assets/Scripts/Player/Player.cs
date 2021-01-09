@@ -70,7 +70,6 @@ public class Player : NetworkBehaviour
         if (!hasAuthority) return;
         
         CmdGetPlayerInputs();
-        CmdApplyMovement();
         CmdListenForSwapping();
 
         //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
@@ -80,7 +79,7 @@ public class Player : NetworkBehaviour
     private void LateUpdate()
     {
         if (!hasAuthority) return;
-        
+        CmdApplyMovement();
         CmdListenForPunching();
     }
     

@@ -110,6 +110,7 @@ public class HexGrid : NetworkBehaviour
         // cells = new HexCell[height * width];
     }
 
+    [ServerCallback]
     void GenerateHexGrid()
     {
         for (int z = 0, i = 0; z < height; z++)
