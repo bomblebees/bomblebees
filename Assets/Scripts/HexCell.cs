@@ -17,6 +17,8 @@ public class HexCell : NetworkBehaviour
     public Color color;
     [SerializeField] HexCell[] neighbors;
 
+    private int listIndex;
+
     public HexCell GetNeighbor(HexDirection direction)
     {
         return neighbors[(int) direction];
@@ -32,6 +34,15 @@ public class HexCell : NetworkBehaviour
     {
         spawnX = x;
         spawnZ = z;
+    }
+    public void SetListIndex(int idx)
+    {
+        listIndex = idx;
+    }
+
+    public int getListIndex()
+    {
+        return listIndex;
     }
 
     public float getSpawnX()

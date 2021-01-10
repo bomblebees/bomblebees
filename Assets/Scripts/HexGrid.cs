@@ -276,6 +276,7 @@ public class HexGrid : NetworkBehaviour
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
         cell.CreateModel(ReturnModelByCellKey(key));
         cell.SetKey(key);
+        cell.SetListIndex(i);
 
         if (x > 0) // Skips first vertical axis
         {
@@ -409,15 +410,28 @@ public class HexGrid : NetworkBehaviour
     {
         Debug.Log("swapped");
         char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
-        HexCell parent = modelHit.GetComponentInParent<HexCell>().GetThis(); // The parent of the model
+        int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 
-        Debug.Log(parent.coordinates.X + ", " + parent.coordinates.Y);
+        CmdSwapHexAndKey(cellIdx, heldKey);
 
-        Destroy(modelHit,
-            0f);
-        parent.CreateModel(this.ReturnModelByCellKey(heldKey));
-        parent.SetKey(heldKey);
-        if (parent.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
+        return (tempKey);
+    }
+
+    [Command(ignoreAuthority = true)]
+    void CmdSwapHexAndKey(int cellIdx, char heldKey)
+    {
+        RpcSwapHexAndKey(cellIdx, heldKey);
+    }
+
+    [ClientRpc]
+    public void RpcSwapHexAndKey(int cellIdx, char heldKey)
+    {
+        HexCell cell = gridList[cellIdx];
+
+        cell.DeleteModel();
+        cell.CreateModel(this.ReturnModelByCellKey(heldKey));
+        cell.SetKey(heldKey);
+        if (cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
         {
             // Unoptimized Scan TODO optimize it
             this.ScanListForGlow();
@@ -425,16 +439,8 @@ public class HexGrid : NetworkBehaviour
         else
         {
             // Optimized scan
-            this.RecalculateGlowForNonCombo(parent);
+            this.RecalculateGlowForNonCombo(cell);
         }
-
-        return (tempKey);
-    }
-
-    [ClientRpc]
-    public void RpcSwapHexAndKey(GameObject modelHit, char heldKey)
-    {
-        SwapHexAndKey(modelHit, heldKey);
     }
 
 

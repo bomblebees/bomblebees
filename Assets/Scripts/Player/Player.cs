@@ -67,12 +67,10 @@ public class Player : NetworkBehaviour
             RpcStart(); // temporary method
         }
         
-        if (!hasAuthority) return;
+        if (!isLocalPlayer) return;
         
         CmdGetPlayerInputs();
-        //CmdApplyMovement();
-        //ApplyMovement();
-        //CmdListenForSwapping();
+        ApplyMovement();
         ListenForSwapping();
 
         //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
@@ -81,8 +79,7 @@ public class Player : NetworkBehaviour
     
     private void LateUpdate()
     {
-        if (!hasAuthority) return;
-        CmdApplyMovement();
+        if (!isLocalPlayer) return;
         CmdListenForPunching();
     }
     
@@ -210,6 +207,7 @@ public class Player : NetworkBehaviour
     }
 
     // Apply movement to the player, using WASD or Arrow keys
+    [Client]
     void ApplyMovement()
     {
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
@@ -245,7 +243,7 @@ public class Player : NetworkBehaviour
             {
                 Debug.Log("space pressed");
                 GameObject modelHit = tileHit.transform.gameObject;
-                HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
+                //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = hexGrid.SwapHexAndKey(modelHit, getHeldKey());
 
 
