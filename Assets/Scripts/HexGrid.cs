@@ -75,7 +75,7 @@ public class HexGrid : NetworkBehaviour
 
         this.gridCanvas = GetComponentInChildren<Canvas>();
         this.hexMesh = GetComponentInChildren<HexMesh>();
-
+        
         GenerateHexGrid();
         ScanListForGlow(gridList);
     }
@@ -110,32 +110,38 @@ public class HexGrid : NetworkBehaviour
         // cells = new HexCell[height * width];
     }
 
-    [ServerCallback]
     void GenerateHexGrid()
     {
         for (int z = 0, i = 0; z < height; z++)
         {
             for (int x = 0; x < width; x++)
             {
-                if (!enableRandomGen)
-                {
-                    RpcCreateCell(x, z, i, level.getArray()[z, x]);
-                    i++;
-                    continue;
-                }
+                //if (!enableRandomGen)
+                //{
+                //    RpcCreateCell(x, z, i, level.getArray()[z, x]);
+                //    i++;
+                //    continue;
+                //}
 
-                if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
-                {
-                    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-                    RpcCreateCellMakeCellUnique(x, z, i, newTileKey);
-                }
-                else
-                {
-                    RpcCreateCell(x, z, i, 'e');
-                }
+                //if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
+                //{
+                //    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+                //    RpcCreateCellMakeCellUnique(x, z, i, newTileKey);
+                //}
+                //else
+                //{
+                //    RpcCreateCell(x, z, i, 'e');
+                //}
+                CreateCell(x, z, i, level.getArray()[z, x]);
                 i++;
             }
         }
+    }
+
+    [ClientRpc]
+    void RpcGenerateHexGrid()
+    {
+        GenerateHexGrid();
     }
 
     [ClientRpc]
@@ -404,6 +410,9 @@ public class HexGrid : NetworkBehaviour
         Debug.Log("swapped");
         char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
         HexCell parent = modelHit.GetComponentInParent<HexCell>().GetThis(); // The parent of the model
+
+        Debug.Log(parent.coordinates.X + ", " + parent.coordinates.Y);
+
         Destroy(modelHit,
             0f);
         parent.CreateModel(this.ReturnModelByCellKey(heldKey));
@@ -421,6 +430,13 @@ public class HexGrid : NetworkBehaviour
 
         return (tempKey);
     }
+
+    [ClientRpc]
+    public void RpcSwapHexAndKey(GameObject modelHit, char heldKey)
+    {
+        SwapHexAndKey(modelHit, heldKey);
+    }
+
 
     public int GetMinTilesInCombo()
     {

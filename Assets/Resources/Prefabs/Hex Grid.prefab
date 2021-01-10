@@ -138,6 +138,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414a0fc06528949a0baff4f719b04a4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   cellPrefab: {fileID: 2770079146010531154, guid: 94c2312396697489abc866a188f80152,
     type: 3}
   cellLabelPrefab: {fileID: 11470134, guid: f68794ca03b6f4510b9a5bd6ee9ba2f4, type: 3}
@@ -152,7 +154,7 @@ MonoBehaviour:
   minTilesForCombo: 3
   minTilesForGlow: 2
   enableCoords: 0
-  enableRandomGen: 1
+  enableRandomGen: 0
   ignoreRandomGenOnE: 1
   enableChainRegen: 0
   tileRegenDuration: 1.5

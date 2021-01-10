@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using Mirror;
 
-public class HexCell : MonoBehaviour
+public class HexCell : NetworkBehaviour
 {
     public HexCoordinates coordinates;
     public GameObject model;

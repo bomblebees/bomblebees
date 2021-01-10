@@ -70,7 +70,10 @@ public class Player : NetworkBehaviour
         if (!hasAuthority) return;
         
         CmdGetPlayerInputs();
-        CmdListenForSwapping();
+        //CmdApplyMovement();
+        //ApplyMovement();
+        //CmdListenForSwapping();
+        ListenForSwapping();
 
         //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
         //Debug.Log(heldHexModel.transform.position);
