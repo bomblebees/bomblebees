@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1294509866372869720}
   - component: {fileID: 6970830818767626191}
   - component: {fileID: 6267859202381966097}
+  - component: {fileID: 6858159854526571295}
   m_Layer: 8
   m_Name: PurpleHex
   m_TagString: BaseTile
@@ -107,3 +108,19 @@ Halo:
     serializedVersion: 2
     rgba: 4286611584
   m_Size: 8
+--- !u!114 &6858159854526571295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790374782423732109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0

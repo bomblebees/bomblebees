@@ -5,20 +5,8 @@ using UnityEngine;
 
 public class SteamNetworkManager : NetworkManager
 {
-    [Header("Custom Features")]
-    public GameObject _HexGrid;
-
-    private void Update()
+    public override void OnStartServer()
     {
-        if (Input.GetKeyDown("1"))
-        {
-            SpawnHexGrid();
-        }
-    }
-
-    [Server]
-    void SpawnHexGrid()
-    {
-        NetworkServer.Spawn(Instantiate(_HexGrid));
+        ServerChangeScene("Scene_SteamworksLobby");
     }
 }

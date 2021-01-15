@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 329017071006951778}
   - component: {fileID: 223594715321064568}
   - component: {fileID: 223594715321064571}
+  - component: {fileID: 9013405629855274477}
   m_Layer: 0
   m_Name: CharacterModel
   m_TagString: Untagged
@@ -164,9 +165,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbfe3a0bc0a9cea44a5b4a663774ff57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  isPlayer2: 0
+  swapKey: space
+  punchKey: p
   controller: {fileID: 223594715321064568}
-  speed: 6
-  turnSmoothness: 0.1
+  movementSpeed: 50
+  turnSpeed: 17
+  punchDuration: 0.5
+  heldKey: 103
+  heldHexScale: {x: 800, y: 800, z: 800}
+--- !u!114 &9013405629855274477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142568386901373912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &2090302488182436559
 GameObject:
   m_ObjectHideFlags: 0

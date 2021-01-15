@@ -4,10 +4,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HexGrid : MonoBehaviour
+public class HexGrid : NetworkBehaviour
 {
     /// <summary>
     /// cellPrefab: The Hex Cell prefab to be instantiated by HexGrid at runtime
@@ -67,14 +68,14 @@ public class HexGrid : MonoBehaviour
     public float tileRegenDuration = 1.5f;
 
 
-    void Awake()
+    void Start()
     {
         CheckErrors();
         GetGridDimensions();
 
         this.gridCanvas = GetComponentInChildren<Canvas>();
         this.hexMesh = GetComponentInChildren<HexMesh>();
-
+        
         GenerateHexGrid();
         ScanListForGlow(gridList);
     }
@@ -115,26 +116,45 @@ public class HexGrid : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                if (!enableRandomGen)
-                {
-                    CreateCell(x, z, i, level.getArray()[z, x]);
-                    i++;
-                    continue;
-                }
+                //if (!enableRandomGen)
+                //{
+                //    RpcCreateCell(x, z, i, level.getArray()[z, x]);
+                //    i++;
+                //    continue;
+                //}
 
-                if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
-                {
-                    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-                    HexCell newCell = CreateCell(x, z, i, newTileKey);
-                    MakeCellUnique(newCell);
-                }
-                else
-                {
-                    CreateCell(x, z, i, 'e');
-                }
+                //if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
+                //{
+                //    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+                //    RpcCreateCellMakeCellUnique(x, z, i, newTileKey);
+                //}
+                //else
+                //{
+                //    RpcCreateCell(x, z, i, 'e');
+                //}
+                CreateCell(x, z, i, level.getArray()[z, x]);
                 i++;
             }
         }
+    }
+
+    [ClientRpc]
+    void RpcGenerateHexGrid()
+    {
+        GenerateHexGrid();
+    }
+
+    [ClientRpc]
+    void RpcCreateCell(int x, int z, int i, char tileKey)
+    {
+        CreateCell(x, z, i, tileKey);
+    }
+
+    [ClientRpc]
+    void RpcCreateCellMakeCellUnique(int x, int z, int i, char tileKey)
+    {
+        HexCell newCell = CreateCell(x, z, i, tileKey);
+        MakeCellUnique(newCell);
     }
 
     // MakeCellUnique: Updates a hex color to not generate a combo with its neighbors
@@ -225,13 +245,7 @@ public class HexGrid : MonoBehaviour
                 return default_Hex;
         }
     }
-
-
-    void Start()
-    {
-        // hexMesh.Triangulate(gridList);
-    }
-
+    
     /// <summary>
     /// CreateCell: Creates a hexCell at the given x & z (where x is the 
     ///     vertical axis. z is the horizontal axis. These are NOT
@@ -262,6 +276,7 @@ public class HexGrid : MonoBehaviour
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
         cell.CreateModel(ReturnModelByCellKey(key));
         cell.SetKey(key);
+        cell.SetListIndex(i);
 
         if (x > 0) // Skips first vertical axis
         {
@@ -288,12 +303,6 @@ public class HexGrid : MonoBehaviour
             }
         }
 
-        Text label = Instantiate<Text>(cellLabelPrefab);
-        label.rectTransform.SetParent(gridCanvas.transform, false);
-        label.rectTransform.anchoredPosition =
-            new Vector2(position.x, position.z);
-        label.text = cell.coordinates.ToStringOnSeparateLines();
-        if (!enableCoords) label.enabled = false;
         return cell;
     }
 
@@ -401,12 +410,28 @@ public class HexGrid : MonoBehaviour
     {
         Debug.Log("swapped");
         char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
-        HexCell parent = modelHit.GetComponentInParent<HexCell>().GetThis(); // The parent of the model
-        Destroy(modelHit,
-            0f);
-        parent.CreateModel(this.ReturnModelByCellKey(heldKey));
-        parent.SetKey(heldKey);
-        if (parent.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
+        int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
+
+        CmdSwapHexAndKey(cellIdx, heldKey);
+
+        return (tempKey);
+    }
+
+    [Command(ignoreAuthority = true)]
+    void CmdSwapHexAndKey(int cellIdx, char heldKey)
+    {
+        RpcSwapHexAndKey(cellIdx, heldKey);
+    }
+
+    [ClientRpc]
+    public void RpcSwapHexAndKey(int cellIdx, char heldKey)
+    {
+        HexCell cell = gridList[cellIdx];
+
+        cell.DeleteModel();
+        cell.CreateModel(this.ReturnModelByCellKey(heldKey));
+        cell.SetKey(heldKey);
+        if (cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
         {
             // Unoptimized Scan TODO optimize it
             this.ScanListForGlow();
@@ -414,11 +439,10 @@ public class HexGrid : MonoBehaviour
         else
         {
             // Optimized scan
-            this.RecalculateGlowForNonCombo(parent);
+            this.RecalculateGlowForNonCombo(cell);
         }
-
-        return (tempKey);
     }
+
 
     public int GetMinTilesInCombo()
     {

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3934587053645438609}
   - component: {fileID: 3363781392330105011}
   - component: {fileID: -8013096733566474739}
+  - component: {fileID: 7126672076765608626}
   m_Layer: 10
   m_Name: Laser Beam
   m_TagString: ComboEffect
@@ -124,3 +125,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2b979ae87c4e4145868ee26c99caf17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7126672076765608626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2661414036607885510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0

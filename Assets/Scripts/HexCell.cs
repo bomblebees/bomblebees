@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using Mirror;
 
-public class HexCell : MonoBehaviour
+public class HexCell : NetworkBehaviour
 {
     public HexCoordinates coordinates;
     public GameObject model;
@@ -15,6 +16,8 @@ public class HexCell : MonoBehaviour
 
     public Color color;
     [SerializeField] HexCell[] neighbors;
+
+    private int listIndex;
 
     public HexCell GetNeighbor(HexDirection direction)
     {
@@ -31,6 +34,15 @@ public class HexCell : MonoBehaviour
     {
         spawnX = x;
         spawnZ = z;
+    }
+    public void SetListIndex(int idx)
+    {
+        listIndex = idx;
+    }
+
+    public int getListIndex()
+    {
+        return listIndex;
     }
 
     public float getSpawnX()
