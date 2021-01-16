@@ -15,25 +15,23 @@ public class Player : NetworkBehaviour
 {
     // Assets
     private HexGrid hexGrid;
-	public int NumLives { get; set; }
+    public int NumLives { get; set; }
 
-    [Header("Input")]
-    [SerializeField] private string swapKey = "space";
+    [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string punchKey = "p";
+    [SerializeField] private string spinKey = "o";
     private float horizontalAxis;
     private float verticalAxis;
 
-    [Header("Movement")]
-    [SerializeField] private CharacterController controller;
+    [Header("Movement")] [SerializeField] private CharacterController controller;
     [SerializeField] private float movementSpeed = 50;
     [SerializeField] private float turnSpeed = 17f;
 
     public float punchDuration = 0.5f;
-	private bool canPunch = true;
+    private bool canPunch = true;
 
 
-    [Header("HexTiles")]
-    [SyncVar(hook = nameof(OnChangeHeldKey))]
+    [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
 
     // Cache raycast refs for optimization
@@ -65,7 +63,7 @@ public class Player : NetworkBehaviour
         // Listens for swapping and highlights selected hex
         ListenForSwapping();
     }
-    
+
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
@@ -83,7 +81,7 @@ public class Player : NetworkBehaviour
     {
         ListenForPunching();
     }
-    
+
     void ListenForPunching()
     {
         if (Input.GetKeyDown(punchKey))
@@ -92,15 +90,37 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [Command]
+    void CmdListenForSpinning()
+    {
+        RpcListenForPunching(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcListenForSpinning(NetworkConnection target)
+    {
+        ListenForSpinning();
+    }
+
+    void ListenForSpinning()
+    {
+        if (Input.GetKeyDown(spinKey))
+        {
+            StartCoroutine(this.Spin());
+        }
+    }
+
+
     IEnumerator Punch()
     {
         if (canPunch)
         {
             // enable punch object for a given number of frames
             var punchHitbox = gameObject.transform.Find("PunchHitbox");
+            // error check
             if (!punchHitbox)
             {
-                Debug.LogError("punchHitbox collider not found");
+                Debug.LogError("Player.cs: no punchHitbox assigned");
             }
             else
             {
@@ -112,6 +132,22 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+    // IEnumerator Spin()
+    // {
+    //     if (canSpin)
+    //     {
+    //         var spinHitbox = gameObject.transform.Find("SpinHitbox");
+    //         if (!spinHitbox)
+    //         {
+    //             Debug.LogError("Player.cs: no spinHitbox assigned");
+    //         }
+    //         else
+    //         {
+    //             
+    //         }
+    //     }
+    // }
 
     [Client]
     void LinkAssets()
