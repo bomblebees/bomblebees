@@ -47,6 +47,8 @@ public class HexGrid : NetworkBehaviour
 
     // Whether the map will generate randomly on start
     public bool enableRandomGen = false;
+    // Seed for random generation
+    public int randomSeed = 1234;
 
     /// <summary>
     /// ignoreRandomGenOnE: if true, use preset map's 'e' tiles as default. Otherwise, ignore.
@@ -70,6 +72,7 @@ public class HexGrid : NetworkBehaviour
 
     void Start()
     {
+        UnityEngine.Random.InitState(randomSeed);
         CheckErrors();
         GetGridDimensions();
 
@@ -116,23 +119,23 @@ public class HexGrid : NetworkBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                //if (!enableRandomGen)
-                //{
-                //    RpcCreateCell(x, z, i, level.getArray()[z, x]);
-                //    i++;
-                //    continue;
-                //}
+                if (!enableRandomGen)
+                {
+                    CreateCell(x, z, i, level.getArray()[z, x]);
+                    i++;
+                    continue;
+                }
 
-                //if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
-                //{
-                //    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-                //    RpcCreateCellMakeCellUnique(x, z, i, newTileKey);
-                //}
-                //else
-                //{
-                //    RpcCreateCell(x, z, i, 'e');
-                //}
-                CreateCell(x, z, i, level.getArray()[z, x]);
+                if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
+                {
+                    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+                    HexCell newCell = CreateCell(x, z, i, newTileKey);
+                    MakeCellUnique(newCell);
+                }
+                else
+                {
+                    CreateCell(x, z, i, 'e');
+                }
                 i++;
             }
         }

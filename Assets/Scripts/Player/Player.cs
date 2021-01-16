@@ -35,7 +35,6 @@ public class Player : NetworkBehaviour
     [Header("HexTiles")]
     [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
-    [SerializeField] private GameObject hexModelTest;
 
     // Cache raycast refs for optimization
     private Ray tileRay;
