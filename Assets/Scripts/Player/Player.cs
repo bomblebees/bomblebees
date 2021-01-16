@@ -15,11 +15,9 @@ public class Player : NetworkBehaviour
 {
     // Assets
     private HexGrid hexGrid;
-    private HexCell cellPrefab;
 	public int NumLives { get; set; }
 
     [Header("Input")]
-    [SerializeField] private bool isPlayer2 = false;
     [SerializeField] private string swapKey = "space";
     [SerializeField] private string punchKey = "p";
     private float horizontalAxis;
@@ -35,6 +33,7 @@ public class Player : NetworkBehaviour
 
 
     [Header("HexTiles")]
+    [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
 
     // Cache raycast refs for optimization
@@ -46,78 +45,31 @@ public class Player : NetworkBehaviour
     float swapDistance = 15;
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
 
-    private void Start()
-    {
-        //LinkAssets();
-        //UpdateHeldHex();
-    }
 
-    [ClientRpc]
-    void RpcStart()
+    public override void OnStartClient()
     {
         LinkAssets();
-        UpdateHeldHex();
+        // Initialize model
+        UpdateHeldHex(heldKey);
+        base.OnStartClient();
     }
 
     // Update is called once per frame
-    protected virtual void Update()
+    [ClientCallback]
+    private void Update()
     {
-        if (Input.GetKeyDown("2"))
-        {
-            RpcStart(); // temporary method
-        }
-        
         if (!isLocalPlayer) return;
-        
-        CmdGetPlayerInputs();
-        ApplyMovement();
-        ListenForSwapping();
 
-        //Debug.DrawRay(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10, Color.green);
-        //Debug.Log(heldHexModel.transform.position);
+        // Applies player movement
+        ApplyMovement();
+        // Listens for swapping and highlights selected hex
+        ListenForSwapping();
     }
     
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
         CmdListenForPunching();
-    }
-    
-    [Command]
-    void CmdGetPlayerInputs()
-    {
-        RpcPlayerInputs(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcPlayerInputs(NetworkConnection target)
-    {
-        GetPlayerInputs();
-    }
-
-    [Command]
-    void CmdApplyMovement()
-    {
-        RpcApplyMovement(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcApplyMovement(NetworkConnection target)
-    {
-        ApplyMovement();
-    }
-
-    [Command]
-    void CmdListenForSwapping()
-    {
-        Debug.Log("CmdListenForSwapping");
-        RpcListenForSwapping(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcListenForSwapping(NetworkConnection target)
-    {
-        ListenForSwapping();
     }
 
     [Command]
@@ -161,32 +113,22 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [Client]
     void LinkAssets()
     {
-        cellPrefab =
-            Resources.Load<HexCell>(String.Concat("Prefabs/",
-                HexMetrics.GetHexCellPrefabName())); // The return type is enclosed by <>
-        if (!cellPrefab) Debug.LogError("Player.cs: No cellPrefab found.");
-
         hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
             .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
-    void GetPlayerInputs()
+    void OnChangeHeldKey(char oldHeldKey, char newHeldKey)
     {
-        if (!isPlayer2)
-        {
-            horizontalAxis = Input.GetAxisRaw("HorizontalPlayer1");
-            verticalAxis = Input.GetAxisRaw("VerticalPlayer1");
-        } else
-        {
-            horizontalAxis = Input.GetAxisRaw("HorizontalPlayer2");
-            verticalAxis = Input.GetAxisRaw("VerticalPlayer2");
-        }
+        //heldKey = newHeldKey;
+        Debug.Log("ON CHANGE TEST");
+        UpdateHeldHex(newHeldKey);
     }
 
-    void UpdateHeldHex()
+    void UpdateHeldHex(char newHeldKey)
     {
         if (this.heldHexModel)
         {
@@ -195,9 +137,8 @@ public class Player : NetworkBehaviour
         }
 
         // Create the hex model in the player's hand
-        this.heldHexModel = cellPrefab.CreateModel
-        (
-            hexGrid.ReturnModelByCellKey(heldKey),
+        this.heldHexModel = Instantiate(
+            hexGrid.ReturnModelByCellKey(newHeldKey),
             transform.position + transform.up * 18 + transform.forward * 10,
             transform.rotation,
             transform
@@ -210,6 +151,9 @@ public class Player : NetworkBehaviour
     [Client]
     void ApplyMovement()
     {
+        horizontalAxis = Input.GetAxisRaw("Horizontal");
+        verticalAxis = Input.GetAxisRaw("Vertical");
+
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         {
@@ -224,6 +168,7 @@ public class Player : NetworkBehaviour
     }
 
     // Listens for key press and swaps the tile beneath the player
+    [Client]
     void ListenForSwapping()
     {
         tileRay = new Ray(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10);
@@ -250,25 +195,23 @@ public class Player : NetworkBehaviour
                 // Only update models and grids if it is a new key
                 if (!this.heldKey.Equals(newKey))
                 {
-                    /*setHeldKey(newKey);
-                    UpdateHeldHex();*/
-                    CmdSetHeldKeyUpdateHeldHex(newKey);
+                    CmdSetHeldKey(newKey);
                 }
             }
         }
     }
 
     [Command]
-    void CmdSetHeldKeyUpdateHeldHex(char newKey)
+    void CmdSetHeldKey(char newKey)
     {
-        RpcSetHeldKeyUpdateHeldHex(newKey);
+        RpcSetHeldKey(newKey);
     }
 
     [ClientRpc]
-    void RpcSetHeldKeyUpdateHeldHex(char newKey)
+    void RpcSetHeldKey(char newKey)
     {
         setHeldKey(newKey);
-        UpdateHeldHex();
+        UpdateHeldHex(newKey);
     }
 
     public void setHeldKey(char key)

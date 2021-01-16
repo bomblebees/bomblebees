@@ -17,8 +17,13 @@ public class KcpNetworkManager : NetworkManager
     [SerializeField] private GameObject levelManager;
     [SerializeField] private GameObject healthManager;
     [SerializeField] private GameObject playUI;
-    
-    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
+
+    public override void OnStartServer()
+    {
+        spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
+        SpawnScene();
+    } 
+
 
     public override void OnStartClient()
     {
@@ -46,14 +51,6 @@ public class KcpNetworkManager : NetworkManager
         GameObject instantiatePlayer = Instantiate(player);
         NetworkServer.Spawn(instantiatePlayer);
         NetworkServer.AddPlayerForConnection(conn, instantiatePlayer);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown("1"))
-        {
-            SpawnScene(); // temporary method
-        }
     }
     
     [ServerCallback]
