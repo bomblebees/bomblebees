@@ -27,8 +27,11 @@ public class Player : NetworkBehaviour
     [SerializeField] private float movementSpeed = 50;
     [SerializeField] private float turnSpeed = 17f;
 
-    public float punchDuration = 0.5f;
+    public float punchCooldown = 0.5f;
+    public float spinDuration = 0.6f;
+    public float spinCooldown = 0.7f;
     private bool canPunch = true;
+    private bool canSpin = true;
 
 
     [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
@@ -46,10 +49,19 @@ public class Player : NetworkBehaviour
 
     public override void OnStartClient()
     {
+        this.Assert();
         LinkAssets();
         // Initialize model
         UpdateHeldHex(heldKey);
         base.OnStartClient();
+    }
+
+    void Assert()
+    {
+        if (spinCooldown < spinDuration)
+        {
+            Debug.LogError("Player.cs: spinCooldown is lower than spinDuration.");
+        }
     }
 
     // Update is called once per frame
@@ -62,12 +74,13 @@ public class Player : NetworkBehaviour
         ApplyMovement();
         // Listens for swapping and highlights selected hex
         ListenForSwapping();
+        CmdListenForPunching();
+        CmdListenForSpinning();
     }
 
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
-        CmdListenForPunching();
     }
 
     [Command]
@@ -93,7 +106,7 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdListenForSpinning()
     {
-        RpcListenForPunching(connectionToClient);
+        RpcListenForSpinning(connectionToClient);
     }
 
     [TargetRpc]
@@ -126,28 +139,34 @@ public class Player : NetworkBehaviour
             {
                 canPunch = false;
                 punchHitbox.gameObject.SetActive(true);
-                yield return new WaitForSeconds(punchDuration);
+                yield return new WaitForSeconds(punchCooldown);
                 canPunch = true;
                 punchHitbox.gameObject.SetActive(false);
             }
         }
     }
 
-    // IEnumerator Spin()
-    // {
-    //     if (canSpin)
-    //     {
-    //         var spinHitbox = gameObject.transform.Find("SpinHitbox");
-    //         if (!spinHitbox)
-    //         {
-    //             Debug.LogError("Player.cs: no spinHitbox assigned");
-    //         }
-    //         else
-    //         {
-    //             
-    //         }
-    //     }
-    // }
+    IEnumerator Spin()
+    {
+        if (canSpin)
+        {
+            Debug.Log("Spun");
+            var spinHitbox = gameObject.transform.Find("SpinHitbox");
+            if (!spinHitbox)
+            {
+                Debug.LogError("Player.cs: no spinHitbox assigned");
+            }
+            else
+            {
+                canSpin = false;
+                spinHitbox.gameObject.SetActive(true);
+                yield return new WaitForSeconds(spinDuration);
+                spinHitbox.gameObject.SetActive(false);
+                yield return new WaitForSeconds(spinCooldown);
+                canSpin = true;
+            }
+        }
+    }
 
     [Client]
     void LinkAssets()
