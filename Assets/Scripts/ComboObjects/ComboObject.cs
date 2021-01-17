@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Castle.Components.DictionaryAdapter.Xml;
 using UnityEngine;
 
 // Required Children:
@@ -13,6 +14,7 @@ public class ComboObject : MonoBehaviour
     private Vector3 puncherPosition;
     private Vector3 tileCoordUnderPuncher;
     private float pushedDir = 30;
+    public Vector3 nearestCenter;
     
     public float tickDuration = 4f;
     public float vfxDuration = 4f;
@@ -21,7 +23,29 @@ public class ComboObject : MonoBehaviour
     public float lifeDuration = 8f;   
     public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
     public float universalVal = 4f;
-     
+
+    protected virtual void Start()
+    {
+        FindCenter();
+        GoToCenter();
+    }
+
+    protected virtual void FindCenter()
+    {
+       var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
+       RaycastHit tileUnderneath;
+       if (Physics.Raycast(objectRay, out tileUnderneath, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+       {
+           var result = tileUnderneath.transform.gameObject.GetComponent<Transform>().position;
+           nearestCenter = result;
+       }
+    }
+
+    protected virtual void GoToCenter()
+    {
+       this.gameObject.transform.position = nearestCenter;
+    }
+
     protected virtual IEnumerator TickDown()
     {
         yield return new WaitForSeconds(tickDuration);
@@ -29,8 +53,24 @@ public class ComboObject : MonoBehaviour
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
         StartCoroutine(DisableObjectModel());
+        StopVelocity();
         yield return new WaitForSeconds(lifeDuration);
         DestroySelf();
+    }
+    
+    protected virtual void FindDistFromCenter()
+    {
+    }
+
+    protected virtual void RecursiveWait()
+    {
+    }
+
+    protected virtual void StopVelocity()
+    {
+        // wait if not at center
+        var rigidBody = this.GetComponent<Rigidbody>();
+        rigidBody.velocity = Vector3.zero;
     }
     
     protected virtual IEnumerator EnableVFX()
@@ -56,7 +96,7 @@ public class ComboObject : MonoBehaviour
     
     protected virtual IEnumerator DisableObjectModel()
     {
-        this.gameObject.transform.Find("Model").gameObject.SetActive(true);
+        this.gameObject.transform.Find("Model").gameObject.SetActive(false);
         yield return new WaitForSeconds(lifeDuration);
     }
 

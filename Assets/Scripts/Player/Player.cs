@@ -106,7 +106,7 @@ public class Player : NetworkBehaviour
 
     IEnumerator BombUse()
     {
-        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"), this.gameObject.transform.position,Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"), this.gameObject.transform.position + new Vector3(0f,10f,0f),Quaternion.identity);
         yield return new WaitForSeconds(0);
     }
 

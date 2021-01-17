@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 4365775587545036260}
   - component: {fileID: 1977835111053345070}
   - component: {fileID: -7917524021038800300}
-  - component: {fileID: 8496690332767476697}
   - component: {fileID: 1048301957364624522}
-  m_Layer: 8
+  - component: {fileID: -8548571574283322683}
+  m_Layer: 11
   m_Name: YellowHex
   m_TagString: BaseTile
   m_Icon: {fileID: 0}
@@ -93,21 +93,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6099800089077584851, guid: e931c1c0417776542aac00d7edc28bff, type: 3}
---- !u!122 &8496690332767476697
-Halo:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 32179397214527739}
-  m_Enabled: 0
-  m_Color:
-    serializedVersion: 2
-    rgba: 4286611584
-  m_Size: 10.05
 --- !u!114 &1048301957364624522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,3 +112,19 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
+--- !u!54 &-8548571574283322683
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 32179397214527739}
+  serializedVersion: 2
+  m_Mass: 0.0000001
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0

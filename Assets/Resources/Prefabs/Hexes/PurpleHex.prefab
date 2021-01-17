@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 6970830818767626191}
   - component: {fileID: 6267859202381966097}
   - component: {fileID: 6858159854526571295}
-  m_Layer: 8
+  - component: {fileID: 3582608037080364581}
+  m_Layer: 11
   m_Name: PurpleHex
   m_TagString: BaseTile
   m_Icon: {fileID: 0}
@@ -93,7 +94,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6099800089077584851, guid: e931c1c0417776542aac00d7edc28bff, type: 3}
 --- !u!122 &6267859202381966097
@@ -124,3 +125,19 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
+--- !u!54 &3582608037080364581
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 790374782423732109}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
