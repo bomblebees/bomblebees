@@ -18,7 +18,38 @@ public class ComboObject : MonoBehaviour
     protected virtual IEnumerator TickDown()
     {
         yield return new WaitForSeconds(4);
+        StartCoroutine(EnableSFX());
+        StartCoroutine(EnableVFX());
+        StartCoroutine(DisableObjectModel());
+        StartCoroutine(EnableHitbox());
+        yield return new WaitForSeconds(2);
         this.DestroySelf();
+    }
+    
+    protected virtual IEnumerator EnableSFX()
+    {
+        yield return new WaitForSeconds(0);
+    }
+
+    protected virtual IEnumerator EnableVFX()
+    {
+        var animation = this.gameObject.transform.Find("Animation");
+        animation.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0);
+    }
+    
+    protected virtual IEnumerator DisableObjectModel()
+    {
+        var model = this.gameObject.transform.Find("Model");
+        model.gameObject.SetActive(false);
+        yield return new WaitForSeconds(0);
+    }
+
+    protected virtual IEnumerator EnableHitbox()
+    {
+        var hitbox = this.gameObject.transform.Find("Hitbox");
+        hitbox.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0);
     }
 
     protected virtual void PunchedAction(int edgeIndex)
@@ -46,6 +77,7 @@ public class ComboObject : MonoBehaviour
             var playerPosition = other.transform.parent.gameObject.transform.position;
             // note: Don't use Vector3.Angle
             var angleInRad = Mathf.Atan2(playerPosition.x - transform.position.x, playerPosition.z - transform.position.z);
+            
             var dirFromPlayerToThis = (Mathf.Rad2Deg * angleInRad) + 180;  // "+ 180" because Unity ranges it from [-180, 180]
 
             pushedDir = 30f;
@@ -62,26 +94,5 @@ public class ComboObject : MonoBehaviour
             Debug.Log("target dir is " + pushedDir);
             this.PunchedAction(edgeIndex);
         }
-    }
-
-    // Deprecated
-    protected Vector3 GetTileCoordUnderPuncher(Collider other)
-    {
-        var playerRay = new Ray(other.gameObject.transform.position, Vector3.down);
-        RaycastHit tileUnderneath;
-
-
-        // old method
-
-        if (Physics.Raycast(playerRay, out tileUnderneath, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-        {
-            // make a sphere at point
-            var result = tileUnderneath.transform.position; // this is right
-            Instantiate(Resources.Load("Prefabs/Debug/Cylinder"), result, Quaternion.identity);
-            return result;
-        }
-        else
-            // remove this
-            return Vector3.down;
     }
 }

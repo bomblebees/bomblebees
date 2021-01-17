@@ -7,6 +7,8 @@ public class BombObject : ComboObject
 {
     public float tickDuration = 2f;
     public string effectPath = "Prefabs/ComboEffects/Bomb Explosion";
+    public float animDuration = 4f;
+    public float hitboxDuration = 4f;
 
     private void Start()
     {
@@ -15,10 +17,11 @@ public class BombObject : ComboObject
 
     protected override IEnumerator TickDown()
     {
+        
         yield return new WaitForSeconds(tickDuration);
-
+        StartCoroutine(EnableAnim());
+        StartCoroutine(EnableFX);
         this.Explode();
-        this.DestroySelf();
     }
 
     private void Explode()
