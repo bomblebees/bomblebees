@@ -20,8 +20,8 @@ public class ComboObject : MonoBehaviour
         yield return new WaitForSeconds(4);
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
-        StartCoroutine(DisableObjectModel());
         StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectModel());
         yield return new WaitForSeconds(2);
         this.DestroySelf();
     }

@@ -19,9 +19,11 @@ public class BombObject : ComboObject
     {
         
         yield return new WaitForSeconds(tickDuration);
-        StartCoroutine(EnableAnim());
-        StartCoroutine(EnableFX);
-        this.Explode();
+        StartCoroutine(EnableSFX());
+        StartCoroutine(EnableVFX());
+        StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectModel());
+        // StartCoroutine(Destroy());
     }
 
     private void Explode()
