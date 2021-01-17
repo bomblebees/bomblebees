@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class LaserObject : ComboObject
 {
-    public float tickDuration = 2f;
     private HexDirection hexDirection;
     public string effectPath = "Prefabs/ComboEffects/Laser Beam";
 

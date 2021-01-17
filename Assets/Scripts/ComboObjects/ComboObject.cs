@@ -3,53 +3,61 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Required Children:
+// - VFX
+// - SFX
+// - Hitbox
 public class ComboObject : MonoBehaviour
 {
     public float pushedSpeed = 5000f;
     private Vector3 puncherPosition;
     private Vector3 tileCoordUnderPuncher;
     private float pushedDir = 30;
-
-    protected virtual void DestroySelf()
-    {
-        Destroy(this.gameObject);
-    }
-
+    
+    public float tickDuration = 4f;
+    public float vfxDuration = 4f;
+    public float sfxDuration = 4f;
+    public float hitboxDuration = 4f;
+    public float lifeDuration = 8f;   
+    public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
+    public float universalVal = 4f;
+     
     protected virtual IEnumerator TickDown()
     {
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(tickDuration);
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
         StartCoroutine(DisableObjectModel());
-        yield return new WaitForSeconds(2);
-        this.DestroySelf();
+        yield return new WaitForSeconds(lifeDuration);
+        DestroySelf();
+    }
+    
+    protected virtual IEnumerator EnableVFX()
+    {
+        this.gameObject.transform.Find("VFX").gameObject.SetActive(true);
+        if (!useUniversalVal) yield return new WaitForSeconds(vfxDuration);
+        else yield return new WaitForSeconds(universalVal);
     }
     
     protected virtual IEnumerator EnableSFX()
     {
-        yield return new WaitForSeconds(0);
+        this.gameObject.transform.Find("SFX").gameObject.SetActive(true);
+        if (!useUniversalVal) yield return new WaitForSeconds(sfxDuration);
+        else yield return new WaitForSeconds(universalVal);
     }
-
-    protected virtual IEnumerator EnableVFX()
+    
+    protected virtual IEnumerator EnableHitbox()
     {
-        var animation = this.gameObject.transform.Find("Animation");
-        animation.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0);
+        this.gameObject.transform.Find("Hitbox").gameObject.SetActive(true);
+        if (!useUniversalVal) yield return new WaitForSeconds(hitboxDuration);
+        else yield return new WaitForSeconds(universalVal);
     }
     
     protected virtual IEnumerator DisableObjectModel()
     {
-        var model = this.gameObject.transform.Find("Model");
-        model.gameObject.SetActive(false);
-        yield return new WaitForSeconds(0);
-    }
-
-    protected virtual IEnumerator EnableHitbox()
-    {
-        var hitbox = this.gameObject.transform.Find("Hitbox");
-        hitbox.gameObject.SetActive(true);
-        yield return new WaitForSeconds(0);
+        this.gameObject.transform.Find("Model").gameObject.SetActive(true);
+        yield return new WaitForSeconds(lifeDuration);
     }
 
     protected virtual void PunchedAction(int edgeIndex)
@@ -94,5 +102,10 @@ public class ComboObject : MonoBehaviour
             Debug.Log("target dir is " + pushedDir);
             this.PunchedAction(edgeIndex);
         }
+    }
+    
+    protected virtual void DestroySelf()
+    {
+        Destroy(this.gameObject);
     }
 }

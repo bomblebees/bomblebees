@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour
     [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string punchKey = "p";
     [SerializeField] private string spinKey = "o";
+    [SerializeField] private string bombKey = "j";
     private float horizontalAxis;
     private float verticalAxis;
 
@@ -76,11 +77,37 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
         CmdListenForPunching();
         CmdListenForSpinning();
+        CmdListenForBombUse();
     }
 
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
+    }
+    
+    void CmdListenForBombUse()
+    {
+        RpcListenForBombUse(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcListenForBombUse(NetworkConnection target)
+    {
+        ListenForBombUse();
+    }
+    
+    void ListenForBombUse()
+    {
+        if (Input.GetKeyDown(bombKey))
+        {
+            StartCoroutine(this.BombUse());
+        }
+    }
+
+    IEnumerator BombUse()
+    {
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"), this.gameObject.transform.position,Quaternion.identity);
+        yield return new WaitForSeconds(0);
     }
 
     [Command]

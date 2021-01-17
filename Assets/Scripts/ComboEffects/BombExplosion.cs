@@ -8,7 +8,6 @@ public class BombExplosion : ComboEffect
 {
     private float lifeDuration = 0.5f;
     private float sizeScalar = 2f;
-
 	private int defaultDamage = 1;
 
     // Start is called before the first frame update
@@ -31,7 +30,6 @@ public class BombExplosion : ComboEffect
 
     private void OnTriggerEnter(Collider other)
     {
-
 		if (other.gameObject.GetComponent<Health>() != null)
 		{
 			other.gameObject.GetComponent<Health>().DealDamage(defaultDamage);
