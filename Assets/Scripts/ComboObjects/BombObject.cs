@@ -9,6 +9,7 @@ public class BombObject : ComboObject
     public string effectPath = "Prefabs/ComboEffects/Bomb Explosion";
     public float animDuration = 4f;
     public float hitboxDuration = 4f;
+    public float lifeDuration = 4f;
 
     private void Start()
     {
@@ -23,11 +24,12 @@ public class BombObject : ComboObject
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
         StartCoroutine(DisableObjectModel());
-        // StartCoroutine(Destroy());
+        yield return new WaitForSeconds(lifeDuration);
     }
 
-    private void Explode()
+    protected override IEnumerator EnableHitbox()
     {
+        
         new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
         if (!Instantiate(Resources.Load(effectPath),
             new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
