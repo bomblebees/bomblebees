@@ -199,6 +199,8 @@ public class Player : NetworkBehaviour
                 spinHitbox.gameObject.SetActive(true);
                 yield return new WaitForSeconds(spinDuration);
                 spinHitbox.gameObject.SetActive(false);
+                spinAnim.SetActive(false);
+                
                 yield return new WaitForSeconds(spinCooldown);
                 canSpin = true;
             }
