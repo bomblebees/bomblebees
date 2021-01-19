@@ -18,8 +18,10 @@ public class BombObject : ComboObject
             // Update occupation status of tile
             NotifyOccupiedTile(false);
             
-            Vector3 dir = HexMetrics.edgeDirections[edgeIndex];
-            rigidBody.AddForce(HexMetrics.edgeDirections[edgeIndex] * pushedSpeed);
+            // Vector3 dir = HexMetrics.edgeDirections[edgeIndex];
+            // rigidBody.AddForce(HexMetrics.edgeDirections[edgeIndex] * pushedSpeed);
+            this.gameObject.transform.position += HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * 2;
+
         }
     }
 }

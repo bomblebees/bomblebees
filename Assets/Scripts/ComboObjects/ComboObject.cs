@@ -15,12 +15,12 @@ public class ComboObject : MonoBehaviour
     private Vector3 tileCoordUnderPuncher;
     private float pushedDir = 30;
     public Vector3 nearestCenter;
-    
+
     public float tickDuration = 4f;
     public float vfxDuration = 4f;
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
-    public float lifeDuration = 8f;   
+    public float lifeDuration = 8f;
     public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
     public float universalVal = 4f;
     public HexCell tileUnderneath;
@@ -35,15 +35,15 @@ public class ComboObject : MonoBehaviour
 
     protected virtual void FindCenter()
     {
-       var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
-       RaycastHit tileUnderneathHit;
-       if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-       {
-           tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
-           var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
-           // var result = GetComponent<Transform>().position;
-           nearestCenter = result;
-       }
+        var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
+        RaycastHit tileUnderneathHit;
+        if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+        {
+            tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+            var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
+            // var result = GetComponent<Transform>().position;
+            nearestCenter = result;
+        }
     }
 
     protected virtual void GoToCenter()
@@ -53,8 +53,8 @@ public class ComboObject : MonoBehaviour
 
     protected virtual void NotifyOccupiedTile(bool val)
     {
-            Debug.Log("notified");
-            tileUnderneath.SetOccupiedByComboObject(val);
+        Debug.Log("notified");
+        tileUnderneath.SetOccupiedByComboObject(val);
     }
 
     protected virtual IEnumerator TickDown()
@@ -63,12 +63,13 @@ public class ComboObject : MonoBehaviour
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
         StopVelocity();
         yield return new WaitForSeconds(lifeDuration);
         DestroySelf();
     }
-    
+
     protected virtual void FindDistFromCenter()
     {
     }
@@ -83,31 +84,44 @@ public class ComboObject : MonoBehaviour
         var rigidBody = this.GetComponent<Rigidbody>();
         rigidBody.velocity = Vector3.zero;
     }
-    
+
     protected virtual IEnumerator EnableVFX()
     {
         this.gameObject.transform.Find("VFX").gameObject.SetActive(true);
         if (!useUniversalVal) yield return new WaitForSeconds(vfxDuration);
         else yield return new WaitForSeconds(universalVal);
     }
-    
+
     protected virtual IEnumerator EnableSFX()
     {
         this.gameObject.transform.Find("SFX").gameObject.SetActive(true);
         if (!useUniversalVal) yield return new WaitForSeconds(sfxDuration);
         else yield return new WaitForSeconds(universalVal);
     }
-    
+
     protected virtual IEnumerator EnableHitbox()
     {
         this.gameObject.transform.Find("Hitbox").gameObject.SetActive(true);
         if (!useUniversalVal) yield return new WaitForSeconds(hitboxDuration);
         else yield return new WaitForSeconds(universalVal);
     }
-    
+
     protected virtual IEnumerator DisableObjectModel()
     {
         this.gameObject.transform.Find("Model").gameObject.SetActive(false);
+        yield return new WaitForSeconds(lifeDuration);
+    }
+
+    protected virtual IEnumerator DisableObjectCollider()
+    {
+        if (!this.gameObject.GetComponent<SphereCollider>())
+        {
+            Debug.Log(
+                "ComboObject.cs: ComboObject either looking for incorrect Collider " +
+                "type or you need to overwrite in ComboObject subclass");
+        }
+
+        this.gameObject.GetComponent<SphereCollider>().enabled = false;
         yield return new WaitForSeconds(lifeDuration);
     }
 
@@ -135,9 +149,11 @@ public class ComboObject : MonoBehaviour
         {
             var playerPosition = other.transform.parent.gameObject.transform.position;
             // note: Don't use Vector3.Angle
-            var angleInRad = Mathf.Atan2(playerPosition.x - transform.position.x, playerPosition.z - transform.position.z);
-            
-            var dirFromPlayerToThis = (Mathf.Rad2Deg * angleInRad) + 180;  // "+ 180" because Unity ranges it from [-180, 180]
+            var angleInRad = Mathf.Atan2(playerPosition.x - transform.position.x,
+                playerPosition.z - transform.position.z);
+
+            var dirFromPlayerToThis =
+                (Mathf.Rad2Deg * angleInRad) + 180; // "+ 180" because Unity ranges it from [-180, 180]
 
             pushedDir = 30f;
             int edgeIndex;
@@ -149,11 +165,12 @@ public class ComboObject : MonoBehaviour
                     break;
                 }
             }
+
             Debug.Log("target dir is " + pushedDir);
             this.PunchedAction(edgeIndex);
         }
     }
-    
+
     protected virtual void DestroySelf()
     {
         NotifyOccupiedTile(false);
