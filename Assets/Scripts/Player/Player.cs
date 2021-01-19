@@ -85,6 +85,7 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer) return;
     }
     
+    [Command]
     void CmdListenForBombUse()
     {
         RpcListenForBombUse(connectionToClient);
@@ -177,7 +178,6 @@ public class Player : NetworkBehaviour
     {
         if (canSpin)
         {
-            Debug.Log("Spun");
             var spinHitbox = gameObject.transform.Find("SpinHitbox");
             if (!spinHitbox)
             {

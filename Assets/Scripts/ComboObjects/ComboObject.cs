@@ -132,7 +132,6 @@ public class ComboObject : MonoBehaviour
             int edgeIndex;
             for (edgeIndex = 0; edgeIndex < HexMetrics.edgeAngles.Length; edgeIndex++)
             {
-                Debug.Log(dirFromPlayerToThis + " - " + HexMetrics.edgeAngles[edgeIndex]);
                 if (Mathf.Abs(dirFromPlayerToThis - HexMetrics.edgeAngles[edgeIndex]) <= 30)
                 {
                     pushedDir = HexMetrics.edgeAngles[edgeIndex];
