@@ -10,9 +10,12 @@ using UnityEngine;
 // - Hitbox
 public class ComboObject : MonoBehaviour
 {
+    private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
+    private float travelDistanceInHexes = 2;
     private float pushedDirAngle = 30;
-    public float pushedSpeed = 5000f;
-    public float snapToCenterThreshold = 2f;
+    public float lerpRate = 0.15f;  // The speed at which the object is being pushed
+    public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
+    public float snapToCenterThreshold = 0.5f;
     
     public Vector3 nearestCenter;
     public HexCell tileUnderneath;
@@ -33,6 +36,27 @@ public class ComboObject : MonoBehaviour
         NotifyOccupiedTile(true);
         StartCoroutine(TickDown());
     }
+    
+    
+    protected void Update()
+    {
+        ListenForMoving();
+    }
+
+    protected void ListenForMoving()
+    {
+        if (this.isMoving)
+        {
+            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);
+            if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
+            {
+                Debug.Log("snapping to center");
+                FindCenter();
+                GoToCenter();
+                isMoving = false;
+            }
+        }
+    }
 
     protected virtual void FindCenter()
     {
@@ -47,11 +71,11 @@ public class ComboObject : MonoBehaviour
         }
     }
 
-    protected virtual float GetDistanceFromTileCenter()
+    protected virtual float GetDistanceFrom(Vector3 targetPos)
     {
         var dist = Mathf.Sqrt(
-            Mathf.Pow(this.gameObject.transform.position.x - tileUnderneath.transform.position.x, 2) +
-            Mathf.Pow(this.gameObject.transform.position.y - tileUnderneath.transform.position.y, 2)
+            Mathf.Pow(this.gameObject.transform.position.x - targetPos.x, 2) +
+            Mathf.Pow(this.gameObject.transform.position.z - targetPos.z, 2)
         );
         return dist;
     }
@@ -145,10 +169,11 @@ public class ComboObject : MonoBehaviour
         }
         else
         {
-            Vector3 dir = HexMetrics.edgeDirections[edgeIndex];
-            rigidBody.AddForce(HexMetrics.edgeDirections[edgeIndex] * pushedSpeed);
-            // or
-            // this.gameObject.transform.position += HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * 2;
+            // Update occupation status of tile
+            NotifyOccupiedTile(false);
+            
+            targetPosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * travelDistanceInHexes;
+            this.isMoving = true;
         }
     }
 
