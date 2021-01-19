@@ -15,6 +15,9 @@ public class BombObject : ComboObject
         }
         else
         {
+            // Update occupation status of tile
+            NotifyOccupiedTile(false);
+            
             Vector3 dir = HexMetrics.edgeDirections[edgeIndex];
             rigidBody.AddForce(HexMetrics.edgeDirections[edgeIndex] * pushedSpeed);
         }
