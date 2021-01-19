@@ -23,13 +23,14 @@ public class ComboObject : MonoBehaviour
     public float lifeDuration = 8f;   
     public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
     public float universalVal = 4f;
-    public GameObject tileUnderneath;
+    public HexCell tileUnderneath;
 
     protected virtual void Start()
     {
         FindCenter();
         GoToCenter();
-        NotifyOccupiedTile(tileUnderneath, true);
+        NotifyOccupiedTile(true);
+        StartCoroutine(TickDown());
     }
 
     protected virtual void FindCenter()
@@ -38,7 +39,7 @@ public class ComboObject : MonoBehaviour
        RaycastHit tileUnderneathHit;
        if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
        {
-           tileUnderneath = tileUnderneathHit.transform.gameObject;
+           tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
            var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
            // var result = GetComponent<Transform>().position;
            nearestCenter = result;
@@ -50,13 +51,10 @@ public class ComboObject : MonoBehaviour
         this.gameObject.transform.position = nearestCenter;
     }
 
-    protected virtual void NotifyOccupiedTile(GameObject cell, bool val)
+    protected virtual void NotifyOccupiedTile(bool val)
     {
-        var hexCell = cell.GetComponent<HexCell>();
-        if (hexCell != null)
-        {
-            hexCell.SetOccupiedByComboObject(val);
-        }
+            Debug.Log("notified");
+            tileUnderneath.SetOccupiedByComboObject(val);
     }
 
     protected virtual IEnumerator TickDown()
@@ -158,7 +156,7 @@ public class ComboObject : MonoBehaviour
     
     protected virtual void DestroySelf()
     {
+        NotifyOccupiedTile(false);
         Destroy(this.gameObject);
-        NotifyOccupiedTile(tileUnderneath, false);
     }
 }

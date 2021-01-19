@@ -5,12 +5,6 @@ using UnityEngine;
 
 public class BombObject : ComboObject
 {
-    private void Start()
-    {
-        FindCenter();
-        GoToCenter();
-        StartCoroutine(TickDown());
-    }
     
     protected override void Push(int edgeIndex)
     {

@@ -106,8 +106,12 @@ public class Player : NetworkBehaviour
 
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
+                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+                if (!hexCell.IsOccupiedByComboObject()){
                     StartCoroutine(this.BombUse());
-            }
+                }
+                
+        }
         }
     }
 
