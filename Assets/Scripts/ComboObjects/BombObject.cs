@@ -2,9 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class BombObject : ComboObject
 {
+    private bool isMoving = false;
+    public float lerpRate = 0.15f;
+    public Vector3 targetPosition;
     
     protected override void Push(int edgeIndex)
     {
@@ -20,8 +24,22 @@ public class BombObject : ComboObject
             
             // Vector3 dir = HexMetrics.edgeDirections[edgeIndex];
             // rigidBody.AddForce(HexMetrics.edgeDirections[edgeIndex] * pushedSpeed);
-            this.gameObject.transform.position += HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * 2;
+            // this.gameObject.transform.position += HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * 2;
+            targetPosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * 2;
+            // lerp here
+            this.isMoving = true;
 
+            // dont forget to find new center after, and gotocenter
+        }
+    }
+
+    private void Update()
+    {
+        if (this.isMoving)
+        {
+            // lerp
+            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);
+            // threshold here
         }
     }
 }

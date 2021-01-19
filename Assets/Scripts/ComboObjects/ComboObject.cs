@@ -10,11 +10,12 @@ using UnityEngine;
 // - Hitbox
 public class ComboObject : MonoBehaviour
 {
+    private float pushedDirAngle = 30;
     public float pushedSpeed = 5000f;
-    private Vector3 puncherPosition;
-    private Vector3 tileCoordUnderPuncher;
-    private float pushedDir = 30;
+    public float snapToCenterThreshold = 2f;
+    
     public Vector3 nearestCenter;
+    public HexCell tileUnderneath;
 
     public float tickDuration = 4f;
     public float vfxDuration = 4f;
@@ -23,7 +24,7 @@ public class ComboObject : MonoBehaviour
     public float lifeDuration = 8f;
     public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
     public float universalVal = 4f;
-    public HexCell tileUnderneath;
+    
 
     protected virtual void Start()
     {
@@ -44,6 +45,15 @@ public class ComboObject : MonoBehaviour
             // var result = GetComponent<Transform>().position;
             nearestCenter = result;
         }
+    }
+
+    protected virtual float GetDistanceFromTileCenter()
+    {
+        var dist = Mathf.Sqrt(
+            Mathf.Pow(this.gameObject.transform.position.x - tileUnderneath.transform.position.x, 2) +
+            Mathf.Pow(this.gameObject.transform.position.y - tileUnderneath.transform.position.y, 2)
+        );
+        return dist;
     }
 
     protected virtual void GoToCenter()
@@ -68,10 +78,6 @@ public class ComboObject : MonoBehaviour
         StopVelocity();
         yield return new WaitForSeconds(lifeDuration);
         DestroySelf();
-    }
-
-    protected virtual void FindDistFromCenter()
-    {
     }
 
     protected virtual void RecursiveWait()
@@ -139,7 +145,10 @@ public class ComboObject : MonoBehaviour
         }
         else
         {
+            Vector3 dir = HexMetrics.edgeDirections[edgeIndex];
             rigidBody.AddForce(HexMetrics.edgeDirections[edgeIndex] * pushedSpeed);
+            // or
+            // this.gameObject.transform.position += HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * 2;
         }
     }
 
@@ -155,18 +164,18 @@ public class ComboObject : MonoBehaviour
             var dirFromPlayerToThis =
                 (Mathf.Rad2Deg * angleInRad) + 180; // "+ 180" because Unity ranges it from [-180, 180]
 
-            pushedDir = 30f;
+            pushedDirAngle = 30f;
             int edgeIndex;
             for (edgeIndex = 0; edgeIndex < HexMetrics.edgeAngles.Length; edgeIndex++)
             {
                 if (Mathf.Abs(dirFromPlayerToThis - HexMetrics.edgeAngles[edgeIndex]) <= 30)
                 {
-                    pushedDir = HexMetrics.edgeAngles[edgeIndex];
+                    pushedDirAngle = HexMetrics.edgeAngles[edgeIndex];
                     break;
                 }
             }
 
-            Debug.Log("target dir is " + pushedDir);
+            Debug.Log("target dir is " + pushedDirAngle);
             this.PunchedAction(edgeIndex);
         }
     }
