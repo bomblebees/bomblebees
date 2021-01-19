@@ -13,6 +13,7 @@ public class HexCell : NetworkBehaviour
     private GameObject parent;
     public bool isGlowing = false; // Im thinking we connect the glowing by finding samecolorneighbors in each dir
     public bool isSelected = false;
+    public bool occupiedByComboObject = false;
 
     public Color color;
     [SerializeField] HexCell[] neighbors;
@@ -196,4 +197,13 @@ public class HexCell : NetworkBehaviour
         return key == 'e';
     }
 
+    public void SetOccupiedByComboObject(bool input)
+    {
+        this.occupiedByComboObject = input;
+    }
+
+    public bool IsOccupiedByComboObject()
+    {
+        return occupiedByComboObject;
+    }
 }

@@ -273,7 +273,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1163376774926246814}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1024,7 +1024,12 @@ PrefabInstance:
     - target: {fileID: 2883004416715914004, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
       propertyPath: m_Name
-      value: Circle Spin VFX
+      value: SpinVFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 2883004416715914004, guid: 301e680a1f33ae64a95d3c1f66f16181,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2883004416715914007, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
@@ -1084,17 +1089,17 @@ PrefabInstance:
     - target: {fileID: 2883004416715914007, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0
+      value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: 2883004416715914007, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0
+      value: 2.31
       objectReference: {fileID: 0}
     - target: {fileID: 2883004416715914007, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0
+      value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: 2883004418387788805, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
@@ -1109,12 +1114,12 @@ PrefabInstance:
     - target: {fileID: 2883004418387788805, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 200
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 2883004418387788805, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 200
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 2883004418387788807, guid: 301e680a1f33ae64a95d3c1f66f16181,
         type: 3}

@@ -84,7 +84,7 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
     }
-    
+
     [Command]
     void CmdListenForBombUse()
     {
@@ -96,18 +96,25 @@ public class Player : NetworkBehaviour
     {
         ListenForBombUse();
     }
-    
+
     void ListenForBombUse()
     {
+        // raycast down to check if tile is occupied
         if (Input.GetKeyDown(bombKey))
         {
-            StartCoroutine(this.BombUse());
+            tileRay = new Ray(transform.position,Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                    StartCoroutine(this.BombUse());
+            }
         }
     }
 
     IEnumerator BombUse()
     {
-        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"), this.gameObject.transform.position + new Vector3(0f,10f,0f),Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         yield return new WaitForSeconds(0);
     }
 
@@ -185,6 +192,9 @@ public class Player : NetworkBehaviour
             }
             else
             {
+                var spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
+                spinAnim.SetActive(true);
+                
                 canSpin = false;
                 spinHitbox.gameObject.SetActive(true);
                 yield return new WaitForSeconds(spinDuration);
