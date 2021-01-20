@@ -20,35 +20,10 @@ public class ComboObject : MonoBehaviour
     public Vector3 nearestCenter;
     public HexCell tileUnderneath;
 
-    public float tickDuration = 4f;
     public float vfxDuration = 4f;
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
-    protected float lingerDuration = 8f;
-    public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
-    public float universalVal = 4f;
-    
-
-    protected virtual void Start()
-    {
-        FindCenter();
-        GoToCenter();
-        NotifyOccupiedTile(true);
-        StartCoroutine(TickDown());
-    }
-    
-    protected virtual IEnumerator TickDown()
-    {
-        yield return new WaitForSeconds(tickDuration);
-        StartCoroutine(EnableSFX());
-        StartCoroutine(EnableVFX());
-        StartCoroutine(EnableHitbox());
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        StopVelocity();
-        yield return new WaitForSeconds(lingerDuration);
-        StartCoroutine(DestroySelf());
-    }
+    public float lingerDuration = 8f;
     
     protected virtual void Update()
     {
@@ -99,13 +74,7 @@ public class ComboObject : MonoBehaviour
 
     protected virtual void NotifyOccupiedTile(bool val)
     {
-        Debug.Log("notified");
         tileUnderneath.SetOccupiedByComboObject(val);
-    }
-
-
-    protected virtual void RecursiveWait()
-    {
     }
 
     protected virtual void StopVelocity()
@@ -117,23 +86,26 @@ public class ComboObject : MonoBehaviour
 
     protected virtual IEnumerator EnableVFX()
     {
-        this.gameObject.transform.Find("VFX").gameObject.SetActive(true);
-        if (!useUniversalVal) yield return new WaitForSeconds(vfxDuration);
-        else yield return new WaitForSeconds(universalVal);
+        var vfx = this.gameObject.transform.Find("VFX").gameObject;
+        vfx.SetActive(true);
+        yield return new WaitForSeconds(vfxDuration);
+        vfx.SetActive(false);
     }
 
     protected virtual IEnumerator EnableSFX()
     {
-        this.gameObject.transform.Find("SFX").gameObject.SetActive(true);
-        if (!useUniversalVal) yield return new WaitForSeconds(sfxDuration);
-        else yield return new WaitForSeconds(universalVal);
+        var sfx = this.gameObject.transform.Find("SFX").gameObject;
+        sfx.SetActive(true);
+        yield return new WaitForSeconds(sfxDuration);
+        sfx.SetActive(false);
     }
 
     protected virtual IEnumerator EnableHitbox()
     {
-        this.gameObject.transform.Find("Hitbox").gameObject.SetActive(true);
-        if (!useUniversalVal) yield return new WaitForSeconds(hitboxDuration);
-        else yield return new WaitForSeconds(universalVal);
+        var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
+        hitbox.SetActive(true);
+        yield return new WaitForSeconds(hitboxDuration);
+        hitbox.SetActive(false);
     }
 
     protected virtual IEnumerator DisableObjectModel()
@@ -205,8 +177,10 @@ public class ComboObject : MonoBehaviour
         Destroy(this.gameObject);
     }
     
+    // For extension time
     protected virtual IEnumerator DestroySelf(float extensionTime)
     {
+        Debug.Log("Extending for "+extensionTime);
         yield return new WaitForSeconds(extensionTime);
         NotifyOccupiedTile(false);
         Destroy(this.gameObject);
