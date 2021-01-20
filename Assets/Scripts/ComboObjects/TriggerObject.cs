@@ -13,7 +13,7 @@ public class TriggerObject : ComboObject
     protected bool canBeTriggered = true; // to make sure it's only hit once.
     protected float timeAlive = 0f; // Seconds since object was instantiated
     protected float timeTriggered = 0f;
-    protected float minimumLifeDuration = 4f; // Minimum time the object needs to use effect for
+    public float minimumLifeDuration = 4f; // Minimum time the object needs to use effect for
 
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
@@ -23,11 +23,6 @@ public class TriggerObject : ComboObject
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
-    }
-
-    protected override IEnumerator TickDown()
-    {
-        yield return new WaitForSeconds(0);
     }
 
     protected override void Update()
@@ -56,13 +51,18 @@ public class TriggerObject : ComboObject
     {
         if (canBeExtended && timeAlive > lingerDuration)
         {
+            Debug.Log("entered despawn");
             canBeExtended = false;
             if (wasHit)
             {
-                if (lingerDuration - timeTriggered < minimumLifeDuration) // extend here
+                if (lingerDuration - timeTriggered < minimumLifeDuration) // If hit and going into "overtime" with trigger
                 {
                     float extensionTime = minimumLifeDuration - (lingerDuration - timeTriggered);
                     StartCoroutine(DestroySelf(extensionTime));
+                }
+                else // If was hit and not going into "overtime" with trigger
+                {
+                    StartCoroutine(DestroySelf());
                 }
             }
             else
@@ -79,42 +79,10 @@ public class TriggerObject : ComboObject
 
     protected override IEnumerator EnableHitbox()
     {
-        // 
-        this.gameObject.transform.Find("Hitbox").gameObject.SetActive(true);
-        if (!useUniversalVal) yield return new WaitForSeconds(hitboxDuration);
-        else yield return new WaitForSeconds(universalVal);
-    }
-
-    public Quaternion GetRotationFromDirection(HexDirection dir)
-    {
-        Vector3 newDirVec;
-        switch (dir)
-        {
-            case HexDirection.NW:
-                newDirVec = new Vector3(90f, 0f, 30f);
-                break;
-            case HexDirection.SE:
-                newDirVec = new Vector3(90f, 0f, 30f);
-                break;
-            case HexDirection.W:
-                newDirVec = new Vector3(90f, 0f, 90f);
-                break;
-            case HexDirection.E:
-                newDirVec = new Vector3(90f, 0f, 90f);
-                break;
-            case HexDirection.SW:
-                newDirVec = new Vector3(90f, 0f, 150f);
-                break;
-            case HexDirection.NE:
-                newDirVec = new Vector3(90f, 0f, 150f);
-                break;
-            default:
-                Debug.LogError("LaserObject.cs: This should not be happening.");
-                newDirVec = new Vector3(90f, 0f, 150f);
-                break;
-        }
-
-        return Quaternion.Euler(newDirVec);
+        var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
+        hitbox.SetActive(true);
+        yield return new WaitForSeconds(hitboxDuration);
+        hitbox.SetActive(false);
     }
     
     protected override void Push(int edgeIndex)

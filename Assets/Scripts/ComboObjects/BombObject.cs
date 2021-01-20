@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
-public class BombObject : ComboObject
+public class BombObject : TickObject
 {
     
 }
