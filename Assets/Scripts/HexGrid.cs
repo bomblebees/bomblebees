@@ -360,15 +360,15 @@ public class HexGrid : NetworkBehaviour
             case 'b':
                 Debug.Log("Blue");
                 result = (GameObject) Instantiate(laserObjPath, spawnCoords);
-                result.GetComponent<LaserObject>().SetDirection(HexDirection.SW);
+                // result.GetComponent<LaserObject>().SetDirection(HexDirection.SW);
                 break;
             case 'g':
                 result = (GameObject) Instantiate(laserObjPath, spawnCoords);
-                result.GetComponent<LaserObject>().SetDirection(HexDirection.W);
+                // result.GetComponent<LaserObject>().SetDirection(HexDirection.W);
                 break;
             case 'y':
                 result = (GameObject) Instantiate(laserObjPath, spawnCoords);
-                result.GetComponent<LaserObject>().SetDirection(HexDirection.SE);
+                // result.GetComponent<LaserObject>().SetDirection(HexDirection.SE);
                 break;
             case 'r':
                 result = (GameObject) Instantiate(bombObjPath, spawnCoords);

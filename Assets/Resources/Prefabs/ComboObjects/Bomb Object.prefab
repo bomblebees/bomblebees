@@ -64,8 +64,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ae1bcfa2d30a8438b19b2e7cc06a95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushedSpeed: 5000
+  lerpRate: 0.15
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
   nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
   tickDuration: 4
   vfxDuration: 4
   sfxDuration: 4
@@ -73,7 +76,6 @@ MonoBehaviour:
   lifeDuration: 2
   useUniversalVal: 0
   universalVal: 4
-  tileUnderneath: {fileID: 0}
 --- !u!114 &5054101179393573515
 MonoBehaviour:
   m_ObjectHideFlags: 0

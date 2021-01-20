@@ -174,8 +174,9 @@ MonoBehaviour:
   movementSpeed: 50
   turnSpeed: 17
   punchCooldown: 0.5
-  spinDuration: 0.6
-  spinCooldown: 0.8
+  spinHitboxDuration: 0.1
+  spinAnimDuration: 0.8
+  spinTotalCooldown: 0.8
   heldKey: 103
   heldHexScale: {x: 800, y: 800, z: 800}
 --- !u!114 &-8900185448856423588

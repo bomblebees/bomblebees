@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using Castle.Components.DictionaryAdapter.Xml;
 using UnityEngine;
 
-public class LaserObject : ComboObject
+// To change
+// - Push() to spawn laser
+// - TickDown() to not 
+public class LaserObject : TriggerObject
 {
-    private HexDirection hexDirection;
-    public string effectPath = "Prefabs/ComboEffects/Laser Beam";
-
-    /* SetDirection:
-        Called (separately) when LaserObject is Instantiated.
-    */
-    public void SetDirection(HexDirection dir)
+    
+    protected override IEnumerator EnableHitbox()
     {
-        this.hexDirection = dir;
+        // 
+        this.gameObject.transform.Find("Hitbox").gameObject.SetActive(true);
+        if (!useUniversalVal) yield return new WaitForSeconds(hitboxDuration);
+        else yield return new WaitForSeconds(universalVal);
     }
 
     public Quaternion GetRotationFromDirection(HexDirection dir)
@@ -49,39 +50,15 @@ public class LaserObject : ComboObject
         return Quaternion.Euler(newDirVec);
     }
 
-    private void Awake()
+    protected override void Push(int edgeIndex)
     {
+        wasHit = true;
+        UpdateLaserDirection(edgeIndex);
     }
 
-    private void Start()
+    protected virtual void UpdateLaserDirection(int edgeIndex)
     {
-        StartCoroutine(TickDown());
-    }
-
-    protected override IEnumerator TickDown()
-    {
-        Debug.Log(String.Concat("LaserObject is ticking for ", tickDuration));
-        yield return new WaitForSeconds(tickDuration);
-        this.Lase(hexDirection);
-        this.DestroySelf();
-    }
-
-    protected override void DestroySelf() 
-    {
-        Destroy(this.gameObject);
-    }
-
-    private void Lase(HexDirection hexDirection)
-    {
-        Debug.Log("Creating Bomb Explosion");
-        var laser = Instantiate(Resources.Load(effectPath),
-            new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
-            GetRotationFromDirection(hexDirection)
-            ) as GameObject;
-        if (!laser) Debug.Log("LaserObject.cs: could not instantiate laser beam.");
-        else
-        {
-            laser.GetComponent<LaserBeam>().SpawnInDirection(hexDirection);
-        }
+        Debug.Log("edgeIndex is "+edgeIndex);
+        this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
     }
 }

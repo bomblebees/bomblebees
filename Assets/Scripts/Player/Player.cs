@@ -118,11 +118,34 @@ public class Player : NetworkBehaviour
                 }
             }
         }
+        
+        // Temp
+        if (Input.GetKeyDown("k"))
+        {
+            tileRay = new Ray(transform.position, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+                if (!hexCell.IsOccupiedByComboObject())
+                {
+                    StartCoroutine(this.LaserUse());
+                }
+            }
+        }
     }
 
     IEnumerator BombUse()
     {
         Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        yield return new WaitForSeconds(0);
+    }
+    
+    //
+    IEnumerator LaserUse()
+    {
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         yield return new WaitForSeconds(0);
     }

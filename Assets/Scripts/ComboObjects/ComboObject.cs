@@ -12,7 +12,7 @@ public class ComboObject : MonoBehaviour
 {
     private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     private float travelDistanceInHexes = 2;
-    private float pushedDirAngle = 30;
+    protected float pushedDirAngle = 30;
     public float lerpRate = 0.15f;  // The speed at which the object is being pushed
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
     public float snapToCenterThreshold = 0.5f;
@@ -24,7 +24,7 @@ public class ComboObject : MonoBehaviour
     public float vfxDuration = 4f;
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
-    public float lifeDuration = 8f;
+    protected float lingerDuration = 8f;
     public bool useUniversalVal = false; // Replaces the other durations (except lifeDuration)
     public float universalVal = 4f;
     
@@ -37,8 +37,20 @@ public class ComboObject : MonoBehaviour
         StartCoroutine(TickDown());
     }
     
+    protected virtual IEnumerator TickDown()
+    {
+        yield return new WaitForSeconds(tickDuration);
+        StartCoroutine(EnableSFX());
+        StartCoroutine(EnableVFX());
+        StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectCollider());
+        StartCoroutine(DisableObjectModel());
+        StopVelocity();
+        yield return new WaitForSeconds(lingerDuration);
+        StartCoroutine(DestroySelf());
+    }
     
-    protected void Update()
+    protected virtual void Update()
     {
         ListenForMoving();
     }
@@ -91,18 +103,6 @@ public class ComboObject : MonoBehaviour
         tileUnderneath.SetOccupiedByComboObject(val);
     }
 
-    protected virtual IEnumerator TickDown()
-    {
-        yield return new WaitForSeconds(tickDuration);
-        StartCoroutine(EnableSFX());
-        StartCoroutine(EnableVFX());
-        StartCoroutine(EnableHitbox());
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        StopVelocity();
-        yield return new WaitForSeconds(lifeDuration);
-        DestroySelf();
-    }
 
     protected virtual void RecursiveWait()
     {
@@ -139,7 +139,7 @@ public class ComboObject : MonoBehaviour
     protected virtual IEnumerator DisableObjectModel()
     {
         this.gameObject.transform.Find("Model").gameObject.SetActive(false);
-        yield return new WaitForSeconds(lifeDuration);
+        yield return new WaitForSeconds(lingerDuration);
     }
 
     protected virtual IEnumerator DisableObjectCollider()
@@ -152,12 +152,7 @@ public class ComboObject : MonoBehaviour
         }
 
         this.gameObject.GetComponent<SphereCollider>().enabled = false;
-        yield return new WaitForSeconds(lifeDuration);
-    }
-
-    protected virtual void PunchedAction(int edgeIndex)
-    {
-        this.Push(edgeIndex);
+        yield return new WaitForSeconds(lingerDuration);
     }
 
     protected virtual void Push(int edgeIndex)
@@ -177,7 +172,7 @@ public class ComboObject : MonoBehaviour
         }
     }
 
-    protected void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Spin"))
         {
@@ -199,14 +194,20 @@ public class ComboObject : MonoBehaviour
                     break;
                 }
             }
-
-            Debug.Log("target dir is " + pushedDirAngle);
-            this.PunchedAction(edgeIndex);
+            Push(edgeIndex);
         }
     }
 
-    protected virtual void DestroySelf()
+    protected virtual IEnumerator DestroySelf()
     {
+        yield return new WaitForSeconds(0);
+        NotifyOccupiedTile(false);
+        Destroy(this.gameObject);
+    }
+    
+    protected virtual IEnumerator DestroySelf(float extensionTime)
+    {
+        yield return new WaitForSeconds(extensionTime);
         NotifyOccupiedTile(false);
         Destroy(this.gameObject);
     }
