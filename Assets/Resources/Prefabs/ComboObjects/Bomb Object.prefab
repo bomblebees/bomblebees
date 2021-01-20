@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8536866416565234776}
   - component: {fileID: 5054101179393573515}
   - component: {fileID: 4911830529377168919}
+  - component: {fileID: 4036233143453118000}
   m_Layer: 8
   m_Name: Bomb Object
   m_TagString: ComboObject
@@ -63,8 +64,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ae1bcfa2d30a8438b19b2e7cc06a95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushedSpeed: 5000
+  lerpRate: 0.15
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
   nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
   tickDuration: 4
   vfxDuration: 4
   sfxDuration: 4
@@ -104,6 +108,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4036233143453118000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4324099173052882053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83392ae5c1b731446909f252fd494ae4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  target: {fileID: 4911830529377168919}
+  clientAuthority: 0
+  syncVelocity: 1
+  clearVelocity: 0
+  velocitySensitivity: 0.1
+  syncAngularVelocity: 1
+  clearAngularVelocity: 0
+  angularVelocitySensitivity: 0.1
 --- !u!1 &6130566936131504250
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +249,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7041638112445808588}
   - component: {fileID: 5784687581659772064}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Hitbox
   m_TagString: ComboHitbox
   m_Icon: {fileID: 0}
@@ -360,6 +386,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: EffectHex
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &3684272691360384705 stripped
@@ -464,6 +495,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EffectHex
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
@@ -570,6 +606,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: EffectHex (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &490870996900922155 stripped
@@ -674,6 +715,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EffectHex (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
@@ -910,6 +956,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: EffectHex (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &8103868460731677162 stripped
@@ -1015,6 +1066,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: EffectHex (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &6180522932576721000 stripped
@@ -1119,6 +1175,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: EffectHex (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}

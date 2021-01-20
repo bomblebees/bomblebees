@@ -13,8 +13,6 @@ GameObject:
   - component: {fileID: 3857503828779962497}
   - component: {fileID: -848184830189409174}
   - component: {fileID: -2069887934230866168}
-  - component: {fileID: -7828964286825024397}
-  - component: {fileID: 1903321499662269927}
   m_Layer: 11
   m_Name: BlueHex
   m_TagString: BaseTile
@@ -113,37 +111,3 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &-7828964286825024397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3353043427499192660}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f032128052c95a46afb0ddd97d994cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  target: {fileID: 1903321499662269927}
-  lerpVelocityAmount: 0.5
-  lerpPositionAmount: 0.5
-  clientAuthority: 0
---- !u!54 &1903321499662269927
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3353043427499192660}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 126
-  m_CollisionDetection: 0

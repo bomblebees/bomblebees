@@ -29,11 +29,14 @@ public class Player : NetworkBehaviour
     [SerializeField] private float turnSpeed = 17f;
 
     public float punchCooldown = 0.5f;
-    public float spinDuration = 0.6f;
-    public float spinCooldown = 0.7f;
+    public float spinHitboxDuration = 0.6f;
+    public float spinAnimDuration = 0.8f;
+    public float spinTotalCooldown = 0.8f;
     private bool canPunch = true;
     private bool canSpin = true;
-
+    
+    private GameObject spinHitbox;
+    private GameObject spinAnim; 
 
     [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
@@ -52,6 +55,8 @@ public class Player : NetworkBehaviour
     {
         this.Assert();
         LinkAssets();
+        spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
+        spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         // Initialize model
         UpdateHeldHex(heldKey);
         base.OnStartClient();
@@ -59,7 +64,7 @@ public class Player : NetworkBehaviour
 
     void Assert()
     {
-        if (spinCooldown < spinDuration)
+        if (spinTotalCooldown <= spinHitboxDuration && spinTotalCooldown <= spinAnimDuration)
         {
             Debug.LogError("Player.cs: spinCooldown is lower than spinDuration.");
         }
@@ -84,7 +89,8 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
     }
-    
+
+    [Command]
     void CmdListenForBombUse()
     {
         RpcListenForBombUse(connectionToClient);
@@ -95,18 +101,52 @@ public class Player : NetworkBehaviour
     {
         ListenForBombUse();
     }
-    
+
     void ListenForBombUse()
     {
+        // raycast down to check if tile is occupied
         if (Input.GetKeyDown(bombKey))
         {
-            StartCoroutine(this.BombUse());
+            tileRay = new Ray(transform.position, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+                if (!hexCell.IsOccupiedByComboObject())
+                {
+                    StartCoroutine(this.BombUse());
+                }
+            }
+        }
+        
+        // Temp
+        if (Input.GetKeyDown("k"))
+        {
+            tileRay = new Ray(transform.position, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+                if (!hexCell.IsOccupiedByComboObject())
+                {
+                    StartCoroutine(this.LaserUse());
+                }
+            }
         }
     }
 
     IEnumerator BombUse()
     {
-        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"), this.gameObject.transform.position + new Vector3(0f,10f,0f),Quaternion.identity);
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        yield return new WaitForSeconds(0);
+    }
+    
+    //
+    IEnumerator LaserUse()
+    {
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         yield return new WaitForSeconds(0);
     }
 
@@ -142,14 +182,13 @@ public class Player : NetworkBehaviour
         ListenForSpinning();
     }
 
-    void ListenForSpinning()
+    public void ListenForSpinning()
     {
         if (Input.GetKeyDown(spinKey))
         {
-            StartCoroutine(this.Spin());
+            StartCoroutine(Spin());
         }
     }
-
 
     IEnumerator Punch()
     {
@@ -173,26 +212,38 @@ public class Player : NetworkBehaviour
         }
     }
 
-    IEnumerator Spin()
+    public IEnumerator Spin()
     {
         if (canSpin)
         {
-            Debug.Log("Spun");
-            var spinHitbox = gameObject.transform.Find("SpinHitbox");
             if (!spinHitbox)
             {
                 Debug.LogError("Player.cs: no spinHitbox assigned");
             }
             else
             {
+                StartCoroutine(HandleSpinHitbox());
+                StartCoroutine(HandleSpinAnim());
+                
                 canSpin = false;
-                spinHitbox.gameObject.SetActive(true);
-                yield return new WaitForSeconds(spinDuration);
-                spinHitbox.gameObject.SetActive(false);
-                yield return new WaitForSeconds(spinCooldown);
+                yield return new WaitForSeconds(spinTotalCooldown);
                 canSpin = true;
             }
         }
+    }
+
+    private IEnumerator HandleSpinHitbox()
+    {
+        spinHitbox.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinHitboxDuration);
+        spinHitbox.gameObject.SetActive(false);
+    }
+    
+    private IEnumerator HandleSpinAnim()
+    {
+        spinAnim.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinAnimDuration);
+        spinAnim.gameObject.SetActive(false);
     }
 
     [Client]
