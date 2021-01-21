@@ -27,6 +27,12 @@ public class Player : NetworkBehaviour
     [SerializeField] private float movementSpeed = 50;
     [SerializeField] private float turnSpeed = 17f;
 
+    [Header("HexTiles")]
+    [SyncVar(hook = nameof(OnChangeHeldKey))]
+    public char heldKey = 'g';
+    public Vector3 heldHexScale = new Vector3(800, 800, 800);
+    //float swapDistance = 15; // unused (for swapping in front of player)
+
     public float punchCooldown = 0.5f;
     public float spinHitboxDuration = 0.6f;
     public float spinAnimDuration = 0.8f;
@@ -37,17 +43,15 @@ public class Player : NetworkBehaviour
     private GameObject spinHitbox;
     private GameObject spinAnim; 
 
-    [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
-    public char heldKey = 'g';
+
 
     // Cache raycast refs for optimization
     private Ray tileRay;
     private RaycastHit tileHit;
-
     private GameObject selectedTile;
     private GameObject heldHexModel;
-    float swapDistance = 15;
-    public Vector3 heldHexScale = new Vector3(800, 800, 800);
+    
+
 
 
     public override void OnStartClient()
@@ -75,9 +79,8 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        // Applies player movement
         ApplyMovement();
-        // Listens for swapping and highlights selected hex
+        ApplyTileHighlight();
         ListenForSwapping();
         CmdListenForPunching();
         CmdListenForSpinning();
@@ -303,22 +306,13 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForSwapping()
     {
-        tileRay = new Ray(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10);
-
-        if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+        if (Input.GetKeyDown(swapKey))
         {
-            // Debug.Log("hit");
+            tileRay = new Ray(transform.position, Vector3.down * 10);
 
-            // Apply indicator to hex tile to show the tile selected
-            if (selectedTile)
-                selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
-            selectedTile = tileHit.transform.gameObject;
-            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
-
-            // When swap key is pressed, swap held tile with selected tile
-            if (Input.GetKeyDown(swapKey))
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
-                Debug.Log("space pressed");
+                    Debug.Log("space pressed");
                 GameObject modelHit = tileHit.transform.gameObject;
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = hexGrid.SwapHexAndKey(modelHit, getHeldKey());
@@ -332,6 +326,27 @@ public class Player : NetworkBehaviour
             }
         }
     }
+
+    // Applies the highlight shader to the tile the player is "looking" at
+    // This is the tile that will be swapped, and one where the bomb will be placed on
+    [Client]
+    void ApplyTileHighlight()
+    {
+        tileRay = new Ray(transform.position, Vector3.down * 10);
+
+        if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+        {
+            // Debug.Log("hit");
+
+            // Apply indicator to hex tile to show the tile selected
+            if (selectedTile)
+                selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+            selectedTile = tileHit.transform.gameObject;
+            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
+        }
+    }
+
+
 
     [Command]
     void CmdSetHeldKey(char newKey)
