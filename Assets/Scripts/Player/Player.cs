@@ -39,29 +39,35 @@ public class Player : NetworkBehaviour
     public float spinTotalCooldown = 0.8f;
     private bool canPunch = true;
     private bool canSpin = true;
-    
+
     private GameObject spinHitbox;
-    private GameObject spinAnim; 
-
-
+    private GameObject spinAnim;
 
     // Cache raycast refs for optimization
     private Ray tileRay;
     private RaycastHit tileHit;
     private GameObject selectedTile;
     private GameObject heldHexModel;
-    
 
-
+    [SerializeField] private int maxStackSize = 3;
+    readonly List<char> itemStack = new List<char>();
+    private GameObject stackUI;
+    private Quaternion stackRotationLock;
 
     public override void OnStartClient()
     {
+
         this.Assert();
         LinkAssets();
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
-        // Initialize model
-        UpdateHeldHex(heldKey);
+        UpdateHeldHex(heldKey); // Initialize model
+
+        if (isLocalPlayer)
+        {
+            stackUI.GetComponent<Text>().enabled = true;
+            stackRotationLock = stackUI.transform.rotation;
+        }
         base.OnStartClient();
     }
 
@@ -85,11 +91,25 @@ public class Player : NetworkBehaviour
         CmdListenForPunching();
         CmdListenForSpinning();
         CmdListenForBombUse();
+
+        //Debug.Log(itemStack);
     }
 
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
+        stackUI.transform.rotation = stackRotationLock;
+    }
+
+    [Client]
+    void LinkAssets()
+    {
+        hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
+            .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
+        if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
+
+        // Probably dangerous way to get game object, UI has to be first in player prefab
+        stackUI = this.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
     }
 
     [Command]
@@ -116,11 +136,53 @@ public class Player : NetworkBehaviour
                 var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
                 if (!hexCell.IsOccupiedByComboObject())
                 {
-                    StartCoroutine(this.BombUse());
+                    if (itemStack.Count > 0)
+                    {
+                        char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
+                        itemStack.RemoveAt(itemStack.Count - 1); // pop it off
+                        UpdateStackUI(); // temp - update the changed ui
+
+                        switch (bombType)
+                        {
+                            case 'b':
+                                Debug.Log("Blue Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'g':
+                                Debug.Log("Green Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'y':
+                                Debug.Log("Yellow Bomb Type");
+                                StartCoroutine(this.LaserUse());
+                                break;
+                            case 'r':
+                                Debug.Log("Red Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'p':
+                                Debug.Log("Purple Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'w':
+                                Debug.Log("White Bomb Type");
+                                // unimplemented
+                                break;
+                            default:
+                                // code should not reach here
+                                Debug.Log("Bomb type not found");
+                                break;
+                        }
+                    } else
+                    {
+                        Debug.Log("dropping default bomb");
+                        // Else use the default bomb
+                        StartCoroutine(this.BombUse());
+                    }
                 }
             }
         }
-        
+
         // Temp
         if (Input.GetKeyDown("k"))
         {
@@ -143,7 +205,7 @@ public class Player : NetworkBehaviour
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         yield return new WaitForSeconds(0);
     }
-    
+
     //
     IEnumerator LaserUse()
     {
@@ -226,7 +288,7 @@ public class Player : NetworkBehaviour
             {
                 StartCoroutine(HandleSpinHitbox());
                 StartCoroutine(HandleSpinAnim());
-                
+
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
                 canSpin = true;
@@ -240,20 +302,12 @@ public class Player : NetworkBehaviour
         yield return new WaitForSeconds(spinHitboxDuration);
         spinHitbox.gameObject.SetActive(false);
     }
-    
+
     private IEnumerator HandleSpinAnim()
     {
         spinAnim.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinAnimDuration);
         spinAnim.gameObject.SetActive(false);
-    }
-
-    [Client]
-    void LinkAssets()
-    {
-        hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
-            .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
-        if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
     void OnChangeHeldKey(char oldHeldKey, char newHeldKey)
@@ -312,10 +366,13 @@ public class Player : NetworkBehaviour
 
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
-                    Debug.Log("space pressed");
+                Debug.Log("space pressed");
                 GameObject modelHit = tileHit.transform.gameObject;
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
-                char newKey = hexGrid.SwapHexAndKey(modelHit, getHeldKey());
+                char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+
+                hexGrid.SwapHexAndKey(modelHit, getHeldKey(), this.netIdentity);
+                //CmdSwapHexAndKey(modelHit, getHeldKey());
 
 
                 // Only update models and grids if it is a new key
@@ -325,6 +382,12 @@ public class Player : NetworkBehaviour
                 }
             }
         }
+    }
+
+    [Command]
+    void CmdSwapHexAndKey(GameObject modelHit, char heldKey, NetworkConnectionToClient sender = null)
+    {
+        hexGrid.SwapHexAndKey(modelHit, heldKey, sender.identity);
     }
 
     // Applies the highlight shader to the tile the player is "looking" at
@@ -346,7 +409,62 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public void AddItemCombo(char colorKey)
+    {
+        CmdAddItemCombo(colorKey);
+    }
 
+    [Command]
+    void CmdAddItemCombo(char colorKey)
+    {
+        RpcAddItemCombo(colorKey);
+    }
+
+    [ClientRpc]
+    void RpcAddItemCombo(char colorKey)
+    {
+        if (itemStack.Count < maxStackSize)
+        {
+            itemStack.Add(colorKey); // Push new combo to stack
+        }
+        else
+        {
+            itemStack.RemoveAt(0); // Remove oldest combo (bottom of stack)
+            itemStack.Add(colorKey); // Push new combo to stack
+        }
+
+        // Changing the UI
+        string stackDisplay = "[";
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (i < itemStack.Count) stackDisplay += itemStack[i];
+            else stackDisplay += "e";
+
+            if (i < 2) stackDisplay += ", ";
+            else stackDisplay += "]";
+        }
+
+        Debug.Log(stackDisplay);
+
+        stackUI.GetComponent<Text>().text = stackDisplay;
+    }
+
+
+    // Temporary function, should be replaced
+    void UpdateStackUI()
+    {
+        string stackDisplay = "[";
+        for (int i = 0; i < 3; i++)
+        {
+            if (i < itemStack.Count) stackDisplay += itemStack[i];
+            else stackDisplay += "e";
+
+            if (i < 2) stackDisplay += ", ";
+            else stackDisplay += "]";
+        }
+        stackUI.GetComponent<Text>().text = stackDisplay;
+    }
 
     [Command]
     void CmdSetHeldKey(char newKey)
@@ -357,8 +475,8 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSetHeldKey(char newKey)
     {
-        setHeldKey(newKey);
-        UpdateHeldHex(newKey);
+        setHeldKey(newKey); // Sync held key
+        UpdateHeldHex(newKey); // Update model for all observers
     }
 
     public void setHeldKey(char key)
