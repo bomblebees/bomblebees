@@ -50,13 +50,13 @@ public class Player : NetworkBehaviour
     private GameObject heldHexModel;
 
     [SerializeField] private int maxStackSize = 3;
-    readonly List<char> itemStack = new List<char>();
+    readonly SyncList<char> itemStack = new SyncList<char>();
     private GameObject stackUI;
     private Quaternion stackRotationLock;
 
     public override void OnStartClient()
     {
-
+        base.OnStartClient();
         this.Assert();
         LinkAssets();
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
@@ -68,7 +68,8 @@ public class Player : NetworkBehaviour
             stackUI.GetComponent<Text>().enabled = true;
             stackRotationLock = stackUI.transform.rotation;
         }
-        base.OnStartClient();
+        itemStack.Callback += OnItemStackChange;
+        
     }
 
     void Assert()
@@ -98,7 +99,7 @@ public class Player : NetworkBehaviour
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
-        stackUI.transform.rotation = stackRotationLock;
+        //stackUI.transform.rotation = stackRotationLock;
     }
 
     [Client]
@@ -139,8 +140,7 @@ public class Player : NetworkBehaviour
                     if (itemStack.Count > 0)
                     {
                         char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
-                        itemStack.RemoveAt(itemStack.Count - 1); // pop it off
-                        UpdateStackUI(); // temp - update the changed ui
+                        RemoveItemCombo(); // pop it off
 
                         switch (bombType)
                         {
@@ -371,8 +371,13 @@ public class Player : NetworkBehaviour
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
 
-                hexGrid.SwapHexAndKey(modelHit, getHeldKey(), this.netIdentity);
-                //CmdSwapHexAndKey(modelHit, getHeldKey());
+                int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
+
+                CmdTestSwap(cellIdx, getHeldKey());
+                //hexGrid.netIdentity.AssignClientAuthority(connectionToClient);
+                //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
+                //hexGrid.netIdentity.RemoveClientAuthority();
+            
 
 
                 // Only update models and grids if it is a new key
@@ -385,9 +390,9 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    void CmdSwapHexAndKey(GameObject modelHit, char heldKey, NetworkConnectionToClient sender = null)
+    void CmdTestSwap(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
     {
-        hexGrid.SwapHexAndKey(modelHit, heldKey, sender.identity);
+        hexGrid.CmdSwapHexAndKey(cellIdx, heldKey, sender.identity);
     }
 
     // Applies the highlight shader to the tile the player is "looking" at
@@ -409,19 +414,20 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [TargetRpc]
+    public void TargetAddItemCombo(NetworkConnection target, char colorKey)
+    {
+        CmdAddItemCombo(colorKey);
+    }
+
     public void AddItemCombo(char colorKey)
     {
+        if (!isLocalPlayer) return;
         CmdAddItemCombo(colorKey);
     }
 
     [Command]
     void CmdAddItemCombo(char colorKey)
-    {
-        RpcAddItemCombo(colorKey);
-    }
-
-    [ClientRpc]
-    void RpcAddItemCombo(char colorKey)
     {
         if (itemStack.Count < maxStackSize)
         {
@@ -432,15 +438,26 @@ public class Player : NetworkBehaviour
             itemStack.RemoveAt(0); // Remove oldest combo (bottom of stack)
             itemStack.Add(colorKey); // Push new combo to stack
         }
-
-        // Changing the UI
-        UpdateStackUI();
     }
 
-
-    // Temporary function, should be replaced
-    void UpdateStackUI()
+    public void RemoveItemCombo()
     {
+        if (!isLocalPlayer) return;
+        CmdRemoveItemCombo();
+    }
+
+    [Command]
+    void CmdRemoveItemCombo()
+    {
+        if (itemStack.Count > 0)
+        {
+            itemStack.RemoveAt(itemStack.Count - 1); // pop it off
+        }
+    }
+
+    void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
+    {
+        // Update the stack UI
         string stackDisplay = "[";
         for (int i = 0; i < 3; i++)
         {

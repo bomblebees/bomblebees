@@ -411,44 +411,43 @@ public class HexGrid : NetworkBehaviour
     /// @param heldKey - the color key we want the hex to be
     /// @return char - the original color key of the hex before swapping occurs
     /// </summary>
-    [Server]
-    public void SwapHexAndKey(GameObject modelHit, char heldKey, NetworkIdentity player)
-    {
-        if (!player.isLocalPlayer) return;
-        Debug.Log("swapped");
-        //char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
-        int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
-
-
-        HexCell cell = gridList[cellIdx];
-        cell.SetKey(heldKey);
-        List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
-        if (comboCells.Count > 0)
-        {
-            player.GetComponent<Player>().AddItemCombo(heldKey);
-        }
-
-        RpcSwapHexAndKey(cellIdx, heldKey);
-
-        //return (tempKey);
-    }
-
-    //[Command(ignoreAuthority = true)]
-    //void CmdSwapHexAndKey(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
+    //[Server]
+    //public void SwapHexAndKey(GameObject modelHit, char heldKey, NetworkIdentity player)
     //{
+    //    if (!player.isLocalPlayer) return;
+    //    Debug.Log("swapped");
+    //    //char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+    //    int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
+
 
     //    HexCell cell = gridList[cellIdx];
     //    cell.SetKey(heldKey);
     //    List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
-    //    Debug.Log(comboCells.Count);
-
     //    if (comboCells.Count > 0)
     //    {
-    //        sender.identity.GetComponent<Player>().AddItemCombo(heldKey);
+    //        player.GetComponent<Player>().AddItemCombo(heldKey);
     //    }
 
     //    RpcSwapHexAndKey(cellIdx, heldKey);
+
+    //    //return (tempKey);
     //}
+
+    [Command(ignoreAuthority = true)]
+    public void CmdSwapHexAndKey(int cellIdx, char heldKey, NetworkIdentity player)
+    {
+        HexCell cell = gridList[cellIdx];
+        cell.SetKey(heldKey);
+        List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+        Debug.Log(comboCells.Count);
+
+        if (comboCells.Count > 0)
+        {
+            player.GetComponent<Player>().TargetAddItemCombo(player.connectionToClient, heldKey);
+        }
+
+        RpcSwapHexAndKey(cellIdx, heldKey);
+    }
 
     [ClientRpc]
     public void RpcSwapHexAndKey(int cellIdx, char heldKey)
