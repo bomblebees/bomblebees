@@ -411,49 +411,26 @@ public class HexGrid : NetworkBehaviour
     /// @param heldKey - the color key we want the hex to be
     /// @return char - the original color key of the hex before swapping occurs
     /// </summary>
-    [Server]
-    public void SwapHexAndKey(GameObject modelHit, char heldKey, NetworkIdentity player)
+    [Command(ignoreAuthority = true)]
+    public void CmdSwapHexAndKey(int cellIdx, char heldKey, NetworkIdentity player)
     {
-        if (!player.isLocalPlayer) return;
-        Debug.Log("swapped");
-        //char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
-        int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
-
-
         HexCell cell = gridList[cellIdx];
         cell.SetKey(heldKey);
         List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+        Debug.Log(comboCells.Count);
+
         if (comboCells.Count > 0)
         {
-            player.GetComponent<Player>().AddItemCombo(heldKey);
+            player.GetComponent<Player>().TargetAddItemCombo(player.connectionToClient, heldKey);
         }
 
         RpcSwapHexAndKey(cellIdx, heldKey);
-
-        //return (tempKey);
     }
 
-    //[Command(ignoreAuthority = true)]
-    //void CmdSwapHexAndKey(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
-    //{
-
-    //    HexCell cell = gridList[cellIdx];
-    //    cell.SetKey(heldKey);
-    //    List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
-    //    Debug.Log(comboCells.Count);
-
-    //    if (comboCells.Count > 0)
-    //    {
-    //        sender.identity.GetComponent<Player>().AddItemCombo(heldKey);
-    //    }
-
-    //    RpcSwapHexAndKey(cellIdx, heldKey);
-    //}
-
+    // Sync new swapped models for all clients
     [ClientRpc]
     public void RpcSwapHexAndKey(int cellIdx, char heldKey)
     {
-
         HexCell cell = gridList[cellIdx];
         cell.DeleteModel();
         cell.CreateModel(this.ReturnModelByCellKey(heldKey));
@@ -461,18 +438,6 @@ public class HexGrid : NetworkBehaviour
 
         List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
         ComboCallback(comboCells);
-
-        //cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo());
-        //if (cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
-        //{
-        //    // Unoptimized Scan TODO optimize it
-        //    this.ScanListForGlow();
-        //}
-        //else
-        //{
-        //    // Optimized scan
-        //    this.RecalculateGlowForNonCombo(cell);
-        //}
     }
 
 

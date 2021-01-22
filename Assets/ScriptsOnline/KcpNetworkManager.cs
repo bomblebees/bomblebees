@@ -17,6 +17,8 @@ public class KcpNetworkManager : NetworkManager
     [SerializeField] private GameObject levelManager;
     [SerializeField] private GameObject healthManager;
     [SerializeField] private GameObject playUI;
+    [SerializeField] private GameObject bombObject;
+    [SerializeField] private GameObject laserObject;
 
     public override void OnStartServer()
     {
