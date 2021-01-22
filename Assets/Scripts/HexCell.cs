@@ -102,39 +102,40 @@ public class HexCell : NetworkBehaviour
     * returns 
     * TODO: create a default callback that does nothing, or overload function to have 1 param
     */
-    public bool FindSameColorTiles(System.Action<List<HexCell>> callback, int minTilesInCombo)
+    public List<HexCell> FindSameColorTiles(int minTilesInCombo)
     {
+        List<HexCell> checkList = new List<HexCell>(15); // To reduce array-doubling
+        List<HexCell> combosList = new List<HexCell>(15); // To reduce array-doubling
+
         // No combos can be found when its empty
-        if (this.GetKey() == 'e') return false;
+        if (this.GetKey() == 'e') return checkList;
 
         bool hasAtLeastOneCombo = false;
-        List<HexCell> ComboList = new List<HexCell>(15); // To reduce array-doubling
         for (var direction = 0; direction < 3; direction++)
         {
             HexDirection hexDirection = (HexDirection) direction;
             HexDirection oppositeDirection = hexDirection.Opposite();
-            CollectSameColorNeighbors(this.GetNeighbor(hexDirection), hexDirection, ComboList);
-            CollectSameColorNeighbors(this.GetNeighbor(oppositeDirection), oppositeDirection, ComboList);
-            if (ComboList.Count >= minTilesInCombo - 1) // - 1 because of the this tile
+            CollectSameColorNeighbors(this.GetNeighbor(hexDirection), hexDirection, checkList);
+            CollectSameColorNeighbors(this.GetNeighbor(oppositeDirection), oppositeDirection, checkList);
+            if (checkList.Count >= minTilesInCombo - 1) // - 1 because of the this tile
             {
                 if (!hasAtLeastOneCombo) // Stops "this" from being in callback() twice
                 {
                     hasAtLeastOneCombo = true;
                 }
-
-                callback(ComboList);
+                
+                combosList.AddRange(checkList); // Append checkList to the list of combos
             }
-
-            ComboList.Clear();
+            checkList.Clear();
         }
         // Kill off this tilei
         if (hasAtLeastOneCombo)
         {
-            ComboList.Add(this);
-            callback(ComboList);
+            combosList.Add(this);
+            //callback(ComboList);
         }
 
-        return hasAtLeastOneCombo;
+        return combosList;
     }
 
     public void CollectSameColorNeighbors(HexCell neighbor, HexDirection hexDirection, List<HexCell> list)

@@ -41,7 +41,7 @@ public class HexGrid : NetworkBehaviour
     /// <summary>
     /// gridList: Stores every Hex Cell on the board
     /// </summary>
-    private List<HexCell> gridList = new List<HexCell>(); 
+    public List<HexCell> gridList = new List<HexCell>(); 
 
     public bool enableCoords = false;
 
@@ -166,7 +166,7 @@ public class HexGrid : NetworkBehaviour
         List<char> listTileTypes = new List<char>(tileTypes);
 
         // While a combo exists with this tile type, randomly generate a different tile type
-        while (cell.FindSameColorTiles((List<HexCell> _) => { }, GetMinTilesInCombo()))
+        while (cell.FindSameColorTiles(GetMinTilesInCombo()).Count != 0)
         {
             cell.DeleteModel();
             // Remove the tile type from list and generate new tile type
@@ -329,11 +329,13 @@ public class HexGrid : NetworkBehaviour
         // If chain regeneration enabled, check for new combos
         if (enableChainRegen)
         {
-            if (cell.FindSameColorTiles((List<HexCell> _) => { }, GetMinTilesInCombo()))
+            if (cell.FindSameColorTiles(GetMinTilesInCombo()).Count != 0)
             {
                 // Wait one second, so combo not instantly executed
                 yield return new WaitForSeconds(1);
-                cell.FindSameColorTiles(ComboCallback, GetMinTilesInCombo());
+                List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+                ComboCallback(comboCells);
+                //cell.FindSameColorTiles(ComboCallback, GetMinTilesInCombo());
             }
         }
         else
@@ -397,7 +399,7 @@ public class HexGrid : NetworkBehaviour
     {
         foreach (HexCell cell in list)
         {
-            var ComboObj = SpawnComboObjByKey(cell.GetKey(), cell.transform);
+            //var ComboObj = SpawnComboObjByKey(cell.GetKey(), cell.transform);
             // Start a coroutine that regenerates the tile
             StartCoroutine(RegenerateCell(cell));
         }
@@ -409,41 +411,68 @@ public class HexGrid : NetworkBehaviour
     /// @param heldKey - the color key we want the hex to be
     /// @return char - the original color key of the hex before swapping occurs
     /// </summary>
-    public char SwapHexAndKey(GameObject modelHit, char heldKey)
+    [Server]
+    public void SwapHexAndKey(GameObject modelHit, char heldKey, NetworkIdentity player)
     {
+        if (!player.isLocalPlayer) return;
         Debug.Log("swapped");
-        char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+        //char tempKey = modelHit.GetComponentInParent<HexCell>().GetKey();
         int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 
-        CmdSwapHexAndKey(cellIdx, heldKey);
 
-        return (tempKey);
-    }
+        HexCell cell = gridList[cellIdx];
+        cell.SetKey(heldKey);
+        List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+        if (comboCells.Count > 0)
+        {
+            player.GetComponent<Player>().AddItemCombo(heldKey);
+        }
 
-    [Command(ignoreAuthority = true)]
-    void CmdSwapHexAndKey(int cellIdx, char heldKey)
-    {
         RpcSwapHexAndKey(cellIdx, heldKey);
+
+        //return (tempKey);
     }
+
+    //[Command(ignoreAuthority = true)]
+    //void CmdSwapHexAndKey(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
+    //{
+
+    //    HexCell cell = gridList[cellIdx];
+    //    cell.SetKey(heldKey);
+    //    List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+    //    Debug.Log(comboCells.Count);
+
+    //    if (comboCells.Count > 0)
+    //    {
+    //        sender.identity.GetComponent<Player>().AddItemCombo(heldKey);
+    //    }
+
+    //    RpcSwapHexAndKey(cellIdx, heldKey);
+    //}
 
     [ClientRpc]
     public void RpcSwapHexAndKey(int cellIdx, char heldKey)
     {
-        HexCell cell = gridList[cellIdx];
 
+        HexCell cell = gridList[cellIdx];
         cell.DeleteModel();
         cell.CreateModel(this.ReturnModelByCellKey(heldKey));
         cell.SetKey(heldKey);
-        if (cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
-        {
-            // Unoptimized Scan TODO optimize it
-            this.ScanListForGlow();
-        }
-        else
-        {
-            // Optimized scan
-            this.RecalculateGlowForNonCombo(cell);
-        }
+
+        List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+        ComboCallback(comboCells);
+
+        //cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo());
+        //if (cell.FindSameColorTiles(this.ComboCallback, this.GetMinTilesInCombo()) == true)
+        //{
+        //    // Unoptimized Scan TODO optimize it
+        //    this.ScanListForGlow();
+        //}
+        //else
+        //{
+        //    // Optimized scan
+        //    this.RecalculateGlowForNonCombo(cell);
+        //}
     }
 
 
@@ -459,7 +488,9 @@ public class HexGrid : NetworkBehaviour
 
     public bool FindGlowCombos(HexCell cell)
     {
-        return cell.FindSameColorTiles(this.SetListToGlow, this.minTilesForGlow);
+        List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+        SetListToGlow(comboCells);
+        return comboCells.Count != 0;
     }
 
     /* RecalculateGlowForNonCombo: Recalculates isGlowing for a newly-swapped cell and for other cells
