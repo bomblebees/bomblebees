@@ -69,7 +69,19 @@ public class Player : NetworkBehaviour
             stackRotationLock = stackUI.transform.rotation;
         }
         itemStack.Callback += OnItemStackChange;
-        
+
+        Debug.Log("local started");
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        this.Assert();
+        LinkAssets();
+        spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
+        spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
+
+        Debug.Log("server started");
     }
 
     void Assert()
@@ -92,8 +104,6 @@ public class Player : NetworkBehaviour
         ListenForPunching();
         ListenForSpinning();
         ListenForBombUse();
-
-        //Debug.Log(itemStack);
     }
 
     private void LateUpdate()
@@ -102,7 +112,6 @@ public class Player : NetworkBehaviour
         //stackUI.transform.rotation = stackRotationLock;
     }
 
-    [Client]
     void LinkAssets()
     {
         hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
@@ -364,7 +373,7 @@ public class Player : NetworkBehaviour
 
                 int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 
-                CmdTestSwap(cellIdx, getHeldKey());
+                CmdSwap(cellIdx, getHeldKey());
                 //hexGrid.netIdentity.AssignClientAuthority(connectionToClient);
                 //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
                 //hexGrid.netIdentity.RemoveClientAuthority();
@@ -381,7 +390,7 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    void CmdTestSwap(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
+    void CmdSwap(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
     {
         hexGrid.CmdSwapHexAndKey(cellIdx, heldKey, sender.identity);
     }
