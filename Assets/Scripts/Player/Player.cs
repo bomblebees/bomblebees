@@ -89,9 +89,9 @@ public class Player : NetworkBehaviour
         ApplyMovement();
         ApplyTileHighlight();
         ListenForSwapping();
-        CmdListenForPunching();
-        CmdListenForSpinning();
-        CmdListenForBombUse();
+        ListenForPunching();
+        ListenForSpinning();
+        ListenForBombUse();
 
         //Debug.Log(itemStack);
     }
@@ -111,18 +111,6 @@ public class Player : NetworkBehaviour
 
         // Probably dangerous way to get game object, UI has to be first in player prefab
         stackUI = this.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
-    }
-
-    [Command]
-    void CmdListenForBombUse()
-    {
-        RpcListenForBombUse(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcListenForBombUse(NetworkConnection target)
-    {
-        ListenForBombUse();
     }
 
     void ListenForBombUse()
@@ -201,10 +189,24 @@ public class Player : NetworkBehaviour
 
     IEnumerator BombUse()
     {
-        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        CmdBombUse();
+
         yield return new WaitForSeconds(0);
     }
+
+    [Command]
+    void CmdBombUse()
+    {
+        GameObject bomb = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(bomb);
+    }
+
+    //[ClientRpc]
+    //void RpcBombUse()
+    //{
+        
+    //}
 
     //
     IEnumerator LaserUse()
@@ -212,18 +214,6 @@ public class Player : NetworkBehaviour
         Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         yield return new WaitForSeconds(0);
-    }
-
-    [Command]
-    void CmdListenForPunching()
-    {
-        RpcListenForPunching(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcListenForPunching(NetworkConnection target)
-    {
-        ListenForPunching();
     }
 
     void ListenForPunching()
@@ -234,23 +224,11 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [Command]
-    void CmdListenForSpinning()
-    {
-        RpcListenForSpinning(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcListenForSpinning(NetworkConnection target)
-    {
-        ListenForSpinning();
-    }
-
     public void ListenForSpinning()
     {
         if (Input.GetKeyDown(spinKey))
         {
-            StartCoroutine(Spin());
+            CmdSpin();
         }
     }
 
@@ -294,6 +272,19 @@ public class Player : NetworkBehaviour
                 canSpin = true;
             }
         }
+    }
+
+    [Command]
+    void CmdSpin()
+    {
+        RpcSpin();
+    }
+
+    [ClientRpc]
+    void RpcSpin()
+    {
+        // Client will spin for all observers
+        StartCoroutine(Spin());
     }
 
     private IEnumerator HandleSpinHitbox()
