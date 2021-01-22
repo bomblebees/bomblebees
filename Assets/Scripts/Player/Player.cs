@@ -434,20 +434,7 @@ public class Player : NetworkBehaviour
         }
 
         // Changing the UI
-        string stackDisplay = "[";
-
-        for (int i = 0; i < 3; i++)
-        {
-            if (i < itemStack.Count) stackDisplay += itemStack[i];
-            else stackDisplay += "e";
-
-            if (i < 2) stackDisplay += ", ";
-            else stackDisplay += "]";
-        }
-
-        Debug.Log(stackDisplay);
-
-        stackUI.GetComponent<Text>().text = stackDisplay;
+        UpdateStackUI();
     }
 
 
@@ -458,7 +445,7 @@ public class Player : NetworkBehaviour
         for (int i = 0; i < 3; i++)
         {
             if (i < itemStack.Count) stackDisplay += itemStack[i];
-            else stackDisplay += "e";
+            else stackDisplay += "-";
 
             if (i < 2) stackDisplay += ", ";
             else stackDisplay += "]";
