@@ -35,7 +35,6 @@ public class TriggerObject : ComboObject
     {
         if (canBeTriggered && wasHit)
         {
-            Debug.Log("triggered");
             canBeTriggered = false;  // To stop it from being triggered twice
             timeTriggered = timeAlive;
             StartCoroutine(EnableSFX());
@@ -50,7 +49,6 @@ public class TriggerObject : ComboObject
     {
         if (canBeExtended && timeAlive > lingerDuration)
         {
-            Debug.Log("entered despawn");
             canBeExtended = false;
             if (wasHit)
             {

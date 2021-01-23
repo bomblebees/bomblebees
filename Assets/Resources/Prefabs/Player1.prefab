@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: -8900185448856423588}
   - component: {fileID: 7210949671591448289}
   - component: {fileID: -4029230019786924673}
+  - component: {fileID: 732740295544866867}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Player
@@ -167,6 +168,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  lives: 3
+  invincibilityDuration: 2
+  ghostDuration: 5
   swapKey: space
   punchKey: p
   spinKey: o
@@ -228,6 +232,20 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
+--- !u!136 &732740295544866867
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728363404677404264}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 4
+  m_Height: 20
+  m_Direction: 1
+  m_Center: {x: 0, y: 10, z: 0}
 --- !u!1 &1163376774926246814
 GameObject:
   m_ObjectHideFlags: 0
@@ -778,8 +796,9 @@ GameObject:
   - component: {fileID: 576993572615881957}
   - component: {fileID: 3507495396872683302}
   - component: {fileID: 6506546042859524519}
+  - component: {fileID: 3639652156352726055}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Inventory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -792,9 +811,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4849357194100230548}
-  m_LocalRotation: {x: 0.38795114, y: -0.00402154, z: 0.0016927529, w: 0.92166966}
+  m_LocalRotation: {x: 0.38795114, y: -0.0040215394, z: 0.0016927529, w: 0.92166954}
   m_LocalPosition: {x: 0, y: 0, z: 5.4}
-  m_LocalScale: {x: 0.33114, y: 0.33114, z: 0.33114}
+  m_LocalScale: {x: 0.33114, y: 0.33114007, z: 0.33114}
   m_Children:
   - {fileID: 5859111119249792418}
   m_Father: {fileID: 94709753153883346}
@@ -865,6 +884,23 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1818360609 &3639652156352726055
+RotationConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4849357194100230548}
+  m_Enabled: 1
+  m_Weight: 1
+  m_RotationAtRest: {x: 45.655003, y: -0.5, z: 0}
+  m_RotationOffset: {x: 0, y: 0, z: 0}
+  m_AffectRotationX: 1
+  m_AffectRotationY: 1
+  m_AffectRotationZ: 1
+  m_IsContraintActive: 0
+  m_IsLocked: 1
+  m_Sources: []
 --- !u!1 &5092107483030756346
 GameObject:
   m_ObjectHideFlags: 0
@@ -1299,6 +1335,16 @@ PrefabInstance:
     - target: {fileID: 7274719735903540578, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
         type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7274719735903540578, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8545850550850459336, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

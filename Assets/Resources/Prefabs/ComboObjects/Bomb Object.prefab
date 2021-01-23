@@ -262,7 +262,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9095178392891195692}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.3, z: 0}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children:
   - {fileID: 3684272691360384705}
@@ -302,6 +302,11 @@ PrefabInstance:
     - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
@@ -389,6 +394,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &3684272691360384705 stripped
@@ -412,6 +422,11 @@ PrefabInstance:
     - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
@@ -499,6 +514,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &1181919302049452712 stripped
@@ -522,6 +542,11 @@ PrefabInstance:
     - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
@@ -609,6 +634,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &490870996900922155 stripped
@@ -632,6 +662,11 @@ PrefabInstance:
     - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
@@ -718,6 +753,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
@@ -889,6 +929,11 @@ PrefabInstance:
       propertyPath: m_Convex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_AssetId
@@ -974,6 +1019,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &8103868460731677162 stripped
@@ -997,6 +1047,11 @@ PrefabInstance:
     - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
@@ -1084,6 +1139,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &6180522932576721000 stripped
@@ -1107,6 +1167,11 @@ PrefabInstance:
     - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
@@ -1193,6 +1258,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_TagString
+      value: ComboHitbox
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}

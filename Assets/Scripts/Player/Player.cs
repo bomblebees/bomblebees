@@ -14,7 +14,11 @@ public class Player : NetworkBehaviour
 {
     // Assets
     private HexGrid hexGrid;
-    public int NumLives { get; set; }
+    
+    public int lives = 3;
+    public float invincibilityDuration = 2.0f;
+    public float ghostDuration = 5.0f;
+    private bool canBeHit = true;
 
     [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string punchKey = "p";
@@ -373,12 +377,10 @@ public class Player : NetworkBehaviour
 
                 int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 
-                CmdSwap(cellIdx, getHeldKey());
+                CmdSwap(cellIdx, GetHeldKey());
                 //hexGrid.netIdentity.AssignClientAuthority(connectionToClient);
                 //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
                 //hexGrid.netIdentity.RemoveClientAuthority();
-            
-
 
                 // Only update models and grids if it is a new key
                 if (!this.heldKey.Equals(newKey))
@@ -479,17 +481,73 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSetHeldKey(char newKey)
     {
-        setHeldKey(newKey); // Sync held key
+        SetHeldKey(newKey); // Sync held key
         UpdateHeldHex(newKey); // Update model for all observers
     }
 
-    public void setHeldKey(char key)
+    public void SetHeldKey(char key)
     {
         this.heldKey = key;
     }
 
-    public char getHeldKey()
+    public char GetHeldKey()
     {
         return this.heldKey;
+    }
+
+    [Command]
+    public void CmdBeginGhostMode()
+    {
+        RpcBeginGhostMode();
+    }
+    
+    [ClientRpc]
+    public void RpcBeginGhostMode()
+    {
+        StartCoroutine(BeginGhostMode());
+    }
+    
+    public IEnumerator BeginGhostMode()
+    {
+        // TODO: place ghost anim here
+        this.TakeDamage(1);
+        Debug.Log("begin ghost mode");
+        canBeHit = false;
+        yield return new WaitForSeconds(ghostDuration);
+        StartCoroutine(BeginInvincibility());
+    }
+
+    public IEnumerator BeginInvincibility()
+    {
+        // TODO: turn on invincibility anim
+        yield return new WaitForSeconds(invincibilityDuration);
+        // turn off invincibility anim
+        canBeHit = true;
+        Debug.Log("turn off invincibility");
+    }
+    
+    public void TakeDamage(int damage)
+    {
+        this.lives -= damage;
+    }
+
+    public void SetCanBeHit(bool input)
+    {
+        canBeHit = input;
+    }
+
+    public bool GetCanBeHit()
+    {
+        return canBeHit;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+        {
+            Debug.Log("Took damage");
+            this.canBeHit = false; // might remove later. this is for extra security
+            this.CmdBeginGhostMode();
+        }
     }
 }

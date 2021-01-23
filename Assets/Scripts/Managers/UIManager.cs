@@ -120,7 +120,7 @@ public class UIManager : MonoBehaviour
 			if (playerList[i].gameObject != null && playerList[i].gameObject == player.gameObject)
 			{
 				playerHealthUIList[i].text = player.GetComponent<Health>().CurrentHealth.ToString();
-				playerLivesUIList[i].text = player.NumLives.ToString();
+				playerLivesUIList[i].text = player.lives.ToString();
 			}
 		}
 	}
