@@ -123,6 +123,9 @@ public class ComboObject : MonoBehaviour
         }
 
         this.gameObject.GetComponent<SphereCollider>().enabled = false;
+        // var rigidBody_ = this.gameObject.transform.GetComponent<Rigidbody>().Destroy;
+        // if(rigidBody_) rigidBody_.enabled 
+        this.gameObject.transform.Find("Model").gameObject.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
 

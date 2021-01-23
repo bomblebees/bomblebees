@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 12265583371404684}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: SFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -447,6 +447,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4969612748772648567, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4969612749365553991, guid: 31bbba3f89fb12e47841e5a59be3f32c,
         type: 3}
       propertyPath: moveWithTransform
@@ -456,6 +461,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969612749365554008, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4969612749365554009, guid: 31bbba3f89fb12e47841e5a59be3f32c,
         type: 3}
@@ -471,6 +481,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6151422544886337683, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 31bbba3f89fb12e47841e5a59be3f32c, type: 3}

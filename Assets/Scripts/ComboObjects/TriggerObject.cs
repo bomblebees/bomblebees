@@ -86,6 +86,7 @@ public class TriggerObject : ComboObject
     
     protected override void Push(int edgeIndex)
     {
+        NotifyOccupiedTile(false);
         wasHit = true;
     }
 }

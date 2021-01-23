@@ -10,7 +10,7 @@ public class LaserObject : TriggerObject
 {
     protected override void Push(int edgeIndex)
     {
-        wasHit = true;
+        base.Push(edgeIndex);  // Uses TriggerObject.Push()
         UpdateLaserDirection(edgeIndex);
     }
 
