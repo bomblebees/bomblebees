@@ -394,7 +394,7 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdSwap(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
     {
-        hexGrid.CmdSwapHexAndKey(cellIdx, heldKey, sender.identity);
+        hexGrid.SwapHexAndKey(cellIdx, heldKey, sender.identity);
     }
 
     // Applies the highlight shader to the tile the player is "looking" at
