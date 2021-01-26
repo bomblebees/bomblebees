@@ -3,84 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LaserObject : ComboObject
+// To change
+// - Push() to spawn laser
+// - TickDown() to not 
+public class LaserObject : TriggerObject
 {
-    private HexDirection hexDirection;
-    public string effectPath = "Prefabs/ComboEffects/Laser Beam";
-
-    /* SetDirection:
-        Called (separately) when LaserObject is Instantiated.
-    */
-    public void SetDirection(HexDirection dir)
+    protected override void Push(int edgeIndex)
     {
-        this.hexDirection = dir;
+        base.Push(edgeIndex);  // Uses TriggerObject.Push()
+        UpdateLaserDirection(edgeIndex);
     }
 
-    public Quaternion GetRotationFromDirection(HexDirection dir)
+    protected virtual void UpdateLaserDirection(int edgeIndex)
     {
-        Vector3 newDirVec;
-        switch (dir)
-        {
-            case HexDirection.NW:
-                newDirVec = new Vector3(90f, 0f, 30f);
-                break;
-            case HexDirection.SE:
-                newDirVec = new Vector3(90f, 0f, 30f);
-                break;
-            case HexDirection.W:
-                newDirVec = new Vector3(90f, 0f, 90f);
-                break;
-            case HexDirection.E:
-                newDirVec = new Vector3(90f, 0f, 90f);
-                break;
-            case HexDirection.SW:
-                newDirVec = new Vector3(90f, 0f, 150f);
-                break;
-            case HexDirection.NE:
-                newDirVec = new Vector3(90f, 0f, 150f);
-                break;
-            default:
-                Debug.LogError("LaserObject.cs: This should not be happening.");
-                newDirVec = new Vector3(90f, 0f, 150f);
-                break;
-        }
+        Debug.Log("edgeIndex is "+edgeIndex);
+        this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
 
-        return Quaternion.Euler(newDirVec);
-    }
+        // V this is kinda busted, 4/6 angles are wrong
+        this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles += new Vector3(0f, 0f, HexMetrics.edgeAngles[edgeIndex]+270f);
 
-    private void Awake()
-    {
-    }
-
-    private void Start()
-    {
-        StartCoroutine(TickDown());
-    }
-
-    protected override IEnumerator TickDown()
-    {
-        Debug.Log(String.Concat("LaserObject is ticking for ", tickDuration));
-        yield return new WaitForSeconds(tickDuration);
-        this.Lase(hexDirection);
-        this.DestroySelf();
-    }
-
-    protected override void DestroySelf() 
-    {
-        Destroy(this.gameObject);
-    }
-
-    private void Lase(HexDirection hexDirection)
-    {
-        Debug.Log("Creating Bomb Explosion");
-        var laser = Instantiate(Resources.Load(effectPath),
-            new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z),
-            GetRotationFromDirection(hexDirection)
-            ) as GameObject;
-        if (!laser) Debug.Log("LaserObject.cs: could not instantiate laser beam.");
-        else
-        {
-            laser.GetComponent<LaserBeam>().SpawnInDirection(hexDirection);
-        }
     }
 }

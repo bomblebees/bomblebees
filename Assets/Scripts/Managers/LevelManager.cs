@@ -57,7 +57,7 @@ public class LevelManager : MonoBehaviour
 		{
 			// add for one player mode
 			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
-			temp.NumLives = numLives;
+			temp.lives = numLives;
 			Health playerHealth = temp.GetComponent<Health>();
 			playerHealth.CurrentHealth = gameSettings.MaxHP;
 			PlayerList.Add(temp);
@@ -65,13 +65,13 @@ public class LevelManager : MonoBehaviour
 		else if (gameSettings.NumPlayers == 2)
 		{
 			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
-			temp.NumLives = numLives;
+			temp.lives = numLives;
 			Health playerHealth = temp.GetComponent<Health>();
 			playerHealth.CurrentHealth = gameSettings.MaxHP;
 			PlayerList.Add(temp);
 
 			Player temp2 = Instantiate(Resources.Load<Player>("Prefabs/Player2"), player2SpawnPos, new Quaternion());
-			temp2.NumLives = numLives;
+			temp2.lives = numLives;
 			Health playerHealth2 = temp2.GetComponent<Health>();
 			playerHealth2.CurrentHealth = gameSettings.MaxHP;
 			PlayerList.Add(temp2);
@@ -100,7 +100,7 @@ public class LevelManager : MonoBehaviour
 			if (PlayerList[i].gameObject != null && PlayerList[i].gameObject == args.EventObject)
 			{
 				//indexInList = i;
-				if (playerComponent.NumLives > 1)
+				if (playerComponent.lives > 1)
 				{
 					// player has one or more lives left, do respawn thing (we can standardize "resetting" a new life in a new method later)
 					// EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = gameSettings.MaxHP, EventObject = args.EventObject });
@@ -109,7 +109,7 @@ public class LevelManager : MonoBehaviour
 					// later, we would probably use a proper finite state machine for this sorts of stuff
 					healthComponent.CurrentHealth = gameSettings.MaxHP;
 					healthComponent.Invulnerable = true;
-					playerComponent.NumLives--;
+					playerComponent.lives--;
 
 					args.EventObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 1f);
 					StartCoroutine(InvulnUntilEnd(invulnTime, healthComponent));
@@ -129,7 +129,7 @@ public class LevelManager : MonoBehaviour
 				{
 					// player has no lives left, do end game thing, process wins match results and stuff
 					Debug.Log("out of lives, ending match");
-					playerComponent.NumLives--;
+					playerComponent.lives--;
 					UIManager.Instance.PlayerDeathUIChange(playerComponent);
 
 					args.EventObject.SetActive(false);

@@ -121,6 +121,36 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &580091977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 580091978}
+  m_Layer: 0
+  m_Name: HealthManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &580091978
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580091977}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.665894, y: 11.834391, z: 8.696199}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1056732954
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,6 +254,10 @@ MonoBehaviour:
   healthManager: {fileID: 8505791286045204486, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
     type: 3}
   playUI: {fileID: 5684447462390480691, guid: 6912ca7ec0deb8f41bc00003b07bf8f9, type: 3}
+  bombObject: {fileID: 4324099173052882053, guid: 6cc5c0a7548d2e842aed7b8079c87b9e,
+    type: 3}
+  laserObject: {fileID: 8381395955730563735, guid: 36ea410a2f7f6d849b4aed7c50e8764f,
+    type: 3}
 --- !u!4 &1056732957
 Transform:
   m_ObjectHideFlags: 0

@@ -14,7 +14,11 @@ public class Player : NetworkBehaviour
 {
     // Assets
     private HexGrid hexGrid;
-    public int NumLives { get; set; }
+    
+    public int lives = 3;
+    public float invincibilityDuration = 2.0f;
+    public float ghostDuration = 5.0f;
+    private bool canBeHit = true;
 
     [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string punchKey = "p";
@@ -27,38 +31,67 @@ public class Player : NetworkBehaviour
     [SerializeField] private float movementSpeed = 50;
     [SerializeField] private float turnSpeed = 17f;
 
+    [Header("HexTiles")]
+    [SyncVar(hook = nameof(OnChangeHeldKey))]
+    public char heldKey = 'g';
+    public Vector3 heldHexScale = new Vector3(800, 800, 800);
+    public Vector3 heldHexOffset = new Vector3(0, 25, 10);
+    //float swapDistance = 15; // unused (for swapping in front of player)
+
     public float punchCooldown = 0.5f;
-    public float spinDuration = 0.6f;
-    public float spinCooldown = 0.7f;
+    public float spinHitboxDuration = 0.6f;
+    public float spinAnimDuration = 0.8f;
+    public float spinTotalCooldown = 0.8f;
     private bool canPunch = true;
     private bool canSpin = true;
 
-
-    [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
-    public char heldKey = 'g';
+    private GameObject spinHitbox;
+    private GameObject spinAnim;
 
     // Cache raycast refs for optimization
     private Ray tileRay;
     private RaycastHit tileHit;
-
     private GameObject selectedTile;
     private GameObject heldHexModel;
-    float swapDistance = 15;
-    public Vector3 heldHexScale = new Vector3(800, 800, 800);
 
+    [SerializeField] private int maxStackSize = 3;
+    readonly SyncList<char> itemStack = new SyncList<char>();
+    [SerializeField] private Image[] stackUI = new Image[3];
+    private Quaternion stackRotationLock;
 
     public override void OnStartClient()
     {
+        base.OnStartClient();
         this.Assert();
         LinkAssets();
-        // Initialize model
-        UpdateHeldHex(heldKey);
-        base.OnStartClient();
+        spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
+        spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
+        UpdateHeldHex(heldKey); // Initialize model
+
+        if (isLocalPlayer)
+        {
+            //stackUI.GetComponent<Text>().enabled = true;
+            //stackRotationLock = stackUI.transform.rotation;
+        }
+        itemStack.Callback += OnItemStackChange;
+
+        Debug.Log("local started");
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        this.Assert();
+        LinkAssets();
+        spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
+        spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
+
+        Debug.Log("server started");
     }
 
     void Assert()
     {
-        if (spinCooldown < spinDuration)
+        if (spinTotalCooldown <= spinHitboxDuration && spinTotalCooldown <= spinAnimDuration)
         {
             Debug.LogError("Player.cs: spinCooldown is lower than spinDuration.");
         }
@@ -70,55 +103,128 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        // Applies player movement
         ApplyMovement();
-        // Listens for swapping and highlights selected hex
+        ApplyTileHighlight();
         ListenForSwapping();
-        CmdListenForPunching();
-        CmdListenForSpinning();
-        CmdListenForBombUse();
+        ListenForPunching();
+        ListenForSpinning();
+        ListenForBombUse();
     }
 
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
-    }
-    
-    void CmdListenForBombUse()
-    {
-        RpcListenForBombUse(connectionToClient);
+        //stackUI.transform.rotation = stackRotationLock;
     }
 
-    [TargetRpc]
-    void RpcListenForBombUse(NetworkConnection target)
+    void LinkAssets()
     {
-        ListenForBombUse();
+        hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
+            .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
+        if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
-    
+
     void ListenForBombUse()
     {
+        // raycast down to check if tile is occupied
         if (Input.GetKeyDown(bombKey))
         {
-            StartCoroutine(this.BombUse());
+            tileRay = new Ray(transform.position, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+                if (!hexCell.IsOccupiedByComboObject())
+                {
+                    if (itemStack.Count > 0)
+                    {
+                        char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
+                        RemoveItemCombo(); // pop it off
+
+                        switch (bombType)
+                        {
+                            case 'b':
+                                Debug.Log("Blue Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'g':
+                                Debug.Log("Green Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'y':
+                                Debug.Log("Yellow Bomb Type");
+                                StartCoroutine(this.LaserUse());
+                                break;
+                            case 'r':
+                                Debug.Log("Red Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'p':
+                                Debug.Log("Purple Bomb Type");
+                                // unimplemented
+                                break;
+                            case 'w':
+                                Debug.Log("White Bomb Type");
+                                // unimplemented
+                                break;
+                            default:
+                                // code should not reach here
+                                Debug.Log("Bomb type not found");
+                                break;
+                        }
+                    } else
+                    {
+                        Debug.Log("dropping default bomb");
+                        // Else use the default bomb
+                        StartCoroutine(this.BombUse());
+                    }
+                }
+            }
+        }
+
+        // Temp
+        if (Input.GetKeyDown("k"))
+        {
+            tileRay = new Ray(transform.position, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+                if (!hexCell.IsOccupiedByComboObject())
+                {
+                    StartCoroutine(this.LaserUse());
+                }
+            }
         }
     }
 
     IEnumerator BombUse()
     {
-        Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"), this.gameObject.transform.position + new Vector3(0f,10f,0f),Quaternion.identity);
+        CmdBombUse();
+
         yield return new WaitForSeconds(0);
     }
 
     [Command]
-    void CmdListenForPunching()
+    void CmdBombUse()
     {
-        RpcListenForPunching(connectionToClient);
+        GameObject bomb = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(bomb);
     }
 
-    [TargetRpc]
-    void RpcListenForPunching(NetworkConnection target)
+    //[ClientRpc]
+    //void RpcBombUse()
+    //{
+        
+    //}
+
+    //
+    IEnumerator LaserUse()
     {
-        ListenForPunching();
+        Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        yield return new WaitForSeconds(0);
     }
 
     void ListenForPunching()
@@ -129,26 +235,13 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [Command]
-    void CmdListenForSpinning()
-    {
-        RpcListenForSpinning(connectionToClient);
-    }
-
-    [TargetRpc]
-    void RpcListenForSpinning(NetworkConnection target)
-    {
-        ListenForSpinning();
-    }
-
-    void ListenForSpinning()
+    public void ListenForSpinning()
     {
         if (Input.GetKeyDown(spinKey))
         {
-            StartCoroutine(this.Spin());
+            CmdSpin();
         }
     }
-
 
     IEnumerator Punch()
     {
@@ -172,34 +265,51 @@ public class Player : NetworkBehaviour
         }
     }
 
-    IEnumerator Spin()
+    public IEnumerator Spin()
     {
         if (canSpin)
         {
-            Debug.Log("Spun");
-            var spinHitbox = gameObject.transform.Find("SpinHitbox");
             if (!spinHitbox)
             {
                 Debug.LogError("Player.cs: no spinHitbox assigned");
             }
             else
             {
+                StartCoroutine(HandleSpinHitbox());
+                StartCoroutine(HandleSpinAnim());
+
                 canSpin = false;
-                spinHitbox.gameObject.SetActive(true);
-                yield return new WaitForSeconds(spinDuration);
-                spinHitbox.gameObject.SetActive(false);
-                yield return new WaitForSeconds(spinCooldown);
+                yield return new WaitForSeconds(spinTotalCooldown);
                 canSpin = true;
             }
         }
     }
 
-    [Client]
-    void LinkAssets()
+    [Command]
+    void CmdSpin()
     {
-        hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
-            .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
-        if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
+        RpcSpin();
+    }
+
+    [ClientRpc]
+    void RpcSpin()
+    {
+        // Client will spin for all observers
+        StartCoroutine(Spin());
+    }
+
+    private IEnumerator HandleSpinHitbox()
+    {
+        spinHitbox.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinHitboxDuration);
+        spinHitbox.gameObject.SetActive(false);
+    }
+
+    private IEnumerator HandleSpinAnim()
+    {
+        spinAnim.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinAnimDuration);
+        spinAnim.gameObject.SetActive(false);
     }
 
     void OnChangeHeldKey(char oldHeldKey, char newHeldKey)
@@ -217,12 +327,14 @@ public class Player : NetworkBehaviour
             Debug.Log("Destroyed held hex");
         }
 
+        GameObject playerModel = transform.Find("PlayerModel").gameObject;
+
         // Create the hex model in the player's hand
         this.heldHexModel = Instantiate(
             hexGrid.ReturnModelByCellKey(newHeldKey),
-            transform.position + transform.up * 18 + transform.forward * 10,
-            transform.rotation,
-            transform
+            playerModel.transform.position + playerModel.transform.up * heldHexOffset.y + playerModel.transform.forward * heldHexOffset.x,
+            playerModel.transform.rotation,
+            playerModel.transform
         );
 
         this.heldHexModel.gameObject.transform.localScale = heldHexScale;
@@ -235,11 +347,13 @@ public class Player : NetworkBehaviour
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
 
+        GameObject playerModel = transform.Find("PlayerModel").gameObject;
+
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
+            playerModel.transform.rotation = Quaternion.Slerp(
+                playerModel.transform.rotation,
                 Quaternion.LookRotation(direction),
                 turnSpeed * Time.deltaTime
             );
@@ -252,7 +366,45 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForSwapping()
     {
-        tileRay = new Ray(transform.position + transform.forward * swapDistance + transform.up * 5, Vector3.down * 10);
+        if (Input.GetKeyDown(swapKey))
+        {
+            tileRay = new Ray(transform.position, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                Debug.Log("space pressed");
+                GameObject modelHit = tileHit.transform.gameObject;
+                //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
+                char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+
+                int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
+
+                CmdSwap(cellIdx, GetHeldKey());
+                //hexGrid.netIdentity.AssignClientAuthority(connectionToClient);
+                //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
+                //hexGrid.netIdentity.RemoveClientAuthority();
+
+                // Only update models and grids if it is a new key
+                if (!this.heldKey.Equals(newKey))
+                {
+                    CmdSetHeldKey(newKey);
+                }
+            }
+        }
+    }
+
+    [Command]
+    void CmdSwap(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
+    {
+        hexGrid.SwapHexAndKey(cellIdx, heldKey, sender.identity);
+    }
+
+    // Applies the highlight shader to the tile the player is "looking" at
+    // This is the tile that will be swapped, and one where the bomb will be placed on
+    [Client]
+    void ApplyTileHighlight()
+    {
+        tileRay = new Ray(transform.position, Vector3.down * 10);
 
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
         {
@@ -263,22 +415,71 @@ public class Player : NetworkBehaviour
                 selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
             selectedTile = tileHit.transform.gameObject;
             selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
+        }
+    }
 
-            // When swap key is pressed, swap held tile with selected tile
-            if (Input.GetKeyDown(swapKey))
-            {
-                Debug.Log("space pressed");
-                GameObject modelHit = tileHit.transform.gameObject;
-                //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
-                char newKey = hexGrid.SwapHexAndKey(modelHit, getHeldKey());
+    [TargetRpc]
+    public void TargetAddItemCombo(NetworkConnection target, char colorKey)
+    {
+        CmdAddItemCombo(colorKey);
+    }
 
+    public void AddItemCombo(char colorKey)
+    {
+        if (!isLocalPlayer) return;
+        CmdAddItemCombo(colorKey);
+    }
 
-                // Only update models and grids if it is a new key
-                if (!this.heldKey.Equals(newKey))
-                {
-                    CmdSetHeldKey(newKey);
-                }
-            }
+    [Command]
+    void CmdAddItemCombo(char colorKey)
+    {
+        if (itemStack.Count < maxStackSize)
+        {
+            itemStack.Add(colorKey); // Push new combo to stack
+        }
+        else
+        {
+            itemStack.RemoveAt(0); // Remove oldest combo (bottom of stack)
+            itemStack.Add(colorKey); // Push new combo to stack
+        }
+    }
+
+    public void RemoveItemCombo()
+    {
+        if (!isLocalPlayer) return;
+        CmdRemoveItemCombo();
+    }
+
+    [Command]
+    void CmdRemoveItemCombo()
+    {
+        if (itemStack.Count > 0)
+        {
+            itemStack.RemoveAt(itemStack.Count - 1); // pop it off
+        }
+    }
+
+    void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (i < itemStack.Count) stackUI[i].color = TempGetKeyColor(itemStack[i]);
+            else stackUI[i].color = Color.white;
+        }
+    }
+
+    // Temp function - get color associated with key
+    Color TempGetKeyColor(char key)
+    {
+        switch(key)
+        {
+            case 'b': return Color.blue;
+            case 'g': return Color.green;
+            case 'y': return Color.yellow;
+            case 'r': return Color.red;
+            case 'p': return Color.magenta;
+            case 'w': return Color.grey;
+            default: return Color.white;
         }
     }
 
@@ -291,17 +492,73 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSetHeldKey(char newKey)
     {
-        setHeldKey(newKey);
-        UpdateHeldHex(newKey);
+        SetHeldKey(newKey); // Sync held key
+        UpdateHeldHex(newKey); // Update model for all observers
     }
 
-    public void setHeldKey(char key)
+    public void SetHeldKey(char key)
     {
         this.heldKey = key;
     }
 
-    public char getHeldKey()
+    public char GetHeldKey()
     {
         return this.heldKey;
+    }
+
+    [Command]
+    public void CmdBeginGhostMode()
+    {
+        RpcBeginGhostMode();
+    }
+    
+    [ClientRpc]
+    public void RpcBeginGhostMode()
+    {
+        StartCoroutine(BeginGhostMode());
+    }
+    
+    public IEnumerator BeginGhostMode()
+    {
+        // TODO: place ghost anim here
+        this.TakeDamage(1);
+        Debug.Log("begin ghost mode");
+        canBeHit = false;
+        yield return new WaitForSeconds(ghostDuration);
+        StartCoroutine(BeginInvincibility());
+    }
+
+    public IEnumerator BeginInvincibility()
+    {
+        // TODO: turn on invincibility anim
+        yield return new WaitForSeconds(invincibilityDuration);
+        // turn off invincibility anim
+        canBeHit = true;
+        Debug.Log("turn off invincibility");
+    }
+    
+    public void TakeDamage(int damage)
+    {
+        this.lives -= damage;
+    }
+
+    public void SetCanBeHit(bool input)
+    {
+        canBeHit = input;
+    }
+
+    public bool GetCanBeHit()
+    {
+        return canBeHit;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+        {
+            Debug.Log("Took damage");
+            this.canBeHit = false; // might remove later. this is for extra security
+            this.CmdBeginGhostMode();
+        }
     }
 }
