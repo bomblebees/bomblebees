@@ -59,6 +59,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private Image[] stackUI = new Image[3];
     private Quaternion stackRotationLock;
 
+    [SerializeField] private GameObject playerModel;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -178,7 +180,13 @@ public class Player : NetworkBehaviour
                         // Else use the default bomb
                         StartCoroutine(this.BombUse());
                     }
+                } else
+                {
+                    Debug.LogWarning("cell is occupied!");
                 }
+            } else
+            {
+                Debug.LogWarning("no raycast for hex cell found!");
             }
         }
 
@@ -327,8 +335,6 @@ public class Player : NetworkBehaviour
             Debug.Log("Destroyed held hex");
         }
 
-        GameObject playerModel = transform.Find("PlayerModel").gameObject;
-
         // Create the hex model in the player's hand
         this.heldHexModel = Instantiate(
             hexGrid.ReturnModelByCellKey(newHeldKey),
@@ -346,8 +352,6 @@ public class Player : NetworkBehaviour
     {
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
-
-        GameObject playerModel = transform.Find("PlayerModel").gameObject;
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
@@ -418,20 +422,20 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [TargetRpc]
-    public void TargetAddItemCombo(NetworkConnection target, char colorKey)
-    {
-        CmdAddItemCombo(colorKey);
-    }
+    //[TargetRpc]
+    //public void TargetAddItemCombo(NetworkConnection target, char colorKey)
+    //{
+    //    CmdAddItemCombo(colorKey);
+    //}
 
+    //public void AddItemCombo(char colorKey)
+    //{
+    //    if (!isLocalPlayer) return;
+    //    CmdAddItemCombo(colorKey);
+    //}
+
+    [Server]
     public void AddItemCombo(char colorKey)
-    {
-        if (!isLocalPlayer) return;
-        CmdAddItemCombo(colorKey);
-    }
-
-    [Command]
-    void CmdAddItemCombo(char colorKey)
     {
         if (itemStack.Count < maxStackSize)
         {
