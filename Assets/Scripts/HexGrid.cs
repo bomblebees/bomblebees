@@ -120,12 +120,9 @@ public class HexGrid : NetworkBehaviour
     // Hook that is called when the state of colorGridList changes
     void OnColorGridListChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
-        Debug.Log("color list changed! at idx: " + idx + " where new color = " + newColor);
-        
         HexCell cell = gridList[idx];
         cell.SetKey(newColor);
         cell.CreateModel(this.ReturnModelByCellKey(newColor));
-
     }
 
     void CheckErrors()
@@ -135,7 +132,7 @@ public class HexGrid : NetworkBehaviour
             // || cellLabelPrefab == null
         )
         {
-            Debug.Log("HexGrid.cs: A Hex Asset is not assigned");
+            Debug.LogWarning("HexGrid.cs: A Hex Asset is not assigned");
         }
 
         if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null || p_Hex == null
@@ -384,7 +381,6 @@ public class HexGrid : NetworkBehaviour
         }
         else
         {
-            Debug.Log("regenerate unique cell in idx: " + cell.getListIndex());
             MakeCellUnique(cell.getListIndex());
         }
     }
@@ -405,7 +401,6 @@ public class HexGrid : NetworkBehaviour
         switch (key)
         {
             case 'b':
-                Debug.Log("Blue");
                 result = (GameObject) Instantiate(laserObjPath, spawnCoords);
                 // result.GetComponent<LaserObject>().SetDirection(HexDirection.SW);
                 break;
@@ -467,7 +462,6 @@ public class HexGrid : NetworkBehaviour
         colorGridList[cellIdx] = heldKey;
 
         List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
-        Debug.Log(comboCells.Count);
 
         if (comboCells.Count > 0)
         {

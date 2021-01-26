@@ -35,6 +35,7 @@ public class Player : NetworkBehaviour
     [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
+    public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     //float swapDistance = 15; // unused (for swapping in front of player)
 
     public float punchCooldown = 0.5f;
@@ -55,7 +56,7 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private int maxStackSize = 3;
     readonly SyncList<char> itemStack = new SyncList<char>();
-    private GameObject stackUI;
+    [SerializeField] private Image[] stackUI = new Image[3];
     private Quaternion stackRotationLock;
 
     public override void OnStartClient()
@@ -69,8 +70,8 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            stackUI.GetComponent<Text>().enabled = true;
-            stackRotationLock = stackUI.transform.rotation;
+            //stackUI.GetComponent<Text>().enabled = true;
+            //stackRotationLock = stackUI.transform.rotation;
         }
         itemStack.Callback += OnItemStackChange;
 
@@ -121,9 +122,6 @@ public class Player : NetworkBehaviour
         hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
             .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
-
-        // Probably dangerous way to get game object, UI has to be first in player prefab
-        stackUI = this.transform.GetChild(0).gameObject.transform.GetChild(0).gameObject;
     }
 
     void ListenForBombUse()
@@ -329,12 +327,14 @@ public class Player : NetworkBehaviour
             Debug.Log("Destroyed held hex");
         }
 
+        GameObject playerModel = transform.Find("PlayerModel").gameObject;
+
         // Create the hex model in the player's hand
         this.heldHexModel = Instantiate(
             hexGrid.ReturnModelByCellKey(newHeldKey),
-            transform.position + transform.up * 18 + transform.forward * 10,
-            transform.rotation,
-            transform
+            playerModel.transform.position + playerModel.transform.up * heldHexOffset.y + playerModel.transform.forward * heldHexOffset.x,
+            playerModel.transform.rotation,
+            playerModel.transform
         );
 
         this.heldHexModel.gameObject.transform.localScale = heldHexScale;
@@ -347,11 +347,13 @@ public class Player : NetworkBehaviour
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
 
+        GameObject playerModel = transform.Find("PlayerModel").gameObject;
+
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
+            playerModel.transform.rotation = Quaternion.Slerp(
+                playerModel.transform.rotation,
                 Quaternion.LookRotation(direction),
                 turnSpeed * Time.deltaTime
             );
@@ -459,17 +461,26 @@ public class Player : NetworkBehaviour
 
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
-        // Update the stack UI
-        string stackDisplay = "[";
         for (int i = 0; i < 3; i++)
         {
-            if (i < itemStack.Count) stackDisplay += itemStack[i];
-            else stackDisplay += "-";
-
-            if (i < 2) stackDisplay += ", ";
-            else stackDisplay += "]";
+            if (i < itemStack.Count) stackUI[i].color = TempGetKeyColor(itemStack[i]);
+            else stackUI[i].color = Color.white;
         }
-        stackUI.GetComponent<Text>().text = stackDisplay;
+    }
+
+    // Temp function - get color associated with key
+    Color TempGetKeyColor(char key)
+    {
+        switch(key)
+        {
+            case 'b': return Color.blue;
+            case 'g': return Color.green;
+            case 'y': return Color.yellow;
+            case 'r': return Color.red;
+            case 'p': return Color.magenta;
+            case 'w': return Color.grey;
+            default: return Color.white;
+        }
     }
 
     [Command]
