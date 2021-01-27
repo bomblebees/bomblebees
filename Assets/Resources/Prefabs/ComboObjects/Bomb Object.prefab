@@ -64,6 +64,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ae1bcfa2d30a8438b19b2e7cc06a95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   lerpRate: 0.15
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
@@ -72,7 +74,7 @@ MonoBehaviour:
   vfxDuration: 4
   sfxDuration: 4
   hitboxDuration: 4
-  lingerDuration: 8
+  lingerDuration: 2
   tickDuration: 4
 --- !u!114 &5054101179393573515
 MonoBehaviour:

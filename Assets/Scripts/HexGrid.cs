@@ -86,11 +86,6 @@ public class HexGrid : NetworkBehaviour
         
         GenerateHexGrid();
 
-        if (isLocalPlayer)
-        {
-            //colorGridList.Callback += OnColorGridListChange;
-        }
-
         CreateHexGridModels(); // When dedicated server is introduced, dont need to create models on server
 
         //ScanListForGlow(gridList); // temp unused (should happen client side)
@@ -124,7 +119,6 @@ public class HexGrid : NetworkBehaviour
     // Hook that is called when the state of colorGridList changes
     void OnColorGridListChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
-        Debug.Log("changing hex at index: " + idx + " to " + newColor);
         HexCell cell = gridList[idx];
         cell.SetKey(newColor);
         cell.CreateModel(this.ReturnModelByCellKey(newColor));

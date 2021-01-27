@@ -16,9 +16,10 @@ public class TriggerObject : ComboObject
 
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
-    
-    protected virtual void Start()
+
+    public override void OnStartServer()
     {
+        base.OnStartServer();
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
