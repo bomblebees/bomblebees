@@ -112,6 +112,7 @@ public class ComboObject : NetworkBehaviour
     {
         var rigidBody = this.GetComponent<Rigidbody>();
         rigidBody.velocity = Vector3.zero;
+        this.isMoving = false;
     }
 
     protected virtual IEnumerator EnableVFX()

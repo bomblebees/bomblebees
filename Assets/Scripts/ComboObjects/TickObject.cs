@@ -27,12 +27,12 @@ public class TickObject : ComboObject
     protected virtual IEnumerator TickDown()
     {
         yield return new WaitForSeconds(tickDuration);
+        StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
-        StopVelocity();
         NotifyOccupiedTile(false);
         yield return new WaitForSeconds(lingerDuration);
         StartCoroutine(DestroySelf());
