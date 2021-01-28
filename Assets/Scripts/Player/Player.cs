@@ -59,6 +59,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private Image[] stackUI = new Image[3];
     private Quaternion stackRotationLock;
 
+    [SerializeField] private GameObject playerModel;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -124,109 +126,26 @@ public class Player : NetworkBehaviour
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
     }
 
+    [Client]
     void ListenForBombUse()
     {
         // raycast down to check if tile is occupied
         if (Input.GetKeyDown(bombKey))
         {
-            tileRay = new Ray(transform.position, Vector3.down * 10);
-
-            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-            {
-                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
-                if (!hexCell.IsOccupiedByComboObject())
-                {
-                    if (itemStack.Count > 0)
-                    {
-                        char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
-                        RemoveItemCombo(); // pop it off
-
-                        switch (bombType)
-                        {
-                            case 'b':
-                                Debug.Log("Blue Bomb Type");
-                                // unimplemented
-                                break;
-                            case 'g':
-                                Debug.Log("Green Bomb Type");
-                                // unimplemented
-                                break;
-                            case 'y':
-                                Debug.Log("Yellow Bomb Type");
-                                StartCoroutine(this.LaserUse());
-                                break;
-                            case 'r':
-                                Debug.Log("Red Bomb Type");
-                                // unimplemented
-                                break;
-                            case 'p':
-                                Debug.Log("Purple Bomb Type");
-                                // unimplemented
-                                break;
-                            case 'w':
-                                Debug.Log("White Bomb Type");
-                                // unimplemented
-                                break;
-                            default:
-                                // code should not reach here
-                                Debug.Log("Bomb type not found");
-                                break;
-                        }
-                    } else
-                    {
-                        Debug.Log("dropping default bomb");
-                        // Else use the default bomb
-                        StartCoroutine(this.BombUse());
-                    }
-                }
-            }
+            CmdBombUse();
         }
+    }
 
-        // Temp
-        if (Input.GetKeyDown("k"))
+    [Client]
+    public void ListenForSpinning()
+    {
+        if (Input.GetKeyDown(spinKey))
         {
-            tileRay = new Ray(transform.position, Vector3.down * 10);
-
-            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-            {
-                var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
-                if (!hexCell.IsOccupiedByComboObject())
-                {
-                    StartCoroutine(this.LaserUse());
-                }
-            }
+            CmdSpin();
         }
     }
 
-    IEnumerator BombUse()
-    {
-        CmdBombUse();
-
-        yield return new WaitForSeconds(0);
-    }
-
-    [Command]
-    void CmdBombUse()
-    {
-        GameObject bomb = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(bomb);
-    }
-
-    //[ClientRpc]
-    //void RpcBombUse()
-    //{
-        
-    //}
-
-    //
-    IEnumerator LaserUse()
-    {
-        Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        yield return new WaitForSeconds(0);
-    }
-
+    [Client]
     void ListenForPunching()
     {
         if (Input.GetKeyDown(punchKey))
@@ -235,12 +154,76 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public void ListenForSpinning()
+    [Command]
+    void CmdBombUse(NetworkConnectionToClient sender = null)
     {
-        if (Input.GetKeyDown(spinKey))
+        Ray tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
+
+        if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
         {
-            CmdSpin();
+            var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
+            if (!hexCell.IsOccupiedByComboObject())
+            {
+                if (itemStack.Count > 0)
+                {
+                    char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
+                    sender.identity.GetComponent<Player>().RemoveItemCombo(); // pop it off
+
+                    switch (bombType)
+                    {
+                        case 'b':
+                            Debug.Log("Blue Bomb Type");
+                            // unimplemented
+                            break;
+                        case 'g':
+                            Debug.Log("Green Bomb Type");
+                            // unimplemented
+                            break;
+                        case 'y':
+                            Debug.Log("Yellow Bomb Type");
+                            this.SpawnLaserBomb();
+                            break;
+                        case 'r':
+                            Debug.Log("Red Bomb Type");
+                            // unimplemented
+                            break;
+                        case 'p':
+                            Debug.Log("Purple Bomb Type");
+                            // unimplemented
+                            break;
+                        case 'w':
+                            Debug.Log("White Bomb Type");
+                            // unimplemented
+                            break;
+                        default:
+                            // code should not reach here
+                            Debug.Log("Bomb type not found");
+                            break;
+                    }
+                } else
+                {
+                    Debug.Log("dropping default bomb");
+                    // Else use the default bomb
+                    this.SpawnDefaultBomb();
+                }
+            } 
         }
+    }
+
+    [Server]
+    void SpawnDefaultBomb()
+    {
+        GameObject bomb = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(bomb);
+    }
+    
+    [Server]
+    void SpawnLaserBomb()
+    {
+        GameObject laser = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(laser);
     }
 
     IEnumerator Punch()
@@ -288,6 +271,8 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdSpin()
     {
+        // Spin for server
+        StartCoroutine(Spin());
         RpcSpin();
     }
 
@@ -327,8 +312,6 @@ public class Player : NetworkBehaviour
             Debug.Log("Destroyed held hex");
         }
 
-        GameObject playerModel = transform.Find("PlayerModel").gameObject;
-
         // Create the hex model in the player's hand
         this.heldHexModel = Instantiate(
             hexGrid.ReturnModelByCellKey(newHeldKey),
@@ -346,8 +329,6 @@ public class Player : NetworkBehaviour
     {
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
-
-        GameObject playerModel = transform.Find("PlayerModel").gameObject;
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
@@ -368,7 +349,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(swapKey))
         {
-            tileRay = new Ray(transform.position, Vector3.down * 10);
+            tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
@@ -404,7 +385,7 @@ public class Player : NetworkBehaviour
     [Client]
     void ApplyTileHighlight()
     {
-        tileRay = new Ray(transform.position, Vector3.down * 10);
+        tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
         {
@@ -418,20 +399,20 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [TargetRpc]
-    public void TargetAddItemCombo(NetworkConnection target, char colorKey)
-    {
-        CmdAddItemCombo(colorKey);
-    }
+    //[TargetRpc]
+    //public void TargetAddItemCombo(NetworkConnection target, char colorKey)
+    //{
+    //    CmdAddItemCombo(colorKey);
+    //}
 
+    //public void AddItemCombo(char colorKey)
+    //{
+    //    if (!isLocalPlayer) return;
+    //    CmdAddItemCombo(colorKey);
+    //}
+
+    [Server]
     public void AddItemCombo(char colorKey)
-    {
-        if (!isLocalPlayer) return;
-        CmdAddItemCombo(colorKey);
-    }
-
-    [Command]
-    void CmdAddItemCombo(char colorKey)
     {
         if (itemStack.Count < maxStackSize)
         {
@@ -444,14 +425,8 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [Server]
     public void RemoveItemCombo()
-    {
-        if (!isLocalPlayer) return;
-        CmdRemoveItemCombo();
-    }
-
-    [Command]
-    void CmdRemoveItemCombo()
     {
         if (itemStack.Count > 0)
         {

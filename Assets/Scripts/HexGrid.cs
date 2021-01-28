@@ -86,19 +86,18 @@ public class HexGrid : NetworkBehaviour
         
         GenerateHexGrid();
 
-        if (!isClient)
-        {
-            colorGridList.Callback += OnColorGridListChange;
-
-        }
-
         CreateHexGridModels(); // When dedicated server is introduced, dont need to create models on server
 
         //ScanListForGlow(gridList); // temp unused (should happen client side)
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        colorGridList.Callback += OnColorGridListChange;
+    }
+
     // Creates the models for cells in gridList with the colors saved in colorGridList
-    [Client]
     void CreateHexGridModels()
     {
         // verify that gridList is synced with colorGridList
@@ -188,8 +187,8 @@ public class HexGrid : NetworkBehaviour
 
             // Update the cell model 
             char newType = nonComboTileTypes[UnityEngine.Random.Range(0, nonComboTileTypes.Count)];
-            //cell.CreateModel(ReturnModelByCellKey(newType));
             cell.SetKey(newType);
+            cell.CreateModel(ReturnModelByCellKey(newType));
             if (isServer) colorGridList[idx] = newType;
 
             return true;
@@ -356,7 +355,7 @@ public class HexGrid : NetworkBehaviour
         }
 
         cell.SetKey('e');
-        cell.DeleteModel();
+        cell.CreateModel(ReturnModelByCellKey('e'));
         colorGridList[cell.getListIndex()] = 'e';
         yield return new WaitForSeconds(tileRegenDuration);
 
@@ -465,7 +464,7 @@ public class HexGrid : NetworkBehaviour
 
         if (comboCells.Count > 0)
         {
-            player.GetComponent<Player>().TargetAddItemCombo(player.connectionToClient, heldKey);
+            player.GetComponent<Player>().AddItemCombo(heldKey);
         }
 
         ComboCallback(comboCells);

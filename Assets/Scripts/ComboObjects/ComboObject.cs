@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 // Required Children:
 // - VFX
 // - SFX
 // - Hitbox
-public class ComboObject : MonoBehaviour
+public class ComboObject : NetworkBehaviour
 {
     private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     private float travelDistanceInHexes = 2;
@@ -37,13 +38,27 @@ public class ComboObject : MonoBehaviour
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
                 Debug.Log("snapping to center");
-                FindCenter();
-                GoToCenter();
-                isMoving = false;
+                if (isServer)
+                {
+                    // The server should calculate these values to make sure
+                    // all clients have the synced values as dictated by the server
+                    FindCenter();
+                    GoToCenter();
+                    NotifyOccupiedTile(true);
+                    isMoving = false;
+                    RpcStopMoving();
+                }
             }
         }
     }
 
+    [ClientRpc]
+    void RpcStopMoving()
+    {
+        isMoving = false;
+    }
+
+    [Server]
     protected virtual void FindCenter()
     {
         var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
@@ -54,7 +69,15 @@ public class ComboObject : MonoBehaviour
             var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
             // var result = GetComponent<Transform>().position;
             nearestCenter = result;
+            RpcFindCenter(result);
         }
+    }
+
+    // Tell all clients the nearest center as calculated by the server
+    [ClientRpc]
+    protected virtual void RpcFindCenter(Vector3 centerPos)
+    {
+        nearestCenter = centerPos;
     }
 
     protected virtual float GetDistanceFrom(Vector3 targetPos)
@@ -66,16 +89,25 @@ public class ComboObject : MonoBehaviour
         return dist;
     }
 
+    [Server]
     protected virtual void GoToCenter()
     {
         this.gameObject.transform.position = nearestCenter;
+        RpcGoToCenter(nearestCenter);
+    }
+
+    // Tell all clients to move their bomb to the center
+    [ClientRpc]
+    protected virtual void RpcGoToCenter(Vector3 centerPos)
+    {
+        Debug.Log("go to center at pos: " + centerPos);
+        this.gameObject.transform.position = centerPos;
     }
 
     protected virtual void NotifyOccupiedTile(bool val)
     {
-        tileUnderneath.SetOccupiedByComboObject(val);
+        if (isServer) tileUnderneath.SetOccupiedByComboObject(val);
     }
-
     protected virtual void StopVelocity()
     {
         // wait if not at center
@@ -129,6 +161,12 @@ public class ComboObject : MonoBehaviour
         yield return new WaitForSeconds(lingerDuration);
     }
 
+    [ClientRpc]
+    protected virtual void RpcPush(int edgeIndex)
+    {
+        Push(edgeIndex);
+    }
+
     protected virtual void Push(int edgeIndex)
     {
         var rigidBody = this.GetComponent<Rigidbody>();
@@ -138,16 +176,16 @@ public class ComboObject : MonoBehaviour
         }
         else
         {
-            // Update occupation status of tile
-            NotifyOccupiedTile(false);
-            
             targetPosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * travelDistanceInHexes;
             this.isMoving = true;
         }
     }
 
+    [ServerCallback]
     protected virtual void OnTriggerEnter(Collider other)
     {
+        if (!isServer) return; // The calculations should be validated on server side, return if not server
+
         if (other.gameObject.CompareTag("Spin"))
         {
             var playerPosition = other.transform.parent.gameObject.transform.position;
@@ -168,7 +206,9 @@ public class ComboObject : MonoBehaviour
                     break;
                 }
             }
-            Push(edgeIndex);
+            NotifyOccupiedTile(false); // Update occupation status of tile
+            Push(edgeIndex); // Push for server too
+            RpcPush(edgeIndex);
         }
     }
 
@@ -176,7 +216,7 @@ public class ComboObject : MonoBehaviour
     {
         yield return new WaitForSeconds(0);
         NotifyOccupiedTile(false);
-        Destroy(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
     }
     
     // For extension time
@@ -185,6 +225,6 @@ public class ComboObject : MonoBehaviour
         Debug.Log("Extending for "+extensionTime);
         yield return new WaitForSeconds(extensionTime);
         NotifyOccupiedTile(false);
-        Destroy(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
     }
 }
