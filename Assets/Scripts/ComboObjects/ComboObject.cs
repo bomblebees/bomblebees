@@ -176,7 +176,25 @@ public class ComboObject : NetworkBehaviour
         }
         else
         {
-            targetPosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * travelDistanceInHexes;
+            // raycast forward to see if tile position exists. If not, try a tile less while tileUnderneath is the same as that tile raycasted
+            // also keep track of lerp rate, increasing it for every tile closer
+
+            targetPosition = this.gameObject.transform.position;  // Safety, in the event that no possible tiles are found.
+            
+            float lerpScaleRate = 1/travelDistanceInHexes;
+            
+            for (int tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
+            {
+                var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * (travelDistanceInHexes - tileOffset);
+                var objectRay = new Ray(possiblePosition, Vector3.down);
+                RaycastHit tileUnderneathHit;
+                if (Physics.Raycast(objectRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles")))
+                {
+                    targetPosition = possiblePosition;
+                    break;
+                }
+                lerpRate *= 1+lerpScaleRate;
+            }
             this.isMoving = true;
         }
     }
