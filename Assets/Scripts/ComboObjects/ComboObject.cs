@@ -34,7 +34,7 @@ public class ComboObject : NetworkBehaviour
     {
         if (this.isMoving)
         {
-            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);
+            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
                 Debug.Log("snapping to center");
@@ -100,8 +100,8 @@ public class ComboObject : NetworkBehaviour
     [ClientRpc]
     protected virtual void RpcGoToCenter(Vector3 centerPos)
     {
-        Debug.Log("go to center at pos: " + centerPos);
         this.gameObject.transform.position = centerPos;
+        
     }
 
     protected virtual void NotifyOccupiedTile(bool val)
@@ -110,7 +110,6 @@ public class ComboObject : NetworkBehaviour
     }
     protected virtual void StopVelocity()
     {
-        // wait if not at center
         var rigidBody = this.GetComponent<Rigidbody>();
         rigidBody.velocity = Vector3.zero;
     }

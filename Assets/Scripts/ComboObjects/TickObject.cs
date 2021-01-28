@@ -33,6 +33,7 @@ public class TickObject : ComboObject
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
         StopVelocity();
+        NotifyOccupiedTile(false);
         yield return new WaitForSeconds(lingerDuration);
         StartCoroutine(DestroySelf());
     }
