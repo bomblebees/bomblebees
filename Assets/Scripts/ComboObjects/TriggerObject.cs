@@ -83,9 +83,10 @@ public class TriggerObject : ComboObject
         hitbox.SetActive(false);
     }
     
-    protected override void Push(int edgeIndex)
+    protected override bool Push(int edgeIndex)
     {
-        NotifyOccupiedTile(false);
+        NotifyOccupiedTile(false); // prolly move this later
         wasHit = true;
+        return true;
     }
 }

@@ -37,4 +37,14 @@ public class TickObject : ComboObject
         yield return new WaitForSeconds(lingerDuration);
         StartCoroutine(DestroySelf());
     }
+
+    protected override bool Push(int edgeIndex)
+    {
+        bool result = base.Push(edgeIndex);
+        if (result)
+        {
+            NotifyOccupiedTile(false);
+        }
+        return result;
+    }
 }

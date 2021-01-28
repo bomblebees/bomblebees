@@ -167,23 +167,20 @@ public class ComboObject : NetworkBehaviour
         Push(edgeIndex);
     }
 
-    protected virtual void Push(int edgeIndex)
+    protected virtual bool Push(int edgeIndex)
     {
+        bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
         {
+            return false;
             Debug.LogError("ComboObject.cs: ComboObject has no RigidBody component.");
         }
         else
         {
-            // raycast forward to see if tile position exists. If not, try a tile less while tileUnderneath is the same as that tile raycasted
-            // also keep track of lerp rate, increasing it for every tile closer
-
             targetPosition = this.gameObject.transform.position;  // Safety, in the event that no possible tiles are found.
-            
-            float lerpScaleRate = 1/travelDistanceInHexes;
-            
-            for (int tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
+            // float lerpScaleRate = 1/travelDistanceInHexes;
+            for (var tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
             {
                 var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * (travelDistanceInHexes - tileOffset);
                 var objectRay = new Ray(possiblePosition, Vector3.down);
@@ -191,11 +188,13 @@ public class ComboObject : NetworkBehaviour
                 if (Physics.Raycast(objectRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles")))
                 {
                     targetPosition = possiblePosition;
+                    result = true;
                     break;
                 }
-                lerpRate *= 1+lerpScaleRate;
+                // lerpRate *= 1+lerpScaleRate;
             }
-            this.isMoving = true;
+            if (result == true) { this.isMoving = true; }
+            return result;
         }
     }
 
