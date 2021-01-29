@@ -37,7 +37,6 @@ public class ComboObject : NetworkBehaviour
             this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
-                Debug.Log("snapping to center");
                 if (isServer)
                 {
                     // The server should calculate these values to make sure
@@ -183,9 +182,12 @@ public class ComboObject : NetworkBehaviour
             for (var tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
             {
                 var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * (travelDistanceInHexes - tileOffset);
-                var objectRay = new Ray(possiblePosition, Vector3.down);
+                var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
+                var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 10f, 0f), Vector3.down);
                 RaycastHit tileUnderneathHit;
-                if (Physics.Raycast(objectRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles")))
+                RaycastHit otherObjectHit;
+                if (Physics.Raycast(checkForEmptyRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles"))  // if raycast hit basetile, break
+                    && !Physics.Raycast(checkForObjectRay, out otherObjectHit, 10f, 1 << LayerMask.NameToLayer("ComboObjects"))) // And there shouldn't be a bomb on this tile
                 {
                     targetPosition = possiblePosition;
                     result = true;
