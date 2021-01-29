@@ -15,6 +15,43 @@ public class TickObject : ComboObject
         NotifyOccupiedTile(true);
         StartCoroutine(TickDown());
     }
+    
+    protected virtual IEnumerator TickDown()
+    {
+        yield return new WaitForSeconds(tickDuration);
+        if (!didEarlyEffects)
+        {
+            StartCoroutine(TickDownFinish());
+        }
+    }
+    
+    protected virtual IEnumerator TickDownFinish()
+    {
+        ProcEffects();
+        if (!didEarlyEffects)
+        {
+            yield return new WaitForSeconds(lingerDuration);
+            StartCoroutine(DestroySelf());
+        }
+    }
+
+    public virtual void ProcEffects()
+    {
+        StopVelocity();
+        StartCoroutine(EnableSFX());
+        StartCoroutine(EnableVFX());
+        StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectCollider());
+        StartCoroutine(DisableObjectModel());
+        NotifyOccupiedTile(false);
+    }
+
+
+    public virtual void EarlyProc()
+    {
+        didEarlyEffects = true;
+        ProcEffects();
+    }
 
     public override void OnStartClient()
     {
@@ -24,19 +61,6 @@ public class TickObject : ComboObject
         StartCoroutine(TickDown());
     }
 
-    protected virtual IEnumerator TickDown()
-    {
-        yield return new WaitForSeconds(tickDuration);
-        StopVelocity();
-        StartCoroutine(EnableSFX());
-        StartCoroutine(EnableVFX());
-        StartCoroutine(EnableHitbox());
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        NotifyOccupiedTile(false);
-        yield return new WaitForSeconds(lingerDuration);
-        StartCoroutine(DestroySelf());
-    }
 
     protected override bool Push(int edgeIndex)
     {

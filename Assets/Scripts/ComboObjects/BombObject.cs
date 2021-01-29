@@ -17,23 +17,37 @@ public class BombObject : TickObject
 
     protected override IEnumerator TickDown()
     {
-        yield return new WaitForSeconds(timeTillAnimSpeedup);
-        SpeedUpAnim();
-        yield return new WaitForSeconds(tickDuration - timeTillAnimSpeedup);
-        StopVelocity();
-        StartCoroutine(EnableSFX());
-        StartCoroutine(EnableVFX());
-        StartCoroutine(EnableHitbox());
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        NotifyOccupiedTile(false);
-        yield return new WaitForSeconds(lingerDuration);
-        StartCoroutine(DestroySelf());
+        if (!didEarlyEffects) {
+            yield return new WaitForSeconds(timeTillAnimSpeedup);
+            SpeedUpAnim();
+        }
+        yield return new WaitForSeconds(tickDuration-timeTillAnimSpeedup);
+        if (!didEarlyEffects)
+        {
+            StartCoroutine(TickDownFinish());
+        }
     }
 
     protected virtual void SpeedUpAnim()
     {
         Debug.Log("speeding up anim");
         flashingMaterial.SetFloat("Boolean_7185963F", 0f);
+    }
+    
+
+    // Note: this is when THIS object enters a collision
+    protected override void OnTriggerEnter(Collider other)
+    {
+        base.OnTriggerEnter(other);
+        var gameObjHit = other.gameObject;
+        if (gameObjHit.CompareTag("ComboHitbox")
+            &&
+        gameObjHit.transform.root.name.Equals("Bomb Object(Clone)")
+            )
+        {
+            Debug.Log("HAI");
+            //here make the other explode too
+            this.EarlyProc();
+        }
     }
 }

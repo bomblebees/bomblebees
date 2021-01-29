@@ -24,11 +24,13 @@ public class ComboObject : NetworkBehaviour
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
+    public bool didEarlyEffects = false;
     
     protected virtual void Update()
     {
         ListenForMoving();
     }
+    
 
     protected void ListenForMoving()
     {
