@@ -76,6 +76,8 @@ MonoBehaviour:
   hitboxDuration: 4
   lingerDuration: 2
   tickDuration: 4
+  timeTillAnimSpeedup: 2
+  model: {fileID: 6130566936131504250}
 --- !u!114 &5054101179393573515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,7 +182,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 34eaac2dcfba9ce4798d4520a61f62d4, type: 2}
+  - {fileID: 2100000, guid: 73175c228c565f346aa2b3e908059b71, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
