@@ -34,6 +34,6 @@ public class BombObject : TickObject
     protected virtual void SpeedUpAnim()
     {
         Debug.Log("speeding up anim");
-        flashingMaterial.SetFloat("Boolean_7185963F", 1f);
+        flashingMaterial.SetFloat("Boolean_7185963F", 0f);
     }
 }
