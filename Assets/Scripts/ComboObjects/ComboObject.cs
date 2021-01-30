@@ -183,7 +183,8 @@ public class ComboObject : NetworkBehaviour
             // float lerpScaleRate = 1/travelDistanceInHexes;
             for (var tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
             {
-                var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * (travelDistanceInHexes - tileOffset);
+                var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; //(travelDistanceInHexes - tileOffset);
+                // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
                 var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 10f, 0f), Vector3.down);
                 RaycastHit tileUnderneathHit;
@@ -193,6 +194,9 @@ public class ComboObject : NetworkBehaviour
                 {
                     targetPosition = possiblePosition;
                     result = true;
+                }
+                else
+                {
                     break;
                 }
                 // lerpRate *= 1+lerpScaleRate;
