@@ -37,7 +37,8 @@ public class HexGrid : NetworkBehaviour
     
     public int minTilesForCombo = 3;
     public int minTilesForGlow = 2;
-    
+
+    [Header("Grid Settings")]
     /// <summary>
     /// gridList: Stores every Hex Cell on the board
     /// </summary>
@@ -65,8 +66,8 @@ public class HexGrid : NetworkBehaviour
     public bool enableChainRegen = false;
 
     public Level1 level = new Level1();
-    private int width;
-    private int height;
+    [SerializeField] private int width = 19;
+    [SerializeField] private int height = 11;
 
     Canvas gridCanvas;
     HexMesh hexMesh;
@@ -147,8 +148,11 @@ public class HexGrid : NetworkBehaviour
     // getGridDimensions: used once at the start of the level
     void GetGridDimensions()
     {
-        this.width = level.getWidth();
-        this.height = level.getHeight();
+        if (!enableRandomGen)
+        {
+            this.width = level.getWidth();
+            this.height = level.getHeight();
+        }
         if (width == null || height == null) Debug.LogError("GetGridDimensions: could not get level dimensions.");
 
         // cells = new HexCell[height * width];
@@ -327,13 +331,20 @@ public class HexGrid : NetworkBehaviour
             }
         }
 
+
         // Set cell (color) and spawn model
         char key = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)]; // default random generated
+
 
         if (!enableRandomGen)
         {
             // If random gen disabled, grab key from level file
             key = level.getArray()[z, x];
+        }
+
+        if (ignoreRandomGenOnE && level.getArray()[z, x] == 'e')
+        {
+            key = 'e';
         }
 
         //cell.CreateModel(ReturnModelByCellKey(key));
