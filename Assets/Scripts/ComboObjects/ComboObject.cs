@@ -11,7 +11,7 @@ using UnityEngine;
 public class ComboObject : NetworkBehaviour
 {
     private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
-    public float travelDistanceInHexes = 3;
+    public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
     public float lerpRate = 0.15f;  // The speed at which the object is being pushed
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
@@ -181,7 +181,7 @@ public class ComboObject : NetworkBehaviour
         {
             targetPosition = this.gameObject.transform.position;  // Safety, in the event that no possible tiles are found.
             // float lerpScaleRate = 1/travelDistanceInHexes;
-            for (var tileOffset = 0; tileOffset < travelDistanceInHexes+1; tileOffset++)
+            for (var tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
             {
                 var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; //(travelDistanceInHexes - tileOffset);
                 // if works then change targetPosition

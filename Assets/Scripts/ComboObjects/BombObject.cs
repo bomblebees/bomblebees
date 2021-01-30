@@ -8,7 +8,7 @@ public class BombObject : TickObject
 {
     public float timeTillAnimSpeedup;
     public GameObject model;
-    private Material flashingMaterial;
+    public Material flashingMaterial;
 
     private void Start()
     {
