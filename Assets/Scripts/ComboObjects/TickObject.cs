@@ -27,6 +27,8 @@ public class TickObject : ComboObject
     
     protected virtual IEnumerator TickDownFinish()
     {
+        FindCenter();
+        GoToCenter();
         ProcEffects();
         if (!didEarlyEffects)
         {
