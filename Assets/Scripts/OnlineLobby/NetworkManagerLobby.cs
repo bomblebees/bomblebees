@@ -10,6 +10,10 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private int minPlayers = 2;
     [Scene] [SerializeField] private string menuScene = string.Empty;
 
+    [Header("Maps")]
+    [SerializeField] private int numberOfRounds = 1;
+    [SerializeField] private MapSet mapSet = null;
+
     [Header("Room")]
     [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
 
@@ -17,6 +21,8 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
     [SerializeField] private GameObject playerSpawnSystem = null;
     [SerializeField] private GameObject roundSystem = null;
+
+    private MapHandler mapHandler;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
@@ -26,11 +32,11 @@ public class NetworkManagerLobby : NetworkManager
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
     public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby>();
 
-    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
 
     public override void OnStartClient()
     {
-        var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
 
         foreach (var prefab in spawnablePrefabs)
         {
@@ -59,7 +65,7 @@ public class NetworkManagerLobby : NetworkManager
             conn.Disconnect();
             return;
         }
-        
+
         if (SceneManager.GetActiveScene().name != menuScene)
         {
             conn.Disconnect();
@@ -128,8 +134,10 @@ public class NetworkManagerLobby : NetworkManager
         if (SceneManager.GetActiveScene().name == menuScene)
         {
             if (!IsReadyToStart()) { return; }
-            
-            ServerChangeScene("Level1");
+
+            mapHandler = new MapHandler(mapSet, numberOfRounds);
+
+            ServerChangeScene(mapHandler.NextMap);
         }
     }
 

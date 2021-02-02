@@ -6,14 +6,13 @@ using UnityEngine;
 public class NetworkManagerManager : MonoBehaviour
 {
     [SerializeField] private GameObject networkManagerManager;
-    
-    [SerializeField] private GameObject basicNetworkManager;
+    [SerializeField] private GameObject kcp2NetworkManager;
     [SerializeField] private GameObject steamNetworkManager;
     [SerializeField] private GameObject kcpNetworkManager;
     public void ChooseBasicNetworkManager()
     {
         networkManagerManager.SetActive(false);
-        basicNetworkManager.SetActive(true);
+        kcp2NetworkManager.SetActive(true);
     }
     
     public void ChooseSteamNetworkManager()

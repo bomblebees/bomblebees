@@ -1,15 +1,33 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using Steamworks;
 using UnityEngine;
 
-public class SteamNetworkManager : NetworkManager
+public class SteamNetworkManagerLobby : NetworkManager
 {
-    [Header("Spawnable GameObject")] 
-    
+    [Header("Spawnable GameObject")]
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject hexGrid;
 
+    [SerializeField] private int minPlayers = 1;
+    [Scene] [SerializeField] private string menuScene = string.Empty;
+
+    [Header("Room")]
+    [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
+
+    [Header("Game")]
+    [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
+    
+    public static event Action OnClientConnected;
+    public static event Action OnClientDisconnected;
+    public static event Action<NetworkConnection> OnServerReadied;
+    public static event Action OnServerStopped;
+    
+    public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
+    public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby>();
+    
     public override void OnStartServer()
     {
         spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
@@ -43,6 +61,14 @@ public class SteamNetworkManager : NetworkManager
         GameObject instantiatePlayer = Instantiate(player);
         NetworkServer.Spawn(instantiatePlayer);
         NetworkServer.AddPlayerForConnection(conn, instantiatePlayer);
+        
+        /*CSteamID steamId = SteamMatchmaking.GetLobbyMemberByIndex(
+            SteamLobby.LobbyId,
+            numPlayers - 1);
+
+        var playerInfoDisplay = conn.identity.GetComponent<PlayerInfoDisplay>();
+
+        playerInfoDisplay.SetSteamId(steamId.m_SteamID);*/
     }
     
     [ServerCallback]
@@ -51,4 +77,5 @@ public class SteamNetworkManager : NetworkManager
         NetworkServer.Spawn(Instantiate(hexGrid));
     }
 }
+
 
