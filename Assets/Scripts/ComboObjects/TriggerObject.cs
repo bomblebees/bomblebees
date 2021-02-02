@@ -16,9 +16,10 @@ public class TriggerObject : ComboObject
 
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
-    
-    protected virtual void Start()
+
+    public override void OnStartServer()
     {
+        base.OnStartServer();
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
@@ -82,9 +83,10 @@ public class TriggerObject : ComboObject
         hitbox.SetActive(false);
     }
     
-    protected override void Push(int edgeIndex)
+    protected override bool Push(int edgeIndex)
     {
-        NotifyOccupiedTile(false);
+        NotifyOccupiedTile(false); // prolly move this later
         wasHit = true;
+        return true;
     }
 }

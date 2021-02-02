@@ -112,18 +112,18 @@ public class UIManager : MonoBehaviour
 
 	}
 
-	public void PlayerDeathUIChange(Player player)
-	{
-		// change number of lives and reset hp UI
-		for (int i = 0; i < playerList.Count; i++)
-		{
-			if (playerList[i].gameObject != null && playerList[i].gameObject == player.gameObject)
-			{
-				playerHealthUIList[i].text = player.GetComponent<Health>().CurrentHealth.ToString();
-				playerLivesUIList[i].text = player.lives.ToString();
-			}
-		}
-	}
+	// public void PlayerDeathUIChange(Player player)
+	// {
+	// 	// change number of lives and reset hp UI
+	// 	for (int i = 0; i < playerList.Count; i++)
+	// 	{
+	// 		if (playerList[i].gameObject != null && playerList[i].gameObject == player.gameObject)
+	// 		{
+	// 			playerHealthUIList[i].text = player.GetComponent<Health>().CurrentHealth.ToString();
+	// 			playerLivesUIList[i].text = player.lives.ToString();
+	// 		}
+	// 	}
+	// }
 
 	private void initialGameUIRefresh()
 	{

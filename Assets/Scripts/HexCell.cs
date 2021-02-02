@@ -58,6 +58,7 @@ public class HexCell : NetworkBehaviour
 
     public void CreateModel(GameObject model)
     {
+        if (GetModel()) this.DeleteModel();
         model = Instantiate(model, this.gameObject.transform);
         this.SetModel(model);
     }

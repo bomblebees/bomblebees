@@ -1,52 +1,113 @@
-// Referencing Jason Weimann's YouTube video "Unity Architecture - Composition or Inheritance?"
-// https://www.youtube.com/watch?v=8TIkManpEu4
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
+using UnityEngine.Networking;
+using NetworkBehaviour = Mirror.NetworkBehaviour;
 
-public class Health : MonoBehaviour
+// No generics in Mirror
+public class Health : NetworkBehaviour
 {
-	// it's a serializefield rn, but later on when we start prototyping it might get annoying editing other values in code
-	[SerializeField]
-	protected int startingHealth = 3;
+    [Header("Settings")] 
+    [SerializeField] private int maxLives = 3;
+    [Mirror.SyncVar] public int currentLives;
+    [SerializeField] float ghostDuration = 5.0f;
+    [SerializeField] float invincibilityDuration = 2.0f;
 
-	// read only (is this the right way to do this lol?)
-	public int CurrentHealth { get; set; }
-	public bool Invulnerable { get; set; }
+    [Mirror.SyncVar] private bool canBeHit = true;
 
-	// Start is called before the first frame update
-	void Awake()
+    public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
+
+    public GameObject playerModel;
+    public GameObject ghostModel;
+    
+    // All the subscribed subscribed will receive this event
+    public event LivesChangedDelegate EventLivesChanged;
+
+
+    [Mirror.ClientRpc]
+    private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
     {
-		CurrentHealth = startingHealth;
-		Invulnerable = false;
+        EventLivesChanged?.Invoke(currentHealth, maxHealth);
     }
 
-	void Start()
-	{
+    #region Server
 
-	}
+    [Mirror.Server]  // Only server can call this
+    private void SetHealth(int value)
+    {
+        currentLives = value;
+        RpcLivesChangedDelegate(currentLives, maxLives); // Run event for all
+    }
 
-	public void DealDamage(int amount)
-	{
-		if (CurrentHealth > 0)
-		{
-			// change currentHealth by amount (and emit damage dealt event)
-			CurrentHealth -= amount;
-			EventManager.TriggerEvent("healthChanged", this, new CustomEventArgs { Amount = CurrentHealth, EventObject = gameObject });
-		}
+    // Starts when Player starts existing on server
+    public override void OnStartServer()
+    {
+        SetHealth(maxLives);
+    }
 
-		if (CurrentHealth <= 0)
-		{
-			// call method for when currentHealth hits 0 (and emit death event)
-			OnHealthZero();
-		}
-	}
+    [Mirror.Command]
+    private void CmdTakeDamage(int damage)
+    {
+        SetHealth(Mathf.Max(currentLives - damage, 0)); 
+    }
 
-	private void OnHealthZero()
-	{
-		// when health hits 0, call death event thru EventManager singleton which listeners can react to and use custom args
-		EventManager.TriggerEvent("healthObjectDied", this, new CustomEventArgs { EventObject = gameObject });
-	}
+    #endregion
+
+    #region Client
+
+    [Mirror.Command]
+    public void CmdBeginGhostMode()
+    {
+        RpcBeginGhostMode();
+    }
+    
+    [Mirror.ClientRpc]
+    public void RpcBeginGhostMode()
+    {
+        StartCoroutine(BeginGhostMode());
+    }
+    
+    public IEnumerator BeginGhostMode()
+    {
+        // TODO: place ghost anim here
+        this.CmdTakeDamage(1);
+        // Anims
+        ghostModel.SetActive(true);
+        playerModel.SetActive(false);
+        
+        Debug.Log("begin ghost mode");
+        canBeHit = false;
+        yield return new WaitForSeconds(ghostDuration);
+        StartCoroutine(BeginInvincibility());
+    }
+
+    public IEnumerator BeginInvincibility()
+    {
+        // TODO: turn on invincibility anim
+        yield return new WaitForSeconds(invincibilityDuration);
+        // turn off invincibility anim
+        
+        canBeHit = true;
+        Debug.Log("turn off invincibility");
+        ghostModel.SetActive(false);
+        playerModel.SetActive(true);
+    }
+
+    [Mirror.ClientCallback]
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!hasAuthority) return;
+        
+        if (canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+        {
+            Debug.Log("Took damage");
+            this.canBeHit = false; // might remove later. this is for extra security
+            this.CmdBeginGhostMode();
+        }
+    }
+
+    #endregion
 }

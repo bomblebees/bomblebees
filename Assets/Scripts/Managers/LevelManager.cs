@@ -35,7 +35,7 @@ public class LevelManager : MonoBehaviour
 	{
 		PlayerList = new List<Player>();
 
-		EventManager.Subscribe("playerDied", new EventHandler<CustomEventArgs>(HandlePlayerDeath));
+		// EventManager.Subscribe("playerDied", new EventHandler<CustomEventArgs>(HandlePlayerDeath));
 		EventManager.Subscribe("gameStart", new EventHandler<CustomEventArgs>(GameStart));
 	}
 
@@ -51,32 +51,32 @@ public class LevelManager : MonoBehaviour
         
     }
 
-	void AddPlayers()
-	{
-		if (gameSettings.NumPlayers == 1)
-		{
-			// add for one player mode
-			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
-			temp.lives = numLives;
-			Health playerHealth = temp.GetComponent<Health>();
-			playerHealth.CurrentHealth = gameSettings.MaxHP;
-			PlayerList.Add(temp);
-		}
-		else if (gameSettings.NumPlayers == 2)
-		{
-			Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
-			temp.lives = numLives;
-			Health playerHealth = temp.GetComponent<Health>();
-			playerHealth.CurrentHealth = gameSettings.MaxHP;
-			PlayerList.Add(temp);
-
-			Player temp2 = Instantiate(Resources.Load<Player>("Prefabs/Player2"), player2SpawnPos, new Quaternion());
-			temp2.lives = numLives;
-			Health playerHealth2 = temp2.GetComponent<Health>();
-			playerHealth2.CurrentHealth = gameSettings.MaxHP;
-			PlayerList.Add(temp2);
-		}
-	}
+	// void AddPlayers()
+	// {
+	// 	if (gameSettings.NumPlayers == 1)
+	// 	{
+	// 		// add for one player mode
+	// 		Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
+	// 		temp.lives = numLives;
+	// 		Health playerHealth = temp.GetComponent<Health>();
+	// 		playerHealth.currentLives = gameSettings.MaxHP;
+	// 		PlayerList.Add(temp);
+	// 	}
+	// 	else if (gameSettings.NumPlayers == 2)
+	// 	{
+	// 		Player temp = Instantiate(Resources.Load<Player>("Prefabs/Player1"), player1SpawnPos, new Quaternion());
+	// 		temp.lives = numLives;
+	// 		Health playerHealth = temp.GetComponent<Health>();
+	// 		playerHealth.currentLives = gameSettings.MaxHP;
+	// 		PlayerList.Add(temp);
+	//
+	// 		Player temp2 = Instantiate(Resources.Load<Player>("Prefabs/Player2"), player2SpawnPos, new Quaternion());
+	// 		temp2.lives = numLives;
+	// 		Health playerHealth2 = temp2.GetComponent<Health>();
+	// 		playerHealth2.currentLives = gameSettings.MaxHP;
+	// 		PlayerList.Add(temp2);
+	// 	}
+	// }
 
 	void GameStart(object uiManager, CustomEventArgs args)
 	{
@@ -87,65 +87,65 @@ public class LevelManager : MonoBehaviour
 
 		roundRunning = true;
 		
-		AddPlayers();
+		// AddPlayers();
 	}
 
-	void HandlePlayerDeath(object player, CustomEventArgs args)
-	{
-		Player playerComponent = args.EventObject.GetComponent<Player>();
-		Health healthComponent = args.EventObject.GetComponent<Health>();
-		// int indexInList;
-		for (int i = 0; i < PlayerList.Count; i++)
-		{
-			if (PlayerList[i].gameObject != null && PlayerList[i].gameObject == args.EventObject)
-			{
-				//indexInList = i;
-				if (playerComponent.lives > 1)
-				{
-					// player has one or more lives left, do respawn thing (we can standardize "resetting" a new life in a new method later)
-					// EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = gameSettings.MaxHP, EventObject = args.EventObject });
-
-					// right now, we set the player state to invulnerable and set it to false using coroutine upon dying
-					// later, we would probably use a proper finite state machine for this sorts of stuff
-					healthComponent.CurrentHealth = gameSettings.MaxHP;
-					healthComponent.Invulnerable = true;
-					playerComponent.lives--;
-
-					args.EventObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 1f);
-					StartCoroutine(InvulnUntilEnd(invulnTime, healthComponent));
-					
-					UIManager.Instance.PlayerDeathUIChange(playerComponent);
-
-					if (i == 0)
-					{
-						args.EventObject.transform.position = player1SpawnPos;
-					}
-					else if (i == 1)
-					{
-						args.EventObject.transform.position = player2SpawnPos;
-					}
-				}
-				else
-				{
-					// player has no lives left, do end game thing, process wins match results and stuff
-					Debug.Log("out of lives, ending match");
-					playerComponent.lives--;
-					UIManager.Instance.PlayerDeathUIChange(playerComponent);
-
-					args.EventObject.SetActive(false);
-					roundRunning = false;
-				}
-			}
-		}
-		// Process death of a Player object, change game state, subtract from lives, etc
-	}
-
-	private IEnumerator InvulnUntilEnd(float timer, Health health)
-	{
-		Debug.Log("timer started for invuln");
-		yield return new WaitForSeconds(timer);
-		Debug.Log("timer ended.");
-		health.Invulnerable = false;
-		health.gameObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 0f);
-	}
+	// void HandlePlayerDeath(object player, CustomEventArgs args)
+	// {
+	// 	Player playerComponent = args.EventObject.GetComponent<Player>();
+	// 	Health healthComponent = args.EventObject.GetComponent<Health>();
+	// 	// int indexInList;
+	// 	for (int i = 0; i < PlayerList.Count; i++)
+	// 	{
+	// 		if (PlayerList[i].gameObject != null && PlayerList[i].gameObject == args.EventObject)
+	// 		{
+	// 			//indexInList = i;
+	// 			if (playerComponent.lives > 1)
+	// 			{
+	// 				// player has one or more lives left, do respawn thing (we can standardize "resetting" a new life in a new method later)
+	// 				// EventManager.TriggerEvent("playerHealthChanged", this, new CustomEventArgs { Amount = gameSettings.MaxHP, EventObject = args.EventObject });
+	//
+	// 				// right now, we set the player state to invulnerable and set it to false using coroutine upon dying
+	// 				// later, we would probably use a proper finite state machine for this sorts of stuff
+	// 				healthComponent.currentLives = gameSettings.MaxHP;
+	// 				healthComponent.Invulnerable = true;
+	// 				playerComponent.lives--;
+	//
+	// 				args.EventObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 1f);
+	// 				StartCoroutine(InvulnUntilEnd(invulnTime, healthComponent));
+	// 				
+	// 				UIManager.Instance.PlayerDeathUIChange(playerComponent);
+	//
+	// 				if (i == 0)
+	// 				{
+	// 					args.EventObject.transform.position = player1SpawnPos;
+	// 				}
+	// 				else if (i == 1)
+	// 				{
+	// 					args.EventObject.transform.position = player2SpawnPos;
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				// player has no lives left, do end game thing, process wins match results and stuff
+	// 				Debug.Log("out of lives, ending match");
+	// 				playerComponent.lives--;
+	// 				UIManager.Instance.PlayerDeathUIChange(playerComponent);
+	//
+	// 				args.EventObject.SetActive(false);
+	// 				roundRunning = false;
+	// 			}
+	// 		}
+	// 	}
+	// 	// Process death of a Player object, change game state, subtract from lives, etc
+	// }
+	//
+	// private IEnumerator InvulnUntilEnd(float timer, Health health)
+	// {
+	// 	Debug.Log("timer started for invuln");
+	// 	yield return new WaitForSeconds(timer);
+	// 	Debug.Log("timer ended.");
+	// 	health.Invulnerable = false;
+	// 	health.gameObject.GetComponentInChildren<Renderer>().material.SetFloat("_isBlinking", 0f);
+	// }
 }

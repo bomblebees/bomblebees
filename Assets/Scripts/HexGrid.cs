@@ -37,18 +37,24 @@ public class HexGrid : NetworkBehaviour
     
     public int minTilesForCombo = 3;
     public int minTilesForGlow = 2;
-    
+
+    [Header("Grid Settings")]
     /// <summary>
     /// gridList: Stores every Hex Cell on the board
     /// </summary>
     public List<HexCell> gridList = new List<HexCell>(); 
 
+    // A network-synchronized list of colors of every hex cell on the board
+    // Should represent gridList in the form of colors
+    public SyncList<char> colorGridList = new SyncList<char>(); 
+
     public bool enableCoords = false;
 
     // Whether the map will generate randomly on start
     public bool enableRandomGen = false;
+
     // Seed for random generation
-    public int randomSeed = 1234;
+    //public int randomSeed = 1234; //unused
 
     /// <summary>
     /// ignoreRandomGenOnE: if true, use preset map's 'e' tiles as default. Otherwise, ignore.
@@ -60,8 +66,8 @@ public class HexGrid : NetworkBehaviour
     public bool enableChainRegen = false;
 
     public Level1 level = new Level1();
-    private int width;
-    private int height;
+    [SerializeField] private int width = 19;
+    [SerializeField] private int height = 11;
 
     Canvas gridCanvas;
     HexMesh hexMesh;
@@ -72,7 +78,7 @@ public class HexGrid : NetworkBehaviour
 
     void Start()
     {
-        UnityEngine.Random.InitState(randomSeed);
+        //UnityEngine.Random.InitState(randomSeed); //unused
         CheckErrors();
         GetGridDimensions();
 
@@ -80,7 +86,43 @@ public class HexGrid : NetworkBehaviour
         this.hexMesh = GetComponentInChildren<HexMesh>();
         
         GenerateHexGrid();
-        ScanListForGlow(gridList);
+
+        CreateHexGridModels(); // When dedicated server is introduced, dont need to create models on server
+
+        //ScanListForGlow(gridList); // temp unused (should happen client side)
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        colorGridList.Callback += OnColorGridListChange;
+    }
+
+    // Creates the models for cells in gridList with the colors saved in colorGridList
+    void CreateHexGridModels()
+    {
+        // verify that gridList is synced with colorGridList
+        if (gridList.Count != colorGridList.Count)
+        {
+            Debug.LogError("GridList is not synced with colorGridList!");
+            return;
+        }
+
+        for (int i = 0; i < colorGridList.Count; i++)
+        {
+            // Create the model based on 
+            char syncedKey = colorGridList[i];
+            gridList[i].CreateModel(ReturnModelByCellKey(syncedKey)); // create model based on synced list
+            gridList[i].SetKey(syncedKey); // not necessary, but for safety?
+        }
+    }
+
+    // Hook that is called when the state of colorGridList changes
+    void OnColorGridListChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
+    {
+        HexCell cell = gridList[idx];
+        cell.SetKey(newColor);
+        cell.CreateModel(this.ReturnModelByCellKey(newColor));
     }
 
     void CheckErrors()
@@ -90,7 +132,7 @@ public class HexGrid : NetworkBehaviour
             // || cellLabelPrefab == null
         )
         {
-            Debug.Log("HexGrid.cs: A Hex Asset is not assigned");
+            Debug.LogWarning("HexGrid.cs: A Hex Asset is not assigned");
         }
 
         if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null || p_Hex == null
@@ -106,8 +148,11 @@ public class HexGrid : NetworkBehaviour
     // getGridDimensions: used once at the start of the level
     void GetGridDimensions()
     {
-        this.width = level.getWidth();
-        this.height = level.getHeight();
+        if (!enableRandomGen)
+        {
+            this.width = level.getWidth();
+            this.height = level.getHeight();
+        }
         if (width == null || height == null) Debug.LogError("GetGridDimensions: could not get level dimensions.");
 
         // cells = new HexCell[height * width];
@@ -119,63 +164,40 @@ public class HexGrid : NetworkBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                if (!enableRandomGen)
-                {
-                    CreateCell(x, z, i, level.getArray()[z, x]);
-                    i++;
-                    continue;
-                }
-
-                if (ignoreRandomGenOnE && level.getArray()[z, x] != 'e')
-                {
-                    char newTileKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-                    HexCell newCell = CreateCell(x, z, i, newTileKey);
-                    MakeCellUnique(newCell);
-                }
-                else
-                {
-                    CreateCell(x, z, i, 'e');
-                }
+                CreateCell(x, z, i);
                 i++;
             }
         }
     }
 
-    [ClientRpc]
-    void RpcGenerateHexGrid()
-    {
-        GenerateHexGrid();
-    }
-
-    [ClientRpc]
-    void RpcCreateCell(int x, int z, int i, char tileKey)
-    {
-        CreateCell(x, z, i, tileKey);
-    }
-
-    [ClientRpc]
-    void RpcCreateCellMakeCellUnique(int x, int z, int i, char tileKey)
-    {
-        HexCell newCell = CreateCell(x, z, i, tileKey);
-        MakeCellUnique(newCell);
-    }
-
     // MakeCellUnique: Updates a hex color to not generate a combo with its neighbors
-    void MakeCellUnique(HexCell cell)
+    //      returns true if cell is updated, false otherwise
+    bool MakeCellUnique(int idx)
     {
-        List<char> listTileTypes = new List<char>(tileTypes);
+        // Get a reference to the cell
+        HexCell cell = gridList[idx];
 
-        // While a combo exists with this tile type, randomly generate a different tile type
-        while (cell.FindSameColorTiles(GetMinTilesInCombo()).Count != 0)
+        List<char> nonComboTileTypes = new List<char>(tileTypes); // tile types that wont form a combo
+        List<HexCell> comboCellsList = cell.FindSameColorTiles(GetMinTilesInCombo());
+
+        // If cells exist in comboCellsList, then it forms a combo
+        if (comboCellsList.Count > 0)
         {
-            cell.DeleteModel();
-            // Remove the tile type from list and generate new tile type
-            listTileTypes.Remove(cell.GetKey());
+            // Remove the the key formed by the cells from list of non combo tile types
+            foreach (HexCell c in comboCellsList)
+            {
+                nonComboTileTypes.Remove(c.GetKey());
+            }
 
-            char newType = listTileTypes[UnityEngine.Random.Range(0, listTileTypes.Count)];
-            cell.CreateModel(ReturnModelByCellKey(newType));
+            // Update the cell model 
+            char newType = nonComboTileTypes[UnityEngine.Random.Range(0, nonComboTileTypes.Count)];
             cell.SetKey(newType);
+            cell.CreateModel(ReturnModelByCellKey(newType));
+            if (isServer) colorGridList[idx] = newType;
+
+            return true;
         }
+        return false;
     }
 
     
@@ -260,7 +282,7 @@ public class HexGrid : NetworkBehaviour
     /// <param name="key"></param>
     /// <returns></returns>
     /// </summary>
-    HexCell CreateCell(int x, int z, int i, char key)
+    HexCell CreateCell(int x, int z, int i)
     {
         Vector3 position;
         position.x = (x +
@@ -270,17 +292,20 @@ public class HexGrid : NetworkBehaviour
         position.y = 0f;
         position.z = z * (HexMetrics.outerRadius * 1.5f);
 
+        // Instantiate cell
         HexCell cell = Instantiate<HexCell>(cellPrefab);
         gridList.Add(cell);
         
+        // Set coords and index in gridList
+        cell.SetListIndex(i);
         cell.SetSpawnCoords(x, z);
+
+        // Set spawn position
         cell.transform.SetParent(transform, false);
         cell.transform.localPosition = position;
         cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-        cell.CreateModel(ReturnModelByCellKey(key));
-        cell.SetKey(key);
-        cell.SetListIndex(i);
 
+        // Set cell neighbors
         if (x > 0) // Skips first vertical axis
         {
             cell.SetNeighbor(HexDirection.W, gridList[i - 1]);
@@ -306,9 +331,33 @@ public class HexGrid : NetworkBehaviour
             }
         }
 
+
+        // Set cell (color) and spawn model
+        char key = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)]; // default random generated
+
+
+        if (!enableRandomGen)
+        {
+            // If random gen disabled, grab key from level file
+            key = level.getArray()[z, x];
+        }
+
+        if (ignoreRandomGenOnE && level.getArray()[z, x] == 'e')
+        {
+            key = 'e';
+        }
+
+        //cell.CreateModel(ReturnModelByCellKey(key));
+        cell.SetKey(key);
+        if (isServer) colorGridList.Add(key);
+
+        // Update the cell if it makes a combo
+        MakeCellUnique(i);
+
         return cell;
     }
 
+    [Server]
     IEnumerator RegenerateCell(HexCell cell)
     {
         if (cell.GetKey() == 'e')
@@ -317,12 +366,14 @@ public class HexGrid : NetworkBehaviour
         }
 
         cell.SetKey('e');
-        Destroy(cell.GetModel());
+        cell.CreateModel(ReturnModelByCellKey('e'));
+        colorGridList[cell.getListIndex()] = 'e';
         yield return new WaitForSeconds(tileRegenDuration);
 
         char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
         cell.SetKey(newKey);
         cell.CreateModel(ReturnModelByCellKey(newKey));
+        colorGridList[cell.getListIndex()] = newKey;
 
         // TODO: Add shader effects here for tile regen 
 
@@ -340,7 +391,7 @@ public class HexGrid : NetworkBehaviour
         }
         else
         {
-            MakeCellUnique(cell);
+            MakeCellUnique(cell.getListIndex());
         }
     }
 
@@ -360,7 +411,6 @@ public class HexGrid : NetworkBehaviour
         switch (key)
         {
             case 'b':
-                Debug.Log("Blue");
                 result = (GameObject) Instantiate(laserObjPath, spawnCoords);
                 // result.GetComponent<LaserObject>().SetDirection(HexDirection.SW);
                 break;
@@ -411,34 +461,40 @@ public class HexGrid : NetworkBehaviour
     /// @param heldKey - the color key we want the hex to be
     /// @return char - the original color key of the hex before swapping occurs
     /// </summary>
-    [Command(ignoreAuthority = true)]
-    public void CmdSwapHexAndKey(int cellIdx, char heldKey, NetworkIdentity player)
+    //[Command(ignoreAuthority = true)]
+    [Server]
+    public void SwapHexAndKey(int cellIdx, char heldKey, NetworkIdentity player)
     {
         HexCell cell = gridList[cellIdx];
+
+        cell.CreateModel(this.ReturnModelByCellKey(heldKey)); // updates on the server!
         cell.SetKey(heldKey);
+        colorGridList[cellIdx] = heldKey;
+
         List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
-        Debug.Log(comboCells.Count);
 
         if (comboCells.Count > 0)
         {
-            player.GetComponent<Player>().TargetAddItemCombo(player.connectionToClient, heldKey);
+            player.GetComponent<Player>().AddItemCombo(heldKey);
         }
 
-        RpcSwapHexAndKey(cellIdx, heldKey);
-    }
-
-    // Sync new swapped models for all clients
-    [ClientRpc]
-    public void RpcSwapHexAndKey(int cellIdx, char heldKey)
-    {
-        HexCell cell = gridList[cellIdx];
-        cell.DeleteModel();
-        cell.CreateModel(this.ReturnModelByCellKey(heldKey));
-        cell.SetKey(heldKey);
-
-        List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
         ComboCallback(comboCells);
+
+        //RpcSwapHexAndKey(cellIdx, heldKey);
     }
+
+    //// Sync new swapped models for all clients
+    //[ClientRpc]
+    //public void RpcSwapHexAndKey(int cellIdx, char heldKey)
+    //{
+    //    HexCell cell = gridList[cellIdx];
+    //    cell.DeleteModel();
+    //    cell.CreateModel(this.ReturnModelByCellKey(heldKey));
+    //    cell.SetKey(heldKey);
+
+    //    List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
+    //    ComboCallback(comboCells);
+    //}
 
 
     public int GetMinTilesInCombo()
