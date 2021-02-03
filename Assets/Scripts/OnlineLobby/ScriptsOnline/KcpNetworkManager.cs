@@ -17,8 +17,8 @@ public class KcpNetworkManager : NetworkManager
     [SerializeField] private GameObject levelManager;
     [SerializeField] private GameObject healthManager;
     [SerializeField] private GameObject playUI;
-    [SerializeField] private GameObject bombObject;
-    [SerializeField] private GameObject laserObject;
+    //[SerializeField] private GameObject bombObject;
+    //[SerializeField] private GameObject laserObject;
 
     public override void OnStartServer()
     {
@@ -30,6 +30,9 @@ public class KcpNetworkManager : NetworkManager
     public override void OnStartClient()
     {
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
+
+        // Clear for host client to clear warning messages
+        ClientScene.ClearSpawners();
 
         foreach (var prefab in spawnablePrefabs)
         {

@@ -163,11 +163,7 @@ public class HexCell : NetworkBehaviour
 
     public GameObject GetModel()
     {
-        if (this.model == null)
-        {
-            Debug.LogWarning("Error: hexCell model not set. Not a big deal.");
-        }
-
+        // WARNING: this.model could be undefined!
         return this.model;
     }
 
