@@ -12,6 +12,8 @@ public class ComboObject : NetworkBehaviour
 {
     [Header("Required", order = 1)]
     public GameObject blockerHandler;
+    public GameObject hitBox;
+    public Collider collider;
     
     private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
@@ -28,7 +30,20 @@ public class ComboObject : NetworkBehaviour
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
     public bool didEarlyEffects = false;
+
+    protected virtual void Start()
+    {
+        IgnoreDamageHitbox();
+    }
     
+    protected virtual void IgnoreDamageHitbox()
+    {
+        foreach (Collider c in hitBox.GetComponentsInChildren<Collider>())
+        {
+            Physics.IgnoreCollision(collider, c, true);
+        }
+    }
+
     protected virtual void Update()
     {
         ListenForMoving();
@@ -153,13 +168,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DisableObjectCollider()
     {
-        if (!this.gameObject.GetComponent<SphereCollider>())
-        {
-            Debug.Log(
-                "ComboObject.cs: ComboObject either looking for incorrect Collider " +
-                "type or you need to overwrite in ComboObject subclass");
-        }
-        this.gameObject.GetComponent<SphereCollider>().enabled = false;
+        collider.enabled = false;
         blockerHandler.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
@@ -185,16 +194,17 @@ public class ComboObject : NetworkBehaviour
         {
             targetPosition = this.gameObject.transform.position;  // Safety, in the event that no possible tiles are found.
             // float lerpScaleRate = 1/travelDistanceInHexes;
-            for (var tileOffset = 0; tileOffset < travelDistanceInHexes; tileOffset++)
+            for (var tileOffset = 1; tileOffset < travelDistanceInHexes; tileOffset++)
             {
                 var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; //(travelDistanceInHexes - tileOffset);
                 // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
-                var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 10f, 0f), Vector3.down);
+                var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
+                // Debug.DrawRay(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down * 20, Color.cyan, 2, true);
                 RaycastHit tileUnderneathHit;
                 RaycastHit otherObjectHit;
                 if (Physics.Raycast(checkForEmptyRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles"))  // if raycast hit basetile, break
-                    && !Physics.Raycast(checkForObjectRay, out otherObjectHit, 10f, 1 << LayerMask.NameToLayer("ComboObjects"))) // And there shouldn't be a bomb on this tile
+                    && !Physics.Raycast(checkForObjectRay, out otherObjectHit, 20f, 1 << LayerMask.NameToLayer("ComboObjects"))) // And there shouldn't be a bomb on this tile
                 {
                     targetPosition = possiblePosition;
                     result = true;

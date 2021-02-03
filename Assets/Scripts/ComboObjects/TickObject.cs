@@ -6,6 +6,7 @@ using UnityEngine;
 public class TickObject : ComboObject
 {
     public float tickDuration = 4f;
+    
 
     public override void OnStartServer()
     {
@@ -15,7 +16,7 @@ public class TickObject : ComboObject
         NotifyOccupiedTile(true);
         StartCoroutine(TickDown());
     }
-    
+
     protected virtual IEnumerator TickDown()
     {
         yield return new WaitForSeconds(tickDuration);
@@ -24,7 +25,7 @@ public class TickObject : ComboObject
             StartCoroutine(TickDownFinish());
         }
     }
-    
+
     protected virtual IEnumerator TickDownFinish()
     {
         FindCenter();
@@ -71,7 +72,8 @@ public class TickObject : ComboObject
         {
             NotifyOccupiedTile(false);
         }
-        this.blockerHandler.SetActive(false);  // in order to stop blocking players while moving
+
+        this.blockerHandler.SetActive(false); // in order to stop blocking players while moving
         return result;
     }
 }
