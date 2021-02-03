@@ -10,6 +10,7 @@ public class JoinLobbyMenu : MonoBehaviour
     [SerializeField] private GameObject landingPagePanel = null;
     [SerializeField] private TMP_InputField ipAddressInputField = null;
     [SerializeField] private Button joinButton = null;
+    [SerializeField] private GameObject backgroundEnterIpAddress = null;
 
     private void OnEnable()
     {
@@ -25,6 +26,9 @@ public class JoinLobbyMenu : MonoBehaviour
 
     public void JoinLobby()
     {
+        landingPagePanel.SetActive(false);
+        backgroundEnterIpAddress.SetActive(false);
+        
         string ipAddress = ipAddressInputField.text;
 
         networkManager.networkAddress = ipAddress;

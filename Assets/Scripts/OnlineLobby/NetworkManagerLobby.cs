@@ -46,9 +46,17 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnClientConnect(NetworkConnection conn)
     {
-        base.OnClientConnect(conn);
+        /*base.OnClientConnect(conn);
 
-        OnClientConnected?.Invoke();
+        OnClientConnected?.Invoke();*/
+        
+        if (!clientLoadedScene)
+        {
+            // Ready/AddPlayer is usually triggered by a scene load completing. if no scene was loaded, then Ready/AddPlayer it here instead.
+            if (!ClientScene.ready) ClientScene.Ready(conn);
+
+            ClientScene.AddPlayer(conn);
+        }
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -66,7 +74,7 @@ public class NetworkManagerLobby : NetworkManager
             return;
         }
 
-        if (SceneManager.GetActiveScene().name != menuScene)
+        if (SceneManager.GetActiveScene().path != menuScene)
         {
             conn.Disconnect();
             return;
@@ -75,8 +83,26 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        if (SceneManager.GetActiveScene().name == menuScene)
+        Debug.Log("NetworkManagerLobby.cs: OnServerAddPLayer");
+        
+        if (SceneManager.GetActiveScene().path == menuScene)
         {
+            Debug.Log("True: SceneManager.GetActiveScene().name == menuScene");
+            
+            bool isLeader = RoomPlayers.Count == 0;
+
+            NetworkRoomPlayerLobby roomPlayerInstance = Instantiate(roomPlayerPrefab);
+
+            roomPlayerInstance.IsLeader = isLeader;
+
+            NetworkServer.AddPlayerForConnection(conn, roomPlayerInstance.gameObject);
+        } 
+        else
+        {
+            Debug.Log("False: SceneManager.GetActiveScene().name == menuScene");
+            Debug.Log("Scene 1: " + SceneManager.GetActiveScene().name);
+            Debug.Log("Scene 2: " + menuScene);
+            
             bool isLeader = RoomPlayers.Count == 0;
 
             NetworkRoomPlayerLobby roomPlayerInstance = Instantiate(roomPlayerPrefab);
@@ -131,20 +157,21 @@ public class NetworkManagerLobby : NetworkManager
 
     public void StartGame()
     {
-        if (SceneManager.GetActiveScene().name == menuScene)
+        if (SceneManager.GetActiveScene().path == menuScene)
         {
             if (!IsReadyToStart()) { return; }
 
-            mapHandler = new MapHandler(mapSet, numberOfRounds);
+            //mapHandler = new MapHandler(mapSet, numberOfRounds);
 
-            ServerChangeScene(mapHandler.NextMap);
+            //ServerChangeScene(mapHandler.NextMap);
+            ServerChangeScene("level1.1");
         }
     }
 
     public override void ServerChangeScene(string newSceneName)
     {
         // From menu to game
-        if (SceneManager.GetActiveScene().name == menuScene && newSceneName.StartsWith("Scene_Map"))
+        if (SceneManager.GetActiveScene().path == menuScene)
         {
             for (int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
