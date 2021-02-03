@@ -256,7 +256,7 @@ MonoBehaviour:
   tileUnderneath: {fileID: 0}
   vfxDuration: 4
   sfxDuration: 4
-  hitboxDuration: 1
+  hitboxDuration: 0.1
   lingerDuration: 2
   didEarlyEffects: 0
   tickDuration: 4
@@ -2443,17 +2443,17 @@ PrefabInstance:
     - target: {fileID: 4979146895941977243, guid: 94041a94d89667e4897a9fa655408638,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 200
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4979146895941977243, guid: 94041a94d89667e4897a9fa655408638,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 199.99998
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4979146895941977243, guid: 94041a94d89667e4897a9fa655408638,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 200
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4979146895941977244, guid: 94041a94d89667e4897a9fa655408638,
         type: 3}
