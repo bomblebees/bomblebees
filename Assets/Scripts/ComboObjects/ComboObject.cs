@@ -10,8 +10,11 @@ using UnityEngine;
 // - Hitbox
 public class ComboObject : NetworkBehaviour
 {
+    [Header("Required", order = 1)]
+    public GameObject blockerHandler;
+    
     private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
-    public float travelDistanceInHexes = 4;
+    [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
     public float lerpRate = 0.15f;  // The speed at which the object is being pushed
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
@@ -56,6 +59,8 @@ public class ComboObject : NetworkBehaviour
     [ClientRpc]
     void RpcStopMoving()
     {
+        blockerHandler.SetActive(true);
+        blockerHandler.GetComponent<HandleEntry>().Restart();
         isMoving = false;
     }
 
@@ -154,13 +159,12 @@ public class ComboObject : NetworkBehaviour
                 "ComboObject.cs: ComboObject either looking for incorrect Collider " +
                 "type or you need to overwrite in ComboObject subclass");
         }
-
         this.gameObject.GetComponent<SphereCollider>().enabled = false;
-        // var rigidBody_ = this.gameObject.transform.GetComponent<Rigidbody>().Destroy;
-        // if(rigidBody_) rigidBody_.enabled 
-        this.gameObject.transform.Find("Model").gameObject.SetActive(false);
+        blockerHandler.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
+    
+    
 
     [ClientRpc]
     protected virtual void RpcPush(int edgeIndex)
@@ -200,9 +204,12 @@ public class ComboObject : NetworkBehaviour
                     break;
                 }
                 // lerpRate *= 1+lerpScaleRate;
-                Debug.Log("tileOffset is " + tileOffset);
             }
-            if (result == true) { this.isMoving = true; }
+
+            if (result == true)
+            {
+                this.isMoving = true; 
+            }
             return result;
         }
     }

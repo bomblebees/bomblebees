@@ -71,6 +71,7 @@ public class TickObject : ComboObject
         {
             NotifyOccupiedTile(false);
         }
+        this.blockerHandler.SetActive(false);  // in order to stop blocking players while moving
         return result;
     }
 }

@@ -365,6 +365,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60317272cf341b24b8cbf642a303e986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  travelDistanceInHexes: 4
   lerpRate: 0.15
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
@@ -374,6 +377,7 @@ MonoBehaviour:
   sfxDuration: 4
   hitboxDuration: 1.5
   lingerDuration: 6
+  didEarlyEffects: 0
   minimumLifeDuration: 1.5
 --- !u!1001 &7098121081178171037
 PrefabInstance:
