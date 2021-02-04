@@ -160,7 +160,10 @@ public class ComboObject : NetworkBehaviour
                 "type or you need to overwrite in ComboObject subclass");
         }
         this.gameObject.GetComponent<SphereCollider>().enabled = false;
-        blockerHandler.SetActive(false);
+        if (blockerHandler) // temp fix for lasers, but blockerHandler should not be null here
+        {
+            blockerHandler.SetActive(false);
+        }
         yield return new WaitForSeconds(lingerDuration);
     }
     
