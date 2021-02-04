@@ -177,6 +177,7 @@ MonoBehaviour:
   punchKey: p
   spinKey: o
   bombKey: j
+  canPlaceBombs: 1
   controller: {fileID: 493922037362194888}
   movementSpeed: 50
   turnSpeed: 17
@@ -212,6 +213,7 @@ MonoBehaviour:
   ghostDuration: 5
   invincibilityDuration: 2
   playerModel: {fileID: 5953220966861250607}
+  playerScript: {fileID: 0}
   ghostModel: {fileID: 8062245979255692024}
 --- !u!114 &7210949671591448289
 MonoBehaviour:
@@ -474,7 +476,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.9
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1911,15 +1913,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 343c3f866915a1e4cabc0c6a4d21dfd2, type: 3}
---- !u!4 &2156110565965072082 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7249909577646941388, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
-    type: 3}
-  m_PrefabInstance: {fileID: 8750724405304861214}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2126876005053527932 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7274719735903540578, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
+    type: 3}
+  m_PrefabInstance: {fileID: 8750724405304861214}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2156110565965072082 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7249909577646941388, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
     type: 3}
   m_PrefabInstance: {fileID: 8750724405304861214}
   m_PrefabAsset: {fileID: 0}

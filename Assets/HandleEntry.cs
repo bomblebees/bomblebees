@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Configuration;
+//using System.Net.Configuration;
 using Mirror;
 using UnityEngine;
 

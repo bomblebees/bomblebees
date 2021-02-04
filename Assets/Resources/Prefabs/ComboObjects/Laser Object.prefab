@@ -87,7 +87,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.9
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -464,6 +464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  blockerHandler: {fileID: 0}
   travelDistanceInHexes: 4
   lerpRate: 0.15
   targetPosition: {x: 0, y: 0, z: 0}
