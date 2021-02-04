@@ -23,6 +23,7 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private GameObject roundSystem = null;
 
     private MapHandler mapHandler;
+    [SerializeField] private GameObject hexGrid;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
@@ -179,9 +180,8 @@ public class NetworkManagerLobby : NetworkManager
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
 
+                NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject, true);
                 NetworkServer.Destroy(conn.identity.gameObject);
-
-                NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject);
             }
         }
 
@@ -190,14 +190,21 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerSceneChanged(string sceneName)
     {
-        if (sceneName.StartsWith("Scene_Map"))
-        {
-            GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
-            NetworkServer.Spawn(playerSpawnSystemInstance);
+        // Need to spawn in hexgrid so players have a reference to it
+        Debug.Log("spawning hexGrid");
+        NetworkServer.Spawn(Instantiate(hexGrid));
 
-            GameObject roundSystemInstance = Instantiate(roundSystem);
-            NetworkServer.Spawn(roundSystemInstance);
-        }
+        GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+        NetworkServer.Spawn(playerSpawnSystemInstance);
+
+        //if (sceneName.StartsWith("Scene_Map"))
+        //{
+        //    GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+        //    NetworkServer.Spawn(playerSpawnSystemInstance);
+
+        //    GameObject roundSystemInstance = Instantiate(roundSystem);
+        //    NetworkServer.Spawn(roundSystemInstance);
+        //}
     }
 
     public override void OnServerReady(NetworkConnection conn)
