@@ -25,6 +25,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private string bombKey = "j";
     private float horizontalAxis;
     private float verticalAxis;
+    private float fixedY; // TODO: fix the player Y for bug handling
+    public bool canPlaceBombs = true;
 
     [Header("Movement")] [SerializeField] private CharacterController controller;
     [SerializeField] private float movementSpeed = 50;
@@ -86,6 +88,7 @@ public class Player : NetworkBehaviour
         LinkAssets();
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
+        fixedY = this.transform.position.y;
 
         Debug.Log("server started");
     }
@@ -129,7 +132,7 @@ public class Player : NetworkBehaviour
     void ListenForBombUse()
     {
         // raycast down to check if tile is occupied
-        if (Input.GetKeyDown(bombKey))
+        if (Input.GetKeyDown(bombKey) && this.canPlaceBombs)
         {
             CmdBombUse();
         }

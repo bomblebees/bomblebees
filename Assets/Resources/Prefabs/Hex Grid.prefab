@@ -149,6 +149,8 @@ MonoBehaviour:
   y_Hex: {fileID: 32179397214527739, guid: c936b6a4a2bfa454c8f4c78df88a83b6, type: 3}
   p_Hex: {fileID: 790374782423732109, guid: b43964c6bc0ba164b848b6e0f52a072c, type: 3}
   w_Hex: {fileID: 1105639704548485360, guid: 2ffe5189a68dcff4281118e4c6b08486, type: 3}
+  wall_Hex: {fileID: 1078958626922311715, guid: 8ab9887f65e3d2e4389180f522eed103,
+    type: 3}
   default_Hex: {fileID: 3574846304584204012, guid: f3c50f8915d60f146bc61f6b26e52f14,
     type: 3}
   minTilesForCombo: 3
@@ -158,8 +160,8 @@ MonoBehaviour:
   enableRandomGen: 1
   ignoreRandomGenOnE: 1
   enableChainRegen: 0
-  width: 19
-  height: 11
+  width: 14
+  height: 9
   tileRegenDuration: 1.5
 --- !u!114 &6450618751315917604
 MonoBehaviour:

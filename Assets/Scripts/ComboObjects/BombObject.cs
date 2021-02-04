@@ -30,7 +30,6 @@ public class BombObject : TickObject
 
     protected virtual void SpeedUpAnim()
     {
-        Debug.Log("speeding up anim");
         flashingMaterial.SetFloat("Boolean_7185963F", 0f);
     }
     
@@ -45,9 +44,10 @@ public class BombObject : TickObject
         gameObjHit.transform.root.name.Equals("Bomb Object(Clone)")
             )
         {
-            Debug.Log("HAI");
             //here make the other explode too
             this.EarlyProc();
         }
     }
+
+    
 }

@@ -1,13 +1,12 @@
 using Steamworks;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 namespace Mirror.FizzySteam
 {
     [RequireComponent(typeof(SteamManager))]
-    [HelpURL("https://github.com/Chykary/FizzySteamworks")]
+    [HelpURL("https://github.com/Chykary/FizzySteamworks")]    
     public class FizzySteamworks : Transport
     {
         private const string STEAM_SCHEME = "steam";
@@ -192,6 +191,12 @@ namespace Mirror.FizzySteam
 
         public override int GetMaxPacketSize(int channelId)
         {
+            if(channelId >= Channels.Length)
+            {
+                Debug.LogError("Channel Id exceeded configured channels! Please configure more channels.");
+                return 1200;
+            }
+
             switch (Channels[channelId])
             {
                 case EP2PSend.k_EP2PSendUnreliable:

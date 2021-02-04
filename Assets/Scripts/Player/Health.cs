@@ -21,6 +21,7 @@ public class Health : NetworkBehaviour
     public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
 
     public GameObject playerModel;
+    public Player playerScript;
     public GameObject ghostModel;
     
     // All the subscribed subscribed will receive this event
@@ -46,6 +47,7 @@ public class Health : NetworkBehaviour
     public override void OnStartServer()
     {
         SetHealth(maxLives);
+        playerScript = this.gameObject.GetComponent<Player>();
     }
 
     [Mirror.Command]
@@ -80,6 +82,7 @@ public class Health : NetworkBehaviour
         
         Debug.Log("begin ghost mode");
         canBeHit = false;
+        playerScript.canPlaceBombs = false;
         yield return new WaitForSeconds(ghostDuration);
         StartCoroutine(BeginInvincibility());
     }
@@ -94,6 +97,7 @@ public class Health : NetworkBehaviour
         Debug.Log("turn off invincibility");
         ghostModel.SetActive(false);
         playerModel.SetActive(true);
+        playerScript.canPlaceBombs = true;
     }
 
     [Mirror.ClientCallback]

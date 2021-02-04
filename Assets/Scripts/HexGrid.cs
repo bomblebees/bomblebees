@@ -32,6 +32,8 @@ public class HexGrid : NetworkBehaviour
     private string p_Hex_Name = "PurpleHex";
     public GameObject w_Hex;
     private string w_Hex_Name = "WhiteHex";
+    public GameObject wall_Hex;
+    private string wall_Hex_Name = "WallHex";
     public GameObject default_Hex;
     private string default_Hex_Name = "EmptyHex";
     
@@ -66,8 +68,10 @@ public class HexGrid : NetworkBehaviour
     public bool enableChainRegen = false;
 
     public Level1 level = new Level1();
-    [SerializeField] private int width = 19;
-    [SerializeField] private int height = 11;
+    // [SerializeField] private int width = 19;
+    // [SerializeField] private int height = 17;
+    [SerializeField] private int width = 17;
+    [SerializeField] private int height = 10;
 
     Canvas gridCanvas;
     HexMesh hexMesh;
@@ -266,6 +270,8 @@ public class HexGrid : NetworkBehaviour
                 return p_Hex;
             case 'w':
                 return w_Hex;
+            case '-':
+                return wall_Hex;
             default:
                 return default_Hex;
         }
@@ -342,12 +348,12 @@ public class HexGrid : NetworkBehaviour
             key = level.getArray()[z, x];
         }
 
-        if (ignoreRandomGenOnE && level.getArray()[z, x] == 'e')
+        var c = level.getArray()[z, x];
+        if (ignoreRandomGenOnE && (level.getArray()[z, x] == 'e' || level.getArray()[z, x] == '-' ))
         {
-            key = 'e';
+            key = c;
         }
 
-        //cell.CreateModel(ReturnModelByCellKey(key));
         cell.SetKey(key);
         if (isServer) colorGridList.Add(key);
 
