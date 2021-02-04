@@ -199,6 +199,9 @@ public class NetworkManagerLobby : NetworkManager
         GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
         NetworkServer.Spawn(playerSpawnSystemInstance);
 
+        // Disable the menu UI
+        this.transform.Find("UI_MainMenu").gameObject.SetActive(false);
+
         //if (sceneName.StartsWith("Scene_Map"))
         //{
         //    GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
