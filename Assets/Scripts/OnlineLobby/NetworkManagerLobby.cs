@@ -39,6 +39,8 @@ public class NetworkManagerLobby : NetworkManager
     {
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
 
+        ClientScene.ClearSpawners();
+
         foreach (var prefab in spawnablePrefabs)
         {
             ClientScene.RegisterPrefab(prefab);
