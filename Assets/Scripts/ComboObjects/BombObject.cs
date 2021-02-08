@@ -6,13 +6,16 @@ using UnityEngine.PlayerLoop;
 
 public class BombObject : TickObject
 {
-    public float timeTillAnimSpeedup;
     public GameObject model;
+    public float timeTillAnimSpeedup;
     public Material flashingMaterial;
+    
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         flashingMaterial = model.GetComponent<MeshRenderer>().material;
+        if(!flashingMaterial) Debug.Log("Flashing Material not found");
     }
 
     protected override IEnumerator TickDown()

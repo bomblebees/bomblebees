@@ -86,6 +86,7 @@ public class Player : NetworkBehaviour
         base.OnStartServer();
         this.Assert();
         LinkAssets();
+        fixedY = this.transform.position.y;
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         fixedY = this.transform.position.y;
@@ -105,6 +106,7 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
+        this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
         if (!isLocalPlayer) return;
 
         ApplyMovement();
