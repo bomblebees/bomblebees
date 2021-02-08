@@ -12,18 +12,20 @@ public class Health : NetworkBehaviour
 {
     [Header("Settings")] 
     [SerializeField] private int maxLives = 3;
-    [Mirror.SyncVar] public int currentLives;
+    [Mirror.SyncVar(hook = nameof(OnLivesChanged))] public int currentLives;
     [SerializeField] float ghostDuration = 5.0f;
     [SerializeField] float invincibilityDuration = 2.0f;
 
+    
     [Mirror.SyncVar] private bool canBeHit = true;
+
+    public GameObject playerModel;
+    public GameObject playerInv;
+    public Player playerScript;
+    public GameObject ghostModel;
 
     public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
 
-    public GameObject playerModel;
-    public Player playerScript;
-    public GameObject ghostModel;
-    
     // All the subscribed subscribed will receive this event
     public event LivesChangedDelegate EventLivesChanged;
 
@@ -32,6 +34,13 @@ public class Health : NetworkBehaviour
     private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
     {
         EventLivesChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    [Mirror.Client]
+    private void OnLivesChanged(int oldLives, int newLives)
+    {
+        if (newLives == 0) CmdNotifyPlayerDied();
+        else this.CmdBeginGhostMode();
     }
 
     #region Server
@@ -75,7 +84,7 @@ public class Health : NetworkBehaviour
     public IEnumerator BeginGhostMode()
     {
         // TODO: place ghost anim here
-        this.CmdTakeDamage(1);
+
         // Anims
         ghostModel.SetActive(true);
         playerModel.SetActive(false);
@@ -109,9 +118,37 @@ public class Health : NetworkBehaviour
         {
             Debug.Log("Took damage");
             this.canBeHit = false; // might remove later. this is for extra security
-            this.CmdBeginGhostMode();
+            this.CmdTakeDamage(1);
+
+
+            //this.CmdBeginGhostMode();
         }
     }
 
+    [Mirror.Command]
+    public void CmdNotifyPlayerDied()
+    {
+        RpcNotifyPlayerDied();
+    }
+
+    [Mirror.ClientRpc]
+    public void RpcNotifyPlayerDied()
+    {
+        NotifyPlayerDied();
+    }
+
+    public void NotifyPlayerDied()
+    {
+        if (isLocalPlayer)
+        {
+            PlayerInterface playerUI = playerScript.gameObject.GetComponent<PlayerInterface>();
+            StartCoroutine(playerUI.EnableDeathUI());
+        }
+
+        playerInv.SetActive(false);
+        playerModel.SetActive(false);
+        canBeHit = false;
+        playerScript.isDead = true;
+    }
     #endregion
 }

@@ -37,7 +37,7 @@ public class Player : NetworkBehaviour
     public char heldKey = 'g';
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
     public Vector3 heldHexOffset = new Vector3(0, 25, 10);
-    //float swapDistance = 15; // unused (for swapping in front of player)
+    [SerializeField] public bool tileHighlights = true;
 
     public float punchCooldown = 0.5f;
     public float spinHitboxDuration = 0.6f;
@@ -61,6 +61,8 @@ public class Player : NetworkBehaviour
     private Quaternion stackRotationLock;
 
     [SerializeField] private GameObject playerModel;
+
+    public bool isDead = false;
 
     public override void OnStartClient()
     {
@@ -115,6 +117,8 @@ public class Player : NetworkBehaviour
         ListenForPunching();
         ListenForSpinning();
         ListenForBombUse();
+
+        if (isDead) return;
     }
 
     private void LateUpdate()
@@ -389,6 +393,12 @@ public class Player : NetworkBehaviour
     [Client]
     void ApplyTileHighlight()
     {
+        if (!tileHighlights || isDead)
+        {
+            if (selectedTile) selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+            return;
+        }
+
         tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
