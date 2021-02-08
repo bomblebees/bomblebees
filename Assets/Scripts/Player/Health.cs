@@ -19,13 +19,20 @@ public class Health : NetworkBehaviour
     [Mirror.SyncVar] private bool canBeHit = true;
 
     public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
+    public delegate void LivesLoweredDelegate(bool canAct);
+    public delegate void GhostExitDelegate(bool canAct);
 
+    public delegate void InvincibleExitDelegate();
+
+    [Header("Required")]
     public GameObject playerModel;
-    public Player playerScript;
     public GameObject ghostModel;
     
     // All the subscribed subscribed will receive this event
     public event LivesChangedDelegate EventLivesChanged;
+    public event LivesLoweredDelegate EventLivesLowered;
+    public event GhostExitDelegate EventGhostExit;
+    public event InvincibleExitDelegate EventInvincibleExit;
 
 
     [Mirror.ClientRpc]
@@ -47,7 +54,6 @@ public class Health : NetworkBehaviour
     public override void OnStartServer()
     {
         SetHealth(maxLives);
-        playerScript = this.gameObject.GetComponent<Player>();
     }
 
     [Mirror.Command]
@@ -80,11 +86,14 @@ public class Health : NetworkBehaviour
         ghostModel.SetActive(true);
         playerModel.SetActive(false);
         
+        EventLivesLowered?.Invoke(false);
+        
         Debug.Log("begin ghost mode");
         canBeHit = false;
-        playerScript.canPlaceBombs = false;
         yield return new WaitForSeconds(ghostDuration);
         StartCoroutine(BeginInvincibility());
+        
+        EventGhostExit?.Invoke(true);
     }
 
     public IEnumerator BeginInvincibility()
@@ -93,11 +102,12 @@ public class Health : NetworkBehaviour
         yield return new WaitForSeconds(invincibilityDuration);
         // turn off invincibility anim
         
+        EventInvincibleExit?.Invoke();
+        
         canBeHit = true;
         Debug.Log("turn off invincibility");
         ghostModel.SetActive(false);
         playerModel.SetActive(true);
-        playerScript.canPlaceBombs = true;
     }
 
     [Mirror.ClientCallback]

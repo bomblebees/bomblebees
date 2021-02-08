@@ -171,8 +171,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  bomb: {fileID: 4324099173052882053, guid: 6cc5c0a7548d2e842aed7b8079c87b9e, type: 3}
+  laser: {fileID: 8381395955730563735, guid: 36ea410a2f7f6d849b4aed7c50e8764f, type: 3}
+  plasma: {fileID: 0}
+  bigBomb: {fileID: 0}
+  blink: {fileID: 0}
+  gravityObject: {fileID: 0}
   invincibilityDuration: 2
   ghostDuration: 5
+  healthScript: {fileID: -8900185448856423588}
   swapKey: space
   punchKey: p
   spinKey: o
@@ -213,7 +220,7 @@ MonoBehaviour:
   ghostDuration: 5
   invincibilityDuration: 2
   playerModel: {fileID: 5953220966861250607}
-  playerScript: {fileID: 0}
+  playerScript: {fileID: 493922037362194891}
   ghostModel: {fileID: 8062245979255692024}
 --- !u!114 &7210949671591448289
 MonoBehaviour:
