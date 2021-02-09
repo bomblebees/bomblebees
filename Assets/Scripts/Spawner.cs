@@ -16,6 +16,14 @@ public class Spawner : NetworkBehaviour
     [ServerCallback]
     void SpawnScene()
     {
+        RpcTest("SpawnScene()");
+
         NetworkServer.Spawn(Instantiate(hexGrid));
+    }
+
+    [ClientRpc]
+    void RpcTest(string text)
+    {
+        Debug.Log(text);
     }
 }
