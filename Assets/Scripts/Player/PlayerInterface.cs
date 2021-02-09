@@ -1,13 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Threading;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Mirror;
 
 public class PlayerInterface : NetworkBehaviour

@@ -198,6 +198,9 @@ public class NetworkManagerLobby : NetworkManager
 
         GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
         NetworkServer.Spawn(playerSpawnSystemInstance);
+        
+        GameObject roundManagerInstance = Instantiate(roundSystem);
+        NetworkServer.Spawn(roundManagerInstance);
 
         // Disable the menu UI
         this.transform.Find("UI_MainMenu").gameObject.SetActive(false);

@@ -108,7 +108,7 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
-        this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
+        //this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
         if (!isLocalPlayer) return;
 
         ApplyMovement();

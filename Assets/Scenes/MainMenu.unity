@@ -3381,7 +3381,8 @@ MonoBehaviour:
     type: 3}
   playerSpawnSystem: {fileID: 2406211372602509701, guid: 985c2b52dcb619246bef33bcae2af90c,
     type: 3}
-  roundSystem: {fileID: 0}
+  roundSystem: {fileID: 2406211372602509701, guid: fa4976dc98f4a2b4589d0303c20b641f,
+    type: 3}
   hexGrid: {fileID: 157543588881523654, guid: f0c3643c1dd290a4988ed90dc5b9ed14, type: 3}
 --- !u!1 &1074055686
 GameObject:
@@ -4830,10 +4831,6 @@ MonoBehaviour:
   healthManager: {fileID: 8505791286045204486, guid: e0dabb84bba3a7f4ca2713e52d7919fd,
     type: 3}
   playUI: {fileID: 5684447462390480691, guid: 6912ca7ec0deb8f41bc00003b07bf8f9, type: 3}
-  bombObject: {fileID: 4324099173052882053, guid: 6cc5c0a7548d2e842aed7b8079c87b9e,
-    type: 3}
-  laserObject: {fileID: 8381395955730563735, guid: 36ea410a2f7f6d849b4aed7c50e8764f,
-    type: 3}
 --- !u!4 &1615775777
 Transform:
   m_ObjectHideFlags: 0
