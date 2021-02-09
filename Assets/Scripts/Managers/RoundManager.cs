@@ -15,16 +15,22 @@ public class RoundManager : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        NetworkManagerLobby.OnServerReadied += Test;
+        //NetworkRoomManagerExt.OnServerReadied += Test;
     }
     
-    [Server]
-    public void Test(NetworkConnection conn)
+    [Client]
+    public override void OnStartClient()
     {
-        Health live = conn.identity.gameObject.GetComponent<Health>();
+        CmdAddPlayerToRound();
+        //NetworkRoomManagerExt.OnServerReadied += Test;
+    }
+
+    [Command(ignoreAuthority = true)]
+    public void CmdAddPlayerToRound(NetworkConnectionToClient sender = null)
+    {
+        Health live = sender.identity.gameObject.GetComponent<Health>();
         live.EventLivesChanged += CheckRoundEnd;
         playerLives.Add(live);
-        Debug.Log("added player " + playerLives.Count);
     }
 
     [ServerCallback]
@@ -76,7 +82,8 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator ServerEndRound()
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
-        Debug.Log("moving back to lobby");
+        NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        room.ServerChangeScene(room.RoomScene);
     }
 
 }
