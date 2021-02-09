@@ -14,19 +14,21 @@ public class Player : NetworkBehaviour
 {
     // Assets
     private HexGrid hexGrid;
+
     
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     private bool canBeHit = true;
+    [SerializeField] public Health healthScript = null;
 
     [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string punchKey = "p";
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
+    
     private float horizontalAxis;
     private float verticalAxis;
-    private float fixedY; // TODO: fix the player Y for bug handling
-    public bool canPlaceBombs = true;
+    private float fixedY;   // The Y position the player will be stuck to.
 
     [Header("Movement")] [SerializeField] private CharacterController controller;
     [SerializeField] private float movementSpeed = 50;
@@ -43,13 +45,24 @@ public class Player : NetworkBehaviour
     public float spinHitboxDuration = 0.6f;
     public float spinAnimDuration = 0.8f;
     public float spinTotalCooldown = 0.8f;
+    
+    private bool canPlaceBombs = true;
     private bool canPunch = true;
     private bool canSpin = true;
+    private bool canSwap = true;
+    
+    // Game Objects
+    [Header("Required", order = 2)]
+    public GameObject bomb;
+    public GameObject laser;
+    public GameObject plasma;
+    public GameObject bigBomb;
+    public GameObject blink;
+    public GameObject gravityObject;
 
+    // private Caches
     private GameObject spinHitbox;
     private GameObject spinAnim;
-
-    // Cache raycast refs for optimization
     private Ray tileRay;
     private RaycastHit tileHit;
     private GameObject selectedTile;
@@ -91,7 +104,18 @@ public class Player : NetworkBehaviour
         fixedY = this.transform.position.y;
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
-        fixedY = this.transform.position.y;
+        
+        fixedY = this.transform.position.y;  // To prevent bugs from collisions
+        
+        // events
+        healthScript.EventLivesLowered += SetCanPlaceBombs;
+        healthScript.EventLivesLowered += SetCanSpin;
+        healthScript.EventLivesLowered += SetCanSwap;
+        healthScript.EventLivesLowered += ClearItemStack;
+
+        healthScript.EventGhostExit += SetCanPlaceBombs;
+        healthScript.EventGhostExit += SetCanSpin;
+        healthScript.EventGhostExit += SetCanSwap;
 
         Debug.Log("server started");
     }
@@ -181,23 +205,23 @@ public class Player : NetworkBehaviour
                     {
                         case 'b':
                             Debug.Log("Blue Bomb Type");
-                            // unimplemented
+                            SpawnBlinkObject();
                             break;
                         case 'g':
                             Debug.Log("Green Bomb Type");
-                            // unimplemented
+                            SpawnPlasmaObject();
                             break;
                         case 'y':
                             Debug.Log("Yellow Bomb Type");
-                            this.SpawnLaserBomb();
+                            this.SpawnLaserObject();
                             break;
                         case 'r':
                             Debug.Log("Red Bomb Type");
-                            // unimplemented
+                            SpawnBigBombObject();
                             break;
                         case 'p':
                             Debug.Log("Purple Bomb Type");
-                            // unimplemented
+                            SpawnGravityObject();
                             break;
                         case 'w':
                             Debug.Log("White Bomb Type");
@@ -221,17 +245,51 @@ public class Player : NetworkBehaviour
     [Server]
     void SpawnDefaultBomb()
     {
-        GameObject bomb = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Bomb Object"),
+        Debug.Log("spawning bomb");
+        GameObject _bomb = (GameObject)Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(bomb);
+        NetworkServer.Spawn(_bomb);
     }
     
     [Server]
-    void SpawnLaserBomb()
+    void SpawnLaserObject()
     {
-        GameObject laser = (GameObject)Instantiate(Resources.Load("Prefabs/ComboObjects/Laser Object"),
+        GameObject _laser = (GameObject)Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(laser);
+        NetworkServer.Spawn(_laser);
+    }
+    [Server]
+    void SpawnPlasmaObject()
+    {
+        GameObject _plasma = (GameObject)Instantiate(plasma,
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(_plasma);
+    }
+    [Server]
+    void SpawnBlinkObject()
+    {
+        GameObject _blink = (GameObject)Instantiate(blink,
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(_blink);
+    }
+    [Server]
+    void SpawnGravityObject()
+    {
+        GameObject _gravity = (GameObject)Instantiate(gravityObject,
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(_gravity);
+    }
+    [Server]
+    void SpawnBigBombObject()
+    {
+        GameObject _bigBomb = (GameObject)Instantiate(bigBomb,
+            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(_bigBomb);
+    }
+
+    public void SetCanPlaceBombs(bool val)
+    {
+        this.canPlaceBombs = val;
     }
 
     IEnumerator Punch()
@@ -254,6 +312,11 @@ public class Player : NetworkBehaviour
                 punchHitbox.gameObject.SetActive(false);
             }
         }
+    }
+    
+    public void SetCanSpin(bool val)
+    {
+        this.canSpin = val;
     }
 
     public IEnumerator Spin()
@@ -355,7 +418,7 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForSwapping()
     {
-        if (Input.GetKeyDown(swapKey))
+        if (Input.GetKeyDown(swapKey) && this.canSwap)
         {
             tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
@@ -380,6 +443,11 @@ public class Player : NetworkBehaviour
                 }
             }
         }
+    }
+
+    void SetCanSwap(bool val)
+    {
+        this.canSwap = val;
     }
 
     [Command]
@@ -447,6 +515,15 @@ public class Player : NetworkBehaviour
             itemStack.RemoveAt(itemStack.Count - 1); // pop it off
         }
     }
+    
+    [Server]
+    public void ClearItemStack(bool val = true)
+    {
+        while (itemStack.Count > 0)
+        {
+            itemStack.RemoveAt(itemStack.Count - 1); // pop it off
+        }
+    }
 
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
@@ -494,4 +571,6 @@ public class Player : NetworkBehaviour
     {
         return this.heldKey;
     }
+    
+    
 }
