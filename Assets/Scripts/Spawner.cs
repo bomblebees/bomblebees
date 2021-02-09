@@ -7,6 +7,7 @@ using Mirror;
 public class Spawner : NetworkBehaviour
 {
     [SerializeField] private GameObject hexGrid;
+    [SerializeField] private GameObject roundManager;
 
     private void Start()
     {
@@ -16,6 +17,14 @@ public class Spawner : NetworkBehaviour
     [ServerCallback]
     void SpawnScene()
     {
+        RpcTest("SpawnScene()");
         NetworkServer.Spawn(Instantiate(hexGrid));
+        NetworkServer.Spawn(Instantiate(roundManager));
+    }
+
+    [ClientRpc]
+    void RpcTest(string text)
+    {
+        Debug.Log(text);
     }
 }
