@@ -15,7 +15,6 @@ public class Player : NetworkBehaviour
     // Assets
     private HexGrid hexGrid;
 
-    
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     private bool canBeHit = true;
@@ -340,6 +339,7 @@ public class Player : NetworkBehaviour
             {
                 StartCoroutine(HandleSpinHitbox());
                 StartCoroutine(HandleSpinAnim());
+                FindObjectOfType<AudioManager>().PlaySound("playerSpin");
 
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
@@ -449,6 +449,8 @@ public class Player : NetworkBehaviour
                 //hexGrid.netIdentity.AssignClientAuthority(connectionToClient);
                 //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
                 //hexGrid.netIdentity.RemoveClientAuthority();
+
+                FindObjectOfType<AudioManager>().PlaySound("playerSwap");
 
                 // Only update models and grids if it is a new key
                 if (!this.heldKey.Equals(newKey))

@@ -46,6 +46,9 @@ public class Health : NetworkBehaviour
     [Mirror.Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
+        // Play sound when playe dies
+        FindObjectOfType<AudioManager>().PlaySound("playerDeath");
+
         if (newLives == 0) CmdNotifyPlayerDied();
         else this.CmdBeginGhostMode();
     }
@@ -94,7 +97,7 @@ public class Health : NetworkBehaviour
         // Anims
         ghostModel.SetActive(true);
         playerModel.SetActive(false);
-        
+
         EventLivesLowered?.Invoke(false);
         
         Debug.Log("begin ghost mode");
@@ -102,7 +105,7 @@ public class Health : NetworkBehaviour
         yield return new WaitForSeconds(ghostDuration);
         StartCoroutine(BeginInvincibility());
 
-        // probably meant to return to player model?
+        // probably meant to return to player model here?
         ghostModel.SetActive(false);
         playerModel.SetActive(true);
 

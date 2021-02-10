@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7230157094182336862
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1672910520581558632}
+  - component: {fileID: 2808596004038266540}
+  - component: {fileID: -596352727795668667}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1672910520581558632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230157094182336862}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 50.86167, y: 22.346058, z: 195.10634}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2808596004038266540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230157094182336862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5394ed649d6f90942a9040c7885a0cb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  sounds:
+  - name: playerSwap
+    clip: {fileID: 8300000, guid: c0be3e51f111a8745bbc0d47c67001f5, type: 3}
+    volume: 0.25
+    pitch: 1
+    source: {fileID: 0}
+  - name: playerDeath
+    clip: {fileID: 8300000, guid: 40fd7f284bbdb9349b4a75c01cba0064, type: 3}
+    volume: 0.2
+    pitch: 1
+    source: {fileID: 0}
+  - name: playerSpin
+    clip: {fileID: 8300000, guid: 2a0454a2dbffd0f478a067b477686f6a, type: 3}
+    volume: 0.05
+    pitch: 1
+    source: {fileID: 0}
+  - name: bombBeep
+    clip: {fileID: 8300000, guid: ff2d5d176a6b34c419d334cb6bbbc456, type: 3}
+    volume: 0.25
+    pitch: 1
+    source: {fileID: 0}
+  - name: bombExplosion
+    clip: {fileID: 8300000, guid: d5b45d7ea25a5224c95b5cd9bdc1ffe2, type: 3}
+    volume: 0.25
+    pitch: 1
+    source: {fileID: 0}
+  - name: laserShot
+    clip: {fileID: 8300000, guid: da8c8100c3f194e49b82a58f71cbdbe3, type: 3}
+    volume: 0.25
+    pitch: 1
+    source: {fileID: 0}
+  - name: gameCountdown
+    clip: {fileID: 8300000, guid: 4ea711c2b6136844c814f955c5b3e537, type: 3}
+    volume: 0.25
+    pitch: 1
+    source: {fileID: 0}
+--- !u!114 &-596352727795668667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230157094182336862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
