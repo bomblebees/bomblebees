@@ -76,6 +76,14 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject playerModel;
 
     public bool isDead = false;
+    public bool isFrozen = true;
+
+    // Added for easy referencing of local player from anywhere
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+        gameObject.name = "LocalPlayer";
+    }
 
     public override void OnStartClient()
     {
@@ -93,7 +101,7 @@ public class Player : NetworkBehaviour
         }
         itemStack.Callback += OnItemStackChange;
 
-        Debug.Log("local started");
+        //Debug.Log("local started");
     }
 
     public override void OnStartServer()
@@ -117,7 +125,7 @@ public class Player : NetworkBehaviour
         healthScript.EventGhostExit += SetCanSpin;
         healthScript.EventGhostExit += SetCanSwap;
 
-        Debug.Log("server started");
+        //Debug.Log("server started");
     }
 
     void Assert()
@@ -137,10 +145,16 @@ public class Player : NetworkBehaviour
 
         ApplyMovement();
         ApplyTileHighlight();
-        ListenForSwapping();
-        ListenForPunching();
+
+        if (!isFrozen)
+        {
+            ListenForSwapping();
+            ListenForPunching();
+            ListenForBombUse();
+        }
+
+        // can spin while not frozen
         ListenForSpinning();
-        ListenForBombUse();
 
         if (isDead) return;
     }
@@ -410,7 +424,7 @@ public class Player : NetworkBehaviour
                 turnSpeed * Time.deltaTime
             );
 
-            controller.Move(direction * movementSpeed * Time.deltaTime);
+            if(!isFrozen) controller.Move(direction * movementSpeed * Time.deltaTime);
         }
     }
 

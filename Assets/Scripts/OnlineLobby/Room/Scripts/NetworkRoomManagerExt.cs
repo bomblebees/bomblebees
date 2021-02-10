@@ -79,11 +79,6 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         }
     }
 
-    public override void OnServerReady(NetworkConnection conn)
-    {
-        base.OnServerReady(conn);
-    }
-
     public override void OnGUI()
     {
         base.OnGUI();
