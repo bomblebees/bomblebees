@@ -28,7 +28,7 @@ public class Player : NetworkBehaviour
     
     private float horizontalAxis;
     private float verticalAxis;
-    private float fixedY;   // The Y position the player will be stuck to.
+    private float fixedY = 7;   // The Y position the player will be stuck to.
 
     [Header("Movement")] [SerializeField] private CharacterController controller;
     [SerializeField] private float movementSpeed = 50;
@@ -110,11 +110,10 @@ public class Player : NetworkBehaviour
         base.OnStartServer();
         this.Assert();
         LinkAssets();
-        fixedY = this.transform.position.y;
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         
-        fixedY = this.transform.position.y;  // To prevent bugs from collisions
+        //fixedY = this.transform.position.y;  // To prevent bugs from collisions
         
         // events
         healthScript.EventLivesLowered += SetCanPlaceBombs;
@@ -141,8 +140,9 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
-        //this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
         if (!isLocalPlayer) return;
+
+        this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
 
         ApplyMovement();
         ApplyTileHighlight();
