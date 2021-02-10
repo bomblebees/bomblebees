@@ -46,10 +46,10 @@ public class Player : NetworkBehaviour
     public float spinAnimDuration = 0.8f;
     public float spinTotalCooldown = 0.8f;
     
-    private bool canPlaceBombs = true;
-    private bool canPunch = true;
-    private bool canSpin = true;
-    private bool canSwap = true;
+    [SyncVar] private bool canPlaceBombs = true;
+    [SyncVar] private bool canPunch = true;
+    [SyncVar] private bool canSpin = true;
+    [SyncVar] private bool canSwap = true;
     
     // Game Objects
     [Header("Required", order = 2)]
@@ -75,8 +75,8 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private GameObject playerModel;
 
-    public bool isDead = false;
-    public bool isFrozen = true;
+    public bool isDead = false; // when player has lost ALL lives
+    public bool isFrozen = true; // cannot move, but can rotate
 
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()

@@ -101,7 +101,11 @@ public class Health : NetworkBehaviour
         canBeHit = false;
         yield return new WaitForSeconds(ghostDuration);
         StartCoroutine(BeginInvincibility());
-        
+
+        // probably meant to return to player model?
+        ghostModel.SetActive(false);
+        playerModel.SetActive(true);
+
         EventGhostExit?.Invoke(true);
     }
 
@@ -115,8 +119,6 @@ public class Health : NetworkBehaviour
         
         canBeHit = true;
         Debug.Log("turn off invincibility");
-        ghostModel.SetActive(false);
-        playerModel.SetActive(true);
     }
 
     [Mirror.ClientCallback]
