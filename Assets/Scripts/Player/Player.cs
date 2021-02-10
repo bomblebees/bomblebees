@@ -45,11 +45,12 @@ public class Player : NetworkBehaviour
     public float spinHitboxDuration = 0.6f;
     public float spinAnimDuration = 0.8f;
     public float spinTotalCooldown = 0.8f;
-    
-    [SyncVar] private bool canPlaceBombs = true;
-    [SyncVar] private bool canPunch = true;
+
+    [SyncVar] private bool canMove = false;
+    [SyncVar] private bool canPlaceBombs = false;
+    [SyncVar] private bool canPunch = false;
     [SyncVar] private bool canSpin = true;
-    [SyncVar] private bool canSwap = true;
+    [SyncVar] private bool canSwap = false;
     
     // Game Objects
     [Header("Required", order = 2)]
@@ -76,7 +77,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject playerModel;
 
     public bool isDead = false; // when player has lost ALL lives
-    public bool isFrozen = true; // cannot move, but can rotate
+    //public bool isFrozen = true; // cannot move, but can rotate
 
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
@@ -145,15 +146,9 @@ public class Player : NetworkBehaviour
 
         ApplyMovement();
         ApplyTileHighlight();
-
-        if (!isFrozen)
-        {
-            ListenForSwapping();
-            ListenForPunching();
-            ListenForBombUse();
-        }
-
-        // can spin while not frozen
+        ListenForSwapping();
+        ListenForPunching();
+        ListenForBombUse();
         ListenForSpinning();
 
         if (isDead) return;
@@ -424,8 +419,13 @@ public class Player : NetworkBehaviour
                 turnSpeed * Time.deltaTime
             );
 
-            if(!isFrozen) controller.Move(direction * movementSpeed * Time.deltaTime);
+            if(this.canMove) controller.Move(direction * movementSpeed * Time.deltaTime);
         }
+    }
+
+    public void SetCanMove(bool val)
+    {
+        this.canMove = val;
     }
 
     // Listens for key press and swaps the tile beneath the player
@@ -459,7 +459,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void SetCanSwap(bool val)
+    public void SetCanSwap(bool val)
     {
         this.canSwap = val;
     }

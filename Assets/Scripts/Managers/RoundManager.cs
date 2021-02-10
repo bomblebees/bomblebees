@@ -83,16 +83,19 @@ public class RoundManager : NetworkBehaviour
         yield return new WaitForSeconds(startGameFreezeDuration + 1);
         for (int i = 0; i < playerList.Count; i++)
         {
-            playerList[i].isFrozen = false;
+            playerList[i].SetCanPlaceBombs(true);
+            playerList[i].SetCanSpin(true);
+            playerList[i].SetCanSwap(true); 
+            playerList[i].SetCanMove(true);
         }
-        RpcUnfreezePlayers();
+        //RpcUnfreezePlayers();
     }
 
-    [ClientRpc]
-    public void RpcUnfreezePlayers()
-    {
-        GameObject.Find("LocalPlayer").GetComponent<Player>().isFrozen = false;
-    }
+    //[ClientRpc]
+    //public void RpcUnfreezePlayers()
+    //{
+    //    GameObject.Find("LocalPlayer").GetComponent<Player>().isFrozen = false;
+    //}
 
     [Client]
     public IEnumerator ClientStartRound()
