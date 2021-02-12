@@ -16,12 +16,12 @@ public class BombObject : TickObject
     protected override void Start()
     {
         riseRate = 1 / timeTillAnimSpeedup;
-        riseShader.SetFloat("Vector1_9422D918", val);
+        this.model.GetComponent<Renderer>().material.SetFloat("Vector1_9422D918", val);
     }
 
     private void LateUpdate()
     {
-        riseShader.SetFloat("Vector1_9422D918", val);
+        this.model.GetComponent<Renderer>().material.SetFloat("Vector1_9422D918", val);
         val += riseRate * Time.deltaTime;
     }
 
@@ -41,7 +41,7 @@ public class BombObject : TickObject
 
     protected virtual void SpeedUpAnim()
     {
-        riseShader.SetFloat("Boolean_A83C6489", 1f);
+        this.model.GetComponent<Renderer>().material.SetFloat("Boolean_A83C6489", 1f);
     }
     
 
