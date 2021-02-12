@@ -8,15 +8,23 @@ public class BombObject : TickObject
 {
     public GameObject model;
     public float timeTillAnimSpeedup;
-    public Material flashingMaterial;
-    
+    public Material riseShader;
+    public Material pulseShader;
+    public float riseRate;
+    private float val = -.51f;
 
     protected override void Start()
     {
-        base.Start();
-        flashingMaterial = model.GetComponent<MeshRenderer>().material;
-        if(!flashingMaterial) Debug.Log("Flashing Material not found");
+        riseRate = 1 / timeTillAnimSpeedup;
+        riseShader.SetFloat("Vector1_9422D918", val);
     }
+
+    private void LateUpdate()
+    {
+        riseShader.SetFloat("Vector1_9422D918", val);
+        val += riseRate * Time.deltaTime;
+    }
+
 
     protected override IEnumerator TickDown()
     {
@@ -33,7 +41,7 @@ public class BombObject : TickObject
 
     protected virtual void SpeedUpAnim()
     {
-        flashingMaterial.SetFloat("Boolean_7185963F", 0f);
+        riseShader.SetFloat("Boolean_A83C6489", 1f);
     }
     
 
@@ -51,6 +59,4 @@ public class BombObject : TickObject
             this.EarlyProc();
         }
     }
-
-    
 }
