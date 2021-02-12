@@ -193,6 +193,13 @@ MonoBehaviour:
   spinHitboxDuration: 0.1
   spinAnimDuration: 0.8
   spinTotalCooldown: 0.8
+  canMove: 0
+  canPlaceBombs: 0
+  canPunch: 0
+  canSpin: 1
+  canSwap: 0
+  canExitInvincibility: 0
+  canBeHit: 1
   bomb: {fileID: 4324099173052882053, guid: 6cc5c0a7548d2e842aed7b8079c87b9e, type: 3}
   laser: {fileID: 8381395955730563735, guid: 36ea410a2f7f6d849b4aed7c50e8764f, type: 3}
   plasma: {fileID: 0}
@@ -222,10 +229,11 @@ MonoBehaviour:
   syncInterval: 0.1
   maxLives: 3
   currentLives: 3
-  ghostDuration: 5
-  invincibilityDuration: 2
+  ghostDuration: 0
+  invincibilityDuration: 5
   playerModel: {fileID: 5953220966861250607}
   ghostModel: {fileID: 8062245979255692024}
+  revivingModel: {fileID: 8062245979255692024}
   playerInv: {fileID: 4849357194100230548}
   playerScript: {fileID: 493922037362194891}
 --- !u!114 &5921287484511493969
