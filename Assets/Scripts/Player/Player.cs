@@ -23,6 +23,11 @@ public class Player : NetworkBehaviour
     [SerializeField] private string punchKey = "p";
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
+    
+    [SerializeField] private float defaultBombCooldown = 3f;
+    private float defaultBombUseTimer = 0f;
+    [SerializeField] private GameObject onDefaultBombReadyAnim;
+    private bool playedOnDefaultBombReadyAnim = true;
 
     private float horizontalAxis;
     private float verticalAxis;
@@ -152,6 +157,16 @@ public class Player : NetworkBehaviour
         ListenForBombUse();
         ListenForSpinning();
 
+        // Handle default-placing bomb anim
+        if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
+        {
+            Debug.Log("inside");
+            onDefaultBombReadyAnim.SetActive(true);
+            playedOnDefaultBombReadyAnim = true;
+        }
+        defaultBombUseTimer += Time.deltaTime;// This might be the wrong place to put it. Someone verify for me - Ari
+        
+
         if (isDead) return;
     }
 
@@ -245,11 +260,19 @@ public class Player : NetworkBehaviour
                             break;
                     }
                 }
-                else
+                else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
                 {
                     Debug.Log("dropping default bomb");
+                    onDefaultBombReadyAnim.SetActive(false);
+                    playedOnDefaultBombReadyAnim = false;
                     // Else use the default bomb
                     this.SpawnDefaultBomb();
+                    defaultBombUseTimer = 0;
+                    
+                }
+                else // When the default bomb CD isn't up
+                {
+                    
                 }
             }
         }
