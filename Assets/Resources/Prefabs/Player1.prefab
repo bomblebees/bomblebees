@@ -4948,8 +4948,8 @@ MonoBehaviour:
   tileHighlights: 1
   punchCooldown: 0.5
   spinHitboxDuration: 0.1
-  spinAnimDuration: 0.8
-  spinTotalCooldown: 0.8
+  spinAnimDuration: 1
+  spinTotalCooldown: 1.2
   canMove: 0
   canPlaceBombs: 0
   canPunch: 0
@@ -6820,8 +6820,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 5.6070004, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7.2, y: 28.2}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -7.2, y: -21.78}
+  m_SizeDelta: {x: 100, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &13446675480329038
 CanvasRenderer:
