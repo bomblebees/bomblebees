@@ -6,5 +6,8 @@ using UnityEngine;
 
 public class Room_UI : MonoBehaviour
 {
-
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }
