@@ -70,9 +70,9 @@ public class TickObject : ComboObject
     }
 
 
-    protected override bool Push(int edgeIndex)
+    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        bool result = base.Push(edgeIndex);
+        bool result = base.Push(edgeIndex, triggeringPlayer);
         if (result)
         {
             NotifyOccupiedTile(false);

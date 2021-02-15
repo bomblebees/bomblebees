@@ -83,7 +83,7 @@ public class TriggerObject : ComboObject
         hitbox.SetActive(false);
     }
     
-    protected override bool Push(int edgeIndex)
+    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         NotifyOccupiedTile(false); // prolly move this later
         wasHit = true;

@@ -650,4 +650,9 @@ public class Player : NetworkBehaviour
     {
         this.canExitInvincibility = val;
     }
+
+    public void IgnoreThese(Collider coll, bool val)
+    {
+        Physics.IgnoreCollision(this.gameObject.GetComponent<Collider>(), coll, val);
+    }
 }

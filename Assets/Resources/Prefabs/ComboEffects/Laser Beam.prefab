@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3363781392330105011}
   - component: {fileID: -8013096733566474739}
   - component: {fileID: 7126672076765608626}
-  m_Layer: 10
+  m_Layer: 13
   m_Name: Laser Beam
   m_TagString: ComboEffect
   m_Icon: {fileID: 0}
@@ -122,9 +122,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 2661414036607885510}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2b979ae87c4e4145868ee26c99caf17, type: 3}
+  m_Script: {fileID: 11500000, guid: 60317272cf341b24b8cbf642a303e986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  blockerHandler: {fileID: 0}
+  hitBox: {fileID: 0}
+  collider: {fileID: 0}
+  travelDistanceInHexes: 4
+  lerpRate: 0.15
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
+  nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
+  vfxDuration: 4
+  sfxDuration: 4
+  hitboxDuration: 4
+  lingerDuration: 8
+  didEarlyEffects: 0
+  minimumLifeDuration: 4
 --- !u!114 &7126672076765608626
 MonoBehaviour:
   m_ObjectHideFlags: 0
