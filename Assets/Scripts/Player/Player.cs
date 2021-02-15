@@ -149,7 +149,6 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-
         if (isDead) return; // if dead, disable all player updates
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
@@ -159,21 +158,28 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
         ListenForBombUse();
         ListenForSpinning();
+    }
+
+    // Update version for server
+    [ServerCallback]
+    private void LateUpdate()
+    {
+        if (!isServer) return;
 
         // Handle default-placing bomb anim
         if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
         {
             Debug.Log("inside");
-            onDefaultBombReadyAnim.SetActive(true);
+            RpcEnableBombPlaceAnimation();
             playedOnDefaultBombReadyAnim = true;
         }
-        defaultBombUseTimer += Time.deltaTime;// This might be the wrong place to put it. Someone verify for me - Ari
+        defaultBombUseTimer += Time.deltaTime;
     }
 
-    private void LateUpdate()
+    [ClientRpc]
+    void RpcEnableBombPlaceAnimation()
     {
-        if (!isLocalPlayer) return;
-        //stackUI.transform.rotation = stackRotationLock;
+        onDefaultBombReadyAnim.SetActive(true);
     }
 
     void LinkAssets()
