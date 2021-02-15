@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,23 +9,27 @@ using NetworkBehaviour = Mirror.NetworkBehaviour;
 // No generics in Mirror
 public class Health : NetworkBehaviour
 {
-    [Header("Settings")] 
-    [SerializeField] private int maxLives = 3;
-    [Mirror.SyncVar(hook = nameof(OnLivesChanged))] public int currentLives;
+    [Header("Settings")] [SerializeField] private int maxLives = 3;
+
+    [Mirror.SyncVar(hook = nameof(OnLivesChanged))]
+    public int currentLives;
+
     [SerializeField] float ghostDuration = 5.0f;
     [SerializeField] float invincibilityDuration = 2.0f;
 
-    
-    [Mirror.SyncVar] private bool canBeHit = true;
 
     public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
-    public delegate void LivesLoweredDelegate(bool canAct);
-    public delegate void GhostExitDelegate(bool canAct);
+
+    public delegate void LivesLoweredDelegate(bool canAct); // sends false
+
+    public delegate void GhostExitDelegate(bool canAct); // sends true
+
     public delegate void InvincibleExitDelegate();
 
-    [Header("Required")]
+    [Header("Required")] 
     public GameObject playerModel;
     public GameObject ghostModel;
+    public GameObject revivingModel;
     public GameObject playerInv;
     public Player playerScript;
 
@@ -52,7 +55,7 @@ public class Health : NetworkBehaviour
 
     #region Server
 
-    [Mirror.Server]  // Only server can call this
+    [Mirror.Server] // Only server can call this
     private void SetHealth(int value)
     {
         currentLives = value;
@@ -68,7 +71,7 @@ public class Health : NetworkBehaviour
     [Mirror.Command]
     private void CmdTakeDamage(int damage)
     {
-        SetHealth(Mathf.Max(currentLives - damage, 0)); 
+        SetHealth(Mathf.Max(currentLives - damage, 0));
     }
 
     #endregion
@@ -80,42 +83,48 @@ public class Health : NetworkBehaviour
     {
         RpcBeginGhostMode();
     }
-    
+
     [Mirror.ClientRpc]
     public void RpcBeginGhostMode()
     {
         StartCoroutine(BeginGhostMode());
     }
-    
+
     public IEnumerator BeginGhostMode()
     {
         // TODO: place ghost anim here
 
         // Anims
         ghostModel.SetActive(true);
+        revivingModel.SetActive(false);
         playerModel.SetActive(false);
-        
-        EventLivesLowered?.Invoke(false);
-        
+
+        EventLivesLowered?.Invoke(false); // keep
+
         Debug.Log("begin ghost mode");
-        canBeHit = false;
         yield return new WaitForSeconds(ghostDuration);
+        EventGhostExit?.Invoke(true); // keep, turn on canExitInvincibility
         StartCoroutine(BeginInvincibility());
-        
-        EventGhostExit?.Invoke(true);
     }
 
     public IEnumerator BeginInvincibility()
     {
-        // TODO: turn on invincibility anim
-        yield return new WaitForSeconds(invincibilityDuration);
-        // turn off invincibility anim
         
-        EventInvincibleExit?.Invoke();
-        
-        canBeHit = true;
-        Debug.Log("turn off invincibility");
+        // TODO helper
         ghostModel.SetActive(false);
+        revivingModel.SetActive(true);
+        playerModel.SetActive(false);
+        
+        Debug.Log("Ghost Mode Exited");
+        yield return new WaitForSeconds(invincibilityDuration);
+        playerScript.ExitInvincibility();
+    }
+
+    public void SignalExit()
+    {
+        EventInvincibleExit?.Invoke();
+        ghostModel.SetActive(false);
+        revivingModel.SetActive(false);
         playerModel.SetActive(true);
     }
 
@@ -123,15 +132,12 @@ public class Health : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!hasAuthority) return;
-        
-        if (canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+
+        if (playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
         {
             Debug.Log("Took damage");
-            this.canBeHit = false; // might remove later. this is for extra security
+            playerScript.canBeHit = false; // might remove later. this is for extra security
             this.CmdTakeDamage(1);
-
-
-            //this.CmdBeginGhostMode();
         }
     }
 
@@ -157,8 +163,9 @@ public class Health : NetworkBehaviour
 
         playerInv.SetActive(false);
         playerModel.SetActive(false);
-        canBeHit = false;
+        playerScript.canBeHit = false;
         playerScript.isDead = true;
     }
+
     #endregion
 }

@@ -9,6 +9,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 {
     [SerializeField] private GameObject hexGrid;
     [SerializeField] private GameObject roundManager;
+    [SerializeField] private GameObject audioManager;
     /// <summary>
     /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
     /// This is the ideal point to pass any data like player name, credentials, tokens, colors, etc.
@@ -76,12 +77,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             Debug.Log("OnRoomServerSceneChanged");
             NetworkServer.Spawn(Instantiate(hexGrid));
             NetworkServer.Spawn(Instantiate(roundManager));
+            NetworkServer.Spawn(Instantiate(audioManager));
         }
-    }
-
-    public override void OnServerReady(NetworkConnection conn)
-    {
-        base.OnServerReady(conn);
     }
 
     public override void OnGUI()

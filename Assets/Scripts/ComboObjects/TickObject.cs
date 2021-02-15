@@ -6,7 +6,11 @@ using UnityEngine;
 public class TickObject : ComboObject
 {
     public float tickDuration = 4f;
-    
+
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+    }
 
     public override void OnStartServer()
     {
@@ -52,6 +56,7 @@ public class TickObject : ComboObject
 
     public virtual void EarlyProc()
     {
+        if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
         didEarlyEffects = true;
         ProcEffects();
     }
