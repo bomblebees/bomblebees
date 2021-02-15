@@ -15,10 +15,8 @@ public class Player : NetworkBehaviour
     // Assets
     private HexGrid hexGrid;
 
-    
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
-    private bool canBeHit = true;
     [SerializeField] public Health healthScript = null;
 
     [Header("Input")] [SerializeField] private string swapKey = "space";
@@ -26,17 +24,22 @@ public class Player : NetworkBehaviour
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
     
+    [SerializeField] private float defaultBombCooldown = 3f;
+    private float defaultBombUseTimer = 0f;
+    [SerializeField] private GameObject onDefaultBombReadyAnim;
+    private bool playedOnDefaultBombReadyAnim = true;
+
     private float horizontalAxis;
     private float verticalAxis;
-    private float fixedY;   // The Y position the player will be stuck to.
+    private float fixedY = 7; // The Y position the player will be stuck to.
 
     [Header("Movement")] [SerializeField] private CharacterController controller;
     [SerializeField] private float movementSpeed = 50;
     [SerializeField] private float turnSpeed = 17f;
 
-    [Header("HexTiles")]
-    [SyncVar(hook = nameof(OnChangeHeldKey))]
+    [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
+
     public Vector3 heldHexScale = new Vector3(800, 800, 800);
     public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     [SerializeField] public bool tileHighlights = true;
@@ -45,15 +48,17 @@ public class Player : NetworkBehaviour
     public float spinHitboxDuration = 0.6f;
     public float spinAnimDuration = 0.8f;
     public float spinTotalCooldown = 0.8f;
-    
-    private bool canPlaceBombs = true;
-    private bool canPunch = true;
-    private bool canSpin = true;
-    private bool canSwap = true;
-    
+
+    [SyncVar] public bool canMove = false;
+    [SyncVar] public bool canPlaceBombs = false;
+    [SyncVar] public bool canPunch = false;
+    [SyncVar] public bool canSpin = true;
+    [SyncVar] public bool canSwap = false;
+    [SyncVar] public bool canExitInvincibility = false;
+    [SyncVar] public bool canBeHit = true;
+
     // Game Objects
-    [Header("Required", order = 2)]
-    public GameObject bomb;
+    [Header("Required", order = 2)] public GameObject bomb;
     public GameObject laser;
     public GameObject plasma;
     public GameObject bigBomb;
@@ -75,7 +80,15 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private GameObject playerModel;
 
-    public bool isDead = false;
+    public bool isDead = false; // when player has lost ALL lives
+    //public bool isFrozen = true; // cannot move, but can rotate
+
+    // Added for easy referencing of local player from anywhere
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+        gameObject.name = "LocalPlayer";
+    }
 
     public override void OnStartClient()
     {
@@ -91,9 +104,10 @@ public class Player : NetworkBehaviour
             //stackUI.GetComponent<Text>().enabled = true;
             //stackRotationLock = stackUI.transform.rotation;
         }
+
         itemStack.Callback += OnItemStackChange;
 
-        Debug.Log("local started");
+        //Debug.Log("local started");
     }
 
     public override void OnStartServer()
@@ -101,23 +115,24 @@ public class Player : NetworkBehaviour
         base.OnStartServer();
         this.Assert();
         LinkAssets();
-        fixedY = this.transform.position.y;
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
-        
-        fixedY = this.transform.position.y;  // To prevent bugs from collisions
-        
+
+        //fixedY = this.transform.position.y;  // To prevent bugs from collisions
+
         // events
         healthScript.EventLivesLowered += SetCanPlaceBombs;
         healthScript.EventLivesLowered += SetCanSpin;
         healthScript.EventLivesLowered += SetCanSwap;
+        healthScript.EventLivesLowered += SetCanBeHit;
         healthScript.EventLivesLowered += ClearItemStack;
 
         healthScript.EventGhostExit += SetCanPlaceBombs;
         healthScript.EventGhostExit += SetCanSpin;
         healthScript.EventGhostExit += SetCanSwap;
+        healthScript.EventGhostExit += SetCanExitInvincibility;
 
-        Debug.Log("server started");
+        //Debug.Log("server started");
     }
 
     void Assert()
@@ -132,23 +147,39 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
-        //this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
         if (!isLocalPlayer) return;
+
+        if (isDead) return; // if dead, disable all player updates
+
+        this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
 
         ApplyMovement();
         ApplyTileHighlight();
         ListenForSwapping();
-        ListenForPunching();
-        ListenForSpinning();
         ListenForBombUse();
-
-        if (isDead) return;
+        ListenForSpinning();
     }
 
+    // Update version for server
+    [ServerCallback]
     private void LateUpdate()
     {
-        if (!isLocalPlayer) return;
-        //stackUI.transform.rotation = stackRotationLock;
+        if (!isServer) return;
+
+        // Handle default-placing bomb anim
+        if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
+        {
+            Debug.Log("inside");
+            RpcEnableBombPlaceAnimation();
+            playedOnDefaultBombReadyAnim = true;
+        }
+        defaultBombUseTimer += Time.deltaTime;
+    }
+
+    [ClientRpc]
+    void RpcEnableBombPlaceAnimation()
+    {
+        onDefaultBombReadyAnim.SetActive(true);
     }
 
     void LinkAssets()
@@ -162,8 +193,9 @@ public class Player : NetworkBehaviour
     void ListenForBombUse()
     {
         // raycast down to check if tile is occupied
-        if (Input.GetKeyDown(bombKey) && this.canPlaceBombs)
+        if (Input.GetKeyDown(bombKey) && (this.canExitInvincibility || this.canPlaceBombs))
         {
+            ExitInvincibility();
             CmdBombUse();
         }
     }
@@ -173,6 +205,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(spinKey))
         {
+            ExitInvincibility();
             CmdSpin();
         }
     }
@@ -232,13 +265,22 @@ public class Player : NetworkBehaviour
                             Debug.Log("Bomb type not found");
                             break;
                     }
-                } else
+                }
+                else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
                 {
                     Debug.Log("dropping default bomb");
+                    onDefaultBombReadyAnim.SetActive(false);
+                    playedOnDefaultBombReadyAnim = false;
                     // Else use the default bomb
                     this.SpawnDefaultBomb();
+                    defaultBombUseTimer = 0;
+                    
                 }
-            } 
+                else // When the default bomb CD isn't up
+                {
+                    
+                }
+            }
         }
     }
 
@@ -246,43 +288,47 @@ public class Player : NetworkBehaviour
     void SpawnDefaultBomb()
     {
         Debug.Log("spawning bomb");
-        GameObject _bomb = (GameObject)Instantiate(bomb,
+        GameObject _bomb = (GameObject) Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_bomb);
     }
-    
+
     [Server]
     void SpawnLaserObject()
     {
-        GameObject _laser = (GameObject)Instantiate(laser,
+        GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_laser);
     }
+
     [Server]
     void SpawnPlasmaObject()
     {
-        GameObject _plasma = (GameObject)Instantiate(plasma,
+        GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_plasma);
     }
+
     [Server]
     void SpawnBlinkObject()
     {
-        GameObject _blink = (GameObject)Instantiate(blink,
+        GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_blink);
     }
+
     [Server]
     void SpawnGravityObject()
     {
-        GameObject _gravity = (GameObject)Instantiate(gravityObject,
+        GameObject _gravity = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_gravity);
     }
+
     [Server]
     void SpawnBigBombObject()
     {
-        GameObject _bigBomb = (GameObject)Instantiate(bigBomb,
+        GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_bigBomb);
     }
@@ -313,7 +359,7 @@ public class Player : NetworkBehaviour
             }
         }
     }
-    
+
     public void SetCanSpin(bool val)
     {
         this.canSpin = val;
@@ -331,6 +377,7 @@ public class Player : NetworkBehaviour
             {
                 StartCoroutine(HandleSpinHitbox());
                 StartCoroutine(HandleSpinAnim());
+                FindObjectOfType<AudioManager>().PlaySound("playerSpin");
 
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
@@ -386,7 +433,8 @@ public class Player : NetworkBehaviour
         // Create the hex model in the player's hand
         this.heldHexModel = Instantiate(
             hexGrid.ReturnModelByCellKey(newHeldKey),
-            playerModel.transform.position + playerModel.transform.up * heldHexOffset.y + playerModel.transform.forward * heldHexOffset.x,
+            playerModel.transform.position + playerModel.transform.up * heldHexOffset.y +
+            playerModel.transform.forward * heldHexOffset.x,
             playerModel.transform.rotation,
             playerModel.transform
         );
@@ -410,16 +458,22 @@ public class Player : NetworkBehaviour
                 turnSpeed * Time.deltaTime
             );
 
-            controller.Move(direction * movementSpeed * Time.deltaTime);
+            if (this.canMove) controller.Move(direction * movementSpeed * Time.deltaTime);
         }
+    }
+
+    public void SetCanMove(bool val)
+    {
+        this.canMove = val;
     }
 
     // Listens for key press and swaps the tile beneath the player
     [Client]
     void ListenForSwapping()
     {
-        if (Input.GetKeyDown(swapKey) && this.canSwap)
+        if (Input.GetKeyDown(swapKey) && (this.canExitInvincibility || this.canSwap))
         {
+            ExitInvincibility();
             tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
@@ -436,6 +490,8 @@ public class Player : NetworkBehaviour
                 //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
                 //hexGrid.netIdentity.RemoveClientAuthority();
 
+                FindObjectOfType<AudioManager>().PlaySound("playerSwap");
+
                 // Only update models and grids if it is a new key
                 if (!this.heldKey.Equals(newKey))
                 {
@@ -445,7 +501,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void SetCanSwap(bool val)
+    public void SetCanSwap(bool val)
     {
         this.canSwap = val;
     }
@@ -515,7 +571,7 @@ public class Player : NetworkBehaviour
             itemStack.RemoveAt(itemStack.Count - 1); // pop it off
         }
     }
-    
+
     [Server]
     public void ClearItemStack(bool val = true)
     {
@@ -537,7 +593,7 @@ public class Player : NetworkBehaviour
     // Temp function - get color associated with key
     Color TempGetKeyColor(char key)
     {
-        switch(key)
+        switch (key)
         {
             case 'b': return Color.blue;
             case 'g': return Color.green;
@@ -571,6 +627,27 @@ public class Player : NetworkBehaviour
     {
         return this.heldKey;
     }
-    
-    
+
+    public void SetCanBeHit(bool val)
+    {
+        this.canBeHit = val;
+    }
+
+    public void ExitInvincibility()
+    {
+        if (canExitInvincibility)
+        {
+            this.canSpin = true;
+            this.canBeHit = true;
+            this.canSwap = true;
+            this.canPlaceBombs = true;
+            healthScript.SignalExit();
+            this.canExitInvincibility = false;
+        }
+    }
+
+    public void SetCanExitInvincibility(bool val)
+    {
+        this.canExitInvincibility = val;
+    }
 }

@@ -1069,6 +1069,8 @@ namespace Mirror
         /// <param name="start">Transform to register.</param>
         public static void RegisterStartPosition(Transform start)
         {
+            if (startPositions.Exists(s => s.position == start.position)) return;
+
             if (logger.LogEnabled()) logger.Log("RegisterStartPosition: (" + start.gameObject.name + ") " + start.position);
             startPositions.Add(start);
 
