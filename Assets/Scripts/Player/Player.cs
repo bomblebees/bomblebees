@@ -149,6 +149,9 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
+
+        if (isDead) return; // if dead, disable all player updates
+
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
 
         ApplyMovement();
@@ -165,9 +168,6 @@ public class Player : NetworkBehaviour
             playedOnDefaultBombReadyAnim = true;
         }
         defaultBombUseTimer += Time.deltaTime;// This might be the wrong place to put it. Someone verify for me - Ari
-        
-
-        if (isDead) return;
     }
 
     private void LateUpdate()

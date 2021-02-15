@@ -30,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 94709753153883346}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &6111706270655452481
 ParticleSystem:
@@ -4893,6 +4893,7 @@ Transform:
   - {fileID: 3037024604560950709}
   - {fileID: 2156110565965072082}
   - {fileID: 1286395321591997060}
+  - {fileID: 5463598173425273778}
   - {fileID: 3704800468067631663}
   - {fileID: 7850953948692587505}
   m_Father: {fileID: 0}
@@ -4986,11 +4987,11 @@ MonoBehaviour:
   syncInterval: 0.1
   maxLives: 3
   currentLives: 3
-  ghostDuration: 0
+  ghostDuration: 3
   invincibilityDuration: 5
   playerModel: {fileID: 5953220966861250607}
   ghostModel: {fileID: 8062245979255692024}
-  revivingModel: {fileID: 8062245979255692024}
+  revivingModel: {fileID: 5401300670555800704}
   playerInv: {fileID: 4849357194100230548}
   playerScript: {fileID: 493922037362194891}
 --- !u!114 &5921287484511493969
@@ -5658,7 +5659,7 @@ RectTransform:
   - {fileID: 8663358680252305461}
   - {fileID: 1505761261741567782}
   m_Father: {fileID: 94709753153883346}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -6274,6 +6275,37 @@ RotationConstraint:
   m_IsContraintActive: 0
   m_IsLocked: 1
   m_Sources: []
+--- !u!1 &5401300670555800704
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5463598173425273778}
+  m_Layer: 0
+  m_Name: RevivingModel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &5463598173425273778
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5401300670555800704}
+  m_LocalRotation: {x: -0, y: -0.004363274, z: -0, w: 0.9999905}
+  m_LocalPosition: {x: 1.2242486, y: 28.169998, z: 26.90463}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4331818610644636870}
+  m_Father: {fileID: 94709753153883346}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5475857902067857569
 GameObject:
   m_ObjectHideFlags: 0
@@ -6594,6 +6626,36 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &6517237593845673701
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4331818610644636870}
+  m_Layer: 0
+  m_Name: '[Placeholder, replace with revive model]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4331818610644636870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6517237593845673701}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5463598173425273778}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6710098071766006717
 GameObject:
   m_ObjectHideFlags: 0
