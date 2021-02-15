@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SteamLobby : MonoBehaviour
 {
-    [SerializeField] private GameObject buttons = null;
+    //[SerializeField] private GameObject buttons = null;
 
     protected Callback<LobbyCreated_t> lobbyCreated;
     protected Callback<GameLobbyJoinRequested_t> gameLobbyJoinRequested;
@@ -29,7 +29,7 @@ public class SteamLobby : MonoBehaviour
 
     public void HostLobby()
     {
-        buttons.SetActive(false);
+        //buttons.SetActive(false);
 
         SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, networkManager.maxConnections);
     }
@@ -38,7 +38,7 @@ public class SteamLobby : MonoBehaviour
     {
         if (callback.m_eResult != EResult.k_EResultOK)
         {
-            buttons.SetActive(true);
+            //buttons.SetActive(true);
             return;
         }
 
@@ -68,6 +68,6 @@ public class SteamLobby : MonoBehaviour
         networkManager.networkAddress = hostAddress;
         networkManager.StartClient();
 
-        buttons.SetActive(false);
+        //buttons.SetActive(false);
     }
 }
