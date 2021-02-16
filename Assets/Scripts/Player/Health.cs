@@ -101,7 +101,7 @@ public class Health : NetworkBehaviour
 
         EventLivesLowered?.Invoke(false); // keep
 
-        Debug.Log("begin ghost mode");
+        // Debug.Log("begin ghost mode");
         yield return new WaitForSeconds(ghostDuration);
         EventGhostExit?.Invoke(true); // keep, turn on canExitInvincibility
         StartCoroutine(BeginInvincibility());
@@ -115,7 +115,7 @@ public class Health : NetworkBehaviour
         revivingModel.SetActive(true);
         playerModel.SetActive(false);
         
-        Debug.Log("Ghost Mode Exited");
+        // Debug.Log("Ghost Mode Exited");
         yield return new WaitForSeconds(invincibilityDuration);
         playerScript.ExitInvincibility();
     }
@@ -129,16 +129,22 @@ public class Health : NetworkBehaviour
     }
 
     [Mirror.ClientCallback]
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (!hasAuthority) return;
 
-        if (playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+        if (!(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox")))
         {
-            Debug.Log("Took damage");
-            playerScript.canBeHit = false; // might remove later. this is for extra security
-            this.CmdTakeDamage(1);
+            return;
         }
+        if (other.gameObject.transform.root.name == "Plasma Object(Clone)" &&   // Make sure prefabs are unpacked
+            !other.gameObject.transform.root.GetComponent<PlasmaObject>().CanHitThisPlayer(this.gameObject)
+            )
+        {
+            return;
+        }
+        playerScript.canBeHit = false; // might remove later. this is for extra security
+        this.CmdTakeDamage(1);
     }
 
     [Mirror.Command]

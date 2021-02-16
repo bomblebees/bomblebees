@@ -32,6 +32,9 @@ public class ComboObject : NetworkBehaviour
     public float lingerDuration = 8f;
     public bool didEarlyEffects = false;
 
+    protected GameObject triggeringPlayer;
+    protected bool canHitTriggeringPlayer = true;
+
     protected virtual void Start()
     {
         IgnoreDamageHitbox();
@@ -263,7 +266,7 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
-            var triggeringPlayer = other.transform.parent.gameObject;
+            triggeringPlayer = other.transform.parent.gameObject;
             NotifyOccupiedTile(false); // Update occupation status of tile
             Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);
@@ -284,5 +287,16 @@ public class ComboObject : NetworkBehaviour
         yield return new WaitForSeconds(extensionTime);
         NotifyOccupiedTile(false);
         NetworkServer.Destroy(this.gameObject);
+    }
+
+    public bool CanHitThisPlayer(GameObject target)
+    {
+        Debug.Log("triggering player is "+triggeringPlayer.name);
+        Debug.Log("target player is "+target.name);
+        if (canHitTriggeringPlayer && target == triggeringPlayer)
+        {
+            return true;
+        }
+        else return false;
     }
 }
