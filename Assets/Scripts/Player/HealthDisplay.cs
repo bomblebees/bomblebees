@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class HealthDisplay : MonoBehaviour
 {
     [Header("References")] 
     [SerializeField] public Health lives = null;
-    [SerializeField] public Image livesBarImage = null;
+    [SerializeField] private TextMeshProUGUI localLivesText;
+
+
+    [SerializeField] private string localPlayerLivesText = "Your Lives: ";
 
     // Subscribe to event
     private void OnEnable()
     {
-        // this.gameObject.transform.localPosition = new Vector3(100);
         lives.EventLivesChanged += HandleLivesChanged;
     }
 
@@ -22,10 +25,18 @@ public class HealthDisplay : MonoBehaviour
         lives.EventLivesChanged -= HandleLivesChanged;
     }
 
+    public void Start()
+    {
+        //GameObject test = GameObject.Find("RoundManager");
+        //Debug.Log(test);
+        // set initial lives
+        localLivesText.text = localPlayerLivesText + lives.maxLives.ToString();
+    }
+
     private void HandleLivesChanged(int currentLives, int maxLives)
     {
-        Debug.Log("fill amoutn changed");
-        livesBarImage.fillAmount = (float) currentLives / maxLives;
+        //Debug.Log("fill amoutn changed");
+        localLivesText.text = localPlayerLivesText + currentLives.ToString();
     }
 }
 

@@ -9,7 +9,7 @@ using NetworkBehaviour = Mirror.NetworkBehaviour;
 // No generics in Mirror
 public class Health : NetworkBehaviour
 {
-    [Header("Settings")] [SerializeField] private int maxLives = 3;
+    [Header("Settings")] [SerializeField] public int maxLives = 3;
 
     [Mirror.SyncVar(hook = nameof(OnLivesChanged))]
     public int currentLives;
@@ -38,7 +38,6 @@ public class Health : NetworkBehaviour
     public event LivesLoweredDelegate EventLivesLowered;
     public event GhostExitDelegate EventGhostExit;
     public event InvincibleExitDelegate EventInvincibleExit;
-
 
     [Mirror.ClientRpc]
     private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
