@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1589,6 +1589,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 945418024fdbf6046b5367e0746d0d34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMenuScene: Assets/Scenes/MainMenu.unity
+  mainMenuUIGameObject: {fileID: 268592263}
   steamNetworkManager: {fileID: 548958321}
   kcpNetworkManager: {fileID: 139040683}
   steamNetworkManagerGameObject: {fileID: 548958316}
@@ -3510,7 +3512,8 @@ MonoBehaviour:
   hexGrid: {fileID: 157543588881523654, guid: f0c3643c1dd290a4988ed90dc5b9ed14, type: 3}
   roundManager: {fileID: 2406211372602509701, guid: fa4976dc98f4a2b4589d0303c20b641f,
     type: 3}
-  audioManager: {fileID: 0}
+  audioManager: {fileID: 7230157094182336862, guid: 269b415ed09918044b2ef1f91fe511aa,
+    type: 3}
 --- !u!4 &548958322
 Transform:
   m_ObjectHideFlags: 0
