@@ -6,9 +6,13 @@ using Mirror.Authenticators;
 using Steamworks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainMenu_UI : MonoBehaviour
 {
+    [Scene][SerializeField] private string mainMenuScene;
+    [Header("MainMenu_UI GameObject")]
+    [SerializeField] private GameObject mainMenuUIGameObject;
     [Header("Network Manager")]
     [SerializeField] private NetworkManager steamNetworkManager;
     [SerializeField] private NetworkManager kcpNetworkManager;
@@ -20,22 +24,34 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] private GameObject screenConnectWithSteam;
     [SerializeField] private GameObject screenLocal;
     [SerializeField] private GameObject screenOptions;
+    [SerializeField] private GameObject screenLobbyList;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
 
-    private void Start()
+    private void Awake()
     {
-        if (steamNetworkManagerGameObject.activeSelf)
+        if (NetworkClient.isConnected)
         {
-            screenConnectWithSteam.SetActive(true);
-        }
-
-        if (kcpNetworkManagerGameObject.activeSelf)
-        {
-            screenLocal.SetActive(true);
+            Destroy(mainMenuUIGameObject);
         }
     }
+
+    private void Start()
+    {
+        
+    }
+
+    private void Update()
+    {
+        
+    }
+
+    #region Configuration
+    
+    
+    
+    #endregion
 
     #region Continous
     
@@ -71,6 +87,8 @@ public class MainMenu_UI : MonoBehaviour
         screenSelectNetwork.SetActive(false);
         steamNetworkManagerGameObject.SetActive(true);
         screenConnectWithSteam.SetActive(true);
+        
+        mainMenuUIGameObject.transform.SetParent(steamNetworkManagerGameObject.transform);
     }
 
     public void LocalAreaNetwork()
@@ -78,6 +96,8 @@ public class MainMenu_UI : MonoBehaviour
         screenSelectNetwork.SetActive(false);
         kcpNetworkManagerGameObject.SetActive(true);
         screenLocal.SetActive(true);
+        
+        mainMenuUIGameObject.transform.SetParent(kcpNetworkManagerGameObject.transform);
     }
 
     #endregion
@@ -87,6 +107,14 @@ public class MainMenu_UI : MonoBehaviour
     public void HostSteamLobby()
     {
         steamLobby.HostLobby();
+        
+        //mainMenuUIGameObject.SetActive(false);
+    }
+
+    public void JoinFriendsLobby()
+    {
+        screenConnectWithSteam.SetActive(false);
+        screenLobbyList.SetActive(true);
     }
 
     #endregion
@@ -97,6 +125,8 @@ public class MainMenu_UI : MonoBehaviour
     {
         kcpNetworkManager.networkAddress = customIPAddress.ToString();
         kcpNetworkManager.StartHost();
+        
+        //mainMenuUIGameObject.SetActive(false);
     }
 
     public void JoinLocalLobby()
