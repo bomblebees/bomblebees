@@ -24,8 +24,12 @@ using UnityEngine.SceneManagement;
      PlayerState:[InGame,Ready,Wait]
 */
 
+
 public class Matchmaking : MonoBehaviour
 {
+    private string LOBBY_MATCHING_KEY = "[key:bomblebees-lobby]";
+    private string LOBBY_MATCHING_VALUE = "[true]";
+
     //this function will be called when the host player pressed the start button.
     void StartHost()
     {
@@ -39,8 +43,8 @@ public class Matchmaking : MonoBehaviour
         Debug.Log("Joinning the match.");
 
         //if(OnlineGame == Started){
-            //SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "InGame");
-            //return;
+        //SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "InGame");
+        //return;
         //}
         //Invoke("Joinmatch", 1f);
     }
@@ -54,6 +58,7 @@ public class Matchmaking : MonoBehaviour
     public void SetInitiatedLobbyData()
     {
         SteamMatchmaking.SetLobbyData(currentLobby, "LobbyVersion", lobbyVersion);
+        SteamMatchmaking.SetLobbyData(currentLobby, LOBBY_MATCHING_KEY, LOBBY_MATCHING_VALUE);
 
         if (!string.IsNullOrEmpty(inputLobbyName.text))
         {
@@ -176,6 +181,8 @@ public class Matchmaking : MonoBehaviour
 
     public void GetLobbies()
     {
+        SteamMatchmaking.AddRequestLobbyListStringFilter(LOBBY_MATCHING_KEY, LOBBY_MATCHING_VALUE, ELobbyComparison.k_ELobbyComparisonEqual);
+        SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterWorldwide);
         OnLobbyMatchListCallResult.Set(SteamMatchmaking.RequestLobbyList());
     }
 
