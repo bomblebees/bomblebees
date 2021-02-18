@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using Steamworks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -41,6 +42,6 @@ public class Room_UI : MonoBehaviour
         }
         
         SceneManager.LoadScene("MainMenu");
-        mainMenuUI.Activate();
+        mainMenuUI.gameObject.SetActive(true);
     }
 }

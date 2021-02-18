@@ -24,6 +24,7 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] private GameObject screenConnectWithSteam;
     [SerializeField] private GameObject screenLocal;
     [SerializeField] private GameObject screenOptions;
+    [SerializeField] private GameObject screenLobbyList;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
@@ -38,17 +39,12 @@ public class MainMenu_UI : MonoBehaviour
 
     private void Start()
     {
-
+        
     }
 
     private void Update()
     {
         
-    }
-
-    public void Activate()
-    {
-        mainMenuUIGameObject.SetActive(true);
     }
 
     #region Configuration
@@ -113,6 +109,12 @@ public class MainMenu_UI : MonoBehaviour
         steamLobby.HostLobby();
         
         //mainMenuUIGameObject.SetActive(false);
+    }
+
+    public void JoinFriendsLobby()
+    {
+        screenConnectWithSteam.SetActive(false);
+        screenLobbyList.SetActive(true);
     }
 
     #endregion
