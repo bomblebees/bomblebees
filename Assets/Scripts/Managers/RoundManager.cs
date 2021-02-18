@@ -12,18 +12,30 @@ public class RoundManager : NetworkBehaviour
     private List<Health> playerLives = new List<Health>();
     private List<Player> playerList = new List<Player>();
 
-    [Header("Start Game")]
+    [Header("Start Round")]
     [SerializeField] private GameObject startGameUI;
     [SerializeField] private TMP_Text loadText;
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private int startGameFreezeDuration = 5;
 
-    [Header("End Game")]
+    [Header("End Round")]
     [SerializeField] private GameObject endGameUI;
     [SerializeField] private int endGameFreezeDuration = 5;
 
+    [Header("Lives Display")]
+    [SerializeField] private GameObject[] livesUIs = new GameObject[4];
+    //[SerializeField] private TMP_Text playerLivesText;
+
     private int playersConnected = 0;
     private int totalRoomPlayers;
+
+    // events
+    public delegate void RoundStartDelegate();
+    public delegate void RoundEndDelegate();
+    public event RoundStartDelegate EventRoundStart;
+    public event RoundEndDelegate EventRoundEnd;
+
+    #region Setup
 
     public override void OnStartServer()
     {
@@ -37,7 +49,6 @@ public class RoundManager : NetworkBehaviour
     public override void OnStartClient()
     {
         CmdAddPlayerToRound();
-        //NetworkRoomManagerExt.OnServerReadied += Test;
     }
 
     [Command(ignoreAuthority = true)]
@@ -62,11 +73,14 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
+    #endregion
+
     #region Round Start
 
     [Server]
     public void StartRound()
     {
+        EnableLivesUI();
         RpcStartRound();
         StartCoroutine(ServerStartRound());
     }
@@ -74,6 +88,7 @@ public class RoundManager : NetworkBehaviour
     [ClientRpc]
     public void RpcStartRound()
     {
+        EventRoundStart?.Invoke();
         StartCoroutine(ClientStartRound());
     }
 
@@ -156,6 +171,7 @@ public class RoundManager : NetworkBehaviour
     [ClientRpc]
     public void RpcEndRound()
     {
+        EventRoundEnd?.Invoke();
         StartCoroutine(ClientEndRound());
     }
 
@@ -173,6 +189,58 @@ public class RoundManager : NetworkBehaviour
         yield return new WaitForSeconds(endGameFreezeDuration);
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         room.ServerChangeScene(room.RoomScene);
+    }
+
+    #endregion
+
+    #region Lives
+
+    [Server]
+    public void EnableLivesUI()
+    {
+        //livesUI.SetActive(true);
+
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            Health life = playerList[i].GetComponent<Health>();
+
+            RpcEnableLivesUI(i, life.currentLives); // enable and init UI for each player
+
+            // subscribe to all lives of player
+            life.EventLivesChanged += UpdateLivesUI;
+        }
+    }
+
+    [ClientRpc]
+    public void RpcEnableLivesUI(int idx, int lifeCount)
+    {
+        // enable ui for players
+        livesUIs[idx].SetActive(true);
+
+        TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
+
+        // initialize ui
+        livesText.text = "[Player]: " + lifeCount.ToString();
+    }
+
+    // technical debt: having reference to individual player whose live changed is better
+    [Server]
+    public void UpdateLivesUI(int currentHealth, int maxHealth)
+    {
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            Health life = playerList[i].GetComponent<Health>();
+
+            RpcUpdateLivesUI(i, life.currentLives); // update UI for each player
+        }
+    }
+
+    [ClientRpc]
+    public void RpcUpdateLivesUI(int idx, int lifeCount)
+    {
+        TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
+
+        livesText.text = "[Player]: " + lifeCount.ToString();
     }
 
     #endregion
