@@ -20,7 +20,6 @@ public class Player : NetworkBehaviour
     [SerializeField] public Health healthScript = null;
 
     [Header("Input")] [SerializeField] private string swapKey = "space";
-    [SerializeField] private string punchKey = "p";
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
     
@@ -44,14 +43,12 @@ public class Player : NetworkBehaviour
     public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     [SerializeField] public bool tileHighlights = true;
 
-    public float punchCooldown = 0.5f;
     public float spinHitboxDuration = 0.6f;
     public float spinAnimDuration = 0.8f;
     public float spinTotalCooldown = 0.8f;
 
     [SyncVar] public bool canMove = false;
     [SyncVar] public bool canPlaceBombs = false;
-    [SyncVar] public bool canPunch = false;
     [SyncVar] public bool canSpin = true;
     [SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
@@ -210,15 +207,6 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [Client]
-    void ListenForPunching()
-    {
-        if (Input.GetKeyDown(punchKey))
-        {
-            StartCoroutine(this.Punch());
-        }
-    }
-
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)
     {
@@ -336,28 +324,6 @@ public class Player : NetworkBehaviour
     public void SetCanPlaceBombs(bool val)
     {
         this.canPlaceBombs = val;
-    }
-
-    IEnumerator Punch()
-    {
-        if (canPunch)
-        {
-            // enable punch object for a given number of frames
-            var punchHitbox = gameObject.transform.Find("PunchHitbox");
-            // error check
-            if (!punchHitbox)
-            {
-                Debug.LogError("Player.cs: no punchHitbox assigned");
-            }
-            else
-            {
-                canPunch = false;
-                punchHitbox.gameObject.SetActive(true);
-                yield return new WaitForSeconds(punchCooldown);
-                canPunch = true;
-                punchHitbox.gameObject.SetActive(false);
-            }
-        }
     }
 
     public void SetCanSpin(bool val)
