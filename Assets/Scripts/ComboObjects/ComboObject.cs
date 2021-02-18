@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using UnityEditor;
 using UnityEngine;
 
 // Required Children:
@@ -30,6 +31,9 @@ public class ComboObject : NetworkBehaviour
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
     public bool didEarlyEffects = false;
+
+    protected GameObject triggeringPlayer;
+    protected bool canHitTriggeringPlayer = true;
 
     protected virtual void Start()
     {
@@ -80,7 +84,7 @@ public class ComboObject : NetworkBehaviour
     }
 
     [Server]
-    protected virtual void FindCenter()
+    protected virtual void FindCenter() 
     {
         var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
         RaycastHit tileUnderneathHit;
@@ -92,6 +96,19 @@ public class ComboObject : NetworkBehaviour
             nearestCenter = result;
             RpcFindCenter(result);
         }
+    }
+    
+    protected virtual Vector3 FindCenterBelowOther(GameObject origin) 
+    {
+        var objectRay = new Ray(origin.transform.position, Vector3.down);
+        RaycastHit tileUnderneathHit;
+        if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+        {
+            // var tileBelowOrigin = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+            var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position ;
+            return result;
+        }
+        else return origin.transform.position;
     }
 
     // Tell all clients the nearest center as calculated by the server
@@ -176,12 +193,12 @@ public class ComboObject : NetworkBehaviour
     
 
     [ClientRpc]
-    protected virtual void RpcPush(int edgeIndex)
+    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer)
     {
-        Push(edgeIndex);
+        Push(edgeIndex, triggeringPlayer);
     }
 
-    protected virtual bool Push(int edgeIndex)
+    protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
@@ -213,7 +230,6 @@ public class ComboObject : NetworkBehaviour
                 {
                     break;
                 }
-                // lerpRate *= 1+lerpScaleRate;
             }
 
             if (result == true)
@@ -249,9 +265,11 @@ public class ComboObject : NetworkBehaviour
                     break;
                 }
             }
+
+            triggeringPlayer = other.transform.parent.gameObject;
             NotifyOccupiedTile(false); // Update occupation status of tile
-            Push(edgeIndex); // Push for server too
-            RpcPush(edgeIndex);
+            Push(edgeIndex, triggeringPlayer); // Push for server too
+            RpcPush(edgeIndex, triggeringPlayer);
         }
     }
 
@@ -269,5 +287,16 @@ public class ComboObject : NetworkBehaviour
         yield return new WaitForSeconds(extensionTime);
         NotifyOccupiedTile(false);
         NetworkServer.Destroy(this.gameObject);
+    }
+
+    public bool CanHitThisPlayer(GameObject target)
+    {
+        Debug.Log("triggering player is "+triggeringPlayer.name);
+        Debug.Log("target player is "+target.name);
+        if (canHitTriggeringPlayer && target == triggeringPlayer)
+        {
+            return true;
+        }
+        else return false;
     }
 }

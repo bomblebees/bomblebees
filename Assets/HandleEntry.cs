@@ -34,7 +34,7 @@ public class HandleEntry : NetworkBehaviour
     protected virtual void OnTriggerExit(Collider other)
     {
         var gameObjHit = other.gameObject;
-        Debug.Log(gameObjHit.name);
+        // Debug.Log(gameObjHit.name);
         if (gameObjHit.CompareTag("Player"))
         {
             SetPlayerEntry(other, false);

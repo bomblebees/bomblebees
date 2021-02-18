@@ -8,10 +8,10 @@ using UnityEngine;
 // - TickDown() to not 
 public class LaserObject : TriggerObject
 {
-    protected override bool Push(int edgeIndex)
+    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         UpdateLaserDirection(edgeIndex);
-        return base.Push(edgeIndex);  // Uses TriggerObject.Push(). If a bug arises, switch order
+        return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
 
     protected virtual void UpdateLaserDirection(int edgeIndex)
