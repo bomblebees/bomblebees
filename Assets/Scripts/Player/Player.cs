@@ -62,6 +62,9 @@ public class Player : NetworkBehaviour
     public GameObject blink;
     public GameObject gravityObject;
 
+    // reference to Animator component
+    public Animator animator;
+
     // private Caches
     private GameObject spinHitbox;
     private GameObject spinAnim;
@@ -414,6 +417,10 @@ public class Player : NetworkBehaviour
     {
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
+
+        // Update animation state
+        if (horizontalAxis != 0 || verticalAxis != 0) animator.SetBool("anim_isRunning", true);
+        else                                          animator.SetBool("anim_isRunning", false);
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
