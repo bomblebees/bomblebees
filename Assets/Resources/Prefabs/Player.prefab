@@ -4867,6 +4867,7 @@ GameObject:
   - component: {fileID: 5311549566228183417}
   - component: {fileID: 732740295544866867}
   - component: {fileID: -2281093725366134900}
+  - component: {fileID: 2620434565718017240}
   m_Layer: 12
   m_Name: Player
   m_TagString: Player
@@ -4960,7 +4961,8 @@ MonoBehaviour:
   blink: {fileID: 1307435034249700757, guid: cb45ba8bcf3c06c4bb916c0c03237ade, type: 3}
   gravityObject: {fileID: 1307435034249700757, guid: cb45ba8bcf3c06c4bb916c0c03237ade,
     type: 3}
-  animator: {fileID: 278021817198510948}
+  animator: {fileID: 6123777351014949932}
+  networkAnimator: {fileID: 2620434565718017240}
   maxStackSize: 3
   stackUI:
   - {fileID: 3389014979639341869}
@@ -5061,7 +5063,7 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
-  target: {fileID: 6755049633921233808}
+  target: {fileID: 4776731333535001757}
 --- !u!136 &732740295544866867
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -5088,6 +5090,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f84591ce72545258ea98cb7518d8b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2620434565718017240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728363404677404264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6f3bf89aa97405989c802ba270f815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.05
+  clientAuthority: 1
+  animator: {fileID: 6123777351014949932}
 --- !u!1 &1163376774926246814
 GameObject:
   m_ObjectHideFlags: 0
@@ -6115,7 +6133,7 @@ RotationConstraint:
   m_IsContraintActive: 0
   m_IsLocked: 1
   m_Sources: []
---- !u!95 &278021817198510948
+--- !u!95 &6123777351014949932
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 0
@@ -6822,6 +6840,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayerModel
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3727956284482021115, guid: 37f3e26f15b559e439724ae350bd8a9a,
         type: 3}

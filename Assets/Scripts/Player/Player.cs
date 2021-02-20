@@ -62,8 +62,9 @@ public class Player : NetworkBehaviour
     public GameObject blink;
     public GameObject gravityObject;
 
-    // reference to Animator component
+    // reference to Animator, Network Animator components
     public Animator animator;
+    public NetworkAnimator networkAnimator;
 
     // private Caches
     private GameObject spinHitbox;
@@ -415,12 +416,31 @@ public class Player : NetworkBehaviour
     [Client]
     void ApplyMovement()
     {
+
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
 
+        // if (horizontalAxis != 0) Debug.Log(horizontalAxis);
         // Update animation state
-        if (horizontalAxis != 0 || verticalAxis != 0) animator.SetBool("anim_isRunning", true);
-        else                                          animator.SetBool("anim_isRunning", false);
+        // need to copy this to online
+        if (horizontalAxis != 0 || verticalAxis != 0)
+        {
+            // client animator
+            animator.ResetTrigger("anim_IdleTrigger");
+            animator.SetTrigger("anim_RunTrigger");
+            // network animator
+            networkAnimator.ResetTrigger("anim_IdleTrigger");
+            networkAnimator.SetTrigger("anim_RunTrigger");
+        }
+        else
+        {
+            // client animator
+            animator.ResetTrigger("anim_RunTrigger");
+            animator.SetTrigger("anim_IdleTrigger");
+            // network animator
+            networkAnimator.ResetTrigger("anim_RunTrigger");
+            networkAnimator.SetTrigger("anim_IdleTrigger");
+        }
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
