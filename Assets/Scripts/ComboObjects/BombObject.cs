@@ -22,6 +22,7 @@ public class BombObject : TickObject
     private void LateUpdate()
     {
         this.model.GetComponent<Renderer>().material.SetFloat("Vector1_9422D918", val);
+        this.model.GetComponent<Renderer>().material.SetFloat("_WobbleToggle", val);
         val += riseRate * Time.deltaTime;
     }
 
@@ -42,6 +43,7 @@ public class BombObject : TickObject
     protected virtual void SpeedUpAnim()
     {
         this.model.GetComponent<Renderer>().material.SetFloat("Boolean_A83C6489", 1f);
+        this.model.GetComponent<Renderer>().material.SetFloat("_WobbleToggle", val);
     }
     
 
