@@ -4,8 +4,9 @@
     {
         OutlineWidth("OutlineWidth", Float) = 0.05
         Color_C763D23A("OutlineColor", Color) = (0, 0, 0, 0)
-        Vector1_EFD46795("-1", Float) = -1
-        [ToggleUI]_WobbleToggle("WoggleToggle", Float) = 0
+        _PulseRate("PulseRate", Float) = 25
+        [ToggleUI]_WobbleToggle("WobbleToggle", Float) = 0
+        Vector1_E3FC9CB0("DisplaceLevel", Float) = 0.1
     }
     SubShader
     {
@@ -26,7 +27,7 @@
            
             // Render State
             Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
-            Cull Back
+            Cull Front
             ZTest LEqual
             ZWrite Off
             // ColorMask: <None>
@@ -76,11 +77,22 @@
             CBUFFER_START(UnityPerMaterial)
             float OutlineWidth;
             float4 Color_C763D23A;
-            float Vector1_EFD46795;
+            float _PulseRate;
             float _WobbleToggle;
+            float Vector1_E3FC9CB0;
             CBUFFER_END
         
             // Graph Functions
+            
+            void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
+            {
+                Out = A * B;
+            }
+            
+            void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+            {
+                Out = A + B;
+            }
             
             void Unity_Multiply_float(float A, float B, out float Out)
             {
@@ -92,19 +104,9 @@
                 Out = sin(In);
             }
             
-            void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
-            {
-                Out = A * B;
-            }
-            
             void Unity_Branch_float3(float Predicate, float3 True, float3 False, out float3 Out)
             {
                 Out = Predicate ? True : False;
-            }
-            
-            void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-            {
-                Out = A + B;
             }
         
             // Graph Vertex
@@ -126,31 +128,29 @@
             VertexDescription VertexDescriptionFunction(VertexDescriptionInputs IN)
             {
                 VertexDescription description = (VertexDescription)0;
-                float _Property_2FBF19F7_Out_0 = _WobbleToggle;
-                float _Vector1_9C286741_Out_0 = 25;
-                float _Multiply_B3ED25CC_Out_2;
-                Unity_Multiply_float(IN.TimeParameters.x, _Vector1_9C286741_Out_0, _Multiply_B3ED25CC_Out_2);
-                float _Sine_BBA60A6C_Out_1;
-                Unity_Sine_float(_Multiply_B3ED25CC_Out_2, _Sine_BBA60A6C_Out_1);
-                float _Vector1_8CF1933E_Out_0 = 0.1;
-                float _Multiply_BB030A66_Out_2;
-                Unity_Multiply_float(_Sine_BBA60A6C_Out_1, _Vector1_8CF1933E_Out_0, _Multiply_BB030A66_Out_2);
-                float3 _Multiply_D9ED5E80_Out_2;
-                Unity_Multiply_float((_Multiply_BB030A66_Out_2.xxx), IN.ObjectSpaceNormal, _Multiply_D9ED5E80_Out_2);
-                float3 _Branch_3F1F320E_Out_3;
-                Unity_Branch_float3(_Property_2FBF19F7_Out_0, _Multiply_D9ED5E80_Out_2, float3(0, 0, 0), _Branch_3F1F320E_Out_3);
-                float3 _Add_95807EA7_Out_2;
-                Unity_Add_float3(_Branch_3F1F320E_Out_3, IN.ObjectSpacePosition, _Add_95807EA7_Out_2);
                 float _Property_FF5CB134_Out_0 = OutlineWidth;
                 float3 _Multiply_CAD98F06_Out_2;
                 Unity_Multiply_float((_Property_FF5CB134_Out_0.xxx), IN.ObjectSpaceNormal, _Multiply_CAD98F06_Out_2);
                 float3 _Add_589AB606_Out_2;
                 Unity_Add_float3(IN.ObjectSpacePosition, _Multiply_CAD98F06_Out_2, _Add_589AB606_Out_2);
+                float _Property_B7C79E47_Out_0 = _WobbleToggle;
+                float _Property_7CD11D14_Out_0 = _PulseRate;
+                float _Multiply_8E3D7B6B_Out_2;
+                Unity_Multiply_float(IN.TimeParameters.x, _Property_7CD11D14_Out_0, _Multiply_8E3D7B6B_Out_2);
+                float _Multiply_6F09157C_Out_2;
+                Unity_Multiply_float(_Multiply_8E3D7B6B_Out_2, 2, _Multiply_6F09157C_Out_2);
+                float _Sine_2F6221F9_Out_1;
+                Unity_Sine_float(_Multiply_6F09157C_Out_2, _Sine_2F6221F9_Out_1);
+                float _Property_D60AD9DA_Out_0 = Vector1_E3FC9CB0;
+                float _Multiply_4639FBFE_Out_2;
+                Unity_Multiply_float(_Sine_2F6221F9_Out_1, _Property_D60AD9DA_Out_0, _Multiply_4639FBFE_Out_2);
+                float3 _Multiply_2BAD7C50_Out_2;
+                Unity_Multiply_float(IN.ObjectSpaceNormal, (_Multiply_4639FBFE_Out_2.xxx), _Multiply_2BAD7C50_Out_2);
+                float3 _Branch_EA8EC26A_Out_3;
+                Unity_Branch_float3(_Property_B7C79E47_Out_0, _Multiply_2BAD7C50_Out_2, float3(0, 0, 0), _Branch_EA8EC26A_Out_3);
                 float3 _Add_C3CB088D_Out_2;
-                Unity_Add_float3(_Add_589AB606_Out_2, float3(0, 0, 0), _Add_C3CB088D_Out_2);
-                float3 _Add_29B5E34B_Out_2;
-                Unity_Add_float3(_Add_95807EA7_Out_2, _Add_C3CB088D_Out_2, _Add_29B5E34B_Out_2);
-                description.VertexPosition = _Add_29B5E34B_Out_2;
+                Unity_Add_float3(_Add_589AB606_Out_2, _Branch_EA8EC26A_Out_3, _Add_C3CB088D_Out_2);
+                description.VertexPosition = _Add_C3CB088D_Out_2;
                 description.VertexNormal = IN.ObjectSpaceNormal;
                 description.VertexTangent = IN.ObjectSpaceTangent;
                 return description;
@@ -370,11 +370,22 @@
             CBUFFER_START(UnityPerMaterial)
             float OutlineWidth;
             float4 Color_C763D23A;
-            float Vector1_EFD46795;
+            float _PulseRate;
             float _WobbleToggle;
+            float Vector1_E3FC9CB0;
             CBUFFER_END
         
             // Graph Functions
+            
+            void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
+            {
+                Out = A * B;
+            }
+            
+            void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+            {
+                Out = A + B;
+            }
             
             void Unity_Multiply_float(float A, float B, out float Out)
             {
@@ -386,19 +397,9 @@
                 Out = sin(In);
             }
             
-            void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
-            {
-                Out = A * B;
-            }
-            
             void Unity_Branch_float3(float Predicate, float3 True, float3 False, out float3 Out)
             {
                 Out = Predicate ? True : False;
-            }
-            
-            void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-            {
-                Out = A + B;
             }
         
             // Graph Vertex
@@ -420,31 +421,29 @@
             VertexDescription VertexDescriptionFunction(VertexDescriptionInputs IN)
             {
                 VertexDescription description = (VertexDescription)0;
-                float _Property_2FBF19F7_Out_0 = _WobbleToggle;
-                float _Vector1_9C286741_Out_0 = 25;
-                float _Multiply_B3ED25CC_Out_2;
-                Unity_Multiply_float(IN.TimeParameters.x, _Vector1_9C286741_Out_0, _Multiply_B3ED25CC_Out_2);
-                float _Sine_BBA60A6C_Out_1;
-                Unity_Sine_float(_Multiply_B3ED25CC_Out_2, _Sine_BBA60A6C_Out_1);
-                float _Vector1_8CF1933E_Out_0 = 0.1;
-                float _Multiply_BB030A66_Out_2;
-                Unity_Multiply_float(_Sine_BBA60A6C_Out_1, _Vector1_8CF1933E_Out_0, _Multiply_BB030A66_Out_2);
-                float3 _Multiply_D9ED5E80_Out_2;
-                Unity_Multiply_float((_Multiply_BB030A66_Out_2.xxx), IN.ObjectSpaceNormal, _Multiply_D9ED5E80_Out_2);
-                float3 _Branch_3F1F320E_Out_3;
-                Unity_Branch_float3(_Property_2FBF19F7_Out_0, _Multiply_D9ED5E80_Out_2, float3(0, 0, 0), _Branch_3F1F320E_Out_3);
-                float3 _Add_95807EA7_Out_2;
-                Unity_Add_float3(_Branch_3F1F320E_Out_3, IN.ObjectSpacePosition, _Add_95807EA7_Out_2);
                 float _Property_FF5CB134_Out_0 = OutlineWidth;
                 float3 _Multiply_CAD98F06_Out_2;
                 Unity_Multiply_float((_Property_FF5CB134_Out_0.xxx), IN.ObjectSpaceNormal, _Multiply_CAD98F06_Out_2);
                 float3 _Add_589AB606_Out_2;
                 Unity_Add_float3(IN.ObjectSpacePosition, _Multiply_CAD98F06_Out_2, _Add_589AB606_Out_2);
+                float _Property_B7C79E47_Out_0 = _WobbleToggle;
+                float _Property_7CD11D14_Out_0 = _PulseRate;
+                float _Multiply_8E3D7B6B_Out_2;
+                Unity_Multiply_float(IN.TimeParameters.x, _Property_7CD11D14_Out_0, _Multiply_8E3D7B6B_Out_2);
+                float _Multiply_6F09157C_Out_2;
+                Unity_Multiply_float(_Multiply_8E3D7B6B_Out_2, 2, _Multiply_6F09157C_Out_2);
+                float _Sine_2F6221F9_Out_1;
+                Unity_Sine_float(_Multiply_6F09157C_Out_2, _Sine_2F6221F9_Out_1);
+                float _Property_D60AD9DA_Out_0 = Vector1_E3FC9CB0;
+                float _Multiply_4639FBFE_Out_2;
+                Unity_Multiply_float(_Sine_2F6221F9_Out_1, _Property_D60AD9DA_Out_0, _Multiply_4639FBFE_Out_2);
+                float3 _Multiply_2BAD7C50_Out_2;
+                Unity_Multiply_float(IN.ObjectSpaceNormal, (_Multiply_4639FBFE_Out_2.xxx), _Multiply_2BAD7C50_Out_2);
+                float3 _Branch_EA8EC26A_Out_3;
+                Unity_Branch_float3(_Property_B7C79E47_Out_0, _Multiply_2BAD7C50_Out_2, float3(0, 0, 0), _Branch_EA8EC26A_Out_3);
                 float3 _Add_C3CB088D_Out_2;
-                Unity_Add_float3(_Add_589AB606_Out_2, float3(0, 0, 0), _Add_C3CB088D_Out_2);
-                float3 _Add_29B5E34B_Out_2;
-                Unity_Add_float3(_Add_95807EA7_Out_2, _Add_C3CB088D_Out_2, _Add_29B5E34B_Out_2);
-                description.VertexPosition = _Add_29B5E34B_Out_2;
+                Unity_Add_float3(_Add_589AB606_Out_2, _Branch_EA8EC26A_Out_3, _Add_C3CB088D_Out_2);
+                description.VertexPosition = _Add_C3CB088D_Out_2;
                 description.VertexNormal = IN.ObjectSpaceNormal;
                 description.VertexTangent = IN.ObjectSpaceTangent;
                 return description;
@@ -661,11 +660,22 @@
             CBUFFER_START(UnityPerMaterial)
             float OutlineWidth;
             float4 Color_C763D23A;
-            float Vector1_EFD46795;
+            float _PulseRate;
             float _WobbleToggle;
+            float Vector1_E3FC9CB0;
             CBUFFER_END
         
             // Graph Functions
+            
+            void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
+            {
+                Out = A * B;
+            }
+            
+            void Unity_Add_float3(float3 A, float3 B, out float3 Out)
+            {
+                Out = A + B;
+            }
             
             void Unity_Multiply_float(float A, float B, out float Out)
             {
@@ -677,19 +687,9 @@
                 Out = sin(In);
             }
             
-            void Unity_Multiply_float(float3 A, float3 B, out float3 Out)
-            {
-                Out = A * B;
-            }
-            
             void Unity_Branch_float3(float Predicate, float3 True, float3 False, out float3 Out)
             {
                 Out = Predicate ? True : False;
-            }
-            
-            void Unity_Add_float3(float3 A, float3 B, out float3 Out)
-            {
-                Out = A + B;
             }
         
             // Graph Vertex
@@ -711,31 +711,29 @@
             VertexDescription VertexDescriptionFunction(VertexDescriptionInputs IN)
             {
                 VertexDescription description = (VertexDescription)0;
-                float _Property_2FBF19F7_Out_0 = _WobbleToggle;
-                float _Vector1_9C286741_Out_0 = 25;
-                float _Multiply_B3ED25CC_Out_2;
-                Unity_Multiply_float(IN.TimeParameters.x, _Vector1_9C286741_Out_0, _Multiply_B3ED25CC_Out_2);
-                float _Sine_BBA60A6C_Out_1;
-                Unity_Sine_float(_Multiply_B3ED25CC_Out_2, _Sine_BBA60A6C_Out_1);
-                float _Vector1_8CF1933E_Out_0 = 0.1;
-                float _Multiply_BB030A66_Out_2;
-                Unity_Multiply_float(_Sine_BBA60A6C_Out_1, _Vector1_8CF1933E_Out_0, _Multiply_BB030A66_Out_2);
-                float3 _Multiply_D9ED5E80_Out_2;
-                Unity_Multiply_float((_Multiply_BB030A66_Out_2.xxx), IN.ObjectSpaceNormal, _Multiply_D9ED5E80_Out_2);
-                float3 _Branch_3F1F320E_Out_3;
-                Unity_Branch_float3(_Property_2FBF19F7_Out_0, _Multiply_D9ED5E80_Out_2, float3(0, 0, 0), _Branch_3F1F320E_Out_3);
-                float3 _Add_95807EA7_Out_2;
-                Unity_Add_float3(_Branch_3F1F320E_Out_3, IN.ObjectSpacePosition, _Add_95807EA7_Out_2);
                 float _Property_FF5CB134_Out_0 = OutlineWidth;
                 float3 _Multiply_CAD98F06_Out_2;
                 Unity_Multiply_float((_Property_FF5CB134_Out_0.xxx), IN.ObjectSpaceNormal, _Multiply_CAD98F06_Out_2);
                 float3 _Add_589AB606_Out_2;
                 Unity_Add_float3(IN.ObjectSpacePosition, _Multiply_CAD98F06_Out_2, _Add_589AB606_Out_2);
+                float _Property_B7C79E47_Out_0 = _WobbleToggle;
+                float _Property_7CD11D14_Out_0 = _PulseRate;
+                float _Multiply_8E3D7B6B_Out_2;
+                Unity_Multiply_float(IN.TimeParameters.x, _Property_7CD11D14_Out_0, _Multiply_8E3D7B6B_Out_2);
+                float _Multiply_6F09157C_Out_2;
+                Unity_Multiply_float(_Multiply_8E3D7B6B_Out_2, 2, _Multiply_6F09157C_Out_2);
+                float _Sine_2F6221F9_Out_1;
+                Unity_Sine_float(_Multiply_6F09157C_Out_2, _Sine_2F6221F9_Out_1);
+                float _Property_D60AD9DA_Out_0 = Vector1_E3FC9CB0;
+                float _Multiply_4639FBFE_Out_2;
+                Unity_Multiply_float(_Sine_2F6221F9_Out_1, _Property_D60AD9DA_Out_0, _Multiply_4639FBFE_Out_2);
+                float3 _Multiply_2BAD7C50_Out_2;
+                Unity_Multiply_float(IN.ObjectSpaceNormal, (_Multiply_4639FBFE_Out_2.xxx), _Multiply_2BAD7C50_Out_2);
+                float3 _Branch_EA8EC26A_Out_3;
+                Unity_Branch_float3(_Property_B7C79E47_Out_0, _Multiply_2BAD7C50_Out_2, float3(0, 0, 0), _Branch_EA8EC26A_Out_3);
                 float3 _Add_C3CB088D_Out_2;
-                Unity_Add_float3(_Add_589AB606_Out_2, float3(0, 0, 0), _Add_C3CB088D_Out_2);
-                float3 _Add_29B5E34B_Out_2;
-                Unity_Add_float3(_Add_95807EA7_Out_2, _Add_C3CB088D_Out_2, _Add_29B5E34B_Out_2);
-                description.VertexPosition = _Add_29B5E34B_Out_2;
+                Unity_Add_float3(_Add_589AB606_Out_2, _Branch_EA8EC26A_Out_3, _Add_C3CB088D_Out_2);
+                description.VertexPosition = _Add_C3CB088D_Out_2;
                 description.VertexNormal = IN.ObjectSpaceNormal;
                 description.VertexTangent = IN.ObjectSpaceTangent;
                 return description;

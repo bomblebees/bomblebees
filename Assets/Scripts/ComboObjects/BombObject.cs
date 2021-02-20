@@ -16,13 +16,15 @@ public class BombObject : TickObject
     protected override void Start()
     {
         riseRate = 1 / timeTillAnimSpeedup;
-        this.model.GetComponent<Renderer>().material.SetFloat("Vector1_9422D918", val);
+        // increase fill value of material
+        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", val);
+
     }
 
     private void LateUpdate()
     {
-        this.model.GetComponent<Renderer>().material.SetFloat("Vector1_9422D918", val);
-        this.model.GetComponent<Renderer>().material.SetFloat("_WobbleToggle", val);
+        // increase fill value of material
+        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", val);
         val += riseRate * Time.deltaTime;
     }
 
@@ -42,8 +44,9 @@ public class BombObject : TickObject
 
     protected virtual void SpeedUpAnim()
     {
-        this.model.GetComponent<Renderer>().material.SetFloat("Boolean_A83C6489", 1f);
-        this.model.GetComponent<Renderer>().material.SetFloat("_WobbleToggle", val);
+        // toggle "about to explode" state of material
+        this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
+        this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
     
 
