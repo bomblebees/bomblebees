@@ -2,19 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Threading;
+using Castle.Core.Smtp;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Mirror;
+using NSubstitute.Exceptions;
+using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
 {
     // Assets
+    [Header("Debug")]
+    public bool debugMode = false;
+    public string debugBombPress1 = "i";
+    public string debugBombPress2 = "a";
     private HexGrid hexGrid;
 
+    [Header("Respawn")]
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
@@ -159,6 +168,19 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
         ListenForBombUse();
         ListenForSpinning();
+        if (debugMode) DebugMode();
+    }
+
+    private void DebugMode()
+    {
+        if (Input.GetKeyDown(debugBombPress1))
+        {
+            SpawnLaserObject();
+        }
+        if (Input.GetKeyDown(debugBombPress2))
+        {
+            SpawnDefaultBomb();
+        }
     }
 
     // Update version for server
