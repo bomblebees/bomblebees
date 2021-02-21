@@ -381,8 +381,18 @@ public class Player : NetworkBehaviour
     private IEnumerator HandleSpinAnim()
     {
         spinAnim.gameObject.SetActive(true);
+
+        // trigger character spin animation
+        animator.SetTrigger("anim_SpinTrigger");
+        networkAnimator.SetTrigger("anim_SpinTrigger");
+
         yield return new WaitForSeconds(spinAnimDuration);
         spinAnim.gameObject.SetActive(false);
+        
+
+        // reset character spin animation
+        animator.ResetTrigger("anim_SpinTrigger");
+        networkAnimator.ResetTrigger("anim_SpinTrigger");
     }
 
     void OnChangeHeldKey(char oldHeldKey, char newHeldKey)
