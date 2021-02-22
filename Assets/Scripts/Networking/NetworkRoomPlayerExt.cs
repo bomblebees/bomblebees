@@ -28,6 +28,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public override void OnClientExitRoom()
     {
+        SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
+        Debug.Log("exit room count" + room.roomSlots.Count);
         UpdateLobbyList();
     }
 
@@ -54,13 +56,21 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
 
-        for (int i = 0; i < room.roomSlots.Count; i++)
+        // update all existing players
+        for (int i = 0; i < 4; i++)
         {
+            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+
+            // if player does not exist
+            if (i >= room.roomSlots.Count)
+            {
+                card.playerCard.SetActive(false);
+                break;
+            }
+
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
             CSteamID steamid = new CSteamID(player.steamId);
-
-            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
 
             // Player list background
             card.playerCard.SetActive(true);
@@ -74,8 +84,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Ready check mark
             if (player.readyToBegin) card.readyStatus.SetActive(true);
             else card.readyStatus.SetActive(false);
-
-           
         }
 
         // Start button

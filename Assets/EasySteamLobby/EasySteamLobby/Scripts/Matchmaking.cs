@@ -152,7 +152,6 @@ public class Matchmaking : MonoBehaviour
 
     public void uiLeaveLobby()
     {
-
         if (currentLobby != (CSteamID)0)
             SteamMatchmaking.LeaveLobby(currentLobby);
 
@@ -174,6 +173,8 @@ public class Matchmaking : MonoBehaviour
         LobbyCanvas.SetActive(true);
         MainMenu_UI menu = MainMenu_UI.singleton;
         menu.gameObject.SetActive(true);
+
+        GetLobbies(); // refresh lobbies
     }
 
     #region EasySteamLobby
