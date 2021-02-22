@@ -219,7 +219,7 @@ public class RoundManager : NetworkBehaviour
         {
             Health life = playerList[i].health;
 
-            RpcEnableLivesUI(i, life.currentLives); // enable and init UI for each player
+            RpcEnableLivesUI(i, life.currentLives, playerList[i].steamId); // enable and init UI for each player
 
             // subscribe to all lives of player
             life.EventLivesChanged += UpdateLivesUI;
@@ -227,7 +227,7 @@ public class RoundManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcEnableLivesUI(int idx, int lifeCount)
+    public void RpcEnableLivesUI(int idx, int lifeCount, ulong steamId)
     {
         // enable ui for players
         livesUIs[idx].SetActive(true);
@@ -235,7 +235,7 @@ public class RoundManager : NetworkBehaviour
         TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
 
 
-        CSteamID steamID = new CSteamID(playerList[idx].steamId);
+        CSteamID steamID = new CSteamID(steamId);
 
         string steamUser = SteamFriends.GetFriendPersonaName(steamID);
 
