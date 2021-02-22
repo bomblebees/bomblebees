@@ -48,7 +48,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         is set as DontDestroyOnLoad = true.
     */
 
-    bool showStartButton;
+    public bool showStartButton;
 
     public override void OnRoomServerPlayersReady()
     {

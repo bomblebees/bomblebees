@@ -3,14 +3,41 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Steamworks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Room_UI : MonoBehaviour
 {
+
     [SerializeField] private NetworkManager networkManager;
     [SerializeField] private MainMenu_UI mainMenuUI;
     [SerializeField] private GameObject screenHowToPlay;
+    [SerializeField] public GameObject buttonStart;
+
+    [Serializable]
+    public class PlayerLobbyCard
+    {
+        public GameObject playerCard;
+        public RawImage avatar;
+        public TMP_Text username;
+        public GameObject readyStatus;
+    }
+
+    [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
+
+    // events
+    public delegate void ReadyClickDelegate();
+    public delegate void StartClickDelegate();
+    public event ReadyClickDelegate EventReadyButtonClicked;
+    public event StartClickDelegate EventStartButtonClicked;
+
+    public static Room_UI singleton;
+    private void Awake()
+    {
+        singleton = this;
+    }
 
     public void Start()
     {
@@ -55,6 +82,16 @@ public class Room_UI : MonoBehaviour
 
             mainMenuUI.gameObject.SetActive(true);
         }
+    }
+
+    public void OnStartButtonClick()
+    {
+        EventStartButtonClicked?.Invoke();
+    }
+
+    public void OnReadyButtonClick()
+    {
+        EventReadyButtonClicked?.Invoke();
     }
 
     #region Screen: HOW TO PLAY
