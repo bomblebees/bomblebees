@@ -16,7 +16,7 @@ public class SteamLobby : MonoBehaviour
 
     private void Start()
     {
-        networkManager = GetComponent<Steam3NetworkManager>();
+        networkManager = GetComponent<SteamNetworkManager>();
 
         if (!SteamManager.Initialized) { return; }
 

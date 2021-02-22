@@ -33,7 +33,7 @@ public class Matchmaking : MonoBehaviour
     private const string HostAddressKey = "HostAddress";
 
     // The network manager for game scene networking
-    [SerializeField] private NetworkRoomManagerExt networkManager;
+    [SerializeField] private SteamNetworkManager networkManager;
 
     //this function will be called when the host player pressed the start button.
     void StartHost()
