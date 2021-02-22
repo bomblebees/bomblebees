@@ -25,6 +25,8 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] private GameObject screenLocal;
     [SerializeField] private GameObject screenOptions;
     [SerializeField] private GameObject screenLobbyList;
+    [SerializeField] public GameObject screenNavigation;
+    [SerializeField] public GameObject screenLoading;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
@@ -67,17 +69,8 @@ public class MainMenu_UI : MonoBehaviour
     {
         if (screenOptions.activeSelf)
         {
-            if (steamNetworkManagerGameObject.activeSelf)
-            {
-                screenOptions.SetActive(false);
-                screenConnectWithSteam.SetActive(true);
-            }
-
-            if (kcpNetworkManagerGameObject.activeSelf)
-            {
-                screenOptions.SetActive(false);
-                screenLocal.SetActive(true);
-            }
+            screenOptions.SetActive(false);
+            screenMainMenu.SetActive(true);
         }
 
         if (screenLobbyList && screenLobbyList.activeSelf)

@@ -93,6 +93,10 @@ public class Matchmaking : MonoBehaviour
         // Start Mirror Client
         networkManager.networkAddress = hostAddress;
         networkManager.StartClient();
+
+        MainMenu_UI menu = MainMenu_UI.singleton;
+        menu.screenLoading.SetActive(true);
+        menu.screenNavigation.SetActive(false);
     }
 
     public void SetInitiatedLobbyData()

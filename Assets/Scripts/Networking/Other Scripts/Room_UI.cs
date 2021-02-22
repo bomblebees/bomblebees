@@ -15,7 +15,18 @@ public class Room_UI : MonoBehaviour
     {
         networkManager = NetworkManager.singleton;
         mainMenuUI = MainMenu_UI.singleton;
-        
+
+        if (mainMenuUI.screenLoading.activeSelf)
+        {
+            mainMenuUI.screenLoading.SetActive(false);
+            
+        }
+
+        if (!mainMenuUI.screenNavigation.activeSelf)
+        {
+            mainMenuUI.screenNavigation.SetActive(true);
+        }
+
         mainMenuUI.gameObject.SetActive(false);
     }
 
