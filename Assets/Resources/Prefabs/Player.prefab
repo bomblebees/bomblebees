@@ -4868,7 +4868,7 @@ GameObject:
   - component: {fileID: 732740295544866867}
   - component: {fileID: -2281093725366134900}
   m_Layer: 12
-  m_Name: Player1
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4980,9 +4980,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  maxLives: 3
-  currentLives: 3
-  ghostDuration: 0
+  maxLives: 1
+  currentLives: 1
+  ghostDuration: 5
   invincibilityDuration: 5
   playerModel: {fileID: 5953220966861250607}
   ghostModel: {fileID: 8062245979255692024}

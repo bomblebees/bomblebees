@@ -13,8 +13,8 @@ public class Room_UI : MonoBehaviour
 
     public void Start()
     {
-        networkManager = FindObjectOfType<NetworkManager>();
-        mainMenuUI = FindObjectOfType<MainMenu_UI>();
+        networkManager = NetworkManager.singleton;
+        mainMenuUI = MainMenu_UI.singleton;
         
         mainMenuUI.gameObject.SetActive(false);
     }
@@ -26,22 +26,22 @@ public class Room_UI : MonoBehaviour
 
     public void Back()
     {
-        if (NetworkServer.active && NetworkClient.isConnected)
+
+
+        Matchmaking matchmaker = Matchmaking.singleton;
+        if (matchmaker)
         {
-            networkManager.StopHost();
+            matchmaker.uiLeaveLobby();
         }
-        // stop client if client-only
-        else if (NetworkClient.isConnected)
+        else
         {
-            networkManager.StopClient();
+            if (NetworkServer.active) networkManager.StopHost();
+            else networkManager.StopClient();
+
+            // For some reason netowrk manager is moved out of dontdestroy, this is to put it back
+            DontDestroyOnLoad(networkManager.gameObject);
+
+            mainMenuUI.gameObject.SetActive(true);
         }
-        // stop server if server-only
-        else if (NetworkServer.active)
-        {
-            networkManager.StopServer();
-        }
-        
-        SceneManager.LoadScene("MainMenu");
-        mainMenuUI.gameObject.SetActive(true);
     }
 }
