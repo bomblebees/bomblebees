@@ -89,4 +89,5 @@ public class TriggerObject : ComboObject
         wasHit = true;
         return true;
     }
+
 }
