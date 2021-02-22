@@ -10,6 +10,7 @@ public class Room_UI : MonoBehaviour
 {
     [SerializeField] private NetworkManager networkManager;
     [SerializeField] private MainMenu_UI mainMenuUI;
+    [SerializeField] private GameObject screenHowToPlay;
 
     public void Start()
     {
@@ -55,4 +56,13 @@ public class Room_UI : MonoBehaviour
             mainMenuUI.gameObject.SetActive(true);
         }
     }
+
+    #region Screen: HOW TO PLAY
+
+    public void ToggleScreenHowToPlay()
+    {
+        screenHowToPlay.SetActive(!screenHowToPlay.activeSelf);
+    }
+
+    #endregion
 }
