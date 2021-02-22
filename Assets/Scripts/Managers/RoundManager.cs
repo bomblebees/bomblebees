@@ -81,6 +81,9 @@ public class RoundManager : NetworkBehaviour
 
         playerList.Add(playerInfo);
 
+        // Subscribe to life change event
+        live.EventLivesChanged += CheckRoundEnd;
+
         if (totalRoomPlayers == playersConnected)
         {
             StartRound();
@@ -160,7 +163,7 @@ public class RoundManager : NetworkBehaviour
             int aliveCount = 0;
             for (int i = 0; i < playerList.Count; i++)
             {
-                //Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerLives[i].currentLives);
+                Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerList[i].health.currentLives);
                 if (playerList[i].health.currentLives > 0)
                 {
                     aliveCount++;
@@ -283,16 +286,16 @@ public class RoundManager : NetworkBehaviour
         {
             Health life = playerList[i].health;
 
-            RpcUpdateLivesUI(i, life.currentLives); // update UI for each player
+            RpcUpdateLivesUI(i, life.currentLives, playerList[i].steamId); // update UI for each player
         }
     }
 
     [ClientRpc]
-    public void RpcUpdateLivesUI(int idx, int lifeCount)
+    public void RpcUpdateLivesUI(int idx, int lifeCount, ulong steamId)
     {
         TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
 
-        CSteamID steamID = new CSteamID(playerList[idx].steamId);
+        CSteamID steamID = new CSteamID(steamId);
 
         string steamUser = SteamFriends.GetFriendPersonaName(steamID);
 

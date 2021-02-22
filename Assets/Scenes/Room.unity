@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 186371081}
+  m_SkyboxMaterial: {fileID: 200911632}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -499,7 +499,7 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!21 &186371081
+--- !u!21 &200911632
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -1736,8 +1736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a00128818eda43dfaa959b83527b255, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  otherPanels:
-  - {fileID: 0}
+  otherPanels: []
 --- !u!1 &1547114822
 GameObject:
   m_ObjectHideFlags: 0

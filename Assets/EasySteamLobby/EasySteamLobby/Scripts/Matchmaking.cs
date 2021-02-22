@@ -142,6 +142,14 @@ public class Matchmaking : MonoBehaviour
         }
     }
 
+    public void MirrorLeaveLobby()
+    {
+        if (NetworkServer.active) networkManager.StopHost();
+        else if (NetworkClient.isConnected) networkManager.StopClient();
+
+        uiLeaveLobby();
+    }
+
     public void uiLeaveLobby()
     {
 
@@ -163,17 +171,9 @@ public class Matchmaking : MonoBehaviour
         lobbyOwner = (CSteamID)0;
         currentLobby = new CSteamID();
 
-        if (NetworkServer.active) networkManager.StopHost();
-        else networkManager.StopClient();
-
-        // For some reason netowrk manager is moved out of dontdestroy, this is to put it back
-        DontDestroyOnLoad(networkManager.gameObject);
-
         LobbyCanvas.SetActive(true);
         MainMenu_UI menu = MainMenu_UI.singleton;
         menu.gameObject.SetActive(true);
-
-
     }
 
     #region EasySteamLobby

@@ -43,7 +43,7 @@ public class Room_UI : MonoBehaviour
         Matchmaking matchmaker = Matchmaking.singleton;
         if (matchmaker)
         {
-            matchmaker.uiLeaveLobby();
+            matchmaker.MirrorLeaveLobby();
         }
         else
         {
