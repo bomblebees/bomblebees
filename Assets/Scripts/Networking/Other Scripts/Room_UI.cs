@@ -11,8 +11,10 @@ using UnityEngine.UI;
 public class Room_UI : MonoBehaviour
 {
 
-    [SerializeField] private NetworkManager networkManager;
-    [SerializeField] private MainMenu_UI mainMenuUI;
+    private NetworkManager networkManager;
+    private MainMenu_UI mainMenuUI;
+    private Matchmaking matchmaker;
+
     [SerializeField] private GameObject screenHowToPlay;
     [SerializeField] public GameObject buttonStart;
 
@@ -26,6 +28,7 @@ public class Room_UI : MonoBehaviour
     }
 
     [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
+    [SerializeField] public TMP_Text lobbyName;
 
     // events
     public delegate void ReadyClickDelegate();
@@ -43,6 +46,7 @@ public class Room_UI : MonoBehaviour
     {
         networkManager = NetworkManager.singleton;
         mainMenuUI = MainMenu_UI.singleton;
+        matchmaker = Matchmaking.singleton;
 
         if (mainMenuUI.screenLoading.activeSelf)
         {
@@ -56,6 +60,8 @@ public class Room_UI : MonoBehaviour
         }
 
         mainMenuUI.gameObject.SetActive(false);
+
+        lobbyName.text = matchmaker.GetLobbyName();
     }
 
     public void Quit()
@@ -65,9 +71,6 @@ public class Room_UI : MonoBehaviour
 
     public void Back()
     {
-
-
-        Matchmaking matchmaker = Matchmaking.singleton;
         if (matchmaker)
         {
             matchmaker.MirrorLeaveLobby();

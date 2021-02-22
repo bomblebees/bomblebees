@@ -177,6 +177,11 @@ public class Matchmaking : MonoBehaviour
         GetLobbies(); // refresh lobbies
     }
 
+    public string GetLobbyName()
+    {
+        return SteamMatchmaking.GetLobbyData(currentLobby, "LobbyName");
+    }
+
     #region EasySteamLobby
     public static Matchmaking singleton;
 

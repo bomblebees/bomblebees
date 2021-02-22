@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
-using Castle.Core.Smtp;
+//using Castle.Core.Smtp;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Mirror;
-using NSubstitute.Exceptions;
+//using NSubstitute.Exceptions;
 using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
