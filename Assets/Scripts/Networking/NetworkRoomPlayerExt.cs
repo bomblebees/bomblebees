@@ -29,6 +29,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public override void OnClientExitRoom()
     {
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
+        if (!room) return;
         Debug.Log("exit room count" + room.roomSlots.Count);
         UpdateLobbyList();
     }
@@ -55,6 +56,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
 
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
+        if (!room) return;
 
         // update all existing players
         for (int i = 0; i < 4; i++)

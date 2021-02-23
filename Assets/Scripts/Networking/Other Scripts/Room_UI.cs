@@ -61,7 +61,7 @@ public class Room_UI : MonoBehaviour
 
         mainMenuUI.gameObject.SetActive(false);
 
-        lobbyName.text = matchmaker.GetLobbyName();
+        if (matchmaker) lobbyName.text = matchmaker.GetLobbyName();
     }
 
     public void Quit()

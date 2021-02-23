@@ -59,8 +59,14 @@ public class RoundManager : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-        ulong steamId = SteamUser.GetSteamID().m_SteamID;
-        CmdAddPlayerToRound(steamId);
+        try
+        {
+            ulong steamId = SteamUser.GetSteamID().m_SteamID;
+            CmdAddPlayerToRound(steamId);
+        } catch
+        {
+            CmdAddPlayerToRound(0);
+        }
     }
 
     [Command(ignoreAuthority = true)]
@@ -237,22 +243,26 @@ public class RoundManager : NetworkBehaviour
 
         TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
 
+        string userName = "[Player Name]";
 
-        CSteamID steamID = new CSteamID(steamId);
+        // Set steam user name and avatars
+        if (steamId != 0)
+        {
+            CSteamID steamID = new CSteamID(steamId);
 
-        string steamUser = SteamFriends.GetFriendPersonaName(steamID);
+            userName = SteamFriends.GetFriendPersonaName(steamID);
+
+            RawImage profileImg = livesUIs[idx].transform.GetChild(1).GetComponent<RawImage>();
+
+            int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
+
+            if (imageId == -1) return;
+
+            profileImg.texture = GetSteamImageAsTexture(imageId);
+        } 
 
         // initialize health and username
-        livesText.text = steamUser + ": " + lifeCount.ToString();
-
-
-        RawImage profileImg = livesUIs[idx].transform.GetChild(1).GetComponent<RawImage>();
-
-        int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
-
-        if (imageId == -1) return;
-
-        profileImg.texture = GetSteamImageAsTexture(imageId);
+        livesText.text = userName + ": " + lifeCount.ToString();
     }
 
     private Texture2D GetSteamImageAsTexture(int iImage)
@@ -295,11 +305,18 @@ public class RoundManager : NetworkBehaviour
     {
         TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
 
-        CSteamID steamID = new CSteamID(steamId);
+        string userName = "[Player Name]";
 
-        string steamUser = SteamFriends.GetFriendPersonaName(steamID);
+        // Set steam user name and avatars
+        if (steamId != 0)
+        {
+            CSteamID steamID = new CSteamID(steamId);
 
-        livesText.text = steamUser + ": " + lifeCount.ToString();
+            userName = SteamFriends.GetFriendPersonaName(steamID);
+        }
+
+        // initialize health and username
+        livesText.text = userName + ": " + lifeCount.ToString();
     }
 
     #endregion
