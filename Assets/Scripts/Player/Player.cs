@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour
     public bool debugMode = false;
     public string debugBombPress1 = "i";
     public string debugBombPress2 = "a";
+    public string debugBombPress3 = "e";
     private HexGrid hexGrid;
 
     [Header("Respawn")]
@@ -180,6 +181,10 @@ public class Player : NetworkBehaviour
         if (Input.GetKeyDown(debugBombPress2))
         {
             SpawnDefaultBomb();
+        }
+        if (Input.GetKeyDown(debugBombPress3))
+        {
+            SpawnPlasmaObject();
         }
     }
 

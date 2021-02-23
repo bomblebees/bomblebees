@@ -289,13 +289,19 @@ public class ComboObject : NetworkBehaviour
         NetworkServer.Destroy(this.gameObject);
     }
 
+    // this isn't being sent to every player
+    // [Command(ignoreAuthority = true)] 
     public bool CanHitThisPlayer(GameObject target)
     {
-        Debug.Log("triggering player is "+triggeringPlayer.name);
-        Debug.Log("target player is "+target.name);
-        if (canHitTriggeringPlayer && target == triggeringPlayer)
+        if (
+            (canHitTriggeringPlayer 
+            && 
+            target == triggeringPlayer)
+            ||
+            (target != triggeringPlayer)
+        )
         {
-            return true;
+         return true;
         }
         else return false;
     }

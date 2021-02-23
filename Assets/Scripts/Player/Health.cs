@@ -136,8 +136,9 @@ public class Health : NetworkBehaviour
         {
             return;
         }
-        if (other.gameObject.transform.root.name == "Plasma Object(Clone)" &&   // Make sure prefabs are unpacked
-            !other.gameObject.transform.root.GetComponent<PlasmaObject>().CanHitThisPlayer(this.gameObject)
+        if (other.gameObject.transform.root.name == "Plasma Object(Clone)" 
+            &&   // Make sure prefabs are unpacked
+            !other.gameObject.transform.root.GetComponent<PlasmaObject>().CanHitThisPlayer(this.gameObject)  // I want everyone to 
             )
         {
             return;
