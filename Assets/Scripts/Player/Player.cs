@@ -2,19 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Threading;
+//using Castle.Core.Smtp;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Mirror;
+//using NSubstitute.Exceptions;
+using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
 {
     // Assets
+    [Header("Debug")]
+    public bool debugMode = false;
+    public string debugBombPress1 = "i";
+    public string debugBombPress2 = "a";
     private HexGrid hexGrid;
 
+    [Header("Respawn")]
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
@@ -61,6 +70,10 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
+
+    // reference to Animator, Network Animator components
+    public Animator animator;
+    public NetworkAnimator networkAnimator;
 
     // private Caches
     private GameObject spinHitbox;
@@ -155,6 +168,19 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
         ListenForBombUse();
         ListenForSpinning();
+        if (debugMode) DebugMode();
+    }
+
+    private void DebugMode()
+    {
+        if (Input.GetKeyDown(debugBombPress1))
+        {
+            SpawnLaserObject();
+        }
+        if (Input.GetKeyDown(debugBombPress2))
+        {
+            SpawnDefaultBomb();
+        }
     }
 
     // Update version for server
@@ -377,8 +403,18 @@ public class Player : NetworkBehaviour
     private IEnumerator HandleSpinAnim()
     {
         spinAnim.gameObject.SetActive(true);
+
+        // trigger character spin animation
+        animator.SetTrigger("anim_SpinTrigger");
+        networkAnimator.SetTrigger("anim_SpinTrigger");
+
         yield return new WaitForSeconds(spinAnimDuration);
         spinAnim.gameObject.SetActive(false);
+        
+
+        // reset character spin animation
+        animator.ResetTrigger("anim_SpinTrigger");
+        networkAnimator.ResetTrigger("anim_SpinTrigger");
     }
 
     void OnChangeHeldKey(char oldHeldKey, char newHeldKey)
@@ -412,8 +448,31 @@ public class Player : NetworkBehaviour
     [Client]
     void ApplyMovement()
     {
+
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
+
+        // if (horizontalAxis != 0) Debug.Log(horizontalAxis);
+        // Update animation state
+        // need to copy this to online
+        if (horizontalAxis != 0 || verticalAxis != 0)
+        {
+            // client animator
+            animator.ResetTrigger("anim_IdleTrigger");
+            animator.SetTrigger("anim_RunTrigger");
+            // network animator
+            networkAnimator.ResetTrigger("anim_IdleTrigger");
+            networkAnimator.SetTrigger("anim_RunTrigger");
+        }
+        else
+        {
+            // client animator
+            animator.ResetTrigger("anim_RunTrigger");
+            animator.SetTrigger("anim_IdleTrigger");
+            // network animator
+            networkAnimator.ResetTrigger("anim_RunTrigger");
+            networkAnimator.SetTrigger("anim_IdleTrigger");
+        }
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)

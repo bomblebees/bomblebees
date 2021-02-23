@@ -58,6 +58,8 @@ public class TickObject : ComboObject
     {
         if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
         didEarlyEffects = true;
+        FindCenter();
+        GoToCenter();
         ProcEffects();
     }
 
@@ -81,4 +83,5 @@ public class TickObject : ComboObject
         this.blockerHandler.SetActive(false); // in order to stop blocking players while moving
         return result;
     }
+    
 }

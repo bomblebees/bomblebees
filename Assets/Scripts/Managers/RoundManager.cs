@@ -6,11 +6,22 @@ using UnityEngine.Events;
 using TMPro;
 using System;
 using Mirror;
+using Steamworks;
 
 public class RoundManager : NetworkBehaviour
 {
-    private List<Health> playerLives = new List<Health>();
-    private List<Player> playerList = new List<Player>();
+
+    public class PlayerInfo
+    {
+        public Health health;
+        public Player player;
+        public ulong steamId;
+    }
+
+    //private List<Health> playerLives = new List<Health>();
+    //private List<Player> playerList = new List<Player>();
+
+    private List<PlayerInfo> playerList = new List<PlayerInfo>();
 
     [Header("Start Round")]
     [SerializeField] private GameObject startGameUI;
@@ -48,11 +59,18 @@ public class RoundManager : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-        CmdAddPlayerToRound();
+        try
+        {
+            ulong steamId = SteamUser.GetSteamID().m_SteamID;
+            CmdAddPlayerToRound(steamId);
+        } catch
+        {
+            CmdAddPlayerToRound(0);
+        }
     }
 
     [Command(ignoreAuthority = true)]
-    public void CmdAddPlayerToRound(NetworkConnectionToClient sender = null)
+    public void CmdAddPlayerToRound(ulong steamId, NetworkConnectionToClient sender = null)
     {
         playersConnected++;
         loadText.text = "Waiting for players... (" + playersConnected + "/" + totalRoomPlayers + ")";
@@ -60,12 +78,17 @@ public class RoundManager : NetworkBehaviour
 
         // Add player to list
         Player player = sender.identity.gameObject.GetComponent<Player>();
-        playerList.Add(player);
-
-        // Add player's lives to list
         Health live = sender.identity.gameObject.GetComponent<Health>();
+
+        PlayerInfo playerInfo = new PlayerInfo();
+        playerInfo.player = player;
+        playerInfo.health = live;
+        playerInfo.steamId = steamId;
+
+        playerList.Add(playerInfo);
+
+        // Subscribe to life change event
         live.EventLivesChanged += CheckRoundEnd;
-        playerLives.Add(live);
 
         if (totalRoomPlayers == playersConnected)
         {
@@ -98,10 +121,11 @@ public class RoundManager : NetworkBehaviour
         yield return new WaitForSeconds(startGameFreezeDuration + 1);
         for (int i = 0; i < playerList.Count; i++)
         {
-            playerList[i].SetCanPlaceBombs(true);
-            playerList[i].SetCanSpin(true);
-            playerList[i].SetCanSwap(true); 
-            playerList[i].SetCanMove(true);
+            Player p = playerList[i].player;
+            p.SetCanPlaceBombs(true);
+            p.SetCanSpin(true);
+            p.SetCanSwap(true); 
+            p.SetCanMove(true);
         }
         //RpcUnfreezePlayers();
     }
@@ -143,10 +167,10 @@ public class RoundManager : NetworkBehaviour
         if (currentHealth < 1)
         {
             int aliveCount = 0;
-            for (int i = 0; i < playerLives.Count; i++)
+            for (int i = 0; i < playerList.Count; i++)
             {
-                //Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerLives[i].currentLives);
-                if (playerLives[i].currentLives > 0)
+                Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerList[i].health.currentLives);
+                if (playerList[i].health.currentLives > 0)
                 {
                     aliveCount++;
                 }
@@ -202,9 +226,9 @@ public class RoundManager : NetworkBehaviour
 
         for (int i = 0; i < playerList.Count; i++)
         {
-            Health life = playerList[i].GetComponent<Health>();
+            Health life = playerList[i].health;
 
-            RpcEnableLivesUI(i, life.currentLives); // enable and init UI for each player
+            RpcEnableLivesUI(i, life.currentLives, playerList[i].steamId); // enable and init UI for each player
 
             // subscribe to all lives of player
             life.EventLivesChanged += UpdateLivesUI;
@@ -212,15 +236,56 @@ public class RoundManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcEnableLivesUI(int idx, int lifeCount)
+    public void RpcEnableLivesUI(int idx, int lifeCount, ulong steamId)
     {
         // enable ui for players
         livesUIs[idx].SetActive(true);
 
         TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
 
-        // initialize ui
-        livesText.text = "[Player]: " + lifeCount.ToString();
+        string userName = "[Player Name]";
+
+        // Set steam user name and avatars
+        if (steamId != 0)
+        {
+            CSteamID steamID = new CSteamID(steamId);
+
+            userName = SteamFriends.GetFriendPersonaName(steamID);
+
+            RawImage profileImg = livesUIs[idx].transform.GetChild(1).GetComponent<RawImage>();
+
+            int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
+
+            if (imageId == -1) return;
+
+            profileImg.texture = GetSteamImageAsTexture(imageId);
+        } 
+
+        // initialize health and username
+        livesText.text = userName + ": " + lifeCount.ToString();
+    }
+
+    private Texture2D GetSteamImageAsTexture(int iImage)
+    {
+        Texture2D texture = null;
+
+        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
+
+        if (isValid)
+        {
+            byte[] image = new byte[width * height * 4];
+
+            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
+
+            if (isValid)
+            {
+                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
+                texture.LoadRawTextureData(image);
+                texture.Apply();
+            }
+        }
+
+        return texture;
     }
 
     // technical debt: having reference to individual player whose live changed is better
@@ -229,18 +294,29 @@ public class RoundManager : NetworkBehaviour
     {
         for (int i = 0; i < playerList.Count; i++)
         {
-            Health life = playerList[i].GetComponent<Health>();
+            Health life = playerList[i].health;
 
-            RpcUpdateLivesUI(i, life.currentLives); // update UI for each player
+            RpcUpdateLivesUI(i, life.currentLives, playerList[i].steamId); // update UI for each player
         }
     }
 
     [ClientRpc]
-    public void RpcUpdateLivesUI(int idx, int lifeCount)
+    public void RpcUpdateLivesUI(int idx, int lifeCount, ulong steamId)
     {
         TMP_Text livesText = livesUIs[idx].transform.GetChild(0).GetComponent<TMP_Text>();
 
-        livesText.text = "[Player]: " + lifeCount.ToString();
+        string userName = "[Player Name]";
+
+        // Set steam user name and avatars
+        if (steamId != 0)
+        {
+            CSteamID steamID = new CSteamID(steamId);
+
+            userName = SteamFriends.GetFriendPersonaName(steamID);
+        }
+
+        // initialize health and username
+        livesText.text = userName + ": " + lifeCount.ToString();
     }
 
     #endregion
