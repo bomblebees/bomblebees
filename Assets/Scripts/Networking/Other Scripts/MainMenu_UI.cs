@@ -20,21 +20,26 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] private GameObject steamNetworkManagerGameObject;
     [SerializeField] private GameObject kcpNetworkManagerGameObject;
     [Header("Screen")]
-    [SerializeField] private GameObject screenSelectNetwork;
+    [SerializeField] private GameObject screenMainMenu;
     [SerializeField] private GameObject screenConnectWithSteam;
     [SerializeField] private GameObject screenLocal;
     [SerializeField] private GameObject screenOptions;
     [SerializeField] private GameObject screenLobbyList;
+    [SerializeField] public GameObject screenNavigation;
+    [SerializeField] public GameObject screenLoading;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
 
+    public static MainMenu_UI singleton;
+
     private void Awake()
     {
-        if (NetworkClient.isConnected)
-        {
-            Destroy(mainMenuUIGameObject);
-        }
+        singleton = this;
+        //if (NetworkClient.isConnected)
+        //{
+        //    Destroy(mainMenuUIGameObject);
+        //}
     }
 
     private void Start()
@@ -64,40 +69,52 @@ public class MainMenu_UI : MonoBehaviour
     {
         if (screenOptions.activeSelf)
         {
-            if (steamNetworkManagerGameObject.activeSelf)
-            {
-                screenOptions.SetActive(false);
-                screenConnectWithSteam.SetActive(true);
-            }
+            screenOptions.SetActive(false);
+            screenMainMenu.SetActive(true);
+        }
 
-            if (kcpNetworkManagerGameObject.activeSelf)
-            {
-                screenOptions.SetActive(false);
-                screenLocal.SetActive(true);
-            }
+        if (screenLobbyList && screenLobbyList.activeSelf)
+        {
+            screenLobbyList.SetActive(false);
+            screenMainMenu.SetActive(true);
+        }
+
+        if (screenLocal.activeSelf)
+        {
+            screenLocal.SetActive(false);
+            screenMainMenu.SetActive(true);
         }
     }
     
     #endregion
 
-    #region Screen: Select Network
+    #region Screen: Main Menu
 
-    public void ConnectWithSteam()
+    public void OnClickButtonPlay()
     {
-        screenSelectNetwork.SetActive(false);
-        steamNetworkManagerGameObject.SetActive(true);
-        screenConnectWithSteam.SetActive(true);
-        
-        mainMenuUIGameObject.transform.SetParent(steamNetworkManagerGameObject.transform);
+        // Disable main menu screen
+        screenMainMenu.SetActive(false);
+
+        if (screenLobbyList)
+        {
+            // Enable steam lobby UI
+            screenLobbyList.SetActive(true);
+        } else
+        {
+            screenLocal.SetActive(true);
+        }
+
+
     }
 
-    public void LocalAreaNetwork()
+    public void OnClickButtonOptions()
     {
-        screenSelectNetwork.SetActive(false);
-        kcpNetworkManagerGameObject.SetActive(true);
-        screenLocal.SetActive(true);
+        // Disable main menu screen
+        screenMainMenu.SetActive(false);
+
+        // Enable options screen
+        screenOptions.SetActive(true);
         
-        mainMenuUIGameObject.transform.SetParent(kcpNetworkManagerGameObject.transform);
     }
 
     #endregion

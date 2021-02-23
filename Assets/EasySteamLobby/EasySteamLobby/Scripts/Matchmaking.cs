@@ -12,6 +12,7 @@ using UnityEngine;
 using Steamworks;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Mirror;
 
 /* Lobby Metadata
     LobbyVersion:[=string lobbyVersion]
@@ -29,11 +30,27 @@ public class Matchmaking : MonoBehaviour
 {
     private string LOBBY_MATCHING_KEY = "[key:bomblebees-lobby]";
     private string LOBBY_MATCHING_VALUE = "[true]";
+    private const string HostAddressKey = "HostAddress";
+
+    // The network manager for game scene networking
+    [SerializeField] private SteamNetworkManager networkManager;
 
     //this function will be called when the host player pressed the start button.
     void StartHost()
     {
         Debug.Log("Created the match as the host.");
+
+        if (SteamMatchmaking.GetLobbyMemberData(currentLobby, SteamUser.GetSteamID(), "PlayerState") == "Ready")
+        {
+            SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "InGame");
+
+            // Change to game scene
+            networkManager.ServerChangeScene(networkManager.GameplayScene);
+
+            // Disable ui
+            LobbyCanvas.SetActive(false);
+        }
+
     }
 
     //This function will be called when the guest player is ready 
@@ -55,10 +72,42 @@ public class Matchmaking : MonoBehaviour
         OnLobbyCreatedCallResult.Set(handle);
     }
 
+    public void OnMirrorLobbyCreated()
+    {
+        // Start Mirror host
+        networkManager.StartHost();
+
+    }
+
+    public void OnMirrorLobbyEnter(LobbyEnter_t callback)
+    {
+        LobbyCanvas.SetActive(false);
+
+        // If host, do nothing
+        if (NetworkServer.active) return;
+
+        string hostAddress = SteamMatchmaking.GetLobbyData(
+            currentLobby,
+            HostAddressKey);
+
+        // Start Mirror Client
+        networkManager.networkAddress = hostAddress;
+        networkManager.StartClient();
+
+        MainMenu_UI menu = MainMenu_UI.singleton;
+        menu.screenLoading.SetActive(true);
+        menu.screenNavigation.SetActive(false);
+    }
+
     public void SetInitiatedLobbyData()
     {
         SteamMatchmaking.SetLobbyData(currentLobby, "LobbyVersion", lobbyVersion);
         SteamMatchmaking.SetLobbyData(currentLobby, LOBBY_MATCHING_KEY, LOBBY_MATCHING_VALUE);
+
+        SteamMatchmaking.SetLobbyData(
+            currentLobby,
+            HostAddressKey,
+            SteamUser.GetSteamID().ToString());
 
         if (!string.IsNullOrEmpty(inputLobbyName.text))
         {
@@ -93,6 +142,14 @@ public class Matchmaking : MonoBehaviour
         }
     }
 
+    public void MirrorLeaveLobby()
+    {
+        if (NetworkServer.active) networkManager.StopHost();
+        else if (NetworkClient.isConnected) networkManager.StopClient();
+
+        uiLeaveLobby();
+    }
+
     public void uiLeaveLobby()
     {
         if (currentLobby != (CSteamID)0)
@@ -112,6 +169,17 @@ public class Matchmaking : MonoBehaviour
 
         lobbyOwner = (CSteamID)0;
         currentLobby = new CSteamID();
+
+        LobbyCanvas.SetActive(true);
+        MainMenu_UI menu = MainMenu_UI.singleton;
+        menu.gameObject.SetActive(true);
+
+        GetLobbies(); // refresh lobbies
+    }
+
+    public string GetLobbyName()
+    {
+        return SteamMatchmaking.GetLobbyData(currentLobby, "LobbyName");
     }
 
     #region EasySteamLobby
@@ -197,16 +265,16 @@ public class Matchmaking : MonoBehaviour
         createLobbyWindow.SetActive(false);
         lobbyListPanel.SetActive(true);
     }
-    
+
     public void isLobbyOwner(bool enabled)
     {
         isLobbyHost = enabled;
         if (SteamMatchmaking.GetLobbyMemberData(currentLobby, SteamUser.GetSteamID(), "PlayerState") != "InGame")
         {
-            if(lobbyPanel != null)
-            lobbyPanel.transform.Find("btnStart").gameObject.SetActive(enabled);
-            if(lobbyPanel != null)
-            lobbyPanel.transform.Find("btnReady").gameObject.SetActive(!enabled);
+            if (lobbyPanel != null)
+                lobbyPanel.transform.Find("btnStart").gameObject.SetActive(enabled);
+            if (lobbyPanel != null)
+                lobbyPanel.transform.Find("btnReady").gameObject.SetActive(!enabled);
         }
 
         if (enabled)
@@ -251,8 +319,8 @@ public class Matchmaking : MonoBehaviour
             return;
 
         lobbyPlayers = new List<PeerInfo>();
-        if(lobbyPanel != null)
-        lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text = null;
+        if (lobbyPanel != null)
+            lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text = null;
 
         for (int i = 0; i < SteamMatchmaking.GetNumLobbyMembers(currentLobby); i++)
         {
@@ -261,8 +329,8 @@ public class Matchmaking : MonoBehaviour
 
             if (p.steamID == SteamMatchmaking.GetLobbyOwner(currentLobby))
             {
-                if(lobbyPanel != null)
-                lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += "*";
+                if (lobbyPanel != null)
+                    lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += "*";
                 lobbyOwner = p.steamID;
                 if (p.steamID == SteamUser.GetSteamID())
                 {
@@ -272,27 +340,27 @@ public class Matchmaking : MonoBehaviour
             }
 
             if (lobbyPanel != null)
-            lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += SteamFriends.GetFriendPersonaName(p.steamID);
+                lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += SteamFriends.GetFriendPersonaName(p.steamID);
 
-            if(SteamMatchmaking.GetLobbyMemberData(currentLobby, p.steamID, "PlayerState") == "InGame")
+            if (SteamMatchmaking.GetLobbyMemberData(currentLobby, p.steamID, "PlayerState") == "InGame")
             {
                 if (lobbyPanel != null)
-                lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += ": In-Game";
+                    lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += ": In-Game";
             }
-            else if(SteamMatchmaking.GetLobbyMemberData(currentLobby, p.steamID, "PlayerState") == "Ready") 
+            else if (SteamMatchmaking.GetLobbyMemberData(currentLobby, p.steamID, "PlayerState") == "Ready")
             {
-                if(lobbyPanel != null)
-                lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += ": Ready";
+                if (lobbyPanel != null)
+                    lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += ": Ready";
             }
 
-            if(lobbyPanel != null)
-            lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += "\n";
+            if (lobbyPanel != null)
+                lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += "\n";
 
             lobbyPlayers.Add(p);
         }
 
-        if(lobbyPanel != null)
-        Invoke("GetLobbyPlayers", 1f);
+        if (lobbyPanel != null)
+            Invoke("GetLobbyPlayers", 1f);
     }
 
     void CheckNoOnePlaying()
@@ -321,16 +389,16 @@ public class Matchmaking : MonoBehaviour
         PeerInfo p = new PeerInfo();
         p.steamID = new CSteamID(id);
 
-        if(lobbyPanel != null)
-        lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += SteamFriends.GetFriendPersonaName(p.steamID) + "\n";
+        if (lobbyPanel != null)
+            lobbyPanel.GetComponent<LobbyRoomComponents>().Players.text += SteamFriends.GetFriendPersonaName(p.steamID) + "\n";
 
-        if(lobbyPanel != null)
-        lobbyPanel.GetComponent<LobbyRoomComponents>().startButton.interactable = false;
+        if (lobbyPanel != null)
+            lobbyPanel.GetComponent<LobbyRoomComponents>().startButton.interactable = false;
 
         lobbyPlayers.Add(p);
 
-        if(lobbyPanel != null)
-        lobbyPanel.GetComponent<LobbyRoomComponents>().startButton.interactable = true;
+        if (lobbyPanel != null)
+            lobbyPanel.GetComponent<LobbyRoomComponents>().startButton.interactable = true;
     }
 
     void RemoveLobbyPlayer(ulong id)
@@ -381,7 +449,7 @@ public class Matchmaking : MonoBehaviour
             }
             else
             {
-                
+
             }
         }
 
@@ -395,7 +463,7 @@ public class Matchmaking : MonoBehaviour
         {
             SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "Ready");
         }
-        else if(SteamMatchmaking.GetLobbyMemberData(currentLobby, SteamUser.GetSteamID(), "PlayerState") == "Ready")
+        else if (SteamMatchmaking.GetLobbyMemberData(currentLobby, SteamUser.GetSteamID(), "PlayerState") == "Ready")
         {
             SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "Wait");
         }
@@ -452,7 +520,7 @@ public class Matchmaking : MonoBehaviour
 
     void ChatUpdate()
     {
-        
+
     }
 
     void OnLobbyEnter(LobbyEnter_t pCallback)
@@ -462,15 +530,17 @@ public class Matchmaking : MonoBehaviour
 
         isStartgame = false;
         SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "Wait");
-        if(lobbyPanel != null)
-        lobbyPanel.GetComponent<LobbyRoomComponents>().LobbyName.text = SteamMatchmaking.GetLobbyData(currentLobby, "LobbyName");
+        if (lobbyPanel != null)
+            lobbyPanel.GetComponent<LobbyRoomComponents>().LobbyName.text = SteamMatchmaking.GetLobbyData(currentLobby, "LobbyName");
 
         GetLobbyPlayers();
 
-        if(lobbyListPanel != null)
-        lobbyListPanel.SetActive(false);
-        if(lobbyPanel != null)
-        lobbyPanel.SetActive(true);
+        if (lobbyListPanel != null)
+            lobbyListPanel.SetActive(false);
+        if (lobbyPanel != null)
+            lobbyPanel.SetActive(true);
+
+        OnMirrorLobbyEnter(pCallback);
     }
 
     void OnLobbyEnter(LobbyEnter_t pCallback, bool bIOFailure)
@@ -485,7 +555,7 @@ public class Matchmaking : MonoBehaviour
 
     void OnLobbyGameCreated(LobbyGameCreated_t pCallback)
     {
-        
+
     }
 
     void OnLobbyMatchList(LobbyMatchList_t pCallback, bool bIOFailure)
@@ -512,6 +582,8 @@ public class Matchmaking : MonoBehaviour
         SetInitiatedLobbyData();
         createLobbyWindow.SetActive(false);
         lobbyPanel.SetActive(true);
+
+        OnMirrorLobbyCreated();
     }
 
     void OnLobbyChatUpdate(LobbyChatUpdate_t pCallback)

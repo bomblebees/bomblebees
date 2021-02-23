@@ -682,6 +682,8 @@ namespace Mirror
 
             if (NetworkServer.active && IsSceneActive(GameplayScene))
             {
+                return;
+                
                 GUILayout.BeginArea(new Rect(Screen.width - 150f, 10f, 140f, 30f));
                 if (GUILayout.Button("Return to Room"))
                     ServerChangeScene(RoomScene);

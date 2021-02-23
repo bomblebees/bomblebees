@@ -27,21 +27,15 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
     public override void OnRoomStopClient()
     {
-        // Demonstrates how to get the Network Manager out of DontDestroyOnLoad when
-        // going to the offline scene to avoid collision with the one that lives there.
-        if (gameObject.scene.name == "DontDestroyOnLoad" && !string.IsNullOrEmpty(offlineScene) && SceneManager.GetActiveScene().path != offlineScene)
-            SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
+        // Enable lobby list
+        Matchmaking mm = Matchmaking.singleton;
+        mm.uiLeaveLobby();
 
         base.OnRoomStopClient();
     }
 
     public override void OnRoomStopServer()
     {
-        // Demonstrates how to get the Network Manager out of DontDestroyOnLoad when
-        // going to the offline scene to avoid collision with the one that lives there.
-        if (gameObject.scene.name == "DontDestroyOnLoad" && !string.IsNullOrEmpty(offlineScene) && SceneManager.GetActiveScene().path != offlineScene)
-            SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
-
         base.OnRoomStopServer();
     }
 
@@ -54,7 +48,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         is set as DontDestroyOnLoad = true.
     */
 
-    bool showStartButton;
+    public bool showStartButton;
 
     public override void OnRoomServerPlayersReady()
     {
@@ -80,19 +74,6 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             NetworkServer.Spawn(Instantiate(audioManager));
         }
     }
-
-    public override void OnGUI()
-    {
-        base.OnGUI();
-
-        if (allPlayersReady && showStartButton && GUI.Button(new Rect(150, 300, 120, 20), "START GAME"))
-        {
-            // set to false to hide it in the game scene
-            showStartButton = false;
-
-            ServerChangeScene(GameplayScene);
-        }
-    }
         
     public override void OnStartServer()
     {
@@ -110,6 +91,22 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         foreach (var prefab in spawnablePrefabs)
         {
             ClientScene.RegisterPrefab(prefab);
+        }
+    }
+
+    public override void OnGUI()
+    {
+        Matchmaking mm = Matchmaking.singleton;
+        if (mm) return;
+
+        base.OnGUI();
+
+        if (allPlayersReady && showStartButton && GUI.Button(new Rect(150, 300, 120, 20), "START GAME"))
+        {
+            // set to false to hide it in the game scene
+            showStartButton = false;
+
+            ServerChangeScene(GameplayScene);
         }
     }
 }

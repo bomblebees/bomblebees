@@ -122,7 +122,7 @@ public class Health : NetworkBehaviour
     public void SignalExit()
     {
         EventInvincibleExit?.Invoke();
-        ghostModel.SetActive(false);
+        //ghostModel.SetActive(false);
         revivingModel.SetActive(false);
         playerModel.SetActive(true);
     }
