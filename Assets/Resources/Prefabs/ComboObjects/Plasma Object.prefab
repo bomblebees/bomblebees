@@ -231,12 +231,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 557565722564973074}
+  - component: {fileID: 7080784098826744522}
   - component: {fileID: 7495536017841666971}
   - component: {fileID: 7641741751111898887}
   - component: {fileID: 1595730973257127712}
   - component: {fileID: 7869243171751893354}
   - component: {fileID: 8228823212499711305}
-  - component: {fileID: 7080784098826744522}
   m_Layer: 8
   m_Name: Plasma Object
   m_TagString: ComboObject
@@ -265,6 +265,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7080784098826744522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1307435034249700757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27034c3c1f6bbfb48a75ced0edacbdbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  blockerHandler: {fileID: 3463397929141577594}
+  hitBox: {fileID: 3275824003628949206}
+  collider: {fileID: 7869243171751893354}
+  travelDistanceInHexes: 4
+  lerpRate: 0.15
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
+  nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
+  vfxDuration: 4
+  sfxDuration: 4
+  hitboxDuration: 4
+  lingerDuration: 8
+  didEarlyEffects: 0
+  minimumLifeDuration: 4
+  plasmaSphereModel: {fileID: 4085552186968079639}
+  particleSystem: {fileID: 7751750280610379946}
+  ignoreTriggererDuration: 1
+  lastPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &7495536017841666971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,38 +462,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &7080784098826744522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1307435034249700757}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27034c3c1f6bbfb48a75ced0edacbdbd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  blockerHandler: {fileID: 3463397929141577594}
-  hitBox: {fileID: 3275824003628949206}
-  collider: {fileID: 7869243171751893354}
-  travelDistanceInHexes: 4
-  lerpRate: 0.15
-  targetPosition: {x: 0, y: 0, z: 0}
-  snapToCenterThreshold: 0.5
-  nearestCenter: {x: 0, y: 0, z: 0}
-  tileUnderneath: {fileID: 0}
-  vfxDuration: 4
-  sfxDuration: 4
-  hitboxDuration: 4
-  lingerDuration: 8
-  didEarlyEffects: 0
-  minimumLifeDuration: 4
-  plasmaSphereModel: {fileID: 4085552186968079639}
-  particleSystem: {fileID: 0}
-  ignoreTriggererDuration: 1
 --- !u!1 &1596770885431091820
 GameObject:
   m_ObjectHideFlags: 0

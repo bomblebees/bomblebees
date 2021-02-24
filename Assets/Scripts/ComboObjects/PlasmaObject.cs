@@ -42,6 +42,8 @@ public class PlasmaObject : TriggerObject
             if (lastPosition != nextPos)
             {
                 /// PUT .PLAY() HERE
+                print("next tile");
+                particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
                 lastPosition = nextPos;
             }

@@ -11,7 +11,7 @@ public class BlinkObject : TickObject
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         // FindTriggerDirection(edgeIndex);
-        edgeIndex += 2;
+        // edgeIndex += 2;
         print("edgeIndex "+edgeIndex);
         base.Push(edgeIndex, triggeringPlayer);
         triggeringPlayer.transform.position = this.gameObject.transform.position;
