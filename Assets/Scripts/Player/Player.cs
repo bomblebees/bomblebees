@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
     public string debugBombPress1 = "i";
     public string debugBombPress2 = "a";
     public string debugBombPress3 = "e";
+    public string debugBombPress4 = ";";
     private HexGrid hexGrid;
 
     [Header("Respawn")]
@@ -186,6 +187,10 @@ public class Player : NetworkBehaviour
         {
             SpawnPlasmaObject();
         }
+        if (Input.GetKeyDown(debugBombPress4))
+        {
+            SpawnBlinkObject();
+        }
     }
 
     // Update version for server
@@ -237,6 +242,7 @@ public class Player : NetworkBehaviour
             CmdSpin();
         }
     }
+    
 
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)
@@ -351,7 +357,7 @@ public class Player : NetworkBehaviour
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_bigBomb);
     }
-
+    
     public void SetCanPlaceBombs(bool val)
     {
         this.canPlaceBombs = val;

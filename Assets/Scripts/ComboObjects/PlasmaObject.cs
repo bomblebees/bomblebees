@@ -18,6 +18,7 @@ public class PlasmaObject : TriggerObject
     {
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         FindTriggerDirection(edgeIndex);
+        plasmaSphereModel.transform.position = plasmaSphereModel.transform.position + targetDir * 5;
         this.hitboxEnabled = true;
         this.plasmaSphereModel.SetActive(true);
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order

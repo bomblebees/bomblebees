@@ -19,7 +19,7 @@ public class ComboObject : NetworkBehaviour
     private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
-    public float lerpRate = 0.15f;  // The speed at which the object is being pushed
+    public float lerpRate = 1.0f;  // The speed at which the object is being pushed
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
     public float snapToCenterThreshold = 0.5f;
     

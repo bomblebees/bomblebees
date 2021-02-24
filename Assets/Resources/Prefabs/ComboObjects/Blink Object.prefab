@@ -15661,7 +15661,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3530869513099728654}
-  - component: {fileID: 7990307940820357204}
+  - component: {fileID: 344472640968995314}
   - component: {fileID: 6825638738750783111}
   - component: {fileID: 6678873079452553755}
   - component: {fileID: 2349147081113850428}
@@ -15693,7 +15693,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7990307940820357204
+--- !u!114 &344472640968995314
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -15702,15 +15702,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 2636863302648537225}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3ae1bcfa2d30a8438b19b2e7cc06a95, type: 3}
+  m_Script: {fileID: 11500000, guid: 43ac3c5d5f3fa324e93c43a2799a8df4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
   blockerHandler: {fileID: 480902327305577062}
-  hitBox: {fileID: 7395716483085974816}
+  hitBox: {fileID: 0}
   collider: {fileID: 6596048285113982070}
-  travelDistanceInHexes: 3
+  travelDistanceInHexes: 4
   lerpRate: 0.15
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
@@ -15718,15 +15718,11 @@ MonoBehaviour:
   tileUnderneath: {fileID: 0}
   vfxDuration: 4
   sfxDuration: 4
-  hitboxDuration: 0.02
-  lingerDuration: 2
+  hitboxDuration: 4
+  lingerDuration: 8
   didEarlyEffects: 0
-  tickDuration: 4
-  model: {fileID: 4927879343999822718}
-  timeTillAnimSpeedup: 3.5
-  riseShader: {fileID: 2100000, guid: bc331e15fe9f2d549b32d6d54b08c68f, type: 2}
-  pulseShader: {fileID: 0}
-  riseRate: 0
+  minimumLifeDuration: 4
+  dist: 4
 --- !u!114 &6825638738750783111
 MonoBehaviour:
   m_ObjectHideFlags: 0
