@@ -144,7 +144,10 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual void NotifyOccupiedTile(bool val)
     {
-        if (isServer) tileUnderneath.SetOccupiedByComboObject(val);
+        if (isServer)
+        {
+            if (tileUnderneath) tileUnderneath.SetOccupiedByComboObject(val);
+        }
     }
     protected virtual void StopVelocity()
     {
