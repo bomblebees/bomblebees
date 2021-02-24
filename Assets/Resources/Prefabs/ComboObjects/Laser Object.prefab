@@ -219,14 +219,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2630983886481084931}
+  - component: {fileID: 3904814389104765400}
   - component: {fileID: 5420786656024804234}
   - component: {fileID: 5274583052647651094}
   - component: {fileID: 3826601903467550513}
   - component: {fileID: 5623540237367023995}
   - component: {fileID: 5840423147951142232}
-  - component: {fileID: 3904814389104765400}
   m_Layer: 8
-  m_Name: Laser Test
+  m_Name: Laser Object
   m_TagString: ComboObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -251,6 +251,35 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3904814389104765400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3538439288801371524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60317272cf341b24b8cbf642a303e986, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  blockerHandler: {fileID: 1382474126569940843}
+  hitBox: {fileID: 3377841403693033025}
+  collider: {fileID: 5623540237367023995}
+  travelDistanceInHexes: 4
+  lerpRate: 0.15
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
+  nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
+  vfxDuration: 4
+  sfxDuration: 4
+  hitboxDuration: 0.1
+  lingerDuration: 8
+  minimumLifeDuration: 4
+  breakdownDuration: 3
 --- !u!114 &5420786656024804234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,35 +444,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3904814389104765400
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3538439288801371524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60317272cf341b24b8cbf642a303e986, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  blockerHandler: {fileID: 1382474126569940843}
-  hitBox: {fileID: 3377841403693033025}
-  collider: {fileID: 5623540237367023995}
-  travelDistanceInHexes: 4
-  lerpRate: 0.15
-  targetPosition: {x: 0, y: 0, z: 0}
-  snapToCenterThreshold: 0.5
-  nearestCenter: {x: 0, y: 0, z: 0}
-  tileUnderneath: {fileID: 0}
-  vfxDuration: 4
-  sfxDuration: 4
-  hitboxDuration: 0.1
-  lingerDuration: 8
-  didEarlyEffects: 0
-  minimumLifeDuration: 4
 --- !u!1 &4304598632603087042
 GameObject:
   m_ObjectHideFlags: 0

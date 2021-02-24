@@ -16,7 +16,7 @@ public class ComboObject : NetworkBehaviour
     public GameObject hitBox;
     public Collider collider;
     
-    private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
+    protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
     public float lerpRate = 0.9f;  // The speed at which the object is being pushed
@@ -30,7 +30,7 @@ public class ComboObject : NetworkBehaviour
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
-    public bool didEarlyEffects = false;
+    protected bool didEarlyEffects = false;
 
     protected GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
@@ -307,5 +307,13 @@ public class ComboObject : NetworkBehaviour
          return true;
         }
         else return false;
+    }
+    
+    
+    protected IEnumerator IgnoreTriggeringPlayer(float seconds)
+    {
+        this.canHitTriggeringPlayer = false; // see Health.cs' OnTriggerEnter()
+        yield return new WaitForSeconds(seconds);
+        this.canHitTriggeringPlayer = true;
     }
 }

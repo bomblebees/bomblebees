@@ -130,15 +130,22 @@ public class Health : NetworkBehaviour
     [Mirror.ClientCallback]
     private void OnTriggerStay(Collider other)
     {
-        if (!hasAuthority) return;
-
-        if (!(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox")))
+        if (
+            !hasAuthority
+            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+            )
         {
-            return;
+                return;
         }
-        if (other.gameObject.transform.root.name == "Plasma Object(Clone)" 
+
+        var objName = other.gameObject.transform.root.name;
+        if (
+            (
+                objName == "Plasma Object(Clone)"
+                || objName == "Blink Object(Clone)" 
+            )
             &&   // Make sure prefabs are unpacked
-            !other.gameObject.transform.root.GetComponent<PlasmaObject>().CanHitThisPlayer(this.gameObject)  // I want everyone to 
+            !other.gameObject.transform.root.GetComponent<ComboObject>().CanHitThisPlayer(this.gameObject)  // I want everyone to 
             )
         {
             return;
