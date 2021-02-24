@@ -686,4 +686,9 @@ public class Player : NetworkBehaviour
     {
         this.canExitInvincibility = val;
     }
+
+    public void SetSpinHitboxActive(bool val)
+    {
+        spinHitbox.SetActive(val);
+    }
 }
