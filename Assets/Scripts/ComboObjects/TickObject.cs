@@ -71,7 +71,6 @@ public class TickObject : ComboObject
         StartCoroutine(TickDown());
     }
 
-
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         bool result = base.Push(edgeIndex, triggeringPlayer);

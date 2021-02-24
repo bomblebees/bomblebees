@@ -32,12 +32,18 @@ public class PlasmaObject : TriggerObject
         this.canHitTriggeringPlayer = true;
     }
 
+    public Vector3 lastPosition;
     private void LateUpdate()
     {
         if (this.hitboxEnabled == true)
         {
             plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
-            this.hitBox.transform.position = FindCenterBelowOther(this.plasmaSphereModel);
+            var nextPos = FindCenterBelowOther(this.plasmaSphereModel);
+            if (lastPosition != nextPos)
+            {
+                this.hitBox.transform.position = nextPos;
+                lastPosition = nextPos;
+            }
         }
     }
 
