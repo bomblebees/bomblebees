@@ -27,6 +27,7 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] private GameObject screenLobbyList;
     [SerializeField] public GameObject screenNavigation;
     [SerializeField] public GameObject screenLoading;
+    [SerializeField] public GameObject screenError;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
