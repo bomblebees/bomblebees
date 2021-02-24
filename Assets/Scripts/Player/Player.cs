@@ -677,7 +677,7 @@ public class Player : NetworkBehaviour
             this.canBeHit = true;
             this.canSwap = true;
             this.canPlaceBombs = true;
-            healthScript.SignalExit();
+            //healthScript.SignalExit();
             this.canExitInvincibility = false;
         }
     }

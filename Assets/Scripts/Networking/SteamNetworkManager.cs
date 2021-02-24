@@ -80,6 +80,18 @@ public class SteamNetworkManager : NetworkRoomManagerExt
         }
     }
 
+    public override void OnClientDisconnect(NetworkConnection conn)
+    {
+        MainMenu_UI menu = MainMenu_UI.singleton;
+
+        menu.screenLoading.SetActive(false);
+        menu.screenNavigation.SetActive(true);
+        //menu.screenError.SetActive(true);
+
+
+        base.OnClientDisconnect(conn);
+    }
+
     //public override void OnRoomClientEnter()
     //{
     //    Debug.Log("i joined: " + SteamFriends.GetPersonaName());

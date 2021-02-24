@@ -67,7 +67,7 @@ public class Health : NetworkBehaviour
         SetHealth(maxLives);
     }
 
-    [Mirror.Command]
+    [Mirror.Command(ignoreAuthority = true)]
     private void CmdTakeDamage(int damage)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
@@ -77,7 +77,7 @@ public class Health : NetworkBehaviour
 
     #region Client
 
-    [Mirror.Command]
+    [Mirror.Command(ignoreAuthority = true)]
     public void CmdBeginGhostMode()
     {
         RpcBeginGhostMode();
@@ -117,6 +117,7 @@ public class Health : NetworkBehaviour
         // Debug.Log("Ghost Mode Exited");
         yield return new WaitForSeconds(invincibilityDuration);
         playerScript.ExitInvincibility();
+        SignalExit();
     }
 
     public void SignalExit()
@@ -154,7 +155,7 @@ public class Health : NetworkBehaviour
         this.CmdTakeDamage(1);
     }
 
-    [Mirror.Command]
+    [Mirror.Command(ignoreAuthority = true)]
     public void CmdNotifyPlayerDied()
     {
         RpcNotifyPlayerDied();
