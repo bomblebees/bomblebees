@@ -48,6 +48,7 @@ public class Health : NetworkBehaviour
     [Mirror.Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
+        FindObjectOfType<AudioManager>().PlaySound("playerDeath");
         if (newLives == 0) CmdNotifyPlayerDied();
         else this.CmdBeginGhostMode();
     }
