@@ -4971,6 +4971,7 @@ MonoBehaviour:
   networkAnimator: {fileID: 2620434565718017240}
   maxStackSize: 3
   playerModel: {fileID: 5260639197599151655}
+  ghostModel: {fileID: 7560027545034526390}
   isDead: 0
 --- !u!114 &-8900185448856423588
 MonoBehaviour:
@@ -7349,6 +7350,12 @@ PrefabInstance:
 --- !u!4 &7560027545034526395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2336704052561413615, guid: d46145a26442c5b449a21b5c35d6e0e9,
+    type: 3}
+  m_PrefabInstance: {fileID: 5226215212550458196}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7560027545034526390 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2336704052561413602, guid: d46145a26442c5b449a21b5c35d6e0e9,
     type: 3}
   m_PrefabInstance: {fileID: 5226215212550458196}
   m_PrefabAsset: {fileID: 0}
