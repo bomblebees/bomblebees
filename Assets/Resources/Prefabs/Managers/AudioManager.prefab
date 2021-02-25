@@ -51,36 +51,19 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: c0be3e51f111a8745bbc0d47c67001f5, type: 3}
     volume: 0.25
     pitch: 1
+    spatialBlend: 0
     source: {fileID: 0}
   - name: playerDeath
     clip: {fileID: 8300000, guid: 40fd7f284bbdb9349b4a75c01cba0064, type: 3}
-    volume: 0.2
+    volume: 0.05
     pitch: 1
+    spatialBlend: 0
     source: {fileID: 0}
   - name: playerSpin
     clip: {fileID: 8300000, guid: 2a0454a2dbffd0f478a067b477686f6a, type: 3}
     volume: 0.05
     pitch: 1
-    source: {fileID: 0}
-  - name: bombBeep
-    clip: {fileID: 8300000, guid: ff2d5d176a6b34c419d334cb6bbbc456, type: 3}
-    volume: 0.25
-    pitch: 1
-    source: {fileID: 0}
-  - name: bombExplosion
-    clip: {fileID: 8300000, guid: d5b45d7ea25a5224c95b5cd9bdc1ffe2, type: 3}
-    volume: 0.25
-    pitch: 1
-    source: {fileID: 0}
-  - name: laserShot
-    clip: {fileID: 8300000, guid: da8c8100c3f194e49b82a58f71cbdbe3, type: 3}
-    volume: 0.25
-    pitch: 1
-    source: {fileID: 0}
-  - name: gameCountdown
-    clip: {fileID: 8300000, guid: 4ea711c2b6136844c814f955c5b3e537, type: 3}
-    volume: 0.25
-    pitch: 1
+    spatialBlend: 0
     source: {fileID: 0}
 --- !u!114 &-596352727795668667
 MonoBehaviour:

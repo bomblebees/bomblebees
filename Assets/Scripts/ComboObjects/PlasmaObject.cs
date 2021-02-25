@@ -25,12 +25,6 @@ public class PlasmaObject : TriggerObject
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
     
-    private IEnumerator IgnoreTriggeringPlayer(float seconds)
-    {
-        this.canHitTriggeringPlayer = false; // see Health.cs' OnTriggerEnter()
-        yield return new WaitForSeconds(seconds);
-        this.canHitTriggeringPlayer = true;
-    }
 
     public Vector3 lastPosition;
     private void LateUpdate()
@@ -42,8 +36,6 @@ public class PlasmaObject : TriggerObject
             if (lastPosition != nextPos)
             {
                 /// PUT .PLAY() HERE
-                print("next tile");
-                particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
                 lastPosition = nextPos;
             }

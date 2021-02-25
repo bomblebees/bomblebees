@@ -46,5 +46,6 @@ public class LaserObject : TriggerObject
         // play breakdown anim here
         NotifyOccupiedTile(false);
         yield return new WaitForSeconds(breakdownDuration);
+        DestroySelf();
     }
 }

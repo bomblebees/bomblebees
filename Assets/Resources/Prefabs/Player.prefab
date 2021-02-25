@@ -4930,6 +4930,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  steamId: 0
   debugMode: 1
   debugBombPress1: 8
   debugBombPress2: 9
@@ -4963,13 +4964,14 @@ MonoBehaviour:
   laser: {fileID: 3538439288801371524, guid: 4eab74bbdcd37f241b4d41cdce660250, type: 3}
   plasma: {fileID: 1307435034249700757, guid: cb45ba8bcf3c06c4bb916c0c03237ade, type: 3}
   bigBomb: {fileID: 1307435034249700757, guid: cb45ba8bcf3c06c4bb916c0c03237ade, type: 3}
-  blink: {fileID: 2636863302648537225, guid: b2e7392fe15ad234493edc9e68be7415, type: 3}
+  blink: {fileID: 2355170363218840294, guid: b2e7392fe15ad234493edc9e68be7415, type: 3}
   gravityObject: {fileID: 1307435034249700757, guid: cb45ba8bcf3c06c4bb916c0c03237ade,
     type: 3}
   animator: {fileID: 6123777351014949932}
   networkAnimator: {fileID: 2620434565718017240}
   maxStackSize: 3
   playerModel: {fileID: 5260639197599151655}
+  ghostModel: {fileID: 7560027545034526390}
   isDead: 0
 --- !u!114 &-8900185448856423588
 MonoBehaviour:
@@ -7348,6 +7350,12 @@ PrefabInstance:
 --- !u!4 &7560027545034526395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2336704052561413615, guid: d46145a26442c5b449a21b5c35d6e0e9,
+    type: 3}
+  m_PrefabInstance: {fileID: 5226215212550458196}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7560027545034526390 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2336704052561413602, guid: d46145a26442c5b449a21b5c35d6e0e9,
     type: 3}
   m_PrefabInstance: {fileID: 5226215212550458196}
   m_PrefabAsset: {fileID: 0}

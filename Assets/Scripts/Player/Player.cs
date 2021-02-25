@@ -91,6 +91,7 @@ public class Player : NetworkBehaviour
     readonly SyncList<char> itemStack = new SyncList<char>();
 
     [SerializeField] private GameObject playerModel;
+    [SerializeField] private GameObject ghostModel;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
@@ -491,11 +492,24 @@ public class Player : NetworkBehaviour
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         {
-            playerModel.transform.rotation = Quaternion.Slerp(
-                playerModel.transform.rotation,
-                Quaternion.LookRotation(direction),
-                turnSpeed * Time.deltaTime
-            );
+            if (playerModel.activeSelf)
+            {
+                playerModel.transform.rotation = Quaternion.Slerp(
+                    playerModel.transform.rotation,
+                    Quaternion.LookRotation(direction),
+                    turnSpeed * Time.deltaTime
+                );
+            } else if (ghostModel.activeSelf)
+            {
+                ghostModel.transform.rotation = Quaternion.Slerp(
+                    ghostModel.transform.rotation,
+                    Quaternion.LookRotation(direction),
+                    turnSpeed * Time.deltaTime
+                );
+            }
+
+
+
 
             if (this.canMove) controller.Move(direction * movementSpeed * Time.deltaTime);
         }
@@ -674,5 +688,10 @@ public class Player : NetworkBehaviour
     public void SetCanExitInvincibility(bool val)
     {
         this.canExitInvincibility = val;
+    }
+
+    public void SetSpinHitboxActive(bool val)
+    {
+        spinHitbox.SetActive(val);
     }
 }

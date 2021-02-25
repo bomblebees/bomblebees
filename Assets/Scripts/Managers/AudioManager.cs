@@ -11,7 +11,8 @@ public class AudioManager : NetworkBehaviour
         public string name;
         public AudioClip clip;
         [Range(0f, 1f)] public float volume = .2f;
-        [Range(.1f, 3f)] public float pitch = 1;
+        [Range(-3f, 3f)] public float pitch = 1;
+        [Range(0f, 1f)] public float spatialBlend = 0;
 
         [HideInInspector] public AudioSource source;
     }
@@ -25,6 +26,9 @@ public class AudioManager : NetworkBehaviour
         {
             s.source = gameObject.AddComponent<AudioSource>();
             s.source.clip = s.clip;
+            s.source.volume = s.volume;
+            s.source.pitch = s.pitch;
+            s.source.spatialBlend = s.spatialBlend;
         }
     }
 
@@ -38,8 +42,6 @@ public class AudioManager : NetworkBehaviour
             return;
         }
 
-        s.source.volume = s.volume;
-        s.source.pitch = s.pitch;
         s.source.Play();
     }
 
