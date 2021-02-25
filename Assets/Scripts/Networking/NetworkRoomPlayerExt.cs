@@ -81,7 +81,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.username.text = player.steamUsername;
 
             // User avatar
-            card.avatar.texture = room.GetSteamImageAsTexture(player.steamAvatarId);
+            int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
+            if (imgId > 0) card.avatar.texture = GetSteamImageAsTexture(imgId);
+            else { Debug.LogWarning("ImgId invalid!");  }
 
             // Ready check mark
             if (player.readyToBegin) card.readyStatus.SetActive(true);
@@ -98,6 +100,30 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
+
+    public Texture2D GetSteamImageAsTexture(int iImage)
+    {
+        Texture2D texture = null;
+
+        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
+
+        if (isValid)
+        {
+            byte[] image = new byte[width * height * 4];
+
+            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
+
+            if (isValid)
+            {
+                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
+                texture.LoadRawTextureData(image);
+                texture.Apply();
+            }
+        }
+
+        return texture;
+    }
+
     public void OnStartButtonClick()
     {
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
@@ -107,6 +133,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public void OnReadyButtonClick()
     {
+        if (!hasAuthority) return;
+
         if (readyToBegin) CmdChangeReadyState(false);
         else CmdChangeReadyState(true);
 

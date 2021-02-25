@@ -48,6 +48,7 @@ public class Health : NetworkBehaviour
     [Mirror.Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
+        FindObjectOfType<AudioManager>().PlaySound("playerDeath");
         if (newLives == 0) CmdNotifyPlayerDied();
         else this.CmdBeginGhostMode();
     }
@@ -67,7 +68,7 @@ public class Health : NetworkBehaviour
         SetHealth(maxLives);
     }
 
-    [Mirror.Command]
+    [Mirror.Command(ignoreAuthority = true)]
     private void CmdTakeDamage(int damage)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
@@ -77,7 +78,7 @@ public class Health : NetworkBehaviour
 
     #region Client
 
-    [Mirror.Command]
+    [Mirror.Command(ignoreAuthority = true)]
     public void CmdBeginGhostMode()
     {
         RpcBeginGhostMode();
@@ -117,6 +118,7 @@ public class Health : NetworkBehaviour
         // Debug.Log("Ghost Mode Exited");
         yield return new WaitForSeconds(invincibilityDuration);
         playerScript.ExitInvincibility();
+        SignalExit();
     }
 
     public void SignalExit()
@@ -130,14 +132,22 @@ public class Health : NetworkBehaviour
     [Mirror.ClientCallback]
     private void OnTriggerStay(Collider other)
     {
-        if (!hasAuthority) return;
-
-        if (!(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox")))
+        if (
+            !hasAuthority
+            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+            )
         {
-            return;
+                return;
         }
-        if (other.gameObject.transform.root.name == "Plasma Object(Clone)" &&   // Make sure prefabs are unpacked
-            !other.gameObject.transform.root.GetComponent<PlasmaObject>().CanHitThisPlayer(this.gameObject)
+
+        var objName = other.gameObject.transform.root.name;
+        if (
+            (
+                objName == "Plasma Object(Clone)"
+                || objName == "Blink Object(Clone)" 
+            )
+            &&   // Make sure prefabs are unpacked
+            !other.gameObject.transform.root.GetComponent<ComboObject>().CanHitThisPlayer(this.gameObject)  // I want everyone to 
             )
         {
             return;
@@ -146,7 +156,7 @@ public class Health : NetworkBehaviour
         this.CmdTakeDamage(1);
     }
 
-    [Mirror.Command]
+    [Mirror.Command(ignoreAuthority = true)]
     public void CmdNotifyPlayerDied()
     {
         RpcNotifyPlayerDied();

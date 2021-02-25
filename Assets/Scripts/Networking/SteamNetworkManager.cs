@@ -7,6 +7,22 @@ using Steamworks;
 
 public class SteamNetworkManager : NetworkRoomManagerExt
 {
+    /// <summary>
+    /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
+    /// This is the ideal point to pass any data like player name, credentials, tokens, colors, etc.
+    /// into the GamePlayer object as it is about to enter the Online scene.
+    /// </summary>
+    /// <param name="roomPlayer"></param>
+    /// <param name="gamePlayer"></param>
+    /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
+    public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
+    {
+        // transfer steam id to player
+        gamePlayer.GetComponent<Player>().steamId = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId;
+
+        return true;
+    }
+
     public override GameObject OnRoomServerCreateRoomPlayer(NetworkConnection conn)
     {
         GameObject newRoomGameObject = Instantiate(roomPlayerPrefab.gameObject, Vector3.zero, Quaternion.identity);
@@ -78,6 +94,18 @@ public class SteamNetworkManager : NetworkRoomManagerExt
             showStartButton = false;
             p.UpdateLobbyList();
         }
+    }
+
+    public override void OnClientDisconnect(NetworkConnection conn)
+    {
+        MainMenu_UI menu = MainMenu_UI.singleton;
+
+        menu.screenLoading.SetActive(false);
+        menu.screenNavigation.SetActive(true);
+        //menu.screenError.SetActive(true);
+
+
+        base.OnClientDisconnect(conn);
     }
 
     //public override void OnRoomClientEnter()

@@ -56,7 +56,7 @@ public class TickObject : ComboObject
 
     public virtual void EarlyProc()
     {
-        if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
+        if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep"); // TODO do something like "StopPlaying(objectSound)"
         didEarlyEffects = true;
         FindCenter();
         GoToCenter();
@@ -70,7 +70,6 @@ public class TickObject : ComboObject
         // The server should do all calculations
         StartCoroutine(TickDown());
     }
-
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {

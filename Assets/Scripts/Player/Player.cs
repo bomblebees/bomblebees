@@ -16,11 +16,15 @@ using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
 {
+    [SyncVar] public ulong steamId = 0; // unique steam id
+
     // Assets
     [Header("Debug")]
     public bool debugMode = false;
     public string debugBombPress1 = "i";
     public string debugBombPress2 = "a";
+    public string debugBombPress3 = "e";
+    public string debugBombPress4 = ";";
     private HexGrid hexGrid;
 
     [Header("Respawn")]
@@ -32,7 +36,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
     
-    [SerializeField] private float defaultBombCooldown = 3f;
+    [SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
     [SerializeField] private GameObject onDefaultBombReadyAnim;
     private bool playedOnDefaultBombReadyAnim = true;
@@ -85,10 +89,9 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private int maxStackSize = 3;
     readonly SyncList<char> itemStack = new SyncList<char>();
-    [SerializeField] private Image[] stackUI = new Image[3];
-    private Quaternion stackRotationLock;
 
     [SerializeField] private GameObject playerModel;
+    [SerializeField] private GameObject ghostModel;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
@@ -109,12 +112,6 @@ public class Player : NetworkBehaviour
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         UpdateHeldHex(heldKey); // Initialize model
 
-        if (isLocalPlayer)
-        {
-            //stackUI.GetComponent<Text>().enabled = true;
-            //stackRotationLock = stackUI.transform.rotation;
-        }
-
         itemStack.Callback += OnItemStackChange;
 
         //Debug.Log("local started");
@@ -123,6 +120,7 @@ public class Player : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+
         this.Assert();
         LinkAssets();
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
@@ -181,6 +179,14 @@ public class Player : NetworkBehaviour
         {
             SpawnDefaultBomb();
         }
+        if (Input.GetKeyDown(debugBombPress3))
+        {
+            SpawnPlasmaObject();
+        }
+        if (Input.GetKeyDown(debugBombPress4))
+        {
+            SpawnBlinkObject();
+        }
     }
 
     // Update version for server
@@ -232,6 +238,7 @@ public class Player : NetworkBehaviour
             CmdSpin();
         }
     }
+    
 
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)
@@ -287,6 +294,10 @@ public class Player : NetworkBehaviour
                     playedOnDefaultBombReadyAnim = false;
                     // Else use the default bomb
                     this.SpawnDefaultBomb();
+
+                    // update hud
+                    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
+
                     defaultBombUseTimer = 0;
                     
                 }
@@ -346,7 +357,7 @@ public class Player : NetworkBehaviour
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_bigBomb);
     }
-
+    
     public void SetCanPlaceBombs(bool val)
     {
         this.canPlaceBombs = val;
@@ -417,31 +428,35 @@ public class Player : NetworkBehaviour
         networkAnimator.ResetTrigger("anim_SpinTrigger");
     }
 
-    void OnChangeHeldKey(char oldHeldKey, char newHeldKey)
+    void OnChangeHeldKey(char _, char newHeldKey)
     {
-        //heldKey = newHeldKey;
-        Debug.Log("ON CHANGE TEST");
+        // commented out for now
         UpdateHeldHex(newHeldKey);
     }
 
     void UpdateHeldHex(char newHeldKey)
     {
-        if (this.heldHexModel)
-        {
-            Destroy(this.heldHexModel, 0f);
-            Debug.Log("Destroyed held hex");
-        }
+        this.GetComponent<PlayerInterface>().UpdateHexHud(newHeldKey);
 
-        // Create the hex model in the player's hand
-        this.heldHexModel = Instantiate(
-            hexGrid.ReturnModelByCellKey(newHeldKey),
-            playerModel.transform.position + playerModel.transform.up * heldHexOffset.y +
-            playerModel.transform.forward * heldHexOffset.x,
-            playerModel.transform.rotation,
-            playerModel.transform
-        );
 
-        this.heldHexModel.gameObject.transform.localScale = heldHexScale;
+        // commented out, below is for hex model
+      
+        //if (this.heldHexModel)
+        //{
+        //    Destroy(this.heldHexModel, 0f);
+        //    Debug.Log("Destroyed held hex");
+        //}
+
+        //// Create the hex model in the player's hand
+        //this.heldHexModel = Instantiate(
+        //    hexGrid.ReturnModelByCellKey(newHeldKey),
+        //    playerModel.transform.position + playerModel.transform.up * heldHexOffset.y +
+        //    playerModel.transform.forward * heldHexOffset.x,
+        //    playerModel.transform.rotation,
+        //    playerModel.transform
+        //);
+
+        //this.heldHexModel.gameObject.transform.localScale = heldHexScale;
     }
 
     // Apply movement to the player, using WASD or Arrow keys
@@ -477,11 +492,24 @@ public class Player : NetworkBehaviour
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         {
-            playerModel.transform.rotation = Quaternion.Slerp(
-                playerModel.transform.rotation,
-                Quaternion.LookRotation(direction),
-                turnSpeed * Time.deltaTime
-            );
+            if (playerModel.activeSelf)
+            {
+                playerModel.transform.rotation = Quaternion.Slerp(
+                    playerModel.transform.rotation,
+                    Quaternion.LookRotation(direction),
+                    turnSpeed * Time.deltaTime
+                );
+            } else if (ghostModel.activeSelf)
+            {
+                ghostModel.transform.rotation = Quaternion.Slerp(
+                    ghostModel.transform.rotation,
+                    Quaternion.LookRotation(direction),
+                    turnSpeed * Time.deltaTime
+                );
+            }
+
+
+
 
             if (this.canMove) controller.Move(direction * movementSpeed * Time.deltaTime);
         }
@@ -608,25 +636,11 @@ public class Player : NetworkBehaviour
 
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
+        PlayerInterface hud = this.GetComponent<PlayerInterface>();
         for (int i = 0; i < 3; i++)
         {
-            if (i < itemStack.Count) stackUI[i].color = TempGetKeyColor(itemStack[i]);
-            else stackUI[i].color = Color.white;
-        }
-    }
-
-    // Temp function - get color associated with key
-    Color TempGetKeyColor(char key)
-    {
-        switch (key)
-        {
-            case 'b': return Color.blue;
-            case 'g': return Color.green;
-            case 'y': return Color.yellow;
-            case 'r': return Color.red;
-            case 'p': return Color.magenta;
-            case 'w': return Color.grey;
-            default: return Color.white;
+            if (i < itemStack.Count) hud.UpdateStackHud(i, itemStack[i]);
+            else hud.UpdateStackHud(i, 'e');
         }
     }
 
@@ -666,7 +680,7 @@ public class Player : NetworkBehaviour
             this.canBeHit = true;
             this.canSwap = true;
             this.canPlaceBombs = true;
-            healthScript.SignalExit();
+            //healthScript.SignalExit();
             this.canExitInvincibility = false;
         }
     }
@@ -674,5 +688,10 @@ public class Player : NetworkBehaviour
     public void SetCanExitInvincibility(bool val)
     {
         this.canExitInvincibility = val;
+    }
+
+    public void SetSpinHitboxActive(bool val)
+    {
+        spinHitbox.SetActive(val);
     }
 }

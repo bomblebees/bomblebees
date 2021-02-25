@@ -22,7 +22,6 @@ public class BombObject : TickObject
 
     private void LateUpdate()
     {
-        // increase fill value of material
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", val);
         val += riseRate * Time.deltaTime;
     }
@@ -62,7 +61,7 @@ public class BombObject : TickObject
             {
                 this.EarlyProc();
             }
-            if (_root.Equals("Laser Object(Clone)"))
+            else if (_root.Equals("Laser Object(Clone)"))
             { 
                 this.EarlyProc();
             }

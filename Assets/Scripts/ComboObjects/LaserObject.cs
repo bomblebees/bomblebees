@@ -22,8 +22,6 @@ public class LaserObject : TriggerObject
         this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles = new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex]+270f);
     }
     
-    
-    
     // Note: this is when THIS object enters a collision
     protected override void OnTriggerEnter(Collider other)
     {
@@ -48,5 +46,6 @@ public class LaserObject : TriggerObject
         // play breakdown anim here
         NotifyOccupiedTile(false);
         yield return new WaitForSeconds(breakdownDuration);
+        DestroySelf();
     }
 }

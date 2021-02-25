@@ -16,10 +16,10 @@ public class ComboObject : NetworkBehaviour
     public GameObject hitBox;
     public Collider collider;
     
-    private bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
+    protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
-    public float lerpRate = 0.15f;  // The speed at which the object is being pushed
+    public float lerpRate = 0.9f;  // The speed at which the object is being pushed
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
     public float snapToCenterThreshold = 0.5f;
     
@@ -30,7 +30,7 @@ public class ComboObject : NetworkBehaviour
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
-    public bool didEarlyEffects = false;
+    protected bool didEarlyEffects = false;
 
     protected GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
@@ -144,7 +144,10 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual void NotifyOccupiedTile(bool val)
     {
-        if (isServer) tileUnderneath.SetOccupiedByComboObject(val);
+        if (isServer)
+        {
+            if (tileUnderneath) tileUnderneath.SetOccupiedByComboObject(val);
+        }
     }
     protected virtual void StopVelocity()
     {
@@ -289,14 +292,28 @@ public class ComboObject : NetworkBehaviour
         NetworkServer.Destroy(this.gameObject);
     }
 
+    // this isn't being sent to every player
+    // [Command(ignoreAuthority = true)] 
     public bool CanHitThisPlayer(GameObject target)
     {
-        Debug.Log("triggering player is "+triggeringPlayer.name);
-        Debug.Log("target player is "+target.name);
-        if (canHitTriggeringPlayer && target == triggeringPlayer)
+        if (
+            (canHitTriggeringPlayer 
+            && 
+            target == triggeringPlayer)
+            ||
+            (target != triggeringPlayer)
+        )
         {
-            return true;
+         return true;
         }
         else return false;
+    }
+    
+    
+    protected IEnumerator IgnoreTriggeringPlayer(float seconds)
+    {
+        this.canHitTriggeringPlayer = false; // see Health.cs' OnTriggerEnter()
+        yield return new WaitForSeconds(seconds);
+        this.canHitTriggeringPlayer = true;
     }
 }
