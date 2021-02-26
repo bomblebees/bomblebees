@@ -4991,7 +4991,7 @@ MonoBehaviour:
   maxLives: 3
   currentLives: 3
   ghostDuration: 5
-  invincibilityDuration: 0
+  invincibilityDuration: 1
   playerModel: {fileID: 5260639197599151655}
   ghostModel: {fileID: 8062245979255692024}
   revivingModel: {fileID: 5401300670555800704}
@@ -5133,7 +5133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 2
+  syncInterval: 0.1
   clientAuthority: 1
   animator: {fileID: 6123777351014949932}
 --- !u!1 &1163376774926246814
@@ -5271,7 +5271,7 @@ GameObject:
   - component: {fileID: 6031330717292549313}
   - component: {fileID: 3950544934708593984}
   - component: {fileID: 2432056995335378902}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: DeathText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5690,7 +5690,7 @@ GameObject:
   - component: {fileID: 5620853278148634003}
   - component: {fileID: 4207789161307466880}
   - component: {fileID: 1724025971353731779}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: PlayerInterface
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5751,8 +5751,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 2
-  m_ReferencePixelsPerUnit: 10
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
@@ -6060,7 +6060,7 @@ GameObject:
   - component: {fileID: 5670345358800963263}
   - component: {fileID: 2242633193067271833}
   - component: {fileID: 1466327105825305777}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: GameOverText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6191,7 +6191,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1505761261741567782}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: GameOverUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6856,7 +6856,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8663358680252305461}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: DeathUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
