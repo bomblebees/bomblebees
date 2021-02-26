@@ -15,6 +15,7 @@ public class ComboObject : NetworkBehaviour
     public GameObject blockerHandler;
     public GameObject hitBox;
     public Collider collider;
+    [SerializeField] public GameObject SFX;
     
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
@@ -166,10 +167,9 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableSFX()
     {
-        var sfx = this.gameObject.transform.Find("SFX").gameObject;
-        sfx.SetActive(true);
+        SFX.SetActive(true);
         yield return new WaitForSeconds(sfxDuration);
-        sfx.SetActive(false);
+        SFX.SetActive(false);
     }
 
     protected virtual IEnumerator EnableHitbox()
