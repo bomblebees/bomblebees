@@ -15646,13 +15646,13 @@ MonoBehaviour:
   sfxDuration: 4
   hitboxDuration: 0.2
   lingerDuration: 8
-  didEarlyEffects: 0
   tickDuration: 4
   model: {fileID: 0}
   timeTillAnimSpeedup: 0
   riseShader: {fileID: 0}
   pulseShader: {fileID: 0}
   riseRate: 0
+  breakdownDuration: 5
 --- !u!114 &6525348075751101672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15733,7 +15733,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: ff2d5d176a6b34c419d334cb6bbbc456, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
