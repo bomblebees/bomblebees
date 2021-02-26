@@ -237,6 +237,7 @@ MonoBehaviour:
   blockerHandler: {fileID: 2177154399618768490}
   hitBox: {fileID: 9095178392891195692}
   collider: {fileID: 4833367962059186298}
+  SFX: {fileID: 6587800827991595459}
   travelDistanceInHexes: 3
   lerpRate: 0.15
   targetPosition: {x: 0, y: 0, z: 0}
@@ -245,7 +246,7 @@ MonoBehaviour:
   tileUnderneath: {fileID: 0}
   vfxDuration: 4
   sfxDuration: 4
-  hitboxDuration: 0.02
+  hitboxDuration: 0.1
   lingerDuration: 2
   tickDuration: 4
   model: {fileID: 6699408313976199026}

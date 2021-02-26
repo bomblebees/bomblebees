@@ -74,6 +74,7 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
+    private Vector3 gravObjInfluence = Vector3.zero;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -490,7 +491,7 @@ public class Player : NetworkBehaviour
         }
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
-        if (direction != Vector3.zero)
+        if (direction != Vector3.zero || this.gravObjInfluence != Vector3.zero)
         {
             if (playerModel.activeSelf)
             {
@@ -511,7 +512,10 @@ public class Player : NetworkBehaviour
 
 
 
-            if (this.canMove) controller.Move(direction * movementSpeed * Time.deltaTime);
+            if (this.canMove) controller.Move(((direction * movementSpeed )
+                                                        + this.gravObjInfluence)
+                                                        * Time.deltaTime);
+            this.gravObjInfluence = Vector3.zero;
         }
     }
 
@@ -694,5 +698,10 @@ public class Player : NetworkBehaviour
     public void SetSpinHitboxActive(bool val)
     {
         spinHitbox.SetActive(val);
+    }
+
+    public void ApplyGravityInfluence(Vector3 force)
+    {
+        this.gravObjInfluence += force;
     }
 }
