@@ -17,7 +17,6 @@ public class Health : NetworkBehaviour
     [SerializeField] float ghostDuration = 5.0f;
     [SerializeField] float invincibilityDuration = 2.0f;
 
-
     public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
 
     public delegate void LivesLoweredDelegate(bool canAct); // sends false
@@ -144,14 +143,24 @@ public class Health : NetworkBehaviour
         if (
             (
                 objName == "Plasma Object(Clone)"
-                || objName == "Blink Object(Clone)" 
+                || objName == "Blink Object(Clone)"
             )
-            &&   // Make sure prefabs are unpacked
-            !other.gameObject.transform.root.GetComponent<ComboObject>().CanHitThisPlayer(this.gameObject)  // I want everyone to 
-            )
+            && // Make sure prefabs are unpacked
+            !other.gameObject.transform.root.GetComponent<ComboObject>()
+                .CanHitThisPlayer(this.gameObject) // I want everyone to 
+        )
         {
             return;
         }
+
+        if (objName == "Gravity Object(Clone)")
+        {
+            var target = other.transform.position;
+            this.transform.position += this.transform.position + target;
+            // get pulled here
+            return;
+        }
+
         playerScript.canBeHit = false; // might remove later. this is for extra security
         this.CmdTakeDamage(1);
     }

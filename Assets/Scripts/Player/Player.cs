@@ -173,7 +173,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(debugBombPress1))
         {
-            SpawnLaserObject();
+            SpawnGravityObject();
         }
         if (Input.GetKeyDown(debugBombPress2))
         {
