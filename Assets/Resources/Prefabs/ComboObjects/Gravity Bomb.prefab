@@ -15946,6 +15946,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 591ac7f92dd92c6409253c67e72c567e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  blockerHandler: {fileID: 0}
+  hitBox: {fileID: 0}
+  collider: {fileID: 0}
+  SFX: {fileID: 5551896788278084924}
+  travelDistanceInHexes: 4
+  lerpRate: 0.9
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
+  nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
+  vfxDuration: 4
+  sfxDuration: 4
+  hitboxDuration: 4
+  lingerDuration: 8
+  tickDuration: 4
 --- !u!114 &5783496561789443700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16026,7 +16043,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: ff2d5d176a6b34c419d334cb6bbbc456, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -16037,7 +16054,7 @@ AudioSource:
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -16070,7 +16087,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.9
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -16899,18 +16916,18 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: d5b45d7ea25a5224c95b5cd9bdc1ffe2, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
+  DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -16943,7 +16960,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.9
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

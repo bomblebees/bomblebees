@@ -15636,6 +15636,7 @@ MonoBehaviour:
   blockerHandler: {fileID: 187948155558152201}
   hitBox: {fileID: 7103838186620180303}
   collider: {fileID: 6899203689152902681}
+  SFX: {fileID: 5170667066410782624}
   travelDistanceInHexes: 2
   lerpRate: 0
   targetPosition: {x: 0, y: 0, z: 0}
@@ -16810,18 +16811,18 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: d5b45d7ea25a5224c95b5cd9bdc1ffe2, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
+  DopplerLevel: 0
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -16854,7 +16855,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.9
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
