@@ -682,7 +682,8 @@ public class Player : NetworkBehaviour
             this.canPlaceBombs = true;
             //healthScript.SignalExit();
             this.canExitInvincibility = false;
-        }
+			FindObjectOfType<AudioManager>().PlaySound("playerRespawn");
+		}
     }
 
     public void SetCanExitInvincibility(bool val)

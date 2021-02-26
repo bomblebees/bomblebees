@@ -292,7 +292,6 @@ MonoBehaviour:
   sfxDuration: 4
   hitboxDuration: 4
   lingerDuration: 8
-  didEarlyEffects: 0
   minimumLifeDuration: 4
   plasmaSphereModel: {fileID: 4085552186968079639}
   particleSystem: {fileID: 7751750280610379946}
@@ -378,7 +377,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: ff2d5d176a6b34c419d334cb6bbbc456, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -12475,11 +12474,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: d5b45d7ea25a5224c95b5cd9bdc1ffe2, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 2a4f3486b3a97a1449d066cf22a1d0da, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.8
+  m_Volume: 0.6
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -12488,7 +12487,7 @@ AudioSource:
   MinDistance: 1
   MaxDistance: 500
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
