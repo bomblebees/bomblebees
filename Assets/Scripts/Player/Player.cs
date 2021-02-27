@@ -512,7 +512,7 @@ public class Player : NetworkBehaviour
 
 
 
-            if (this.canMove) controller.Move(((direction * movementSpeed )
+            if (this.canMove) controller.Move(((direction * movementSpeed)
                                                         + this.gravObjInfluence)
                                                         * Time.deltaTime);
             this.gravObjInfluence = Vector3.zero;

@@ -161,7 +161,7 @@ public class Health : NetworkBehaviour
             var dist = target - this.gameObject.transform.position;
             if (dist.magnitude > grav.distThresh)
             {
-                this.playerScript.ApplyGravityInfluence(dist.normalized * grav.pullStrength);
+                this.playerScript.ApplyGravityInfluence(dist.normalized * grav.pullStrength * Time.deltaTime);
             }
             return;
         }
