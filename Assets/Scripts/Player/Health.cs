@@ -155,9 +155,14 @@ public class Health : NetworkBehaviour
 
         if (objName == "Gravity Object(Clone)")
         {
-            var target = other.transform.position;
-            this.transform.position += this.transform.position + target;
-            // get pulled here
+            var obj = other.gameObject.transform.root.transform;
+            var grav = obj.GetComponent<GravityObject>();
+            var target = obj.position;
+            var dist = target - this.gameObject.transform.position;
+            if (dist.magnitude > grav.distThresh)
+            {
+                this.playerScript.ApplyGravityInfluence(dist.normalized * grav.pullStrength * Time.deltaTime);
+            }
             return;
         }
 
