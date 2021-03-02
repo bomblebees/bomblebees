@@ -15,7 +15,10 @@ public class Room_UI : MonoBehaviour
     private MainMenu_UI mainMenuUI;
     private Matchmaking matchmaker;
 
+    [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
+    [SerializeField] private GameObject screenBombleList;
+    [Header("Others")]
     [SerializeField] public GameObject buttonStart;
 
     [Serializable]
@@ -104,5 +107,14 @@ public class Room_UI : MonoBehaviour
         screenHowToPlay.SetActive(!screenHowToPlay.activeSelf);
     }
 
+    #endregion
+
+    #region Screen: BOMBLE LIST
+
+    public void ToggleScreenBombleList()
+    {
+        screenBombleList.SetActive(!screenBombleList.activeSelf);
+    }
+    
     #endregion
 }
