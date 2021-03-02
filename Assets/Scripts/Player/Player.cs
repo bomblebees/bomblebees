@@ -418,6 +418,9 @@ public class Player : NetworkBehaviour
 
     private IEnumerator HandleSpinAnim()
     {
+        isRunAnim = true;
+        isIdleAnim = true;
+
         spinAnim.gameObject.SetActive(true);
 
         // trigger character spin animation
