@@ -15,7 +15,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         // Enable lobby list
         Matchmaking mm = Matchmaking.singleton;
-        mm.uiLeaveLobby();
+        if (mm) mm.uiLeaveLobby();
 
         base.OnRoomStopClient();
     }
@@ -64,7 +64,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     public override void OnStartServer()
     {
         base.OnStartServer();
- 
+
+        spawnPrefabs.Clear();
         spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
     }
         
@@ -73,6 +74,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnStartClient();
             
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
+
+        ClientScene.ClearSpawners();
 
         foreach (var prefab in spawnablePrefabs)
         {

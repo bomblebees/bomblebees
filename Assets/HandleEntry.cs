@@ -5,16 +5,16 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class HandleEntry : NetworkBehaviour
+public class HandleEntry : MonoBehaviour
 {
     // so this trigger that handles if the player is in the object should be smaller than the invis blocker
     public Collider invisibleBlocker;
     private bool allowingEntry = true;
 
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-    }
+    //public override void OnStartServer()
+    //{
+    //    base.OnStartServer();
+    //}
 
     private void OnTriggerEnter(Collider other)
     {
