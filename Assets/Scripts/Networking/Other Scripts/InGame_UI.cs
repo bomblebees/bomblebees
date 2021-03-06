@@ -56,6 +56,12 @@ public class InGame_UI : MonoBehaviour
     {
         audioMixerMusic.SetFloat("volumeMusic", volume);
     }
+
+    public void ToggleFullscreen()
+    {
+        Screen.fullScreen = !Screen.fullScreen;
+        Debug.Log("Fullscreen = " + Screen.fullScreen);
+    }
     
     #endregion
     
