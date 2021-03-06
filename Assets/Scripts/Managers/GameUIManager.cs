@@ -43,7 +43,7 @@ public class GameUIManager : NetworkBehaviour
         else _instance = this;
 
         roundManager = RoundManager.Singleton;
-        if (roundManager == null) Debug.LogError("Cannot find Singleton: GameUIManager");
+        if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
     }
 
     public override void OnStartServer()
