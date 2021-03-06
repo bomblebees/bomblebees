@@ -21,6 +21,7 @@ public class PlayerInterface : NetworkBehaviour
     [Header("User Interface")]
     [SerializeField] private GameObject deathUI;
     [SerializeField] private GameObject gameOverUI;
+    [SerializeField] private GameObject damageIndicator;
 
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
@@ -41,7 +42,7 @@ public class PlayerInterface : NetworkBehaviour
 
     private void Start()
     {
-        
+        this.gameObject.GetComponent<Health>().EventPlayerTookDamage += OnPlayerTakeDamage;
     }
 
     private void Update()
@@ -54,6 +55,11 @@ public class PlayerInterface : NetworkBehaviour
 
             if (bombHudTimer < 0) bombHudTimer = 0;
         }
+    }
+
+    public void OnPlayerTakeDamage(int newValue)
+    {
+        damageIndicator.GetComponent<FlashTween>().StartFlash();
     }
 
     public IEnumerator EnableDeathUI()
