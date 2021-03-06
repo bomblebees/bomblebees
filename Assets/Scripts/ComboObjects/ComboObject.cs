@@ -202,6 +202,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
+        this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
@@ -268,7 +269,8 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
-            triggeringPlayer = other.transform.parent.gameObject;
+            triggeringPlayer = other.transform.parent.gameObject; 
+            print(other.transform.parent.name);
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);
