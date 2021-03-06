@@ -35,7 +35,7 @@ public class PlasmaObject : TriggerObject
             var nextPos = FindCenterBelowOther(this.plasmaSphereModel);
             if (lastPosition != nextPos)
             {
-                /// PUT .PLAY() HERE
+                particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
                 lastPosition = nextPos;
             }
