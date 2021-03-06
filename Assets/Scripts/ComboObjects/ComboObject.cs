@@ -197,12 +197,12 @@ public class ComboObject : NetworkBehaviour
     [ClientRpc]
     protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer)
     {
+        this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
         Push(edgeIndex, triggeringPlayer);
     }
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
@@ -297,6 +297,7 @@ public class ComboObject : NetworkBehaviour
     // [Command(ignoreAuthority = true)] 
     public bool CanHitThisPlayer(GameObject target)
     {
+        print(triggeringPlayer);
         if (
             (canHitTriggeringPlayer 
             && 
