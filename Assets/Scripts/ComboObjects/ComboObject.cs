@@ -193,11 +193,11 @@ public class ComboObject : NetworkBehaviour
         yield return new WaitForSeconds(lingerDuration);
     }
     
-    
 
     [ClientRpc]
     protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer)
     {
+        this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
         Push(edgeIndex, triggeringPlayer);
     }
 
@@ -269,9 +269,10 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
-            triggeringPlayer = other.transform.parent.gameObject;
+            triggeringPlayer = other.transform.parent.gameObject; 
+            print(other.transform.parent.name);
             NotifyOccupiedTile(false); // Update occupation status of tile
-            Push(edgeIndex, triggeringPlayer); // Push for server too
+            // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);
         }
     }
@@ -296,6 +297,7 @@ public class ComboObject : NetworkBehaviour
     // [Command(ignoreAuthority = true)] 
     public bool CanHitThisPlayer(GameObject target)
     {
+        print(triggeringPlayer);
         if (
             (canHitTriggeringPlayer 
             && 

@@ -9,13 +9,14 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 {
     [SerializeField] private GameObject hexGrid;
     [SerializeField] private GameObject roundManager;
+    [SerializeField] private GameObject gameUIManager;
     [SerializeField] private GameObject audioManager;
 
     public override void OnRoomStopClient()
     {
         // Enable lobby list
         Matchmaking mm = Matchmaking.singleton;
-        mm.uiLeaveLobby();
+        if (mm) mm.uiLeaveLobby();
 
         base.OnRoomStopClient();
     }
@@ -57,6 +58,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             Debug.Log("OnRoomServerSceneChanged");
             NetworkServer.Spawn(Instantiate(hexGrid));
             NetworkServer.Spawn(Instantiate(roundManager));
+            NetworkServer.Spawn(Instantiate(gameUIManager));
             NetworkServer.Spawn(Instantiate(audioManager));
         }
     }
@@ -64,7 +66,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     public override void OnStartServer()
     {
         base.OnStartServer();
- 
+
+        spawnPrefabs.Clear();
         spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
     }
         
@@ -73,6 +76,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnStartClient();
             
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
+
+        ClientScene.ClearSpawners();
 
         foreach (var prefab in spawnablePrefabs)
         {

@@ -17,6 +17,8 @@ public class Health : NetworkBehaviour
     [SerializeField] float ghostDuration = 5.0f;
     [SerializeField] float invincibilityDuration = 2.0f;
 
+    public delegate void PlayerTookDamageDelegate(int newValue);
+
     public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
 
     public delegate void LivesLoweredDelegate(bool canAct); // sends false
@@ -33,6 +35,7 @@ public class Health : NetworkBehaviour
     public Player playerScript;
 
     // All the subscribed subscribed will receive this event
+    public event PlayerTookDamageDelegate EventPlayerTookDamage;
     public event LivesChangedDelegate EventLivesChanged;
     public event LivesLoweredDelegate EventLivesLowered;
     public event GhostExitDelegate EventGhostExit;
@@ -52,6 +55,12 @@ public class Health : NetworkBehaviour
         else this.CmdBeginGhostMode();
     }
 
+    [Mirror.TargetRpc]
+    private void RpcTookDamageDelegate(Mirror.NetworkConnection target, int newHealth)
+    {
+        EventPlayerTookDamage?.Invoke(newHealth);
+    }
+
     #region Server
 
     [Mirror.Server] // Only server can call this
@@ -68,9 +77,10 @@ public class Health : NetworkBehaviour
     }
 
     [Mirror.Command(ignoreAuthority = true)]
-    private void CmdTakeDamage(int damage)
+    private void CmdTakeDamage(int damage, string bomb, ulong steamId)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
+        RpcTookDamageDelegate(null, currentLives);
     }
 
     #endregion
@@ -167,7 +177,7 @@ public class Health : NetworkBehaviour
         }
 
         playerScript.canBeHit = false; // might remove later. this is for extra security
-        this.CmdTakeDamage(1);
+        this.CmdTakeDamage(1, objName, playerScript.steamId);
     }
 
     [Mirror.Command(ignoreAuthority = true)]

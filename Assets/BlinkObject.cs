@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 public class BlinkObject : TickObject
@@ -28,12 +29,19 @@ public class BlinkObject : TickObject
         this.triggeringPlayer.GetComponent<Player>().SetSpinHitboxActive(false); // Turns off Player's spin hitbox so it doesn't linger after the teleport.
         isMoving = false;
         
-        this.gameObject.transform.position = targetPosition;
+        // NotifyServerPosition(triggeringPlayer);
         triggeringPlayer.transform.position = this.gameObject.transform.position;
+        
+        this.gameObject.transform.position = targetPosition;
         this.hitBox.SetActive(true);
         EarlyProc();
         StartCoroutine(Breakdown());
         return true;
+    }
+
+    [Command(ignoreAuthority = true)]
+    void NotifyServerPosition(GameObject triggeringPlayer) {
+        triggeringPlayer.transform.position = this.gameObject.transform.position;
     }
 
     protected override IEnumerator TickDown()

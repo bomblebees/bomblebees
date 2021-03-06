@@ -42,7 +42,9 @@ public class Player : NetworkBehaviour
     private bool playedOnDefaultBombReadyAnim = true;
 
     private float horizontalAxis;
+    private float prevHorizontalAxis;
     private float verticalAxis;
+    private float prevVerticalAxis;
     private float fixedY = 7; // The Y position the player will be stuck to.
 
     [Header("Movement")] [SerializeField] private CharacterController controller;
@@ -79,6 +81,8 @@ public class Player : NetworkBehaviour
     // reference to Animator, Network Animator components
     public Animator animator;
     public NetworkAnimator networkAnimator;
+    public bool isRunAnim = false;
+    public bool isIdleAnim = false;
 
     // private Caches
     private GameObject spinHitbox;
@@ -414,6 +418,9 @@ public class Player : NetworkBehaviour
 
     private IEnumerator HandleSpinAnim()
     {
+        isRunAnim = true;
+        isIdleAnim = true;
+
         spinAnim.gameObject.SetActive(true);
 
         // trigger character spin animation
@@ -464,7 +471,6 @@ public class Player : NetworkBehaviour
     [Client]
     void ApplyMovement()
     {
-
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
 
@@ -473,21 +479,37 @@ public class Player : NetworkBehaviour
         // need to copy this to online
         if (horizontalAxis != 0 || verticalAxis != 0)
         {
-            // client animator
-            animator.ResetTrigger("anim_IdleTrigger");
-            animator.SetTrigger("anim_RunTrigger");
-            // network animator
-            networkAnimator.ResetTrigger("anim_IdleTrigger");
-            networkAnimator.SetTrigger("anim_RunTrigger");
+            isIdleAnim = true;
+
+            if (isRunAnim)
+            {
+                // client animator
+                animator.ResetTrigger("anim_IdleTrigger");
+                animator.SetTrigger("anim_RunTrigger");
+                // network animator
+                networkAnimator.ResetTrigger("anim_IdleTrigger");
+                networkAnimator.SetTrigger("anim_RunTrigger");
+
+                isRunAnim = false;
+            }
+
         }
         else
         {
-            // client animator
-            animator.ResetTrigger("anim_RunTrigger");
-            animator.SetTrigger("anim_IdleTrigger");
-            // network animator
-            networkAnimator.ResetTrigger("anim_RunTrigger");
-            networkAnimator.SetTrigger("anim_IdleTrigger");
+            isRunAnim = true;
+
+            if (isIdleAnim)
+            {
+                // client animator
+                animator.ResetTrigger("anim_RunTrigger");
+                animator.SetTrigger("anim_IdleTrigger");
+                // network animator
+                networkAnimator.ResetTrigger("anim_RunTrigger");
+                networkAnimator.SetTrigger("anim_IdleTrigger");
+
+                isIdleAnim = false;
+            }
+
         }
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;

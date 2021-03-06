@@ -22,7 +22,7 @@ public class PlasmaObject : TriggerObject
         plasmaSphereModel.transform.position = plasmaSphereModel.transform.position + targetDir * 5;
         this.hitboxEnabled = true;
         this.plasmaSphereModel.SetActive(true);
-        return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
+        return base.Push(edgeIndex, triggeringPlayer);  // This shoulda been at the top lol
     }
     
 
@@ -35,7 +35,7 @@ public class PlasmaObject : TriggerObject
             var nextPos = FindCenterBelowOther(this.plasmaSphereModel);
             if (lastPosition != nextPos)
             {
-                /// PUT .PLAY() HERE
+                particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
                 lastPosition = nextPos;
             }
