@@ -29,7 +29,8 @@ public class BlinkObject : TickObject
         this.triggeringPlayer.GetComponent<Player>().SetSpinHitboxActive(false); // Turns off Player's spin hitbox so it doesn't linger after the teleport.
         isMoving = false;
         
-        NotifyServerPosition(triggeringPlayer);
+        // NotifyServerPosition(triggeringPlayer);
+        triggeringPlayer.transform.position = this.gameObject.transform.position;
         
         this.gameObject.transform.position = targetPosition;
         this.hitBox.SetActive(true);
@@ -38,7 +39,7 @@ public class BlinkObject : TickObject
         return true;
     }
 
-    [Command]
+    [Command(ignoreAuthority = true)]
     void NotifyServerPosition(GameObject triggeringPlayer) {
         triggeringPlayer.transform.position = this.gameObject.transform.position;
     }
