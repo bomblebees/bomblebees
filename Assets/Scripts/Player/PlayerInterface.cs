@@ -91,12 +91,21 @@ public class PlayerInterface : NetworkBehaviour
 
     public void UpdateStackHud(int idx, char key)
     {
-        stackUI[idx].color = GetKeyColor(key);
+        if (stackUI[idx].color != GetKeyColor(key))
+        {
+            stackUI[idx].color = GetKeyColor(key);
+
+            // Run bounce anim
+            stackUI[idx].gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+        }
     }
 
     public void UpdateHexHud(char key)
     {
         hexUI.color = GetKeyColor(key);
+
+        // Run bounce anim
+        hexUI.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
     }
 
     // get color associated with key
