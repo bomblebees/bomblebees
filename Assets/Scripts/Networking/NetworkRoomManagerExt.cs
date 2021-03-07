@@ -7,6 +7,7 @@ using Mirror;
 
 public class NetworkRoomManagerExt : NetworkRoomManager
 {
+    [SerializeField] private GameObject eventManager;
     [SerializeField] private GameObject hexGrid;
     [SerializeField] private GameObject roundManager;
     [SerializeField] private GameObject gameUIManager;
@@ -56,6 +57,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         if (sceneName == GameplayScene)
         {
             Debug.Log("OnRoomServerSceneChanged");
+            NetworkServer.Spawn(Instantiate(eventManager));
             NetworkServer.Spawn(Instantiate(hexGrid));
             NetworkServer.Spawn(Instantiate(roundManager));
             NetworkServer.Spawn(Instantiate(gameUIManager));

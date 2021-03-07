@@ -35,11 +35,19 @@ public class Health : NetworkBehaviour
     public Player playerScript;
 
     // All the subscribed subscribed will receive this event
-    public event PlayerTookDamageDelegate EventPlayerTookDamage;
     public event LivesChangedDelegate EventLivesChanged;
     public event LivesLoweredDelegate EventLivesLowered;
     public event GhostExitDelegate EventGhostExit;
     public event InvincibleExitDelegate EventInvincibleExit;
+
+    // Event manager singleton
+    private EventManager eventManager;
+
+    private void Awake()
+    {
+        eventManager = EventManager.Singleton;
+        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+    }
 
     [Mirror.ClientRpc]
     private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
@@ -53,12 +61,6 @@ public class Health : NetworkBehaviour
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
         if (newLives == 0) CmdNotifyPlayerDied();
         else this.CmdBeginGhostMode();
-    }
-
-    [Mirror.TargetRpc]
-    private void RpcTookDamageDelegate(Mirror.NetworkConnection target, int newHealth)
-    {
-        EventPlayerTookDamage?.Invoke(newHealth);
     }
 
     #region Server
@@ -77,10 +79,10 @@ public class Health : NetworkBehaviour
     }
 
     [Mirror.Command(ignoreAuthority = true)]
-    private void CmdTakeDamage(int damage, string bomb, ulong steamId)
+    private void CmdTakeDamage(int damage, GameObject bomb, GameObject player)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
-        RpcTookDamageDelegate(null, currentLives);
+        eventManager.EventPlayerTookDamage(currentLives, bomb, player);
     }
 
     #endregion
@@ -177,7 +179,7 @@ public class Health : NetworkBehaviour
         }
 
         playerScript.canBeHit = false; // might remove later. this is for extra security
-        this.CmdTakeDamage(1, objName, playerScript.steamId);
+        this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
     }
 
     [Mirror.Command(ignoreAuthority = true)]

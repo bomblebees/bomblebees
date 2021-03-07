@@ -39,6 +39,8 @@ public class RoundManager : NetworkBehaviour
     public static RoundManager _instance;
     public static RoundManager Singleton { get { return _instance;  } }
 
+    private EventManager eventManager;
+
     private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
@@ -51,6 +53,10 @@ public class RoundManager : NetworkBehaviour
     {
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         totalRoomPlayers = room.roomSlots.Count;
+
+        // Event manager singleton
+        eventManager = EventManager.Singleton;
+        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
     
     [Client]
@@ -100,6 +106,7 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void StartRound()
     {
+        eventManager.EventStartRound();
         RpcStartRound();
         StartCoroutine(ServerStartRound());
     }
@@ -107,12 +114,21 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void EndRound()
     {
+        eventManager.EventEndRound();
         RpcEndRound();
         StartCoroutine(ServerEndRound());
     }
 
-    [ClientRpc] public void RpcStartRound() { EventRoundStart?.Invoke(); }
-    [ClientRpc] public void RpcEndRound() { EventRoundEnd?.Invoke(); }
+    [ClientRpc]
+    public void RpcStartRound()
+    {
+        EventRoundStart?.Invoke();
+
+    }
+    [ClientRpc] public void RpcEndRound() 
+    {
+        EventRoundEnd?.Invoke();
+    }
 
     [Server]
     public IEnumerator ServerStartRound()

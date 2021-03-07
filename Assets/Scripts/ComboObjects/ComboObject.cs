@@ -34,14 +34,31 @@ public class ComboObject : NetworkBehaviour
     public float startupDelay = 0f;
     protected bool didEarlyEffects = false;
 
+    // player who triggered the bomb
     protected GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
+
+    // player who placed the bomb (set in Player.cs, SERVER only variable)
+    protected GameObject ownerPlayer;
+    [Server] public void SetOwnerPlayer(GameObject p) { ownerPlayer = p; }
+    [Server] public GameObject GetOwnerPlayer() { return ownerPlayer; }
+
+    private EventManager eventManager;
 
     protected virtual void Start()
     {
         IgnoreDamageHitbox();
     }
-    
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        // Event manager singleton
+        eventManager = EventManager.Singleton;
+        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+    }
+
     protected virtual void IgnoreDamageHitbox()
     {
         foreach (Collider c in hitBox.GetComponentsInChildren<Collider>())
@@ -275,6 +292,8 @@ public class ComboObject : NetworkBehaviour
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);
+
+            eventManager.EventPlayerSpinHit(this.gameObject, triggeringPlayer);
         }
     }
 

@@ -42,7 +42,7 @@ public class PlayerInterface : NetworkBehaviour
 
     private void Start()
     {
-        this.gameObject.GetComponent<Health>().EventPlayerTookDamage += OnPlayerTakeDamage;
+        this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
     }
 
     private void Update()
@@ -57,7 +57,7 @@ public class PlayerInterface : NetworkBehaviour
         }
     }
 
-    public void OnPlayerTakeDamage(int newValue)
+    public void OnPlayerTakeDamage(int _, int __)
     {
         damageIndicator.GetComponent<FlashTween>().StartFlash();
     }

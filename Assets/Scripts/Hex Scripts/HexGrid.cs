@@ -79,6 +79,7 @@ public class HexGrid : NetworkBehaviour
     private char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
     public float tileRegenDuration = 1.5f;
 
+    private EventManager eventManager;
 
     void Start()
     {
@@ -100,6 +101,15 @@ public class HexGrid : NetworkBehaviour
     {
         base.OnStartClient();
         colorGridList.Callback += OnColorGridListChange;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        // Event manager singleton
+        eventManager = EventManager.Singleton;
+        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
     // Creates the models for cells in gridList with the colors saved in colorGridList
@@ -475,13 +485,19 @@ public class HexGrid : NetworkBehaviour
 
         cell.CreateModel(this.ReturnModelByCellKey(heldKey)); // updates on the server!
         cell.SetKey(heldKey);
+
+        char oldKey = colorGridList[cellIdx];
         colorGridList[cellIdx] = heldKey;
 
         List<HexCell> comboCells = cell.FindSameColorTiles(GetMinTilesInCombo());
 
         if (comboCells.Count > 0)
         {
+            eventManager.EventPlayerSwap(heldKey, oldKey, true, player.gameObject);
             player.GetComponent<Player>().AddItemCombo(heldKey);
+        } else
+        {
+            eventManager.EventPlayerSwap(heldKey, oldKey, false, player.gameObject);
         }
 
         ComboCallback(comboCells);

@@ -101,6 +101,9 @@ public class Player : NetworkBehaviour
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
 
+    // Event manager singleton
+    private EventManager eventManager;
+
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
     {
@@ -146,6 +149,10 @@ public class Player : NetworkBehaviour
         healthScript.EventGhostExit += SetCanExitInvincibility;
 
         //Debug.Log("server started");
+
+        // Event manager singleton
+        eventManager = EventManager.Singleton;
+        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
     void Assert()
@@ -258,29 +265,30 @@ public class Player : NetworkBehaviour
                 if (itemStack.Count > 0)
                 {
                     char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
+
                     sender.identity.GetComponent<Player>().RemoveItemCombo(); // pop it off
 
                     switch (bombType)
                     {
                         case 'b':
                             Debug.Log("Blue Bomb Type");
-                            SpawnBlinkObject();
+                            SpawnBlinkObject(sender.identity.gameObject);
                             break;
                         case 'g':
                             Debug.Log("Green Bomb Type");
-                            SpawnPlasmaObject();
+                            SpawnPlasmaObject(sender.identity.gameObject);
                             break;
                         case 'y':
                             Debug.Log("Yellow Bomb Type");
-                            this.SpawnLaserObject();
+                            this.SpawnLaserObject(sender.identity.gameObject);
                             break;
                         case 'r':
                             Debug.Log("Red Bomb Type");
-                            SpawnBigBombObject();
+                            SpawnBigBombObject(sender.identity.gameObject);
                             break;
                         case 'p':
                             Debug.Log("Purple Bomb Type");
-                            SpawnGravityObject();
+                            SpawnGravityObject(sender.identity.gameObject);
                             break;
                         case 'w':
                             Debug.Log("White Bomb Type");
@@ -297,8 +305,9 @@ public class Player : NetworkBehaviour
                     Debug.Log("dropping default bomb");
                     onDefaultBombReadyAnim.SetActive(false);
                     playedOnDefaultBombReadyAnim = false;
+
                     // Else use the default bomb
-                    this.SpawnDefaultBomb();
+                    this.SpawnDefaultBomb(sender.identity.gameObject);
 
                     // update hud
                     this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
@@ -315,52 +324,70 @@ public class Player : NetworkBehaviour
     }
 
     [Server]
-    void SpawnDefaultBomb()
+    void SpawnDefaultBomb(GameObject placer = null)
     {
         Debug.Log("spawning bomb");
         GameObject _bomb = (GameObject) Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_bomb);
+
+        eventManager.EventBombPlaced("DEF", _bomb, placer); // call event
     }
 
     [Server]
-    void SpawnLaserObject()
+    void SpawnLaserObject(GameObject placer = null)
     {
         GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_laser);
+
+        eventManager.EventBombPlaced("LAS", _laser, placer); // call event
     }
 
     [Server]
-    void SpawnPlasmaObject()
+    void SpawnPlasmaObject(GameObject placer = null)
     {
         GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _plasma.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_plasma);
+
+        eventManager.EventBombPlaced("PLA", _plasma, placer); // call event
     }
 
     [Server]
-    void SpawnBlinkObject()
+    void SpawnBlinkObject(GameObject placer = null)
     {
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _blink.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_blink);
+
+        eventManager.EventBombPlaced("BLK", _blink, placer); // call event
     }
 
     [Server]
-    void SpawnGravityObject()
+    void SpawnGravityObject(GameObject placer = null)
     {
         GameObject _gravity = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _gravity.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_gravity);
+
+        eventManager.EventBombPlaced("GRA", _gravity, placer); // call event
     }
 
     [Server]
-    void SpawnBigBombObject()
+    void SpawnBigBombObject(GameObject placer = null)
     {
         GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _bigBomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_bigBomb);
+
+        eventManager.EventBombPlaced("BIG", _bigBomb, placer); // call event
     }
     
     public void SetCanPlaceBombs(bool val)
@@ -395,11 +422,13 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    void CmdSpin()
+    void CmdSpin(NetworkConnectionToClient sender = null)
     {
         // Spin for server
         StartCoroutine(Spin());
         RpcSpin();
+
+        eventManager.EventPlayerSpin(sender.identity.gameObject);
     }
 
     [ClientRpc]
