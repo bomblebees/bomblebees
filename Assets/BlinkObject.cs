@@ -13,6 +13,23 @@ public class BlinkObject : TickObject
     private float val = -.51f;
     private float ignoreTriggererDuration = 10f;  // they'll never be hit by this
     public float breakdownDuration = 5f;
+    
+    
+    protected override void Start()
+    {
+        IgnoreDamageHitbox();
+        StartCoroutine(DelayedSpawn());
+    }
+
+    protected virtual IEnumerator DelayedSpawn()
+    {
+        yield return new WaitForSeconds(startupDelay);
+        this.collider.enabled = true;
+        // TODO cache these instead in the inspector
+        this.gameObject.transform.Find("BlockerHandler").gameObject.SetActive(true);
+        this.gameObject.transform.Find("Model").gameObject.SetActive(true);
+        this.gameObject.transform.Find("StartupModel").gameObject.SetActive(false);
+    }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
@@ -71,6 +88,19 @@ public class BlinkObject : TickObject
                 // this.EarlyProc();
             }
         }
+    }
+    
+    // Overridden in order to move the startupDelay away from this func and into the actual bomb placement
+    public override IEnumerator ProcEffects()
+    {
+        yield return new WaitForSeconds(startupDelay);
+        StopVelocity();
+        StartCoroutine(EnableSFX());
+        StartCoroutine(EnableVFX());
+        StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectCollider());
+        StartCoroutine(DisableObjectModel());
+        NotifyOccupiedTile(false);
     }
     
     public IEnumerator Breakdown()
