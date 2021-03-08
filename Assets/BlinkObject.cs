@@ -31,9 +31,9 @@ public class BlinkObject : TickObject
         isMoving = false;
         
         // NotifyServerPosition(triggeringPlayer);
+        this.gameObject.transform.position = targetPosition;
         triggeringPlayer.transform.position = this.gameObject.transform.position;
         
-        this.gameObject.transform.position = targetPosition;
         this.hitBox.SetActive(true);
         EarlyProc();
         StartCoroutine(Breakdown());
