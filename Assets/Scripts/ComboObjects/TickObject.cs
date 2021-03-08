@@ -34,7 +34,7 @@ public class TickObject : ComboObject
     {
         FindCenter();
         GoToCenter();
-        ProcEffects();
+        StartCoroutine((ProcEffects()));
         if (!didEarlyEffects)
         {
             yield return new WaitForSeconds(lingerDuration);
@@ -42,8 +42,9 @@ public class TickObject : ComboObject
         }
     }
 
-    public virtual void ProcEffects()
+    public virtual IEnumerator ProcEffects()
     {
+        yield return new WaitForSeconds(startupDelay);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
@@ -60,7 +61,7 @@ public class TickObject : ComboObject
         didEarlyEffects = true;
         FindCenter();
         GoToCenter();
-        ProcEffects();
+        StartCoroutine(ProcEffects());
     }
 
     public override void OnStartClient()

@@ -31,6 +31,7 @@ public class ComboObject : NetworkBehaviour
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
+    public float startupDelay = 0f;
     protected bool didEarlyEffects = false;
 
     protected GameObject triggeringPlayer;

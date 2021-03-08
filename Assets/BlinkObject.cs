@@ -19,6 +19,7 @@ public class BlinkObject : TickObject
         
         // TODO 
         // - the bomb lerp is too fast s.t. unity cant keep track fast enough, so instead of having push move them over time just teleport it to the target 
+        // fr independent lerp
         
         // FindTriggerDirection(edgeIndex);
         // edgeIndex += 2;

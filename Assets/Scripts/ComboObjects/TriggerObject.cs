@@ -36,14 +36,20 @@ public class TriggerObject : ComboObject
     {
         if (canBeTriggered && wasHit)
         {
-            canBeTriggered = false;  // To stop it from being triggered twice
-            timeTriggered = timeAlive;
-            StartCoroutine(EnableSFX());
-            StartCoroutine(EnableVFX());
-            StartCoroutine(EnableHitbox());
-            StartCoroutine(DisableObjectCollider());
-            StartCoroutine(DisableObjectModel());
+            StartCoroutine(Proc());
         }
+    }
+
+    protected virtual IEnumerator Proc()
+    {
+        yield return new WaitForSeconds(startupDelay);
+        canBeTriggered = false;  // To stop it from being triggered twice
+        timeTriggered = timeAlive;
+        StartCoroutine(EnableSFX());
+        StartCoroutine(EnableVFX());
+        StartCoroutine(EnableHitbox());
+        StartCoroutine(DisableObjectCollider());
+        StartCoroutine(DisableObjectModel());
     }
 
     protected virtual void ListenForDespawn()
@@ -53,9 +59,9 @@ public class TriggerObject : ComboObject
             canBeExtended = false;
             if (wasHit)
             {
-                if (lingerDuration - timeTriggered < minimumLifeDuration) // If hit and going into "overtime" with trigger
+                if (lingerDuration - timeTriggered < minimumLifeDuration + startupDelay) // If hit and going into "overtime" with trigger
                 {
-                    float extensionTime = minimumLifeDuration - (lingerDuration - timeTriggered);
+                    float extensionTime = minimumLifeDuration + startupDelay - (lingerDuration - timeTriggered);
                     StartCoroutine(DestroySelf(extensionTime));
                 }
                 else // If was hit and not going into "overtime" with trigger
