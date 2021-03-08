@@ -28,6 +28,7 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] public GameObject screenNavigation;
     [SerializeField] public GameObject screenLoading;
     [SerializeField] public GameObject screenError;
+    [SerializeField] public GameObject screenCredits;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
@@ -172,6 +173,15 @@ public class MainMenu_UI : MonoBehaviour
             screenLocal.SetActive(false);
             screenOptions.SetActive(true);
         }
+    }
+
+    #endregion
+
+    #region Screen: Credits
+
+    public void ToggleCredits()
+    {
+        screenCredits.SetActive(!screenCredits.activeSelf);
     }
 
     #endregion
