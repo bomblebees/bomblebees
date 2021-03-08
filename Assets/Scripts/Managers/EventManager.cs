@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 /*
  * Event manager class for logging game events, these events will 
@@ -12,14 +13,23 @@ public class EventManager : NetworkBehaviour
 {
     public float roundStartTime;
 
-    // singleton
+    private GameObject missSpinPlayer;
+    private float missSpinTime;
+    private bool voidSpin = false;
+
+    // singletons
     public static EventManager _instance;
     public static EventManager Singleton { get { return _instance; } }
+
+    private SessionLogger sessionLogger;
 
     private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: EventManager");
         else _instance = this;
+
+        sessionLogger = SessionLogger.Singleton;
+        if (sessionLogger == null) Debug.LogError("Cannot find Singleton: SessionLogger");
     }
 
     #region Events
@@ -31,32 +41,39 @@ public class EventManager : NetworkBehaviour
     public void EventStartRound()
     {
         roundStartTime = Time.time;
+        sessionLogger.InitializeSession();
     }
 
     /// <summary>
-    /// Called when the round ends
+    /// Called when the round ends (before scene changed)
     /// </summary>
     [Server]
-    public void EventEndRound()
+    public void EventEndRound(List<Player> players)
     {
+        sessionLogger.CollectData(Time.time - roundStartTime, players);
         //Debug.Log("end round time: " + Time.time);
     }
 
     /// <summary>
+    /// Called just before players are sent back to the lobby from the game
+    /// </summary>
+    [Server]
+    public void EventBackToLobby()
+    {
+        sessionLogger.ShowPermsPopup();
+    }
+
+    /// <summary>
     /// Called when a player has placed a bomb.
-    /// List of Bomb Codes: 
-    /// DEF - default bomb
-    /// LAS - laser bomb
-    /// PLA - plasma bomb
-    /// BLK - blink bomb
-    /// GRA - gravity bomb
     /// </summary>
     /// <param name="code">Code of the bomb that was placed, refer to list of bomb codes above</param>
     /// <param name="bomb">The bomb object that was placed</param>
     /// <param name="player">The player object who placed the bomb</param>
     [Server]
-    public void EventBombPlaced(string code, GameObject bomb, GameObject player)
+    public void EventBombPlaced(GameObject bomb, GameObject player)
     {
+        sessionLogger.CreateEventBOM(bomb, player, Time.time - roundStartTime);
+
         //Debug.Log("bomb placed: " + code);
         //Debug.Log("player who placed the bomb: " + player.name);
     }
@@ -70,6 +87,12 @@ public class EventManager : NetworkBehaviour
     [Server]
     public void EventPlayerTookDamage(int newLives, GameObject bomb, GameObject player)
     {
+        sessionLogger.CreateEventDMG(
+            bomb,
+            player,
+            bomb.GetComponent<ComboObject>().GetOwnerPlayer(),
+            Time.time - roundStartTime);
+
         //Debug.Log("player who took damage: " + player.name);
         //Debug.Log("player lives: " + newLives.ToString());
         //Debug.Log("bomb that hit the player: " + bomb);
@@ -86,6 +109,8 @@ public class EventManager : NetworkBehaviour
     [Server]
     public void EventPlayerSwap(char oldKey, char newKey, bool combo, GameObject player)
     {
+        sessionLogger.CreateEventSWP(oldKey, newKey, combo, player, Time.time - roundStartTime);
+
         //Debug.Log("player swapped hand " + oldKey + " with " + newKey + ", player: " + player.name);
         //if (combo) Debug.Log("MADE A COMBO " + oldKey);
     }
@@ -94,23 +119,20 @@ public class EventManager : NetworkBehaviour
     /// Called when a player spins
     /// </summary>
     /// <param name="player">The player who spun</param>
+    /// <param name="bomb">The bomb object that was hit, null if it did not hit anything</param>
     [Server]
-    public void EventPlayerSpin(GameObject player)
+    public void EventPlayerSpin(GameObject player, GameObject bomb = null)
     {
-        //Debug.Log("spun miss at " + Time.time);
-        //Debug.Log("player who spun: " + player.name);
-    }
-
-    /// <summary>
-    /// Called when a player spins, and it hits a bomb
-    /// </summary>
-    /// <param name="bomb">The bomb object that was hit</param>
-    /// <param name="player">The player object who hit the bomb</param>
-    [Server]
-    public void EventPlayerSpinHit(GameObject bomb, GameObject player)
-    {
-        //Debug.Log("spun hit at " + Time.time);
-        //Debug.Log("play spun hit | player: " + player.name + ", bomb: " + bomb.name);
+        if (bomb == null) // If the spin did not hit anything
+        {
+            sessionLogger.CreateEventSPN(
+                player,
+                bomb,
+                Time.time - roundStartTime - player.GetComponent<Player>().spinHitboxDuration); // subtract the time waited for event time
+        } else // if the spin hit a bomb
+        {
+            sessionLogger.CreateEventSPN(player, bomb, Time.time - roundStartTime);
+        }
     }
 
     #endregion

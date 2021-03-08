@@ -114,7 +114,11 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void EndRound()
     {
-        eventManager.EventEndRound();
+        // Append all player objects to player list for event manager
+        List<Player> players = new List<Player>();
+        playerList.ForEach(pi => players.Add(pi.player));
+
+        eventManager.EventEndRound(players);
         RpcEndRound();
         StartCoroutine(ServerEndRound());
     }
@@ -148,6 +152,8 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator ServerEndRound()
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
+        eventManager.EventBackToLobby(); // invoke event
+
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         room.ServerChangeScene(room.RoomScene);
     }

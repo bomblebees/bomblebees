@@ -43,20 +43,9 @@ public class ComboObject : NetworkBehaviour
     [Server] public void SetOwnerPlayer(GameObject p) { ownerPlayer = p; }
     [Server] public GameObject GetOwnerPlayer() { return ownerPlayer; }
 
-    private EventManager eventManager;
-
     protected virtual void Start()
     {
         IgnoreDamageHitbox();
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-
-        // Event manager singleton
-        eventManager = EventManager.Singleton;
-        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
     protected virtual void IgnoreDamageHitbox()
@@ -293,7 +282,8 @@ public class ComboObject : NetworkBehaviour
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);
 
-            eventManager.EventPlayerSpinHit(this.gameObject, triggeringPlayer);
+            // Set spin hit on player, for event logger
+            triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
         }
     }
 

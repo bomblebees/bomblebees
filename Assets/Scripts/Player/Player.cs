@@ -17,6 +17,7 @@ using Debug = UnityEngine.Debug;
 public class Player : NetworkBehaviour
 {
     [SyncVar] public ulong steamId = 0; // unique steam id
+    [SyncVar] public ulong playerId = 0; // unique player id
 
     // Assets
     [Header("Debug")]
@@ -68,6 +69,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
+    public GameObject spinHit = null; // the bomb that was hit with spin
 
     // Game Objects
     [Header("Required", order = 2)] public GameObject bomb;
@@ -332,7 +334,7 @@ public class Player : NetworkBehaviour
         _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_bomb);
 
-        eventManager.EventBombPlaced("DEF", _bomb, placer); // call event
+        eventManager.EventBombPlaced(_bomb, placer); // call event
     }
 
     [Server]
@@ -343,7 +345,7 @@ public class Player : NetworkBehaviour
         _laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_laser);
 
-        eventManager.EventBombPlaced("LAS", _laser, placer); // call event
+        eventManager.EventBombPlaced(_laser, placer); // call event
     }
 
     [Server]
@@ -354,7 +356,7 @@ public class Player : NetworkBehaviour
         _plasma.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_plasma);
 
-        eventManager.EventBombPlaced("PLA", _plasma, placer); // call event
+        eventManager.EventBombPlaced(_plasma, placer); // call event
     }
 
     [Server]
@@ -365,7 +367,7 @@ public class Player : NetworkBehaviour
         _blink.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_blink);
 
-        eventManager.EventBombPlaced("BLK", _blink, placer); // call event
+        eventManager.EventBombPlaced(_blink, placer); // call event
     }
 
     [Server]
@@ -376,7 +378,7 @@ public class Player : NetworkBehaviour
         _gravity.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_gravity);
 
-        eventManager.EventBombPlaced("GRA", _gravity, placer); // call event
+        eventManager.EventBombPlaced(_gravity, placer); // call event
     }
 
     [Server]
@@ -387,7 +389,7 @@ public class Player : NetworkBehaviour
         _bigBomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_bigBomb);
 
-        eventManager.EventBombPlaced("BIG", _bigBomb, placer); // call event
+        eventManager.EventBombPlaced(_bigBomb, placer); // call event
     }
     
     public void SetCanPlaceBombs(bool val)
@@ -421,14 +423,13 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [Command]
+    [Command(ignoreAuthority=true)]
     void CmdSpin(NetworkConnectionToClient sender = null)
     {
         // Spin for server
+        if (canSpin) StartCoroutine(WaitSpinHit(sender.identity.gameObject));
         StartCoroutine(Spin());
         RpcSpin();
-
-        eventManager.EventPlayerSpin(sender.identity.gameObject);
     }
 
     [ClientRpc]
@@ -436,6 +437,24 @@ public class Player : NetworkBehaviour
     {
         // Client will spin for all observers
         StartCoroutine(Spin());
+    }
+
+    // Wait to check if spin hit a bomb
+    private IEnumerator WaitSpinHit(GameObject player)
+    {
+        Player p = player.GetComponent<Player>();
+
+        yield return new WaitForSeconds(p.spinHitboxDuration);
+        
+        if (p.spinHit == null) // If did not hit, make a "spin miss" event
+        {
+            eventManager.EventPlayerSpin(player);
+        }
+        else // If did hit, make a "spin hit" event
+        {
+            eventManager.EventPlayerSpin(player, p.spinHit);
+            p.spinHit = null;
+        }
     }
 
     private IEnumerator HandleSpinHitbox()
@@ -447,8 +466,6 @@ public class Player : NetworkBehaviour
 
     private IEnumerator HandleSpinAnim()
     {
-        isRunAnim = true;
-        isIdleAnim = true;
 
         spinAnim.gameObject.SetActive(true);
 
@@ -463,6 +480,9 @@ public class Player : NetworkBehaviour
         // reset character spin animation
         animator.ResetTrigger("anim_SpinTrigger");
         networkAnimator.ResetTrigger("anim_SpinTrigger");
+
+        isRunAnim = true;
+        isIdleAnim = true;
     }
 
     void OnChangeHeldKey(char _, char newHeldKey)

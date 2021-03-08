@@ -27,6 +27,28 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnRoomStopServer();
     }
 
+    /// <summary>
+    /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
+    /// This is the ideal point to pass any data like player name, credentials, tokens, colors, etc.
+    /// into the GamePlayer object as it is about to enter the Online scene.
+    /// </summary>
+    /// <param name="roomPlayer"></param>
+    /// <param name="gamePlayer"></param>
+    /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
+    public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
+    {
+        Debug.LogWarning("Steam id not found, generating unique ID for this session");
+
+        // generate unique ID based on the time in ms, for development
+        DateTimeOffset curDate = new DateTimeOffset(DateTime.UtcNow);
+        ulong timeId = (ulong) curDate.ToUnixTimeMilliseconds();
+
+        // set the steamId temporarily to a timeId
+        gamePlayer.GetComponent<Player>().playerId = timeId;
+
+        return true;
+    }
+
     /*
         This code below is to demonstrate how to do a Start button that only appears for the Host player
         showStartButton is a local bool that's needed because OnRoomServerPlayersReady is only fired when
