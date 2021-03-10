@@ -181,10 +181,9 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableHitbox()
     {
-        var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
-        hitbox.SetActive(true);
+        hitBox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
-        hitbox.SetActive(false);
+        hitBox.SetActive(false);
     }
 
     protected virtual IEnumerator DisableObjectModel()
