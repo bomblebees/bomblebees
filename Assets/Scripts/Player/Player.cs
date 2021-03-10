@@ -745,7 +745,10 @@ public class Player : NetworkBehaviour
             //healthScript.SignalExit();
             this.canExitInvincibility = false;
 			FindObjectOfType<AudioManager>().PlaySound("playerRespawn");
-		}
+
+            isRunAnim = true;
+            isIdleAnim = true;
+        }
     }
 
     public void SetCanExitInvincibility(bool val)
