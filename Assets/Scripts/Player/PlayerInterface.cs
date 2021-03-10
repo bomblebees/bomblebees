@@ -38,10 +38,7 @@ public class PlayerInterface : NetworkBehaviour
         {
             CmdUpdatePlayerName(steamId);
         }
-    }
 
-    private void Start()
-    {
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
     }
 
@@ -59,7 +56,7 @@ public class PlayerInterface : NetworkBehaviour
 
     public void OnPlayerTakeDamage(int _, int __)
     {
-        damageIndicator.GetComponent<FlashTween>().StartFlash();
+        if (isLocalPlayer) damageIndicator.GetComponent<FlashTween>().StartFlash();
     }
 
     public IEnumerator EnableDeathUI()
