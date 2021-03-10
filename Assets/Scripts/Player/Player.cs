@@ -40,6 +40,8 @@ public class Player : NetworkBehaviour
     private float defaultBombUseTimer = 0f;
     [SerializeField] private GameObject onDefaultBombReadyAnim;
     private bool playedOnDefaultBombReadyAnim = true;
+    public int queenPoints = 0;
+    public int queenPointThreshhold = 5;
 
     private float horizontalAxis;
     private float prevHorizontalAxis;
@@ -284,7 +286,7 @@ public class Player : NetworkBehaviour
                             break;
                         case 'w':
                             Debug.Log("White Bomb Type");
-                            // unimplemented
+                            ApplyQueenPoints(1);
                             break;
                         default:
                             // code should not reach here
@@ -386,7 +388,6 @@ public class Player : NetworkBehaviour
                 StartCoroutine(HandleSpinHitbox());
                 StartCoroutine(HandleSpinAnim());
                 FindObjectOfType<AudioManager>().PlaySound("playerSpin");
-
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
                 canSpin = true;
@@ -473,14 +474,9 @@ public class Player : NetworkBehaviour
     {
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         verticalAxis = Input.GetAxisRaw("Vertical");
-
-        // if (horizontalAxis != 0) Debug.Log(horizontalAxis);
-        // Update animation state
-        // need to copy this to online
         if (horizontalAxis != 0 || verticalAxis != 0)
         {
             isIdleAnim = true;
-
             if (isRunAnim)
             {
                 // client animator
@@ -489,15 +485,12 @@ public class Player : NetworkBehaviour
                 // network animator
                 networkAnimator.ResetTrigger("anim_IdleTrigger");
                 networkAnimator.SetTrigger("anim_RunTrigger");
-
                 isRunAnim = false;
             }
-
         }
         else
         {
             isRunAnim = true;
-
             if (isIdleAnim)
             {
                 // client animator
@@ -506,10 +499,8 @@ public class Player : NetworkBehaviour
                 // network animator
                 networkAnimator.ResetTrigger("anim_RunTrigger");
                 networkAnimator.SetTrigger("anim_IdleTrigger");
-
                 isIdleAnim = false;
             }
-
         }
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
@@ -530,10 +521,6 @@ public class Player : NetworkBehaviour
                     turnSpeed * Time.deltaTime
                 );
             }
-
-
-
-
             if (this.canMove) controller.Move(((direction * movementSpeed)
                                                         + this.gravObjInfluence)
                                                         * Time.deltaTime);
@@ -726,4 +713,31 @@ public class Player : NetworkBehaviour
     {
         this.gravObjInfluence += force;
     }
+
+    public void ApplyQueenPoints(int val)
+    {
+        this.queenPoints += val;
+        if (queenPoints > queenPointThreshhold)
+        {
+            BecomeQueen();
+            RpcBecomeQueen();
+        }
+    }
+
+    public void BecomeQueen()
+    {
+        print("A Player has become queen!");
+    }
+
+    [ClientRpc]
+    public void RpcBecomeQueen()
+    {
+         BecomeQueen();       
+    }
+    
+    
+    
+    
+    
+    
 }
