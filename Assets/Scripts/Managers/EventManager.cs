@@ -22,11 +22,15 @@ public class EventManager : NetworkBehaviour
     public static EventManager Singleton { get { return _instance; } }
 
     private SessionLogger sessionLogger;
-
     private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: EventManager");
         else _instance = this;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
 
         sessionLogger = SessionLogger.Singleton;
         if (sessionLogger == null) Debug.LogError("Cannot find Singleton: SessionLogger");

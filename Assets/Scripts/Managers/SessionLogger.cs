@@ -50,8 +50,6 @@ public class SessionLogger : MonoBehaviour
 
     private void Awake()
     {
-        DontDestroyOnLoad(this);
-
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
     }

@@ -6,6 +6,7 @@ public class PreloaderManager : MonoBehaviour
 {
     [Header("Required")]
     [Scene] public string mainMenuScene;
+    public GameObject sessionLogger;
     public GameObject steamNetworkManager;
     public GameObject localNetworkManager;
     public GameObject mainMenuUI;
@@ -37,6 +38,8 @@ public class PreloaderManager : MonoBehaviour
     private void Preload()
     {
 
+        // Anything that needs to persist past Preload scene goes 
+        DontDestroyOnLoad(sessionLogger);
 
         // Load menu scene
         SceneManager.LoadScene(mainMenuScene);
