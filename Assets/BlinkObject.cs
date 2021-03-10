@@ -18,14 +18,20 @@ public class BlinkObject : TickObject
     protected override void Start()
     {
         IgnoreDamageHitbox();
-        StartCoroutine(DelayedSpawn());
+        // StartCoroutine(DelayedSpawn());  
+        EnableObject();
     }
 
     protected virtual IEnumerator DelayedSpawn()
     {
         yield return new WaitForSeconds(startupDelay);
-        this.collider.enabled = true;
+        EnableObject();
+    }
+
+    protected virtual void EnableObject()
+    {
         // TODO cache these instead in the inspector
+        this.collider.enabled = true;
         this.gameObject.transform.Find("BlockerHandler").gameObject.SetActive(true);
         this.gameObject.transform.Find("Model").gameObject.SetActive(true);
         this.gameObject.transform.Find("StartupModel").gameObject.SetActive(false);
@@ -34,13 +40,15 @@ public class BlinkObject : TickObject
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         
-        // TODO 
-        // - the bomb lerp is too fast s.t. unity cant keep track fast enough, so instead of having push move them over time just teleport it to the target 
-        // fr independent lerp
-        
-        // FindTriggerDirection(edgeIndex);
-        // edgeIndex += 2;
-        
+        // Note: PushActions' stuff was here originally
+        // EarlyProc();  // NOTE: keep this here if you want the delay after the bomb is placed
+        StartCoroutine(PushActions(edgeIndex, triggeringPlayer));
+        return true;
+    }
+
+    protected virtual IEnumerator PushActions(int edgeIndex, GameObject triggeringPlayer)
+    {
+        yield return new WaitForSeconds(startupDelay);
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         this.collider.enabled = false;
         base.Push(edgeIndex, triggeringPlayer); // Doesn't use lerpRate at all. Do this to get targetPosition
@@ -50,11 +58,9 @@ public class BlinkObject : TickObject
         // NotifyServerPosition(triggeringPlayer);
         this.gameObject.transform.position = targetPosition;
         triggeringPlayer.transform.position = this.gameObject.transform.position;
-        
-        this.hitBox.SetActive(true);
-        EarlyProc();
+
+        StartCoroutine(EnableHitbox());
         StartCoroutine(Breakdown());
-        return true;
     }
 
     [Command(ignoreAuthority = true)]
@@ -106,6 +112,7 @@ public class BlinkObject : TickObject
     public IEnumerator Breakdown()
     {
         // if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
+        // EarlyProc();
         didEarlyEffects = true;
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
