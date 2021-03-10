@@ -43,7 +43,7 @@ public class Health : NetworkBehaviour
     // Event manager singleton
     private EventManager eventManager;
 
-    private void Awake()
+    private void Start()
     {
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");

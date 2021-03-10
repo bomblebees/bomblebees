@@ -41,13 +41,18 @@ public class GameUIManager : NetworkBehaviour
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
+    }
 
+    private void InitSingletons()
+    {
         roundManager = RoundManager.Singleton;
         if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
     }
 
     public override void OnStartServer()
     {
+        InitSingletons();
+
         // Subscribe to server round events
         roundManager.EventPlayerConnected += ServerPlayerConnected;
         roundManager.EventRoundStart += ServerStartRound;
@@ -56,6 +61,8 @@ public class GameUIManager : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
+        InitSingletons();
+
         // Subscribe to client round events
         roundManager.EventRoundStart += ClientStartRound;
         roundManager.EventRoundEnd += ClientEndRound;
