@@ -94,12 +94,20 @@ public class PlayerInterface : NetworkBehaviour
 
     public void UpdateStackHud(int idx, char key)
     {
+        if (idx == 2 || stackUI[idx+1].color == Color.clear)
+            stackUI[idx].gameObject.transform.localScale = new Vector3(0.25f,0.25f,0.25f);
+        else
+            stackUI[idx].gameObject.transform.localScale = new Vector3(0.1904f,0.1904f,0.1904f);
+
         if (stackUI[idx].color != GetKeyColor(key))
         {
-            stackUI[idx].color = GetKeyColor(key);
+            if (GetKeyColor(key) == Color.white)
+                stackUI[idx].color = new Color(0f,0f,0f,0f);
+            else 
+                stackUI[idx].color = GetKeyColor(key);
 
             // Run bounce anim
-            stackUI[idx].gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+            // stackUI[idx].gameObject.GetComponent<IconBounceTween>().OnTweenStart();
         }
     }
 

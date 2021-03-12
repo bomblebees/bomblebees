@@ -699,7 +699,8 @@ public class Player : NetworkBehaviour
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
         PlayerInterface hud = this.GetComponent<PlayerInterface>();
-        for (int i = 0; i < 3; i++)
+        // for (int i = 0; i < 3; i++)
+        for (int i = 2; i >= 0; i--)
         {
             if (i < itemStack.Count) hud.UpdateStackHud(i, itemStack[i]);
             else hud.UpdateStackHud(i, 'e');
