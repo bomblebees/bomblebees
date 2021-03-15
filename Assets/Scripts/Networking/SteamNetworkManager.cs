@@ -19,6 +19,7 @@ public class SteamNetworkManager : NetworkRoomManagerExt
     {
         // transfer steam id to player
         gamePlayer.GetComponent<Player>().steamId = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId;
+        gamePlayer.GetComponent<Player>().steamName = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamUsername;
 
         return true;
     }

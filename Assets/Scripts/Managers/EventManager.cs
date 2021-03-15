@@ -17,6 +17,23 @@ public class EventManager : NetworkBehaviour
     private float missSpinTime;
     private bool voidSpin = false;
 
+    // events
+    public delegate void StartRoundDelegate();
+    public delegate void EndRoundDelegate(List<Player> players);
+    public delegate void ReturnToLobbyDelegate();
+    public delegate void BombPlacedDelegate(GameObject bomb, GameObject player);
+    public delegate void PlayerTookDamageDelegate(int newLives, GameObject bomb, GameObject player);
+    public delegate void PlayerSwapDelegate(char oldKey, char newKey, bool combo, GameObject player);
+    public delegate void PlayerSpinDelegate(GameObject player, GameObject bomb);
+
+    public event StartRoundDelegate EventStartRound;
+    public event EndRoundDelegate EventEndRound;
+    public event ReturnToLobbyDelegate EventReturnToLobby;
+    public event BombPlacedDelegate EventBombPlaced;
+    public event PlayerTookDamageDelegate EventPlayerTookDamage;
+    public event PlayerSwapDelegate EventPlayerSwap;
+    public event PlayerSpinDelegate EventPlayerSpin;
+
     // singletons
     public static EventManager _instance;
     public static EventManager Singleton { get { return _instance; } }
@@ -42,29 +59,35 @@ public class EventManager : NetworkBehaviour
     /// Called when the round starts
     /// </summary>
     [Server]
-    public void EventStartRound()
+    public void OnStartRound()
     {
         roundStartTime = Time.time;
         sessionLogger.InitializeSession();
+
+        EventStartRound?.Invoke();
     }
 
     /// <summary>
     /// Called when the round ends (before scene changed)
     /// </summary>
     [Server]
-    public void EventEndRound(List<Player> players)
+    public void OnEndRound(List<Player> players)
     {
         sessionLogger.CollectData(Time.time - roundStartTime, players);
         //Debug.Log("end round time: " + Time.time);
+
+        EventEndRound?.Invoke(players);
     }
 
     /// <summary>
     /// Called just before players are sent back to the lobby from the game
     /// </summary>
     [Server]
-    public void EventBackToLobby()
+    public void OnReturnToLobby()
     {
         sessionLogger.ShowPermsPopup();
+
+        EventReturnToLobby?.Invoke();
     }
 
     /// <summary>
@@ -74,12 +97,14 @@ public class EventManager : NetworkBehaviour
     /// <param name="bomb">The bomb object that was placed</param>
     /// <param name="player">The player object who placed the bomb</param>
     [Server]
-    public void EventBombPlaced(GameObject bomb, GameObject player)
+    public void OnBombPlaced(GameObject bomb, GameObject player)
     {
         sessionLogger.CreateEventBOM(bomb, player, Time.time - roundStartTime);
 
         //Debug.Log("bomb placed: " + code);
         //Debug.Log("player who placed the bomb: " + player.name);
+
+        EventBombPlaced?.Invoke(bomb, player);
     }
 
     /// <summary>
@@ -89,7 +114,7 @@ public class EventManager : NetworkBehaviour
     /// <param name="bomb">The bomb object that caused the damage</param>
     /// <param name="player">The player object who took damage</param>
     [Server]
-    public void EventPlayerTookDamage(int newLives, GameObject bomb, GameObject player)
+    public void OnPlayerTookDamage(int newLives, GameObject bomb, GameObject player)
     {
         sessionLogger.CreateEventDMG(
             bomb,
@@ -101,6 +126,7 @@ public class EventManager : NetworkBehaviour
         //Debug.Log("player lives: " + newLives.ToString());
         //Debug.Log("bomb that hit the player: " + bomb);
         //Debug.Log("original person who placed the bomb " + bomb.GetComponent<ComboObject>().GetOwnerPlayer());
+        EventPlayerTookDamage?.Invoke(newLives, bomb, player);
     }
 
     /// <summary>
@@ -111,12 +137,13 @@ public class EventManager : NetworkBehaviour
     /// <param name="combo">Whether or not the swap made a combo</param>
     /// <param name="player">The player who swapped</param>
     [Server]
-    public void EventPlayerSwap(char oldKey, char newKey, bool combo, GameObject player)
+    public void OnPlayerSwap(char oldKey, char newKey, bool combo, GameObject player)
     {
         sessionLogger.CreateEventSWP(oldKey, newKey, combo, player, Time.time - roundStartTime);
 
         //Debug.Log("player swapped hand " + oldKey + " with " + newKey + ", player: " + player.name);
         //if (combo) Debug.Log("MADE A COMBO " + oldKey);
+        EventPlayerSwap?.Invoke(oldKey, newKey, combo, player);
     }
 
     /// <summary>
@@ -125,7 +152,7 @@ public class EventManager : NetworkBehaviour
     /// <param name="player">The player who spun</param>
     /// <param name="bomb">The bomb object that was hit, null if it did not hit anything</param>
     [Server]
-    public void EventPlayerSpin(GameObject player, GameObject bomb = null)
+    public void OnPlayerSpin(GameObject player, GameObject bomb = null)
     {
         if (bomb == null) // If the spin did not hit anything
         {
@@ -137,6 +164,7 @@ public class EventManager : NetworkBehaviour
         {
             sessionLogger.CreateEventSPN(player, bomb, Time.time - roundStartTime);
         }
+        EventPlayerSpin?.Invoke(player, bomb);
     }
 
     #endregion

@@ -16,8 +16,10 @@ using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
 {
+    // Steam Vars
     [SyncVar] public ulong steamId = 0; // unique steam id
     [SyncVar] public ulong playerId = 0; // unique player id
+    [SyncVar] public string steamName = "[Steam Name]"; // steam username
 
     // Assets
     [Header("Debug")]
@@ -336,7 +338,7 @@ public class Player : NetworkBehaviour
         _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_bomb);
 
-        eventManager.EventBombPlaced(_bomb, placer); // call event
+        eventManager.OnBombPlaced(_bomb, placer); // call event
     }
 
     [Server]
@@ -347,7 +349,7 @@ public class Player : NetworkBehaviour
         _laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_laser);
 
-        eventManager.EventBombPlaced(_laser, placer); // call event
+        eventManager.OnBombPlaced(_laser, placer); // call event
     }
 
     [Server]
@@ -358,7 +360,7 @@ public class Player : NetworkBehaviour
         _plasma.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_plasma);
 
-        eventManager.EventBombPlaced(_plasma, placer); // call event
+        eventManager.OnBombPlaced(_plasma, placer); // call event
     }
 
     [Server]
@@ -369,7 +371,7 @@ public class Player : NetworkBehaviour
         _blink.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_blink);
 
-        eventManager.EventBombPlaced(_blink, placer); // call event
+        eventManager.OnBombPlaced(_blink, placer); // call event
     }
 
     [Server]
@@ -380,7 +382,7 @@ public class Player : NetworkBehaviour
         _gravity.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_gravity);
 
-        eventManager.EventBombPlaced(_gravity, placer); // call event
+        eventManager.OnBombPlaced(_gravity, placer); // call event
     }
 
     [Server]
@@ -391,7 +393,7 @@ public class Player : NetworkBehaviour
         _bigBomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         NetworkServer.Spawn(_bigBomb);
 
-        eventManager.EventBombPlaced(_bigBomb, placer); // call event
+        eventManager.OnBombPlaced(_bigBomb, placer); // call event
     }
     
     public void SetCanPlaceBombs(bool val)
@@ -449,11 +451,11 @@ public class Player : NetworkBehaviour
         
         if (p.spinHit == null) // If did not hit, make a "spin miss" event
         {
-            eventManager.EventPlayerSpin(player);
+            eventManager.OnPlayerSpin(player);
         }
         else // If did hit, make a "spin hit" event
         {
-            eventManager.EventPlayerSpin(player, p.spinHit);
+            eventManager.OnPlayerSpin(player, p.spinHit);
             p.spinHit = null;
         }
     }
