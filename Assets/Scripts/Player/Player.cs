@@ -16,10 +16,12 @@ using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
 {
-    // Steam Vars
+    // Vars transferred from room player object
+    [Header("Identification")]
     [SyncVar] public ulong steamId = 0; // unique steam id
     [SyncVar] public ulong playerId = 0; // unique player id
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
+    [SyncVar] public Color playerColor;
 
     // Assets
     [Header("Debug")]
@@ -125,6 +127,10 @@ public class Player : NetworkBehaviour
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         UpdateHeldHex(heldKey); // Initialize model
+
+        // Set player color
+        GameObject mesh = playerModel.transform.GetChild(0).gameObject;
+        mesh.GetComponent<Renderer>().material.SetColor("_BaseColor", playerColor);
 
         itemStack.Callback += OnItemStackChange;
 

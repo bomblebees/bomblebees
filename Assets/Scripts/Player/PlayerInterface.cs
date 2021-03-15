@@ -30,14 +30,11 @@ public class PlayerInterface : NetworkBehaviour
     {
         base.OnStartClient();
 
-        ulong steamId = this.GetComponent<Player>().steamId;
+        //ulong steamId = this.GetComponent<Player>().steamId;
 
-        Debug.Log("server transfer steamid " + steamId);
+        //Debug.Log("server transfer steamid " + steamId);
 
-        if (steamId != 0)
-        {
-            CmdUpdatePlayerName(steamId);
-        }
+        CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
     }
@@ -79,17 +76,16 @@ public class PlayerInterface : NetworkBehaviour
     #region Heads Up Display (HUD)
 
     [Command(ignoreAuthority=true)]
-    public void CmdUpdatePlayerName(ulong steamId)
+    public void CmdUpdatePlayerName(GameObject player)
     {
-        RpcUpdatePlayerName(steamId);
+        RpcUpdatePlayerName(player);
     }
 
     [ClientRpc]
-    public void RpcUpdatePlayerName(ulong steamId)
+    public void RpcUpdatePlayerName(GameObject player)
     {
-        CSteamID id = new CSteamID(steamId);
-
-        playerName.text = SteamFriends.GetFriendPersonaName(id);
+        playerName.text = player.GetComponent<Player>().steamName;
+        playerName.color = player.GetComponent<Player>().playerColor;
     }
 
     public void UpdateStackHud(int idx, char key)

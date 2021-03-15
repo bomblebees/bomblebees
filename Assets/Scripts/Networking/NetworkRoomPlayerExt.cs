@@ -2,18 +2,30 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
 using Steamworks;
+using System.Collections.Generic;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
     [SyncVar] public ulong steamId;
     [SyncVar] public string steamUsername;
     [SyncVar] public int steamAvatarId;
+    [SyncVar] public Color playerColor;
+
+    // List of player colors
+    private List<Color> listColors = new List<Color> {
+        Color.red,
+        Color.blue,
+        Color.yellow,
+        Color.green,
+    };
 
     Room_UI roomUI;
     
 
     public override void OnStartClient()
     {
+        this.playerColor = listColors[index];
+
         roomUI = Room_UI.singleton;
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;

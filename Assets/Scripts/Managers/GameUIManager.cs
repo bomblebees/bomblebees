@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using TMPro;
 using System;
 using Mirror;
@@ -148,7 +147,7 @@ public class GameUIManager : NetworkBehaviour
         {
             Health life = playerList[i].health;
 
-            RpcEnableLivesUI(i, life.currentLives, playerList[i].steamId); // enable and init UI for each player
+            RpcEnableLivesUI(i, life.currentLives, playerList[i].player.gameObject); // enable and init UI for each player
 
             // subscribe to all lives of player
             life.EventLivesChanged += ServerUpdateLives;
@@ -156,29 +155,25 @@ public class GameUIManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcEnableLivesUI(int idx, int lifeCount, ulong steamId)
+    public void RpcEnableLivesUI(int idx, int lifeCount, GameObject player)
     {
+        Player p = player.GetComponent<Player>();
+
         // enable ui for players
         livesUIs[idx].livesObject.SetActive(true);
 
-        string userName = "[Player Name]";
-
-        // Set steam user name and avatars
-        if (steamId != 0)
+        // Set steam user avatar
+        if (p.steamId != 0)
         {
-            CSteamID steamID = new CSteamID(steamId);
-
-            userName = SteamFriends.GetFriendPersonaName(steamID);
-
+            CSteamID steamID = new CSteamID(p.steamId);
             int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
-
             if (imageId == -1) return;
-
             livesUIs[idx].avatar.texture = GetSteamImageAsTexture(imageId);
         }
 
         // initialize health and username
-        livesUIs[idx].playerName.text = userName;
+        livesUIs[idx].playerName.text = p.steamName;
+        livesUIs[idx].playerName.color = p.playerColor; // sets the color to the color of the player
         livesUIs[idx].livesCounter.text = "Lives: " + lifeCount.ToString();
     }
 
@@ -320,7 +315,8 @@ public class GameUIManager : NetworkBehaviour
 
     private string GetPlayerText(GameObject player)
     {
-        return "<b><color=\"blue\">" + player.GetComponent<Player>().steamName + "</color></b>";
+        Player p = player.GetComponent<Player>();
+        return "<b><color=#" + ColorUtility.ToHtmlStringRGB(p.playerColor) + ">" + p.steamName + "</color></b>";
     }
 
     private string GetBombText(GameObject bomb)
