@@ -120,12 +120,12 @@ public class PlayerInterface : NetworkBehaviour
     {
         switch (key)
         {
-            case 'b': return Color.blue;
-            case 'g': return Color.green;
-            case 'y': return Color.yellow;
+            case 'b': return new Color32(0, 217, 255, 255);
+            case 'g': return new Color32(23, 229, 117, 255);
+            case 'y': return new Color32(249, 255, 35, 255);
             case 'r': return Color.red;
-            case 'p': return Color.magenta;
-            case 'w': return Color.grey;
+            case 'p': return new Color32(241, 83, 255, 255);
+            case 'w': return new Color32(178, 178, 178, 255);
             case 'e': return Color.white;
             default: return Color.white;
         }
