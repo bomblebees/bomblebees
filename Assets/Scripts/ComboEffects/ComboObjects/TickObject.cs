@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class TickObject : ComboObject
 {
-    public float tickDuration = 4f;
+    protected float tickDuration = 4.0f;
 
     public override void OnStartLocalPlayer()
     {
@@ -18,11 +18,25 @@ public class TickObject : ComboObject
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
-        StartCoroutine(TickDown());
     }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        // All the client needs to do is render the sfx/vfx
+        // The server should do all calculations
+        // StartCoroutine(TickDown());
+    }
+
+    // public override void SetCreator(Player player)
+    // {
+    //     StartCoroutine(TickDown());
+    //     base.SetCreator(player);
+    // }
 
     protected virtual IEnumerator TickDown()
     {
+        print("tick tickduration is "+tickDuration);
         yield return new WaitForSeconds(tickDuration);
         if (!didEarlyEffects)
         {
@@ -62,14 +76,6 @@ public class TickObject : ComboObject
         FindCenter();
         GoToCenter();
         StartCoroutine(ProcEffects());
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        // All the client needs to do is render the sfx/vfx
-        // The server should do all calculations
-        StartCoroutine(TickDown());
     }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)

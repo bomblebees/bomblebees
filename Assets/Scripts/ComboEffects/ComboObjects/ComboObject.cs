@@ -11,7 +11,7 @@ using UnityEngine;
 // - Hitbox
 public class ComboObject : NetworkBehaviour
 {
-    private GameObject creator;
+    private Player creatorScript;
     [Header("Required", order = 1)]
     public GameObject blockerHandler;
     public GameObject hitBox;
@@ -34,6 +34,8 @@ public class ComboObject : NetworkBehaviour
     public float lingerDuration = 8f;
     public float startupDelay = 0f;
     protected bool didEarlyEffects = false;
+    // protected float queenStartupDelay = 0f;
+    protected bool playerIsQueen = false;
 
     protected GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
@@ -56,11 +58,10 @@ public class ComboObject : NetworkBehaviour
         ListenForMoving();
     }
 
-    public void SetCreator(GameObject player)
+    public virtual void SetCreator(Player player)
     {
-        this.creator = player;
+        // this.creatorScript = player;
     }
-    
 
     protected void ListenForMoving()
     {
@@ -316,7 +317,6 @@ public class ComboObject : NetworkBehaviour
         }
         else return false;
     }
-    
     
     protected IEnumerator IgnoreTriggeringPlayer(float seconds)
     {

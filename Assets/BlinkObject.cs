@@ -22,6 +22,12 @@ public class BlinkObject : TickObject
         EnableObject();
     }
 
+    // public override void SetCreator(Player player)
+    // {
+    //     base.SetCreator(player);
+    //     queenStartupDelay = 0.0f;
+    // }
+
     protected virtual IEnumerator DelayedSpawn()
     {
         yield return new WaitForSeconds(startupDelay);

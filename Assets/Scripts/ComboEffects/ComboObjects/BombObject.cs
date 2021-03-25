@@ -12,6 +12,7 @@ public class BombObject : TickObject
     public Material pulseShader;
     public float riseRate;
     private float val = -.51f;
+    public float queenStartupDelay = 0.5f;
 
     protected override void Start()
     {
@@ -25,8 +26,19 @@ public class BombObject : TickObject
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", val);
         val += riseRate * Time.deltaTime;
     }
-
-
+    
+    // might need RPC call
+    public override void SetCreator(Player player)
+    {
+        if (player.isQueen)
+        {
+            // tickDuration = 1.0f;
+            timeTillAnimSpeedup = 1.0f;
+            this.tickDuration = queenStartupDelay;
+        }
+        StartCoroutine(this.TickDown());
+        base.SetCreator(player);
+    }
     protected override IEnumerator TickDown()
     {
         if (!didEarlyEffects)
