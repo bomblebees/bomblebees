@@ -279,7 +279,7 @@ public class Player : NetworkBehaviour
                             break;
                         case 'y':
                             Debug.Log("Yellow Bomb Type");
-                            this.SpawnLaserObject();
+                            SpawnLaserObject();
                             break;
                         case 'r':
                             Debug.Log("Red Bomb Type");
@@ -325,6 +325,7 @@ public class Player : NetworkBehaviour
         Debug.Log("spawning bomb");
         GameObject _bomb = (GameObject) Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _bomb.GetComponent<ComboObject>().SetCreator(this.gameObject);
         NetworkServer.Spawn(_bomb);
     }
 
@@ -333,6 +334,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _laser.GetComponent<ComboObject>().SetCreator(this.gameObject);
         NetworkServer.Spawn(_laser);
     }
 
@@ -341,6 +343,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _plasma.GetComponent<ComboObject>().SetCreator(this.gameObject);
         NetworkServer.Spawn(_plasma);
     }
 
@@ -349,6 +352,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+         _blink.GetComponent<ComboObject>().SetCreator(this.gameObject);
         NetworkServer.Spawn(_blink);
     }
 
@@ -357,6 +361,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _gravity = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _gravity.GetComponent<ComboObject>().SetCreator(this.gameObject);
         NetworkServer.Spawn(_gravity);
     }
 
@@ -365,6 +370,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        _bigBomb.GetComponent<ComboObject>().SetCreator(this.gameObject);
         NetworkServer.Spawn(_bigBomb);
     }
     

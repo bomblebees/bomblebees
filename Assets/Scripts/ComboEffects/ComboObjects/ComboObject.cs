@@ -11,6 +11,7 @@ using UnityEngine;
 // - Hitbox
 public class ComboObject : NetworkBehaviour
 {
+    private GameObject creator;
     [Header("Required", order = 1)]
     public GameObject blockerHandler;
     public GameObject hitBox;
@@ -53,6 +54,11 @@ public class ComboObject : NetworkBehaviour
     protected virtual void Update()
     {
         ListenForMoving();
+    }
+
+    public void SetCreator(GameObject player)
+    {
+        this.creator = player;
     }
     
 
