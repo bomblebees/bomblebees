@@ -42,6 +42,11 @@ public class Player : NetworkBehaviour
     private bool playedOnDefaultBombReadyAnim = true;
     public int queenPoints = 0;
     public int queenPointThreshhold = 5;
+    public float queenStartupDuration = 1.0f;
+    public float queenDuration = 10.0f;
+    public float queenFalloffDuration = 1.0f;
+    public GameObject queenVFX;
+    public bool isQueen = true;
 
     private float horizontalAxis;
     private float prevHorizontalAxis;
@@ -285,8 +290,6 @@ public class Player : NetworkBehaviour
                             SpawnGravityObject();
                             break;
                         case 'w':
-                            Debug.Log("White Bomb Type");
-                            ApplyQueenPoints(1);
                             break;
                         default:
                             // code should not reach here
@@ -618,14 +621,21 @@ public class Player : NetworkBehaviour
     [Server]
     public void AddItemCombo(char colorKey)
     {
-        if (itemStack.Count < maxStackSize)
+        if (colorKey == 'w')
         {
-            itemStack.Add(colorKey); // Push new combo to stack
+            this.ApplyQueenPoints(1);
         }
         else
         {
-            itemStack.RemoveAt(0); // Remove oldest combo (bottom of stack)
-            itemStack.Add(colorKey); // Push new combo to stack
+            if (itemStack.Count < maxStackSize)
+            {
+                itemStack.Add(colorKey); // Push new combo to stack
+            }
+            else
+            {
+                itemStack.RemoveAt(0); // Remove oldest combo (bottom of stack)
+                itemStack.Add(colorKey); // Push new combo to stack
+            }
         }
     }
 
@@ -717,27 +727,29 @@ public class Player : NetworkBehaviour
     public void ApplyQueenPoints(int val)
     {
         this.queenPoints += val;
-        if (queenPoints > queenPointThreshhold)
+        print("queen points is "+this.queenPoints);
+        if (this.queenPoints > queenPointThreshhold)
         {
-            BecomeQueen();
             RpcBecomeQueen();
         }
     }
 
-    public void BecomeQueen()
+    public IEnumerator BecomeQueen()
     {
         print("A Player has become queen!");
+        queenVFX.SetActive(true);
+        yield return new WaitForSeconds(queenStartupDuration);
+        isQueen = true;
+        yield return new WaitForSeconds(queenDuration);
+        yield return new WaitForSeconds(queenFalloffDuration);
+        isQueen = false;
+        queenVFX.SetActive(false);
+        print("A Player is no longer queen");
     }
 
     [ClientRpc]
     public void RpcBecomeQueen()
     {
-         BecomeQueen();       
+         StartCoroutine(BecomeQueen());       
     }
-    
-    
-    
-    
-    
-    
 }
