@@ -82,7 +82,7 @@ public class Health : NetworkBehaviour
     private void CmdTakeDamage(int damage, GameObject bomb, GameObject player)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
-        eventManager.EventPlayerTookDamage(currentLives, bomb, player);
+        eventManager.OnPlayerTookDamage(currentLives, bomb, player);
     }
 
     #endregion

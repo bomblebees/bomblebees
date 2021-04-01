@@ -30,14 +30,11 @@ public class PlayerInterface : NetworkBehaviour
     {
         base.OnStartClient();
 
-        ulong steamId = this.GetComponent<Player>().steamId;
+        //ulong steamId = this.GetComponent<Player>().steamId;
 
-        Debug.Log("server transfer steamid " + steamId);
+        //Debug.Log("server transfer steamid " + steamId);
 
-        if (steamId != 0)
-        {
-            CmdUpdatePlayerName(steamId);
-        }
+        CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
     }
@@ -79,17 +76,16 @@ public class PlayerInterface : NetworkBehaviour
     #region Heads Up Display (HUD)
 
     [Command(ignoreAuthority=true)]
-    public void CmdUpdatePlayerName(ulong steamId)
+    public void CmdUpdatePlayerName(GameObject player)
     {
-        RpcUpdatePlayerName(steamId);
+        RpcUpdatePlayerName(player);
     }
 
     [ClientRpc]
-    public void RpcUpdatePlayerName(ulong steamId)
+    public void RpcUpdatePlayerName(GameObject player)
     {
-        CSteamID id = new CSteamID(steamId);
-
-        playerName.text = SteamFriends.GetFriendPersonaName(id);
+        playerName.text = player.GetComponent<Player>().steamName;
+        playerName.color = player.GetComponent<Player>().playerColor;
     }
 
     public void UpdateStackHud(int idx, char key)
@@ -124,12 +120,12 @@ public class PlayerInterface : NetworkBehaviour
     {
         switch (key)
         {
-            case 'b': return Color.blue;
-            case 'g': return Color.green;
-            case 'y': return Color.yellow;
+            case 'b': return new Color32(0, 217, 255, 255);
+            case 'g': return new Color32(23, 229, 117, 255);
+            case 'y': return new Color32(249, 255, 35, 255);
             case 'r': return Color.red;
-            case 'p': return Color.magenta;
-            case 'w': return Color.grey;
+            case 'p': return new Color32(241, 83, 255, 255);
+            case 'w': return new Color32(178, 178, 178, 255);
             case 'e': return Color.white;
             default: return Color.white;
         }

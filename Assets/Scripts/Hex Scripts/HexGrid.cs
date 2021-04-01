@@ -493,11 +493,11 @@ public class HexGrid : NetworkBehaviour
 
         if (comboCells.Count > 0)
         {
-            eventManager.EventPlayerSwap(heldKey, oldKey, true, player.gameObject);
+            eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject);
             player.GetComponent<Player>().AddItemCombo(heldKey);
         } else
         {
-            eventManager.EventPlayerSwap(heldKey, oldKey, false, player.gameObject);
+            eventManager.OnPlayerSwap(heldKey, oldKey, false, player.gameObject);
         }
 
         ComboCallback(comboCells);

@@ -46,6 +46,9 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         // set the steamId temporarily to a timeId
         gamePlayer.GetComponent<Player>().playerId = timeId;
 
+        // transfer the color over
+        gamePlayer.GetComponent<Player>().playerColor = roomPlayer.GetComponent<NetworkRoomPlayerExt>().playerColor;
+
         return true;
     }
 
