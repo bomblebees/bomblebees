@@ -44,8 +44,8 @@ public class InGame_UI : MonoBehaviour
         Application.Quit();
     }
 
-    public AudioMixer audioMixerSoundFX;
-    public AudioMixer audioMixerMusic;
+    [SerializeField] private AudioMixer audioMixerSoundFX;
+    [SerializeField] private AudioMixer audioMixerMusic;
     
     public void SetSoundFXVolume(float volume)
     {

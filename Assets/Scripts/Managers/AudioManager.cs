@@ -17,6 +17,8 @@ public class AudioManager : NetworkBehaviour
         [HideInInspector] public AudioSource source;
     }
 
+    [Header("Audio Mixer Group")]
+    [SerializeField] private AudioMixerGroup audioMixerGroup;
     public Sound[] sounds;
 
     [ClientCallback]
@@ -29,6 +31,7 @@ public class AudioManager : NetworkBehaviour
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.spatialBlend = s.spatialBlend;
+            s.source.outputAudioMixerGroup = audioMixerGroup;
         }
     }
 
