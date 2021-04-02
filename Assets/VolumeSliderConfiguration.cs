@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class VolumeSliderConfiguration : MonoBehaviour
@@ -36,6 +37,11 @@ public class VolumeSliderConfiguration : MonoBehaviour
     private bool soundFXIsMuted;
     private bool musicIsMuted;
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -43,26 +49,25 @@ public class VolumeSliderConfiguration : MonoBehaviour
         sliderSoundFX.maxValue = maxValue;
         sliderMusic.minValue = minValue;
         sliderMusic.maxValue = maxValue;
-
-        if (Math.Abs(sliderSoundFX.value - minValue) < float.Epsilon)
-        {
-            SoundFXMuted();
-        }
-        else
-        {
-            SoundFXUnmuted();
-        }
-
-        if ( Math.Abs(sliderMusic.value - minValue) < float.Epsilon)
-        {
-            MusicMuted();
-        }
-        else
-        {
-            MusicUnmuted();
-        }
+        
+        SetupMuteState();
     }
 
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SetupMuteState();
+    }
+    
     // Update is called once per frame
     void Update()
     {
@@ -87,11 +92,32 @@ public class VolumeSliderConfiguration : MonoBehaviour
         }
     }
 
+    void SetupMuteState()
+    {
+        if (Math.Abs(sliderSoundFX.value - minValue) < float.Epsilon)
+        {
+            SoundFXMuted();
+        }
+        else
+        {
+            SoundFXUnmuted();
+        }
+
+        if ( Math.Abs(sliderMusic.value - minValue) < float.Epsilon)
+        {
+            MusicMuted();
+        }
+        else
+        {
+            MusicUnmuted();
+        }
+    }
+
     private void SoundFXMuted()
     {
         iconSoundFX.sprite = spriteSoundFXOff;
-        soundFXIsMuted = true;
         audioMixerSoundFX.SetFloat("volumeSoundFX", -80);
+        soundFXIsMuted = true;
     }
     
     private void SoundFXUnmuted()
@@ -103,13 +129,23 @@ public class VolumeSliderConfiguration : MonoBehaviour
     private void MusicMuted()
     {
         iconMusic.sprite = spriteMusicOff;
-        musicIsMuted = true;
         audioMixerMusic.SetFloat("volumeMusic", -80);
+        musicIsMuted = true;
     }
     
     private void MusicUnmuted()
     {
         iconMusic.sprite = spriteMusicOn;
         musicIsMuted = false;
+    }
+
+    public void SetSoundFXVolume(float volume)
+    {
+        audioMixerSoundFX.SetFloat("volumeSoundFX", volume);
+    }
+
+    public void SetMusicVolume(float volume)
+    {
+        audioMixerMusic.SetFloat("volumeMusic", volume);
     }
 }
