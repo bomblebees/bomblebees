@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class VolumeSliderLinker : MonoBehaviour
@@ -47,6 +48,25 @@ public class VolumeSliderLinker : MonoBehaviour
         {
             SyncSlider(sliderMusicGlobal, sliderMusicLocal);
         });
+    }
+    
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SyncSlider(sliderSoundFXLocal, sliderSoundFXGlobal);
+        SyncIcon(iconSoundFXLocal, iconSoundFXGlobal);
+
+        SyncSlider(sliderMusicLocal, sliderMusicGlobal);
+        SyncIcon(iconMusicLocal, iconMusicGlobal);
     }
 
     void Update()
