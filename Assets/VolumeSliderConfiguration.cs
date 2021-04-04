@@ -11,6 +11,36 @@ using UnityEngine.UI;
 
 public class VolumeSliderConfiguration : MonoBehaviour
 {
+    [Header("Volume Slider Bound (dB)")]
+    [Range(-80, -1)]
+    [SerializeField] private float minValue;
+    [Range(0, 20)]
+    [SerializeField] private float maxValue;
+    
+    [Header("Custom Default Volume (dB)")]
+    [SerializeField] private float defaultSoundFXVolume = 0;
+    [SerializeField] private float defaultMusicVolume = 0;
+
+    [Header("Music Audio Source")] 
+    [SerializeField] private bool disableMusic;
+    [Space]
+    [SerializeField] private AudioSource musicMenuScene;
+    [Space]
+    [SerializeField] private AudioSource musicRoomScene;
+    [SerializeField] private bool changeMusicOnRoomScene;
+    [SerializeField] private AudioSource musicGameScene;
+    [SerializeField] private bool changeMusicOnGameScene;
+
+    [Header("Sprite")]
+    [SerializeField] private Sprite spriteSoundFXOn;
+    [SerializeField] private Sprite spriteSoundFXOff;
+    [SerializeField] private Sprite spriteMusicOn;
+    [SerializeField] private Sprite spriteMusicOff;
+
+    [Header("Scene")]
+    [Scene][SerializeField] private String sceneRoom;
+    [Scene][SerializeField] private String sceneGame;
+
     [Header("GameObject")]
     [SerializeField] private Slider sliderSoundFX;
     [SerializeField] private Slider sliderMusic;
@@ -19,21 +49,8 @@ public class VolumeSliderConfiguration : MonoBehaviour
     [SerializeField] private AudioMixer audioMixerSoundFX;
     [SerializeField] private AudioMixer audioMixerMusic;
     
-    [Header("Sprite")]
-    [SerializeField] private Sprite spriteSoundFXOn;
-    [SerializeField] private Sprite spriteSoundFXOff;
-    [SerializeField] private Sprite spriteMusicOn;
-    [SerializeField] private Sprite spriteMusicOff;
-    
-    [Header("Volume Slider Bound (dB)")]
-    [Range(-80, -1)]
-    [SerializeField] private float minValue;
-    [Range(0, 20)]
-    [SerializeField] private float maxValue;
-
     private float originalMinValue;
     private float originalMaxValue;
-    
     private bool soundFXIsMuted;
     private bool musicIsMuted;
 
@@ -49,8 +66,15 @@ public class VolumeSliderConfiguration : MonoBehaviour
         sliderSoundFX.maxValue = maxValue;
         sliderMusic.minValue = minValue;
         sliderMusic.maxValue = maxValue;
+
+        sliderSoundFX.value = defaultSoundFXVolume;
+        sliderMusic.value = defaultMusicVolume;
         
         SetupMuteState();
+        
+        musicMenuScene.loop = true;
+        musicRoomScene.loop = true;
+        musicGameScene.loop = true;
     }
 
     void OnEnable()
@@ -66,6 +90,7 @@ public class VolumeSliderConfiguration : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         SetupMuteState();
+        SwitchMusicBetweenScene(scene);
     }
     
     // Update is called once per frame
@@ -147,5 +172,45 @@ public class VolumeSliderConfiguration : MonoBehaviour
     public void SetMusicVolume(float volume)
     {
         audioMixerMusic.SetFloat("volumeMusic", volume);
+    }
+
+    private void SwitchMusicBetweenScene(Scene scene)
+    {
+        if (disableMusic) return;
+        
+        if (changeMusicOnRoomScene == true && scene.path == sceneRoom)
+        {
+            StopAllMusic();
+            musicRoomScene.Play();
+        } 
+        else if (changeMusicOnGameScene == true && scene.path == sceneGame)
+        {
+            StopAllMusic();
+            musicGameScene.Play();
+        }
+        else 
+        {
+            if (musicMenuScene.isPlaying) return;
+            StopAllMusic();
+            musicMenuScene.Play();
+        }
+    }
+    
+    private void StopAllMusic()
+    {
+        if (musicMenuScene.isPlaying)
+        {
+            musicMenuScene.Stop();
+        }
+
+        if (musicRoomScene.isPlaying)
+        {
+            musicRoomScene.Stop();
+        }
+
+        if (musicGameScene.isPlaying)
+        {
+            musicGameScene.Stop();
+        }
     }
 }
