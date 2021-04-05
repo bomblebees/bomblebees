@@ -12,7 +12,7 @@ public class TickObject : ComboObject
         // All the client needs to do is render the sfx/vfx
         // The server should do all calculations
         StartCoroutine(TickDown());
-        base.BeginFillShader();
+        base.ReadyFillShader();
     }
     
     public override void OnStartServer()
@@ -38,7 +38,7 @@ public class TickObject : ComboObject
             StartDangerAnim();
         }
 
-        yield return new WaitForSeconds(tickDuration - fillShaderDuration);
+        yield return new WaitForSeconds(startupDelay - fillShaderDuration);
         if (!didEarlyEffects)
         {
             StartCoroutine(TickDownFinish());
@@ -64,7 +64,8 @@ public class TickObject : ComboObject
 
     public virtual IEnumerator ProcEffects()
     {
-        yield return new WaitForSeconds(startupDelay);
+        print("Proccing");
+        yield return new WaitForSeconds(0);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());

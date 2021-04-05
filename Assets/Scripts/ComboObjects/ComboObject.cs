@@ -42,8 +42,7 @@ public class ComboObject : NetworkBehaviour
     
     [FormerlySerializedAs("objectMat")] public GameObject model;
 
-    [FormerlySerializedAs("timeBtwnFillFinishAndFuse")]
-    public float fillShaderDuration = 0;  // set this in the inspector;
+    [FormerlySerializedAs("timeBtwnFillFinishAndFuse")] public float fillShaderDuration = 0;  // set this in the inspector;
     protected float fillShaderVal = -.51f;
     protected float fillShaderRate = 0;
 
@@ -201,7 +200,12 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DisableObjectModel()
     {
-        this.gameObject.transform.Find("Model").gameObject.SetActive(false);
+        GameObject _model = this.gameObject.transform.Find("Model").gameObject;
+        if (!_model)
+        {
+            print("ERROR: Model not found for a Bomb! Make sure the Model's name is 'Model'");
+        }
+        _model.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
 
@@ -222,7 +226,6 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        print("pushed");
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
@@ -345,7 +348,7 @@ public class ComboObject : NetworkBehaviour
 
     
     // To be called in TickObject and TriggerObject individually
-    protected virtual void BeginFillShader()
+    protected virtual void ReadyFillShader()
     {
         fillShaderRate = 1 / fillShaderDuration;
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);

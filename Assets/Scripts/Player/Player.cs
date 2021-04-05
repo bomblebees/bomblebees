@@ -601,7 +601,6 @@ public class Player : NetworkBehaviour
 
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
-                Debug.Log("space pressed");
                 GameObject modelHit = tileHit.transform.gameObject;
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
