@@ -1,20 +1,17 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 public class TickObject : ComboObject
 {
     public float tickDuration = 4f;
 
-    
-    public override void OnStartClient()
+    public override void OnStartLocalPlayer()
     {
-        base.OnStartClient();
-        // All the client needs to do is render the sfx/vfx
-        // The server should do all calculations
-        StartCoroutine(TickDown());
-        base.BeginFillShader();
+        base.OnStartLocalPlayer();
     }
-    
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -23,21 +20,10 @@ public class TickObject : ComboObject
         NotifyOccupiedTile(true);
         StartCoroutine(TickDown());
     }
-    
-    protected override void Update()
-    {
-        base.StepFillShader();
-    }
-    
+
     protected virtual IEnumerator TickDown()
     {
-        if (!didEarlyEffects)
-        {
-            yield return new WaitForSeconds(fillShaderDurationderDuration);
-            StartDangerAnim();
-        }
-
-        yield return new WaitForSeconds(tickDuration - fillShaderDuration);
+        yield return new WaitForSeconds(tickDuration);
         if (!didEarlyEffects)
         {
             StartCoroutine(TickDownFinish());
@@ -54,11 +40,6 @@ public class TickObject : ComboObject
             yield return new WaitForSeconds(lingerDuration);
             StartCoroutine(DestroySelf());
         }
-    }
-    
-    protected virtual void StartDangerAnim()
-    {
-        // TO DEFINE IN EACH BOMB TYPE
     }
 
     public virtual IEnumerator ProcEffects()
@@ -83,6 +64,13 @@ public class TickObject : ComboObject
         StartCoroutine(ProcEffects());
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        // All the client needs to do is render the sfx/vfx
+        // The server should do all calculations
+        StartCoroutine(TickDown());
+    }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {

@@ -17,6 +17,7 @@ public class LaserObject : TriggerObject
 
     protected virtual void UpdateLaserDirection(int edgeIndex)
     {
+        Debug.Log("edgeIndex is " + edgeIndex);
         this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
         this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles = new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex]+270f);
     }
