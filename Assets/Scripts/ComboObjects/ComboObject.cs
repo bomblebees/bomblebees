@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // Required Children:
 // - VFX
@@ -37,6 +38,13 @@ public class ComboObject : NetworkBehaviour
     // player who triggered the bomb
     protected GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
+    
+    
+    [FormerlySerializedAs("objectMat")] public GameObject model;
+
+    [FormerlySerializedAs("timeBtwnFillFinishAndFuse")] public float fillShaderDuration = 0;  // set this in the inspector;
+    protected float fillShaderVal = -.51f;
+    protected float fillShaderRate = 0;
 
     // player who placed the bomb (set in Player.cs, SERVER only variable)
     protected GameObject ownerPlayer;
@@ -46,6 +54,10 @@ public class ComboObject : NetworkBehaviour
     protected virtual void Start()
     {
         IgnoreDamageHitbox();
+        if (!model)
+        {
+            print("Error: need to assign objectMat to Bomb Object!");
+        }
     }
 
     protected virtual void IgnoreDamageHitbox()
@@ -188,7 +200,12 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DisableObjectModel()
     {
-        this.gameObject.transform.Find("Model").gameObject.SetActive(false);
+        GameObject _model = this.gameObject.transform.Find("Model").gameObject;
+        if (!_model)
+        {
+            print("ERROR: Model not found for a Bomb! Make sure the Model's name is 'Model'");
+        }
+        _model.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
 
@@ -222,7 +239,8 @@ public class ComboObject : NetworkBehaviour
             // float lerpScaleRate = 1/travelDistanceInHexes;
             for (var tileOffset = 1; tileOffset < travelDistanceInHexes; tileOffset++)
             {
-                var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; //(travelDistanceInHexes - tileOffset);
+                var possiblePosition = gameObject.transform.position +
+                                       HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; 
                 // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
                 var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
@@ -327,4 +345,19 @@ public class ComboObject : NetworkBehaviour
         yield return new WaitForSeconds(seconds);
         this.canHitTriggeringPlayer = true;
     }
+
+    
+    // To be called in TickObject and TriggerObject individually
+    protected virtual void ReadyFillShader()
+    {
+        fillShaderRate = 1 / fillShaderDuration;
+        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
+    }
+
+    protected virtual void StepFillShader()
+    {
+        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
+        fillShaderVal += fillShaderRate * Time.deltaTime;
+    }
 }
+    

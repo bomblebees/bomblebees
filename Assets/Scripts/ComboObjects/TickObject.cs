@@ -1,17 +1,20 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using Mirror;
 using UnityEngine;
 
 public class TickObject : ComboObject
 {
     public float tickDuration = 4f;
 
-    public override void OnStartLocalPlayer()
+    
+    public override void OnStartClient()
     {
-        base.OnStartLocalPlayer();
+        base.OnStartClient();
+        // All the client needs to do is render the sfx/vfx
+        // The server should do all calculations
+        StartCoroutine(TickDown());
+        base.ReadyFillShader();
     }
-
+    
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -20,10 +23,22 @@ public class TickObject : ComboObject
         NotifyOccupiedTile(true);
         StartCoroutine(TickDown());
     }
-
+    
+    protected override void Update()
+    {
+        base.Update();
+        base.StepFillShader();
+    }
+    
     protected virtual IEnumerator TickDown()
     {
-        yield return new WaitForSeconds(tickDuration);
+        if (!didEarlyEffects)
+        {
+            yield return new WaitForSeconds(fillShaderDuration);
+            StartDangerAnim();
+        }
+
+        yield return new WaitForSeconds(startupDelay - fillShaderDuration);
         if (!didEarlyEffects)
         {
             StartCoroutine(TickDownFinish());
@@ -41,10 +56,16 @@ public class TickObject : ComboObject
             StartCoroutine(DestroySelf());
         }
     }
+    
+    protected virtual void StartDangerAnim()
+    {
+        // TO DEFINE IN EACH BOMB TYPE
+    }
 
     public virtual IEnumerator ProcEffects()
     {
-        yield return new WaitForSeconds(startupDelay);
+        print("Proccing");
+        yield return new WaitForSeconds(0);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
@@ -64,13 +85,6 @@ public class TickObject : ComboObject
         StartCoroutine(ProcEffects());
     }
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        // All the client needs to do is render the sfx/vfx
-        // The server should do all calculations
-        StartCoroutine(TickDown());
-    }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
