@@ -222,6 +222,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
+        print("pushed");
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
@@ -235,7 +236,8 @@ public class ComboObject : NetworkBehaviour
             // float lerpScaleRate = 1/travelDistanceInHexes;
             for (var tileOffset = 1; tileOffset < travelDistanceInHexes; tileOffset++)
             {
-                var possiblePosition = gameObject.transform.position +  HexMetrics.hexSize * tileOffset * HexMetrics.edgeDirections[edgeIndex]; //(travelDistanceInHexes - tileOffset);
+                var possiblePosition = gameObject.transform.position +
+                                       HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; 
                 // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
                 var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);

@@ -26,6 +26,7 @@ public class TickObject : ComboObject
     
     protected override void Update()
     {
+        base.Update();
         base.StepFillShader();
     }
     
@@ -33,7 +34,7 @@ public class TickObject : ComboObject
     {
         if (!didEarlyEffects)
         {
-            yield return new WaitForSeconds(fillShaderDurationderDuration);
+            yield return new WaitForSeconds(fillShaderDuration);
             StartDangerAnim();
         }
 

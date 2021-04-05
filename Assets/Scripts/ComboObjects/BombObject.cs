@@ -7,6 +7,7 @@ using UnityEngine.PlayerLoop;
 public class BombObject : TickObject
 {
     
+    // called by TickDown()
     protected override void StartDangerAnim()
     {
         this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
