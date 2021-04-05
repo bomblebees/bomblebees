@@ -44,6 +44,19 @@ public class InGame_UI : MonoBehaviour
         Application.Quit();
     }
 
+    public AudioMixer audioMixerSoundFX;
+    public AudioMixer audioMixerMusic;
+    
+    public void SetSoundFXVolume(float volume)
+    {
+        audioMixerSoundFX.SetFloat("volumeSoundFX", volume);
+    }
+
+    public void SetMusicVolume(float volume)
+    {
+        audioMixerMusic.SetFloat("volumeMusic", volume);
+    }
+
     public void ToggleFullscreen()
     {
         Screen.fullScreen = !Screen.fullScreen;
