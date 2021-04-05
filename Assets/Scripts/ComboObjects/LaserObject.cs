@@ -18,7 +18,6 @@ public class LaserObject : TriggerObject
     }
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        FindObjectOfType<AudioManager>().PlaySound("laserCharge");
         UpdateLaserDirection(edgeIndex);
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
@@ -46,6 +45,7 @@ public class LaserObject : TriggerObject
     
     public IEnumerator Breakdown()
     {
+        // if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
         didEarlyEffects = true;
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
