@@ -18,6 +18,7 @@ public class AudioManager : NetworkBehaviour
     }
 
     public Sound[] sounds;
+    [SerializeField] private AudioMixerGroup audioMixerGroup;
 
     [ClientCallback]
     public override void OnStartClient()
@@ -29,6 +30,7 @@ public class AudioManager : NetworkBehaviour
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.spatialBlend = s.spatialBlend;
+            s.source.outputAudioMixerGroup = audioMixerGroup;
         }
     }
 
