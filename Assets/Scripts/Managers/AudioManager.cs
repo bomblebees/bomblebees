@@ -17,6 +17,7 @@ public class AudioManager : NetworkBehaviour
         eventManager.EventPlayerSwap += ServerPlayComboSound;
         eventManager.EventBombPlaced += RpcPlayPlaceSound;
         eventManager.EventEndRound += ServerPlayerWhistleSound;
+        eventManager.EventPlayerSpin += RpcPlayHitSound;
     }
 
     [System.Serializable]
@@ -32,6 +33,7 @@ public class AudioManager : NetworkBehaviour
     }
 
     public Sound[] sounds;
+    [SerializeField] private AudioMixerGroup audioMixerGroup;
 
     [ClientCallback]
     public override void OnStartClient()
@@ -43,6 +45,7 @@ public class AudioManager : NetworkBehaviour
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.spatialBlend = s.spatialBlend;
+            s.source.outputAudioMixerGroup = audioMixerGroup;
         }
     }
 
@@ -99,5 +102,11 @@ public class AudioManager : NetworkBehaviour
     public void RpcPlayWhistleSound()
     {
         PlaySound("endWhistle");
+    }
+
+    [ClientRpc]
+    public void RpcPlayHitSound(GameObject player, GameObject bomb)
+    {
+        PlaySound("bombHit");
     }
 }
