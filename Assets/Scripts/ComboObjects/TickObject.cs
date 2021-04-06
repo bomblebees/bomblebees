@@ -11,8 +11,13 @@ public class TickObject : ComboObject
         base.OnStartClient();
         // All the client needs to do is render the sfx/vfx
         // The server should do all calculations
-        StartCoroutine(TickDown());
+    }
+
+    public virtual void _Start(GameObject player)
+    {
+        base._Start(player);
         base.ReadyFillShader();
+        StartCoroutine(TickDown());
     }
     
     public override void OnStartServer()
@@ -21,7 +26,6 @@ public class TickObject : ComboObject
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
-        StartCoroutine(TickDown());
     }
     
     protected override void Update()
@@ -34,11 +38,25 @@ public class TickObject : ComboObject
     {
         if (!didEarlyEffects)
         {
-            yield return new WaitForSeconds(fillShaderDuration);
+            if (ownerIsQueen)
+            {
+                yield return new WaitForSeconds(fillShaderRatio * queenStartupDelay);
+            }
+            else
+            {
+                yield return new WaitForSeconds(fillShaderRatio * startupDelay);
+            }
             StartDangerAnim();
         }
 
-        yield return new WaitForSeconds(startupDelay - fillShaderDuration);
+        if (ownerIsQueen)
+        {
+            yield return new WaitForSeconds(queenStartupDelay - fillShaderRatio * queenStartupDelay);
+        }
+        else
+        {
+            yield return new WaitForSeconds(startupDelay - fillShaderRatio * startupDelay);
+        }
         if (!didEarlyEffects)
         {
             StartCoroutine(TickDownFinish());

@@ -46,7 +46,9 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject onDefaultBombReadyAnim;
     private bool playedOnDefaultBombReadyAnim = true;
     public int queenPoints = 0;
-    public int queenPointThreshhold = 5;
+    public int queenPointThreshhold = 2;
+    public bool isQueen = false;
+    public float queenDuration = 10f;
 
     private float horizontalAxis;
     private float prevHorizontalAxis;
@@ -91,6 +93,7 @@ public class Player : NetworkBehaviour
     public NetworkAnimator networkAnimator;
     public bool isRunAnim = false;
     public bool isIdleAnim = false;
+
 
     // private Caches
     private GameObject spinHitbox;
@@ -304,7 +307,6 @@ public class Player : NetworkBehaviour
                             break;
                         case 'w':
                             Debug.Log("White Bomb Type");
-                            ApplyQueenPoints(1);
                             break;
                         default:
                             // code should not reach here
@@ -342,6 +344,7 @@ public class Player : NetworkBehaviour
         GameObject _bomb = (GameObject) Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        _bomb.GetComponent<BombObject>()._Start(placer);
         NetworkServer.Spawn(_bomb);
 
         eventManager.OnBombPlaced(_bomb, placer); // call event
@@ -353,6 +356,7 @@ public class Player : NetworkBehaviour
         GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         _laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        _laser.GetComponent<LaserObject>()._Start(placer);
         NetworkServer.Spawn(_laser);
 
         eventManager.OnBombPlaced(_laser, placer); // call event
@@ -363,7 +367,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _plasma.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        _plasma.GetComponent<PlasmaObject>()._Start(placer);
         NetworkServer.Spawn(_plasma);
 
         eventManager.OnBombPlaced(_plasma, placer); // call event
@@ -374,7 +378,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _blink.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        _blink.GetComponent<BlinkObject>()._Start(placer);
         NetworkServer.Spawn(_blink);
 
         eventManager.OnBombPlaced(_blink, placer); // call event
@@ -385,7 +389,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _gravity = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _gravity.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        _gravity.GetComponent<GravityObject>()._Start(placer);
         NetworkServer.Spawn(_gravity);
 
         eventManager.OnBombPlaced(_gravity, placer); // call event
@@ -396,7 +400,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _bigBomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        _bigBomb.GetComponent<ComboObject>()._Start(placer);  // TODO change this type
         NetworkServer.Spawn(_bigBomb);
 
         eventManager.OnBombPlaced(_bigBomb, placer); // call event
@@ -675,7 +679,12 @@ public class Player : NetworkBehaviour
     [Server]
     public void AddItemCombo(char colorKey)
     {
-        if (itemStack.Count < maxStackSize)
+        if (colorKey == 'w')
+        {
+            print("IN HERE");
+            ApplyQueenPoints(1);
+        }
+        else if (itemStack.Count < maxStackSize)
         {
             itemStack.Add(colorKey); // Push new combo to stack
         }
@@ -775,12 +784,14 @@ public class Player : NetworkBehaviour
         this.gravObjInfluence += force;
     }
 
+    
     public void ApplyQueenPoints(int val)
     {
         this.queenPoints += val;
+        print("queen points is now "+this.queenPoints);
         if (queenPoints > queenPointThreshhold)
         {
-            BecomeQueen();
+            print("queen");
             RpcBecomeQueen();
         }
     }
@@ -788,6 +799,14 @@ public class Player : NetworkBehaviour
     public void BecomeQueen()
     {
         print("A Player has become queen!");
+        this.isQueen = true;
+        StartCoroutine(ToggleQueen(queenDuration, false));
+    }
+
+    public IEnumerator ToggleQueen(float delay, bool val)
+    {
+        yield return new WaitForSeconds(delay);
+        this.isQueen = val;
     }
 
     [ClientRpc]
@@ -795,10 +814,4 @@ public class Player : NetworkBehaviour
     {
          BecomeQueen();       
     }
-    
-    
-    
-    
-    
-    
 }

@@ -8,7 +8,6 @@ using UnityEngine;
 // - TickDown() to not 
 public class LaserObject : TriggerObject
 {
-    
     public float breakdownDuration = 3f;
     
     protected override void StartDangerAnim()
@@ -16,6 +15,7 @@ public class LaserObject : TriggerObject
         this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
         this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
+    
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         FindObjectOfType<AudioManager>().PlaySound("laserCharge");

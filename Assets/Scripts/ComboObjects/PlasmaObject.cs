@@ -22,19 +22,24 @@ public class PlasmaObject : TriggerObject
         this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
     
-    
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         wasHit = true;
         StartCoroutine(SpawnBall(edgeIndex, triggeringPlayer));
         return true;
     }
-    
 
     // note: TriggerObject.Proc() runs in parallel
     public IEnumerator SpawnBall(int edgeIndex, GameObject triggeringPlayer)
     {
-        yield return new WaitForSeconds(startupDelay);
+        if (ownerIsQueen)
+        {
+            yield return new WaitForSeconds(queenStartupDelay);
+        }
+        else
+        {
+            yield return new WaitForSeconds(startupDelay);
+        }
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         FindTriggerDirection(edgeIndex);
         // plasmaSphereModel.transform.position = plasmaSphereModel.transform.position + targetDir * 5;  // This was the starting offset

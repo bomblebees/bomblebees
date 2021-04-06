@@ -28,12 +28,15 @@ public class TriggerObject : ComboObject
 
     protected override void Update()
     {
-        ListenForTrigger();
-        ElapseTimeAlive();
-        ListenForDespawn();
-        if (wasHit)
+        if (hasStarted == true)
         {
-            StepFillShader();
+            ListenForTrigger();
+            ElapseTimeAlive();
+            ListenForDespawn();
+            if (wasHit)
+            {
+                StepFillShader();
+            }
         }
     }
 
@@ -53,10 +56,14 @@ public class TriggerObject : ComboObject
 
     protected virtual IEnumerator Proc()
     {
-        var timeBtwnFillAndTrigger = startupDelay - fillShaderDuration;
-        yield return new WaitForSeconds(fillShaderDuration);
+        if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay * fillShaderRatio);
+        else yield return new WaitForSeconds(startupDelay * fillShaderRatio);
+        
         StartDangerAnim();
-        yield return new WaitForSeconds(timeBtwnFillAndTrigger);
+        
+        if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
+        else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
+        
         canBeTriggered = false;  // To stop it from being triggered twice
         timeTriggered = timeAlive;
         StartCoroutine(EnableSFX());

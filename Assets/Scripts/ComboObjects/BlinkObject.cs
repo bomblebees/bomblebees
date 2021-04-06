@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class BlinkObject : TickObject
 {
@@ -13,28 +14,38 @@ public class BlinkObject : TickObject
     private float val = -.51f;
     private float ignoreTriggererDuration = 10f;  // they'll never be hit by this
     public float breakdownDuration = 5f;
+    public bool wasHit = false;
     
     
-    protected override void Start()
+    public override void _Start(GameObject player)
     {
-        IgnoreDamageHitbox();
-        // StartCoroutine(DelayedSpawn());  
+        base._Start(player);
         EnableObject();
     }
+    
 
-    protected virtual IEnumerator DelayedSpawn()
+    // protected virtual IEnumerator DelayedSpawn()
+    // {
+    //     yield return new WaitForSeconds(startupDelay);
+    //     EnableObject();
+    // }
+    
+    // avoids using TickObject's
+    protected override void Update()
     {
-        yield return new WaitForSeconds(startupDelay);
-        EnableObject();
+        ListenForMoving();
+        if (wasHit)
+        {
+            StepFillShader();
+        }
     }
-
+    
     protected virtual void EnableObject()
     {
         // TODO cache these instead in the inspector
         this.collider.enabled = true;
         this.gameObject.transform.Find("BlockerHandler").gameObject.SetActive(true);
         this.gameObject.transform.Find("Model").gameObject.SetActive(true);
-        this.gameObject.transform.Find("StartupModel").gameObject.SetActive(false);
     }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
@@ -48,7 +59,10 @@ public class BlinkObject : TickObject
 
     protected virtual IEnumerator PushActions(int edgeIndex, GameObject triggeringPlayer)
     {
-        yield return new WaitForSeconds(startupDelay);
+        wasHit = true;
+        if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay);
+        else yield return new WaitForSeconds(startupDelay);
+        
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         this.collider.enabled = false;
         base.Push(edgeIndex, triggeringPlayer); // Doesn't use lerpRate at all. Do this to get targetPosition
@@ -99,7 +113,8 @@ public class BlinkObject : TickObject
     // Overridden in order to move the startupDelay away from this func and into the actual bomb placement
     public override IEnumerator ProcEffects()
     {
-        yield return new WaitForSeconds(startupDelay);
+        if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay);
+        else yield return new WaitForSeconds(startupDelay);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
