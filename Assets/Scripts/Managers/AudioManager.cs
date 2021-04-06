@@ -17,6 +17,7 @@ public class AudioManager : NetworkBehaviour
         eventManager.EventPlayerSwap += ServerPlayComboSound;
         eventManager.EventBombPlaced += RpcPlayPlaceSound;
         eventManager.EventEndRound += ServerPlayerWhistleSound;
+        eventManager.EventPlayerSpin += RpcPlayHitSound;
     }
 
     [System.Serializable]
@@ -101,5 +102,11 @@ public class AudioManager : NetworkBehaviour
     public void RpcPlayWhistleSound()
     {
         PlaySound("endWhistle");
+    }
+
+    [ClientRpc]
+    public void RpcPlayHitSound(GameObject player, GameObject bomb)
+    {
+        PlaySound("bombHit");
     }
 }
