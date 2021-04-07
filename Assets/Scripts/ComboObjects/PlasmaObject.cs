@@ -15,16 +15,38 @@ public class PlasmaObject : TriggerObject
     [SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
     public float ignoreTriggererDuration = 1f;
-    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
+    
+    protected override void StartDangerAnim()
     {
-        StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
-        FindTriggerDirection(edgeIndex);
-        plasmaSphereModel.transform.position = plasmaSphereModel.transform.position + targetDir * 5;
-        this.hitboxEnabled = true;
-        this.plasmaSphereModel.SetActive(true);
-        return base.Push(edgeIndex, triggeringPlayer);  // This shoulda been at the top lol
+        this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
+        this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
     
+    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
+    {
+        wasHit = true;
+        StartCoroutine(SpawnBall(edgeIndex, triggeringPlayer));
+        return true;
+    }
+
+    // note: TriggerObject.Proc() runs in parallel
+    public IEnumerator SpawnBall(int edgeIndex, GameObject triggeringPlayer)
+    {
+        if (ownerIsQueen)
+        {
+            yield return new WaitForSeconds(queenStartupDelay);
+        }
+        else
+        {
+            yield return new WaitForSeconds(startupDelay);
+        }
+        StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
+        FindTriggerDirection(edgeIndex);
+        // plasmaSphereModel.transform.position = plasmaSphereModel.transform.position + targetDir * 5;  // This was the starting offset
+        this.hitboxEnabled = true;
+        this.plasmaSphereModel.SetActive(true);
+        base.Push(edgeIndex, triggeringPlayer);  // This shoulda been at the top lol
+    }
 
     public Vector3 lastPosition;
     private void LateUpdate()

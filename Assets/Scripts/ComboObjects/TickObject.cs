@@ -1,29 +1,62 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using Mirror;
 using UnityEngine;
 
 public class TickObject : ComboObject
 {
     public float tickDuration = 4f;
 
-    public override void OnStartLocalPlayer()
+    
+    public override void OnStartClient()
     {
-        base.OnStartLocalPlayer();
+        base.OnStartClient();
+        // All the client needs to do is render the sfx/vfx
+        // The server should do all calculations
     }
 
+    public virtual void _Start(GameObject player)
+    {
+        base._Start(player);
+        base.ReadyFillShader();
+        StartCoroutine(TickDown());
+    }
+    
     public override void OnStartServer()
     {
         base.OnStartServer();
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
-        StartCoroutine(TickDown());
     }
-
+    
+    protected override void Update()
+    {
+        base.Update();
+        base.StepFillShader();
+    }
+    
     protected virtual IEnumerator TickDown()
     {
-        yield return new WaitForSeconds(tickDuration);
+        if (!didEarlyEffects)
+        {
+            if (ownerIsQueen)
+            {
+                yield return new WaitForSeconds(fillShaderRatio * queenStartupDelay);
+            }
+            else
+            {
+                yield return new WaitForSeconds(fillShaderRatio * startupDelay);
+            }
+            StartDangerAnim();
+        }
+
+        if (ownerIsQueen)
+        {
+            yield return new WaitForSeconds(queenStartupDelay - fillShaderRatio * queenStartupDelay);
+        }
+        else
+        {
+            yield return new WaitForSeconds(startupDelay - fillShaderRatio * startupDelay);
+        }
         if (!didEarlyEffects)
         {
             StartCoroutine(TickDownFinish());
@@ -41,10 +74,16 @@ public class TickObject : ComboObject
             StartCoroutine(DestroySelf());
         }
     }
+    
+    protected virtual void StartDangerAnim()
+    {
+        // TO DEFINE IN EACH BOMB TYPE
+    }
 
     public virtual IEnumerator ProcEffects()
     {
-        yield return new WaitForSeconds(startupDelay);
+        print("Proccing");
+        yield return new WaitForSeconds(0);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
@@ -64,13 +103,6 @@ public class TickObject : ComboObject
         StartCoroutine(ProcEffects());
     }
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-        // All the client needs to do is render the sfx/vfx
-        // The server should do all calculations
-        StartCoroutine(TickDown());
-    }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
@@ -79,7 +111,6 @@ public class TickObject : ComboObject
         {
             NotifyOccupiedTile(false);
         }
-
         this.blockerHandler.SetActive(false); // in order to stop blocking players while moving
         return result;
     }

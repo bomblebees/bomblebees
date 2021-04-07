@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // Required Children:
 // - VFX
@@ -18,7 +19,7 @@ public class ComboObject : NetworkBehaviour
     [SerializeField] public GameObject SFX;
     
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
-    [Header("Properties", order = 2)]public float travelDistanceInHexes = 4;
+    [Header("Properties", order = 2)] public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
     public float lerpRate = 0.9f;  // The speed at which the object is being pushed
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
@@ -32,20 +33,38 @@ public class ComboObject : NetworkBehaviour
     public float hitboxDuration = 4f;
     public float lingerDuration = 8f;
     public float startupDelay = 0f;
+    public float queenStartupDelay = 0f;
+    public bool ownerIsQueen = false;
+    public bool hasStarted = false;
     protected bool didEarlyEffects = false;
 
     // player who triggered the bomb
     protected GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
+    
+    [FormerlySerializedAs("objectMat")] public GameObject model;
+    [FormerlySerializedAs("timeBtwnFillFinishAndFuse")] public float fillShaderRatio = 0;  // set this in the inspector;
+    
+    protected float fillShaderVal = -.51f;
+    protected float fillShaderRate = 0;
 
     // player who placed the bomb (set in Player.cs, SERVER only variable)
     protected GameObject ownerPlayer;
-    [Server] public void SetOwnerPlayer(GameObject p) { ownerPlayer = p; }
+    [Server] public void SetOwnerPlayer(GameObject p) { 
+        ownerPlayer = p;
+        ownerIsQueen = p.GetComponent<Player>().isQueen; 
+    }
     [Server] public GameObject GetOwnerPlayer() { return ownerPlayer; }
 
-    protected virtual void Start()
+    public virtual void _Start(GameObject player)
     {
+        SetOwnerPlayer(player);
         IgnoreDamageHitbox();
+        if (!model)
+        {
+            print("Error: need to assign objectMat to Bomb Object!");
+        }
+        hasStarted = true;
     }
 
     protected virtual void IgnoreDamageHitbox()
@@ -60,7 +79,6 @@ public class ComboObject : NetworkBehaviour
     {
         ListenForMoving();
     }
-    
 
     protected void ListenForMoving()
     {
@@ -188,7 +206,12 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DisableObjectModel()
     {
-        this.gameObject.transform.Find("Model").gameObject.SetActive(false);
+        GameObject _model = this.gameObject.transform.Find("Model").gameObject;
+        if (!_model)
+        {
+            print("ERROR: Model not found for a Bomb! Make sure the Model's name is 'Model'");
+        }
+        _model.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
 
@@ -198,7 +221,6 @@ public class ComboObject : NetworkBehaviour
         blockerHandler.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
-    
 
     [ClientRpc]
     protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer)
@@ -222,7 +244,8 @@ public class ComboObject : NetworkBehaviour
             // float lerpScaleRate = 1/travelDistanceInHexes;
             for (var tileOffset = 1; tileOffset < travelDistanceInHexes; tileOffset++)
             {
-                var possiblePosition = this.gameObject.transform.position + HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; //(travelDistanceInHexes - tileOffset);
+                var possiblePosition = gameObject.transform.position +
+                                       HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; 
                 // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
                 var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
@@ -320,11 +343,26 @@ public class ComboObject : NetworkBehaviour
         else return false;
     }
     
-    
     protected IEnumerator IgnoreTriggeringPlayer(float seconds)
     {
         this.canHitTriggeringPlayer = false; // see Health.cs' OnTriggerEnter()
         yield return new WaitForSeconds(seconds);
         this.canHitTriggeringPlayer = true;
+    }
+
+    // To be called in TickObject and TriggerObject individually
+    protected virtual void ReadyFillShader()
+    {
+        if (ownerIsQueen) 
+            fillShaderRate = 1 / (queenStartupDelay * fillShaderRatio);
+        else 
+            fillShaderRate = 1 / (startupDelay * fillShaderRatio);
+        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
+    }
+
+    protected virtual void StepFillShader()
+    {
+        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
+        fillShaderVal += fillShaderRate * Time.deltaTime;
     }
 }

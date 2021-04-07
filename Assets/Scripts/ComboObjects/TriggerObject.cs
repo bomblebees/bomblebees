@@ -23,13 +23,21 @@ public class TriggerObject : ComboObject
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);
+        ReadyFillShader();
     }
 
     protected override void Update()
     {
-        ListenForTrigger();
-        ElapseTimeAlive();
-        ListenForDespawn();
+        if (hasStarted == true)
+        {
+            ListenForTrigger();
+            ElapseTimeAlive();
+            ListenForDespawn();
+            if (wasHit)
+            {
+                StepFillShader();
+            }
+        }
     }
 
     protected virtual void ListenForTrigger()
@@ -39,10 +47,23 @@ public class TriggerObject : ComboObject
             StartCoroutine(Proc());
         }
     }
+    
+    
+    protected virtual void StartDangerAnim()
+    {
+        // TO OVERRIDE IN CHILDREN
+    }
 
     protected virtual IEnumerator Proc()
     {
-        yield return new WaitForSeconds(startupDelay);
+        if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay * fillShaderRatio);
+        else yield return new WaitForSeconds(startupDelay * fillShaderRatio);
+        
+        StartDangerAnim();
+        
+        if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
+        else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
+        
         canBeTriggered = false;  // To stop it from being triggered twice
         timeTriggered = timeAlive;
         StartCoroutine(EnableSFX());
