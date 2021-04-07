@@ -18,13 +18,8 @@ public class GameUIManager : NetworkBehaviour
         public TMP_Text livesCounter;
     }
 
-    [Header("Start Round")]
-    [SerializeField] private GameObject startGameUI;
-    [SerializeField] private TMP_Text waitText;
-    [SerializeField] private TMP_Text timerText;
+    [SerializeField] private RoundStartEnd roundStartEnd = null;
 
-    [Header("End Round")]
-    [SerializeField] private GameObject endGameUI;
 
     [Header("Lives")]
     [SerializeField] private LivesUI[] livesUIs = new LivesUI[4];
@@ -80,101 +75,82 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundEnd += ClientEndRound;
     }
 
+    // When a player loads into the game (on server)
     [Server] public void ServerPlayerConnected(RoundManager.PlayerInfo p)
     {
-        ServerEnableLivesUI();
         RpcPlayerConnected(roundManager.playersConnected, roundManager.totalRoomPlayers);
     }
 
+    // When a player loads into the game (on client)
     [ClientRpc] public void RpcPlayerConnected(int connPlayers, int totalPlayers)
     {
-        UpdateRoundWaitUI(connPlayers, totalPlayers);
+        roundStartEnd.UpdateRoundWaitUI(connPlayers, totalPlayers);
     }
 
     #region Round Start & End
 
-    [Client] public void ServerStartRound() { ServerEnableLivesUI(); }
-    [Client] public void ClientStartRound() { StartCoroutine(StartRoundFreezetime()); }
-    [Client] public void ClientEndRound() { StartCoroutine(EndRoundFreezetime()); }
-
-    public IEnumerator StartRoundFreezetime()
+    [Client] public void ClientStartRound()
     {
-        waitText.text = "All players loaded!";
-        yield return new WaitForSeconds(1);
-        waitText.text = "Game Starting in";
-        timerText.gameObject.SetActive(true);
-
-        for (int i = roundManager.startGameFreezeDuration; i > 0; i--)
-        {
-            timerText.text = i.ToString();
-            yield return new WaitForSeconds(1);
-        }
-
-        waitText.gameObject.SetActive(false);
-        timerText.text = "Begin!";
-
-        yield return new WaitForSeconds(1);
-        startGameUI.SetActive(false);
+        StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
     }
-
-    public IEnumerator EndRoundFreezetime()
+    [Client] public void ClientEndRound()
     {
-        endGameUI.SetActive(true);
-        yield return new WaitForSeconds(roundManager.endGameFreezeDuration);
-        endGameUI.SetActive(false);
-    }
-
-    public void UpdateRoundWaitUI(int connPlayers, int totalPlayers)
-    {
-        // ex. Waiting for players... (2/4)
-        waitText.text = "Waiting for players... (" +
-            connPlayers +
-            "/" +
-            totalPlayers +
-            ")";
+        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration));
     }
 
     #endregion
 
     #region Lives
 
+    [Server] public void ServerStartRound() { ServerEnableLivesUI(); }
+
     [Server]
     public void ServerEnableLivesUI()
     {
+        // Convert playerinfo struct to network transportable gameObjects
         List<RoundManager.PlayerInfo> playerList = roundManager.playerList;
+
+        GameObject[] playerObjects = new GameObject[playerList.Count];
 
         for (int i = 0; i < playerList.Count; i++)
         {
-            Health life = playerList[i].health;
+            playerObjects[i] = playerList[i].player.gameObject;
 
-            RpcEnableLivesUI(i, life.currentLives, playerList[i].player.gameObject); // enable and init UI for each player
-
-            // subscribe to all lives of player
-            life.EventLivesChanged += ServerUpdateLives;
+            // Subscribe to lives change event for specific player
+            playerList[i].health.EventLivesChanged += ServerUpdateLives;
         }
+
+        RpcEnableLivesUI(playerObjects);
+
+
+
     }
 
     [ClientRpc]
-    public void RpcEnableLivesUI(int idx, int lifeCount, GameObject player)
+    public void RpcEnableLivesUI(GameObject[] players)
     {
-        Player p = player.GetComponent<Player>();
-
-        // enable ui for players
-        livesUIs[idx].livesObject.SetActive(true);
-
-        // Set steam user avatar
-        if (p.steamId != 0)
+        for (int i = 0; i < players.Length; i++)
         {
-            CSteamID steamID = new CSteamID(p.steamId);
-            int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
-            if (imageId == -1) return;
-            livesUIs[idx].avatar.texture = GetSteamImageAsTexture(imageId);
+            Player p = players[i].GetComponent<Player>();
+
+            // enable ui for players
+            livesUIs[i].livesObject.SetActive(true);
+
+            // Set steam user avatar
+            if (p.steamId != 0)
+            {
+                CSteamID steamID = new CSteamID(p.steamId);
+                int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
+                if (imageId == -1) return;
+                livesUIs[i].avatar.texture = GetSteamImageAsTexture(imageId);
+            }
+
+            // initialize health and username
+            livesUIs[i].playerName.text = p.steamName;
+            livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
+            livesUIs[i].livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
         }
 
-        // initialize health and username
-        livesUIs[idx].playerName.text = p.steamName;
-        livesUIs[idx].playerName.color = p.playerColor; // sets the color to the color of the player
-        livesUIs[idx].livesCounter.text = "Lives: " + lifeCount.ToString();
     }
 
     // technical debt: having reference to individual player whose live changed is better
