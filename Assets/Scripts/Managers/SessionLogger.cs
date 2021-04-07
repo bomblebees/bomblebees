@@ -291,7 +291,7 @@ public class SessionLogger : MonoBehaviour
 
     private void LoggerDebug(string s)
     {
-        Debug.Log("[SessionLogger]: " + s);
+        // Debug.Log("[SessionLogger]: " + s);
     }
 
     #endregion

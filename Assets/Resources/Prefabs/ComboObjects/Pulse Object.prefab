@@ -17796,9 +17796,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  blockerHandler: {fileID: 0}
+  blockerHandler: {fileID: 6616819736081707414}
   hitBox: {fileID: 0}
-  collider: {fileID: 0}
+  collider: {fileID: 501859540033048454}
   SFX: {fileID: 0}
   travelDistanceInHexes: 4
   lerpRate: 0.9
@@ -17808,20 +17808,18 @@ MonoBehaviour:
   tileUnderneath: {fileID: 0}
   vfxDuration: 4
   sfxDuration: 4
-  hitboxDuration: 4
+  hitboxDuration: 1
   lingerDuration: 8
-  startupDelay: 2
-  queenStartupDelay: 1
+  startupDelay: 4
+  queenStartupDelay: 2
   ownerIsQueen: 0
   hasStarted: 0
-  model: {fileID: 0}
+  model: {fileID: 1809444604607248526}
   fillShaderRatio: 0.9
-  tickDuration: 0
   delays:
-  - 0
-  - 2
-  - 2
-  hitboxPrefab: {fileID: 4015979404735605875, guid: 22e55748bfbe50548b2e502b71221370,
+  - 1
+  - 1
+  hitboxPrefab: {fileID: 1687125853829678087, guid: 0b48df169d93f65418ef42500b09f7a1,
     type: 3}
 --- !u!1 &8802240681566891827
 GameObject:

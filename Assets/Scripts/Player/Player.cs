@@ -286,27 +286,27 @@ public class Player : NetworkBehaviour
                     switch (bombType)
                     {
                         case 'b':
-                            Debug.Log("Blue Bomb Type");
+                            // Debug.Log("Blue Bomb Type");
                             SpawnBlinkObject(sender.identity.gameObject);
                             break;
                         case 'g':
-                            Debug.Log("Green Bomb Type");
+                            // Debug.Log("Green Bomb Type");
                             SpawnPlasmaObject(sender.identity.gameObject);
                             break;
                         case 'y':
-                            Debug.Log("Yellow Bomb Type");
+                            // Debug.Log("Yellow Bomb Type");
                             this.SpawnLaserObject(sender.identity.gameObject);
                             break;
                         case 'r':
-                            Debug.Log("Red Bomb Type");
+                            // Debug.Log("Red Bomb Type");
                             SpawnBigBombObject(sender.identity.gameObject);
                             break;
                         case 'p':
-                            Debug.Log("Purple Bomb Type");
+                            // Debug.Log("Purple Bomb Type");
                             SpawnGravityObject(sender.identity.gameObject);
                             break;
                         case 'w':
-                            Debug.Log("White Bomb Type");
+                            // Debug.Log("White Bomb Type");
                             break;
                         default:
                             // code should not reach here
@@ -400,7 +400,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _bigBomb.GetComponent<ComboObject>()._Start(placer);  // TODO change this type
+        _bigBomb.GetComponent<PulseObject>()._Start(placer);  // TODO change this type
         NetworkServer.Spawn(_bigBomb);
 
         eventManager.OnBombPlaced(_bigBomb, placer); // call event
@@ -605,7 +605,6 @@ public class Player : NetworkBehaviour
 
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
-                Debug.Log("space pressed");
                 GameObject modelHit = tileHit.transform.gameObject;
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();

@@ -178,6 +178,7 @@ public class Health : NetworkBehaviour
             return;
         }
 
+        print("hit pulse");
         playerScript.canBeHit = false; // might remove later. this is for extra security
         this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
     }

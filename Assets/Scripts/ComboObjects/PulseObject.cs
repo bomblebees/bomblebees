@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Mirror;
 using NSubstitute.Core.SequenceChecking;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -9,10 +11,10 @@ public class PulseObject : TickObject
 {
 
     public float[] delays;  // the first should be 0
+    public GameObject hitboxPrefab;
     private int itr = 0;
-    private List<HexCell> closed;
-    private List<HexCell> readyToPulse;
-    public Transform hitboxPrefab;
+    private List<HexCell> closed = new List<HexCell>();
+    private List<HexCell> readyToPulse = new List<HexCell>();
     
     protected override void StartDangerAnim()
     {
@@ -22,19 +24,23 @@ public class PulseObject : TickObject
 
     public IEnumerator PulseStep(float[] delays)
     {
-        if (itr >= delays.Length) { 
+        if (itr > delays.Length) { 
             yield return new WaitForSeconds(0);  // Do nothing
         }
         else
         {
-            while (readyToPulse.Count > 0)  // Pulse each ready cell
+            List<HexCell> allNewReady = new List<HexCell>();
+            while (readyToPulse.Count > 0) 
+                // Pulse each ready cell.
             {
                 HexCell pulser = readyToPulse[0];
                 readyToPulse.RemoveAt(0);
-                closed.Add(pulser);
+                allNewReady = allNewReady.Concat(PulseFindReady(pulser)).ToList();
                 StartCoroutine(PulseCell(pulser, hitboxDuration));
             }
-            yield return new WaitForSeconds(delays[itr]);
+            readyToPulse = allNewReady;
+            if (itr != delays.Length) yield return new WaitForSeconds(delays[itr]);
+            else yield return new WaitForSeconds(0);
             itr++;
             StartCoroutine(PulseStep(delays));
         }
@@ -42,14 +48,13 @@ public class PulseObject : TickObject
     
     public override IEnumerator ProcEffects()
     {
-        print("Proccing Pulse");
         yield return new WaitForSeconds(0);
         StopVelocity();
-        PulseFindReady(tileUnderneath);
-        PulseStep(delays);
+        closed.Add(tileUnderneath);
+        readyToPulse = PulseFindReady(tileUnderneath);
+        StartCoroutine(PulseStep(delays));
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
-        StartCoroutine(EnableHitbox());
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
         NotifyOccupiedTile(false);
@@ -57,34 +62,26 @@ public class PulseObject : TickObject
 
     public IEnumerator PulseCell(HexCell cell, float hitboxDuration)
     {
-        // play anim here
-        // spawn hitbox here?
-        var hitbox = Instantiate(hitboxPrefab, cell.transform.position, Quaternion.identity);
-        hitbox.GetComponent<MeshRenderer>().enabled = true; // for debug
+        GameObject hitbox = (GameObject) Instantiate(hitboxPrefab,cell.transform.position+new Vector3(0f,7f,0f), Quaternion.Euler(0f,90f,0f));
+        hitbox.transform.localScale = new Vector3(1000f, 200f, 1000f);
         yield return new WaitForSeconds(hitboxDuration);
         Destroy(hitbox);
-        // turn off hitbox and anims
     }
-    
 
-    public void PulseFindReady(HexCell cell)
+    public List<HexCell> PulseFindReady(HexCell cell)
     {
+        List<HexCell> newReady = new List<HexCell>();
         // get each neighbor. if not in closed, put it in ready
-        for (var direction = 0; direction < 3; direction++)
+        foreach (HexCell neighbor in cell.neighbors)
         {
-            HexDirection hexDirection = (HexDirection) direction;
-            HexDirection oppositeDirection = hexDirection.Opposite();
-            var n1 = cell.GetNeighbor(hexDirection);
-            var n2 = cell.GetNeighbor(oppositeDirection);
-            if (!(closed.Contains(n1)))
+            if (!(closed.Contains(neighbor)))
             {
-                readyToPulse.Add(n1);
+                newReady.Add(neighbor);
+                closed.Add(neighbor);
             }
-            if (!(closed.Contains(n2)))
-            {
-                readyToPulse.Add(n2);
-            }
+            
         }
+        return newReady;
     }
 
     // Note: this is when THIS object enters a collision

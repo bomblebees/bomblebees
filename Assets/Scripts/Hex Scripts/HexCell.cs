@@ -16,7 +16,7 @@ public class HexCell : NetworkBehaviour
     public bool occupiedByComboObject = false;
 
     public Color color;
-    [SerializeField] HexCell[] neighbors;
+    [SerializeField] public HexCell[] neighbors;
 
     private int listIndex;
 

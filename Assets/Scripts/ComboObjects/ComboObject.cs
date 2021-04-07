@@ -69,9 +69,12 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual void IgnoreDamageHitbox()
     {
-        foreach (Collider c in hitBox.GetComponentsInChildren<Collider>())
+        if (hitBox)
         {
-            Physics.IgnoreCollision(collider, c, true);
+            foreach (Collider c in hitBox.GetComponentsInChildren<Collider>())
+            {
+                Physics.IgnoreCollision(collider, c, true);
+            }
         }
     }
 
@@ -299,7 +302,6 @@ public class ComboObject : NetworkBehaviour
             }
 
             triggeringPlayer = other.transform.parent.gameObject; 
-            print(other.transform.parent.name);
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);

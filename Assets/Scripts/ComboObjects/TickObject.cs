@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class TickObject : ComboObject
 {
-    public float tickDuration = 4f;
-
     
     public override void OnStartClient()
     {
