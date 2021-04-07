@@ -17683,11 +17683,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7817971313910498558}
+  - component: {fileID: 3249442461453592790}
   - component: {fileID: 272083105507323255}
   - component: {fileID: 130384270139376107}
   - component: {fileID: 9072203149358088652}
   - component: {fileID: 501859540033048454}
-  - component: {fileID: 3249442461453592790}
   m_Layer: 8
   m_Name: Pulse Object
   m_TagString: ComboObject
@@ -17714,6 +17714,45 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3249442461453592790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8784039435045286777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47b6b172d12e8fd4683f8ffecdcf3c43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  blockerHandler: {fileID: 6616819736081707414}
+  hitBox: {fileID: 0}
+  collider: {fileID: 501859540033048454}
+  SFX: {fileID: 0}
+  travelDistanceInHexes: 4
+  lerpRate: 0.15
+  targetPosition: {x: 0, y: 0, z: 0}
+  snapToCenterThreshold: 0.5
+  nearestCenter: {x: 0, y: 0, z: 0}
+  tileUnderneath: {fileID: 0}
+  vfxDuration: 4
+  sfxDuration: 4
+  hitboxDuration: 1
+  lingerDuration: 8
+  startupDelay: 4
+  queenStartupDelay: 2
+  ownerIsQueen: 0
+  hasStarted: 0
+  model: {fileID: 1809444604607248526}
+  fillShaderRatio: 0.9
+  delays:
+  - 1
+  - 1
+  hitboxPrefab: {fileID: 1687125853829678087, guid: 0b48df169d93f65418ef42500b09f7a1,
+    type: 3}
 --- !u!114 &272083105507323255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17740,7 +17779,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0.9
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
@@ -17782,45 +17821,6 @@ CapsuleCollider:
   m_Height: 2.3384976
   m_Direction: 1
   m_Center: {x: 0, y: 0.15542431, z: 0}
---- !u!114 &3249442461453592790
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8784039435045286777}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47b6b172d12e8fd4683f8ffecdcf3c43, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  blockerHandler: {fileID: 6616819736081707414}
-  hitBox: {fileID: 0}
-  collider: {fileID: 501859540033048454}
-  SFX: {fileID: 0}
-  travelDistanceInHexes: 4
-  lerpRate: 0.9
-  targetPosition: {x: 0, y: 0, z: 0}
-  snapToCenterThreshold: 0.5
-  nearestCenter: {x: 0, y: 0, z: 0}
-  tileUnderneath: {fileID: 0}
-  vfxDuration: 4
-  sfxDuration: 4
-  hitboxDuration: 1
-  lingerDuration: 8
-  startupDelay: 4
-  queenStartupDelay: 2
-  ownerIsQueen: 0
-  hasStarted: 0
-  model: {fileID: 1809444604607248526}
-  fillShaderRatio: 0.9
-  delays:
-  - 1
-  - 1
-  hitboxPrefab: {fileID: 1687125853829678087, guid: 0b48df169d93f65418ef42500b09f7a1,
-    type: 3}
 --- !u!1 &8802240681566891827
 GameObject:
   m_ObjectHideFlags: 0

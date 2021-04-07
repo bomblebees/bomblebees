@@ -337,7 +337,7 @@ public class GameUIManager : NetworkBehaviour
         {
             return "<color=#00D9FF>Blink Bomb</color>";
         }
-        else if (bomb.GetComponent<GravityObject>() != null)
+        else if (bomb.GetComponent<SludgeObject>() != null)
         {
             return "<color=#F153FF>Gravity Bomb</color>";
         }

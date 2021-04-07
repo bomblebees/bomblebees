@@ -86,7 +86,7 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
-    private Vector3 gravObjInfluence = Vector3.zero;
+    private float sludgeInfluence = 1;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -389,7 +389,7 @@ public class Player : NetworkBehaviour
     {
         GameObject _gravity = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _gravity.GetComponent<GravityObject>()._Start(placer);
+        _gravity.GetComponent<SludgeObject>()._Start(placer);
         NetworkServer.Spawn(_gravity);
 
         eventManager.OnBombPlaced(_gravity, placer); // call event
@@ -565,7 +565,7 @@ public class Player : NetworkBehaviour
         }
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
-        if (direction != Vector3.zero || this.gravObjInfluence != Vector3.zero)
+        if (direction != Vector3.zero)
         {
             if (playerModel.activeSelf)
             {
@@ -582,10 +582,9 @@ public class Player : NetworkBehaviour
                     turnSpeed * Time.deltaTime
                 );
             }
-            if (this.canMove) controller.Move(((direction * movementSpeed)
-                                                        + this.gravObjInfluence)
+            if (this.canMove) controller.Move((direction * movementSpeed * this.sludgeInfluence)
                                                         * Time.deltaTime);
-            this.gravObjInfluence = Vector3.zero;
+            this.sludgeInfluence = 1;
         }
     }
 
@@ -778,9 +777,9 @@ public class Player : NetworkBehaviour
         spinHitbox.SetActive(val);
     }
 
-    public void ApplyGravityInfluence(Vector3 force)
+    public void ApplySludge(float val)
     {
-        this.gravObjInfluence += force;
+        this.sludgeInfluence = val;
     }
 
     

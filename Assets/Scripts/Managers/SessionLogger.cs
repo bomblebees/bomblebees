@@ -232,7 +232,7 @@ public class SessionLogger : MonoBehaviour
         {
             return "BLK";
         }
-        else if (bomb.GetComponent<GravityObject>() != null)
+        else if (bomb.GetComponent<SludgeObject>() != null)
         {
             return "GRA";
         } else

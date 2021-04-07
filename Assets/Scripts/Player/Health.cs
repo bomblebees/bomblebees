@@ -165,20 +165,12 @@ public class Health : NetworkBehaviour
             return;
         }
 
-        if (objName == "Gravity Object(Clone)")
+        if (objName == "Sludge Object(Clone)")
         {
-            var obj = other.gameObject.transform.root.transform;
-            var grav = obj.GetComponent<GravityObject>();
-            var target = obj.position;
-            var dist = target - this.gameObject.transform.position;
-            if (dist.magnitude > grav.distThresh)
-            {
-                this.playerScript.ApplyGravityInfluence(dist.normalized * grav.pullStrength * Time.deltaTime);
-            }
+            var sludge = other.gameObject.transform.root.transform.GetComponent<SludgeObject>();
+            this.playerScript.ApplySludge(sludge.slowRate);
             return;
         }
-
-        print("hit pulse");
         playerScript.canBeHit = false; // might remove later. this is for extra security
         this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
     }
