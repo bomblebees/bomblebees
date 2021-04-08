@@ -354,14 +354,11 @@ public class Player : NetworkBehaviour
     [Server]
     void SpawnDefaultBomb(GameObject placer = null)
     {
-        Debug.Log("spawning bomb");
         GameObject _bomb = (GameObject)Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        RpcSpawnDefaultBomb(_bomb, placer);
         _bomb.GetComponent<BombObject>()._Start(placer);
         NetworkServer.Spawn(_bomb);
-
-        RpcSpawnDefaultBomb(_bomb, placer);
 
         eventManager.OnBombPlaced(_bomb, placer); // call event
     }
@@ -369,7 +366,6 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSpawnDefaultBomb(GameObject bomb, GameObject placer)
     {
-        bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         bomb.GetComponent<BombObject>()._Start(placer);
     }
 
@@ -378,11 +374,9 @@ public class Player : NetworkBehaviour
     {
         GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        RpcSpawnLaserObject(_laser, placer);
         _laser.GetComponent<LaserObject>()._Start(placer);
         NetworkServer.Spawn(_laser);
-
-        RpcSpawnLaserObject(_laser, placer);
 
         eventManager.OnBombPlaced(_laser, placer); // call event
     }
@@ -390,7 +384,6 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSpawnLaserObject(GameObject laser, GameObject placer)
     {
-        laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         laser.GetComponent<LaserObject>()._Start(placer);
     }
 
@@ -399,10 +392,9 @@ public class Player : NetworkBehaviour
     {
         GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        RpcSpawnPlasmaObject(_plasma, placer);
         _plasma.GetComponent<PlasmaObject>()._Start(placer);
         NetworkServer.Spawn(_plasma);
-
-        RpcSpawnPlasmaObject(_plasma, placer);
 
         eventManager.OnBombPlaced(_plasma, placer); // call event
     }
@@ -419,9 +411,8 @@ public class Player : NetworkBehaviour
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         _blink.GetComponent<BlinkObject>()._Start(placer);
-        NetworkServer.Spawn(_blink);
-
         RpcSpawnBlinkObject(_blink, placer);
+        NetworkServer.Spawn(_blink);
 
         eventManager.OnBombPlaced(_blink, placer); // call event
     }
@@ -438,9 +429,8 @@ public class Player : NetworkBehaviour
         GameObject _gravity = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         _gravity.GetComponent<SludgeObject>()._Start(placer);
-        NetworkServer.Spawn(_gravity);
-
         RpcSpawnGravityObject(_gravity, placer);
+        NetworkServer.Spawn(_gravity);
 
         eventManager.OnBombPlaced(_gravity, placer); // call event
     }
@@ -457,9 +447,8 @@ public class Player : NetworkBehaviour
         GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         _bigBomb.GetComponent<PulseObject>()._Start(placer);  // TODO change this type
+        RpcSpawnBigBombObject(_bigBomb, placer);
         NetworkServer.Spawn(_bigBomb);
-
-        RpcSpawnGravityObject(_bigBomb, placer);
 
         eventManager.OnBombPlaced(_bigBomb, placer); // call event
     }
@@ -653,7 +642,7 @@ public class Player : NetworkBehaviour
             }
             if (this.canMove) controller.Move((direction * movementSpeed * this.sludgeInfluence)
                                                         * Time.deltaTime);
-            this.sludgeInfluence = 1;
+            this.sludged = false;
         }
     }
 
