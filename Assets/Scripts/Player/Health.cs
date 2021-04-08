@@ -143,9 +143,14 @@ public class Health : NetworkBehaviour
     [Mirror.ClientCallback]
     private void OnTriggerStay(Collider other)
     {
+        if (hasAuthority && other.gameObject.transform.root != this.gameObject.transform.root)
+        {
+            playerScript.stunnedDuration = 1;
+            return;
+        }
         if (
             !hasAuthority
-            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox") && other.gameObject.transform.root != this.gameObject.transform.root)
+            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
             )
         {
                 return;
@@ -172,7 +177,7 @@ public class Health : NetworkBehaviour
             return;
         }
 
-        playerScript.stunnedDuration = 1;
+        
         playerScript.canBeHit = false; // might remove later. this is for extra security
         this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
     }

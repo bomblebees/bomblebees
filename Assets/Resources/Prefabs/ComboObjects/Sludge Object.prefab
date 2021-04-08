@@ -15766,7 +15766,7 @@ GameObject:
   - component: {fileID: 3342596630823727823}
   - component: {fileID: 6157352836541627525}
   m_Layer: 8
-  m_Name: Gravity Object
+  m_Name: Sludge Object
   m_TagString: ComboObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15825,8 +15825,7 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 1203407218020262036}
   fillShaderRatio: 0.9
-  tickDuration: 0
-  pullStrength: 3000
+  slowRate: 0.8
   distThresh: 5
 --- !u!114 &5783496561789443700
 MonoBehaviour:
