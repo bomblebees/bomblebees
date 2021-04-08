@@ -17740,7 +17740,7 @@ MonoBehaviour:
   tileUnderneath: {fileID: 0}
   vfxDuration: 4
   sfxDuration: 4
-  hitboxDuration: 1
+  hitboxDuration: 0.1
   lingerDuration: 8
   startupDelay: 4
   queenStartupDelay: 2
@@ -17749,8 +17749,8 @@ MonoBehaviour:
   model: {fileID: 1809444604607248526}
   fillShaderRatio: 0.9
   delays:
-  - 1
-  - 1
+  - 1.5
+  - 1.5
   hitboxPrefab: {fileID: 1687125853829678087, guid: 0b48df169d93f65418ef42500b09f7a1,
     type: 3}
 --- !u!114 &272083105507323255

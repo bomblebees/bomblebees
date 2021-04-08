@@ -145,7 +145,7 @@ public class Health : NetworkBehaviour
     {
         if (
             !hasAuthority
-            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox") && other.gameObject.transform.root != this.gameObject.transform.root)
             )
         {
                 return;
@@ -174,6 +174,7 @@ public class Health : NetworkBehaviour
         playerScript.canBeHit = false; // might remove later. this is for extra security
         this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
     }
+    // if (objName == )
 
     [Mirror.Command(ignoreAuthority = true)]
     public void CmdNotifyPlayerDied()

@@ -31,6 +31,8 @@ public class Player : NetworkBehaviour
     public string debugBombPress3 = "e";
     public string debugBombPress4 = ";";
     private HexGrid hexGrid;
+    public bool isStunned = false;
+    public float stunnedDuration = 0;
 
     [Header("Respawn")]
     public float invincibilityDuration = 2.0f;
@@ -187,6 +189,7 @@ public class Player : NetworkBehaviour
         if (isDead) return; // if dead, disable all player updates
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
+        
 
         ApplyMovement();
         ApplyTileHighlight();
@@ -194,6 +197,15 @@ public class Player : NetworkBehaviour
         ListenForBombUse();
         ListenForSpinning();
         if (debugMode) DebugMode();
+        stunnedDuration -= 0.5f * Time.deltaTime;
+        if (stunnedDuration > 0)
+        {
+            canMove = false;
+        }
+        else
+        {
+            canMove = true;
+        }
     }
 
     private void DebugMode()
@@ -307,6 +319,7 @@ public class Player : NetworkBehaviour
                             break;
                         case 'w':
                             // Debug.Log("White Bomb Type");
+                            SpawnDefaultBomb(sender.identity.gameObject);
                             break;
                         default:
                             // code should not reach here
@@ -320,8 +333,8 @@ public class Player : NetworkBehaviour
                     onDefaultBombReadyAnim.SetActive(false);
                     playedOnDefaultBombReadyAnim = false;
 
-                    // Else use the default bomb
-                    this.SpawnDefaultBomb(sender.identity.gameObject);
+                    /// Else use the default bomb
+                    // this.SpawnDefaultBomb(sender.identity.gameObject);
 
                     // update hud
                     this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
@@ -677,12 +690,13 @@ public class Player : NetworkBehaviour
     [Server]
     public void AddItemCombo(char colorKey)
     {
-        if (colorKey == 'w')
-        {
-            print("IN HERE");
-            ApplyQueenPoints(1);
-        }
-        else if (itemStack.Count < maxStackSize)
+        // if (colorKey == 'w')
+        // {
+        //     print("IN HERE");
+        //     ApplyQueenPoints(1);
+        // }
+        // else 
+        if (itemStack.Count < maxStackSize)
         {
             itemStack.Add(colorKey); // Push new combo to stack
         }
