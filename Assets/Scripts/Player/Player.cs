@@ -42,7 +42,7 @@ public class Player : NetworkBehaviour
     [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
-    
+
     [SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
     [SerializeField] private GameObject onDefaultBombReadyAnim;
@@ -277,7 +277,7 @@ public class Player : NetworkBehaviour
             CmdSpin();
         }
     }
-    
+
 
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)
@@ -340,11 +340,11 @@ public class Player : NetworkBehaviour
                     this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
 
                     defaultBombUseTimer = 0;
-                    
+
                 }
                 else // When the default bomb CD isn't up
                 {
-                    
+
                 }
             }
         }
@@ -354,13 +354,22 @@ public class Player : NetworkBehaviour
     void SpawnDefaultBomb(GameObject placer = null)
     {
         Debug.Log("spawning bomb");
-        GameObject _bomb = (GameObject) Instantiate(bomb,
+        GameObject _bomb = (GameObject)Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         _bomb.GetComponent<BombObject>()._Start(placer);
         NetworkServer.Spawn(_bomb);
 
+        RpcSpawnDefaultBomb(_bomb, placer);
+
         eventManager.OnBombPlaced(_bomb, placer); // call event
+    }
+
+    [ClientRpc]
+    void RpcSpawnDefaultBomb(GameObject bomb, GameObject placer)
+    {
+        bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        bomb.GetComponent<BombObject>()._Start(placer);
     }
 
     [Server]
@@ -372,7 +381,16 @@ public class Player : NetworkBehaviour
         _laser.GetComponent<LaserObject>()._Start(placer);
         NetworkServer.Spawn(_laser);
 
+        RpcSpawnLaserObject(_laser, placer);
+
         eventManager.OnBombPlaced(_laser, placer); // call event
+    }
+
+    [ClientRpc]
+    void RpcSpawnLaserObject(GameObject laser, GameObject placer)
+    {
+        laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
+        laser.GetComponent<LaserObject>()._Start(placer);
     }
 
     [Server]
@@ -383,7 +401,15 @@ public class Player : NetworkBehaviour
         _plasma.GetComponent<PlasmaObject>()._Start(placer);
         NetworkServer.Spawn(_plasma);
 
+        RpcSpawnPlasmaObject(_plasma, placer);
+
         eventManager.OnBombPlaced(_plasma, placer); // call event
+    }
+
+    [ClientRpc]
+    void RpcSpawnPlasmaObject(GameObject plasma, GameObject placer)
+    {
+        plasma.GetComponent<PlasmaObject>()._Start(placer);
     }
 
     [Server]
@@ -394,7 +420,15 @@ public class Player : NetworkBehaviour
         _blink.GetComponent<BlinkObject>()._Start(placer);
         NetworkServer.Spawn(_blink);
 
+        RpcSpawnBlinkObject(_blink, placer);
+
         eventManager.OnBombPlaced(_blink, placer); // call event
+    }
+
+    [ClientRpc]
+    void RpcSpawnBlinkObject(GameObject blink, GameObject placer)
+    {
+        blink.GetComponent<BlinkObject>()._Start(placer);
     }
 
     [Server]
@@ -405,7 +439,15 @@ public class Player : NetworkBehaviour
         _gravity.GetComponent<SludgeObject>()._Start(placer);
         NetworkServer.Spawn(_gravity);
 
+        RpcSpawnGravityObject(_gravity, placer);
+
         eventManager.OnBombPlaced(_gravity, placer); // call event
+    }
+
+    [ClientRpc]
+    void RpcSpawnGravityObject(GameObject gravity, GameObject placer)
+    {
+        gravity.GetComponent<SludgeObject>()._Start(placer);
     }
 
     [Server]
@@ -416,9 +458,17 @@ public class Player : NetworkBehaviour
         _bigBomb.GetComponent<PulseObject>()._Start(placer);  // TODO change this type
         NetworkServer.Spawn(_bigBomb);
 
+        RpcSpawnGravityObject(_bigBomb, placer);
+
         eventManager.OnBombPlaced(_bigBomb, placer); // call event
     }
-    
+
+    [ClientRpc]
+    void RpcSpawnBigBombObject(GameObject bigBomb, GameObject placer)
+    {
+        bigBomb.GetComponent<PulseObject>()._Start(placer);
+    }
+
     public void SetCanPlaceBombs(bool val)
     {
         this.canPlaceBombs = val;
