@@ -171,6 +171,8 @@ public class Health : NetworkBehaviour
             this.playerScript.ApplySludge(sludge.slowRate);
             return;
         }
+
+        playerScript.stunnedDuration = 1;
         playerScript.canBeHit = false; // might remove later. this is for extra security
         this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
     }
