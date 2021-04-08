@@ -89,6 +89,7 @@ public class Player : NetworkBehaviour
     public GameObject blink;
     public GameObject gravityObject;
     private float sludgeInfluence = 1;
+    private bool sludged = false;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -645,6 +646,11 @@ public class Player : NetworkBehaviour
                     turnSpeed * Time.deltaTime
                 );
             }
+
+            if (sludged == true)
+            {
+                this.sludgeInfluence = 0.6f;
+            }
             if (this.canMove) controller.Move((direction * movementSpeed * this.sludgeInfluence)
                                                         * Time.deltaTime);
             this.sludgeInfluence = 1;
@@ -841,9 +847,9 @@ public class Player : NetworkBehaviour
         spinHitbox.SetActive(val);
     }
 
-    public void ApplySludge(float val)
+    public void ApplySludge(bool val)
     {
-        this.sludgeInfluence = val;
+        this.sludged = val;
     }
 
     

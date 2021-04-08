@@ -173,7 +173,7 @@ public class Health : NetworkBehaviour
         if (objName == "Sludge Object(Clone)")
         {
             var sludge = other.gameObject.transform.root.transform.GetComponent<SludgeObject>();
-            this.playerScript.ApplySludge(sludge.slowRate);
+            this.playerScript.ApplySludge(true);
             return;
         }
 
