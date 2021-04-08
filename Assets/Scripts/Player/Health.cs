@@ -19,7 +19,7 @@ public class Health : NetworkBehaviour
 
     public delegate void PlayerTookDamageDelegate(int newValue);
 
-    public delegate void LivesChangedDelegate(int currentHealth, int maxHealth);
+    public delegate void LivesChangedDelegate(int currentHealth, int maxHealth, GameObject player);
 
     public delegate void LivesLoweredDelegate(bool canAct); // sends false
 
@@ -52,7 +52,7 @@ public class Health : NetworkBehaviour
     [Mirror.ClientRpc]
     private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
     {
-        EventLivesChanged?.Invoke(currentHealth, maxHealth);
+        EventLivesChanged?.Invoke(currentHealth, maxHealth, this.gameObject);
     }
 
     [Mirror.Client]
