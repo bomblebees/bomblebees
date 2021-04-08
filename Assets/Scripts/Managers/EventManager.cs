@@ -116,17 +116,19 @@ public class EventManager : NetworkBehaviour
     [Server]
     public void OnPlayerTookDamage(int newLives, GameObject bomb, GameObject player)
     {
-        sessionLogger.CreateEventDMG(
-            bomb,
-            player,
-            bomb.GetComponent<ComboObject>().GetOwnerPlayer(),
-            Time.time - roundStartTime);
+        if (bomb) {
+            sessionLogger.CreateEventDMG(
+                bomb,
+                player,
+                bomb.GetComponent<ComboObject>().GetOwnerPlayer(),
+                Time.time - roundStartTime);
+            EventPlayerTookDamage?.Invoke(newLives, bomb, player);
+        }
 
         //Debug.Log("player who took damage: " + player.name);
         //Debug.Log("player lives: " + newLives.ToString());
         //Debug.Log("bomb that hit the player: " + bomb);
         //Debug.Log("original person who placed the bomb " + bomb.GetComponent<ComboObject>().GetOwnerPlayer());
-        EventPlayerTookDamage?.Invoke(newLives, bomb, player);
     }
 
     /// <summary>

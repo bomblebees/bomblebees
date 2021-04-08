@@ -123,8 +123,23 @@ public class ComboObject : NetworkBehaviour
             var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
             // var result = GetComponent<Transform>().position;
             nearestCenter = result;
-            RpcFindCenter(result);
+            RpcFindCenter(result, this.gameObject.transform.position);
         }
+    }
+    
+    // Tell all clients the nearest center as calculated by the server
+    [ClientRpc]
+    protected virtual void RpcFindCenter(Vector3 centerPos, Vector3 pos)
+    {
+        var objectRay = new Ray(pos, Vector3.down);
+            RaycastHit tileUnderneathHit;
+            if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
+                nearestCenter = result;
+            }
+        // nearestCenter = centerPos;
     }
     
     protected virtual Vector3 FindCenterBelowOther(GameObject origin) 
@@ -140,12 +155,6 @@ public class ComboObject : NetworkBehaviour
         else return origin.transform.position;
     }
 
-    // Tell all clients the nearest center as calculated by the server
-    [ClientRpc]
-    protected virtual void RpcFindCenter(Vector3 centerPos)
-    {
-        nearestCenter = centerPos;
-    }
 
     protected virtual float GetDistanceFrom(Vector3 targetPos)
     {
@@ -168,7 +177,6 @@ public class ComboObject : NetworkBehaviour
     protected virtual void RpcGoToCenter(Vector3 centerPos)
     {
         this.gameObject.transform.position = centerPos;
-        
     }
 
     protected virtual void NotifyOccupiedTile(bool val)
@@ -195,9 +203,11 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableSFX()
     {
-        SFX.SetActive(true);
-        yield return new WaitForSeconds(sfxDuration);
-        SFX.SetActive(false);
+        if (SFX) {
+            SFX.SetActive(true);
+            yield return new WaitForSeconds(sfxDuration);
+            SFX.SetActive(false);
+        }
     }
 
     protected virtual IEnumerator EnableHitbox()

@@ -213,7 +213,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(debugBombPress1))
         {
-            SpawnGravityObject();
+            SpawnSludgeObject();
         }
         if (Input.GetKeyDown(debugBombPress2))
         {
@@ -312,11 +312,11 @@ public class Player : NetworkBehaviour
                             break;
                         case 'r':
                             // Debug.Log("Red Bomb Type");
-                            SpawnBigBombObject(sender.identity.gameObject);
+                            SpawnPulseObject(sender.identity.gameObject);
                             break;
                         case 'p':
                             // Debug.Log("Purple Bomb Type");
-                            SpawnGravityObject(sender.identity.gameObject);
+                            SpawnSludgeObject(sender.identity.gameObject);
                             break;
                         case 'w':
                             // Debug.Log("White Bomb Type");
@@ -356,9 +356,9 @@ public class Player : NetworkBehaviour
     {
         GameObject _bomb = (GameObject)Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        RpcSpawnDefaultBomb(_bomb, placer);
-        _bomb.GetComponent<BombObject>()._Start(placer);
         NetworkServer.Spawn(_bomb);
+        _bomb.GetComponent<BombObject>()._Start(placer);
+        RpcSpawnDefaultBomb(_bomb, placer);
 
         eventManager.OnBombPlaced(_bomb, placer); // call event
     }
@@ -374,9 +374,9 @@ public class Player : NetworkBehaviour
     {
         GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        RpcSpawnLaserObject(_laser, placer);
-        _laser.GetComponent<LaserObject>()._Start(placer);
         NetworkServer.Spawn(_laser);
+        _laser.GetComponent<LaserObject>()._Start(placer);
+        RpcSpawnLaserObject(_laser, placer);
 
         eventManager.OnBombPlaced(_laser, placer); // call event
     }
@@ -392,10 +392,10 @@ public class Player : NetworkBehaviour
     {
         GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        RpcSpawnPlasmaObject(_plasma, placer);
-        _plasma.GetComponent<PlasmaObject>()._Start(placer);
         NetworkServer.Spawn(_plasma);
-
+        _plasma.GetComponent<PlasmaObject>()._Start(placer);
+        RpcSpawnPlasmaObject(_plasma, placer);
+        
         eventManager.OnBombPlaced(_plasma, placer); // call event
     }
 
@@ -410,9 +410,9 @@ public class Player : NetworkBehaviour
     {
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
+        NetworkServer.Spawn(_blink);
         _blink.GetComponent<BlinkObject>()._Start(placer);
         RpcSpawnBlinkObject(_blink, placer);
-        NetworkServer.Spawn(_blink);
 
         eventManager.OnBombPlaced(_blink, placer); // call event
     }
@@ -424,39 +424,40 @@ public class Player : NetworkBehaviour
     }
 
     [Server]
-    void SpawnGravityObject(GameObject placer = null)
+    void SpawnSludgeObject(GameObject placer = null)
     {
-        GameObject _gravity = (GameObject) Instantiate(gravityObject,
+        GameObject _sludge = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _gravity.GetComponent<SludgeObject>()._Start(placer);
-        RpcSpawnGravityObject(_gravity, placer);
-        NetworkServer.Spawn(_gravity);
-
-        eventManager.OnBombPlaced(_gravity, placer); // call event
+        NetworkServer.Spawn(_sludge);
+        _sludge.GetComponent<SludgeObject>()._Start(placer);
+        RpcSpawnSludgeBomb(_sludge, placer);
+        
+        eventManager.OnBombPlaced(_sludge, placer); // call event
     }
 
     [ClientRpc]
-    void RpcSpawnGravityObject(GameObject gravity, GameObject placer)
+    void RpcSpawnSludgeBomb(GameObject sludge, GameObject placer)
     {
-        gravity.GetComponent<SludgeObject>()._Start(placer);
+        sludge.GetComponent<SludgeObject>()._Start(placer);
     }
 
     [Server]
-    void SpawnBigBombObject(GameObject placer = null)
+    void SpawnPulseObject(GameObject placer = null)
     {
-        GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
+        GameObject _pulse = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _bigBomb.GetComponent<PulseObject>()._Start(placer);  // TODO change this type
-        RpcSpawnBigBombObject(_bigBomb, placer);
-        NetworkServer.Spawn(_bigBomb);
+        _pulse.GetComponent<PulseObject>()._Start(placer); // TODO change this type
+        NetworkServer.Spawn(_pulse);
 
-        eventManager.OnBombPlaced(_bigBomb, placer); // call event
+        RpcSpawnPulseObject(_pulse, placer);
+
+        eventManager.OnBombPlaced(_pulse, placer); // call event    }
     }
 
     [ClientRpc]
-    void RpcSpawnBigBombObject(GameObject bigBomb, GameObject placer)
+    void RpcSpawnPulseObject(GameObject pulse, GameObject placer)
     {
-        bigBomb.GetComponent<PulseObject>()._Start(placer);
+        pulse.GetComponent<PulseObject>()._Start(placer);
     }
 
     public void SetCanPlaceBombs(bool val)
@@ -639,6 +640,10 @@ public class Player : NetworkBehaviour
             if (sludged == true)
             {
                 this.sludgeInfluence = 0.6f;
+            }
+            else
+            {
+                this.sludgeInfluence = 1f;
             }
             if (this.canMove) controller.Move((direction * movementSpeed * this.sludgeInfluence)
                                                         * Time.deltaTime);
