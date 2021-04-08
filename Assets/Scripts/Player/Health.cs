@@ -143,7 +143,7 @@ public class Health : NetworkBehaviour
     [Mirror.ClientCallback]
     private void OnTriggerStay(Collider other)
     {
-        if (hasAuthority && other.gameObject.transform.root != this.gameObject.transform.root)
+        if (hasAuthority && other.gameObject.transform.root == this.gameObject.transform.root)
         {
             playerScript.stunnedDuration = 1;
             return;
