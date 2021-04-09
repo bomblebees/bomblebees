@@ -22,14 +22,12 @@ public class PulseObject : TickObject
         this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
 
-    public IEnumerator PulseStep(float[] delays)
+    public IEnumerator PulseStep(float[] delays, int i)
     {
-        if (itr > delays.Length) { 
-            yield return new WaitForSeconds(0);  // Do nothing
-        }
-        else
+        while (i <= delays.Length)
         {
             List<HexCell> allNewReady = new List<HexCell>();
+            print("gotta create "+readyToPulse.Count+" on itr "+itr);
             while (readyToPulse.Count > 0) 
                 // Pulse each ready cell.
             {
@@ -38,11 +36,12 @@ public class PulseObject : TickObject
                 allNewReady = allNewReady.Concat(PulseFindReady(pulser)).ToList();
                 StartCoroutine(PulseCell(pulser, hitboxDuration));
             }
+            print("ready before"+readyToPulse.Count);
             readyToPulse = allNewReady;
+            print("ready after"+readyToPulse.Count);
             if (itr != delays.Length) yield return new WaitForSeconds(delays[itr]);
             else yield return new WaitForSeconds(0);
-            itr++;
-            StartCoroutine(PulseStep(delays));
+            i += 1;
         }
     }
     
@@ -52,7 +51,7 @@ public class PulseObject : TickObject
         StopVelocity();
         closed.Add(tileUnderneath);
         readyToPulse = PulseFindReady(tileUnderneath);
-        StartCoroutine(PulseStep(delays));
+        StartCoroutine(PulseStep(delays,0 ));
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(DisableObjectCollider());
@@ -70,8 +69,11 @@ public class PulseObject : TickObject
 
     public List<HexCell> PulseFindReady(HexCell cell)
     {
+        // print(cell.neighbors.Length);
         List<HexCell> newReady = new List<HexCell>();
         // get each neighbor. if not in closed, put it in ready
+        // print("before"+newReady.Count);
+        if (!cell) return newReady;
         foreach (HexCell neighbor in cell.neighbors)
         {
             if (!(closed.Contains(neighbor)))
@@ -81,6 +83,7 @@ public class PulseObject : TickObject
             }
             
         }
+        // print("after"+newReady.Count);
         return newReady;
     }
 

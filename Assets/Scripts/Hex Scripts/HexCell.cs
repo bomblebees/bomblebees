@@ -29,6 +29,7 @@ public class HexCell : NetworkBehaviour
     {
         neighbors[(int) direction] = cell;
         cell.neighbors[(int) direction.Opposite()] = this;
+        if (cell.neighbors.Length > 6) print("there should not be more than 6 neighbors");
     }
 
     public void SetSpawnCoords(int x, int z)
