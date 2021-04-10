@@ -80,6 +80,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
     public GameObject spinHit = null; // the bomb that was hit with spin
+    public GameObject spinPVP = null;
 
     // Game Objects
     [Header("Required", order = 2)] public GameObject bomb;
@@ -131,6 +132,7 @@ public class Player : NetworkBehaviour
         this.Assert();
         LinkAssets();
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
+        spinPVP = gameObject.transform.Find("SpinPVP").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         UpdateHeldHex(heldKey); // Initialize model
 
@@ -529,6 +531,10 @@ public class Player : NetworkBehaviour
         spinHitbox.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinHitboxDuration);
         spinHitbox.gameObject.SetActive(false);
+        
+        spinPVP.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinHitboxDuration);
+        spinPVP.gameObject.SetActive(false);
     }
 
     private IEnumerator HandleSpinAnim()
