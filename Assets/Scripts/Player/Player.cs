@@ -413,8 +413,8 @@ public class Player : NetworkBehaviour
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
         NetworkServer.Spawn(_blink);
-        // _blink.GetComponent<BlinkObject>()._Start(placer);
-        RpcSpawnBlinkObject(_blink, placer);
+        _blink.GetComponent<BlinkObject>()._Start(placer);
+        // RpcSpawnBlinkObject(_blink, placer);
 
         eventManager.OnBombPlaced(_blink, placer); // call event
     }
