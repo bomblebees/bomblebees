@@ -23,7 +23,6 @@ public class BlinkObject : TickObject
         base._Start(player);
         EnableObject();
     }
-    
 
     // protected virtual IEnumerator DelayedSpawn()
     // {
