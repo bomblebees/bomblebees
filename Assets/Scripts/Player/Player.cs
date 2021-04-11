@@ -104,7 +104,7 @@ public class Player : NetworkBehaviour
     private GameObject heldHexModel;
 
     [SerializeField] private int maxStackSize = 3;
-    readonly SyncList<char> itemStack = new SyncList<char>();
+    public readonly SyncList<char> itemStack = new SyncList<char>();
 
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
