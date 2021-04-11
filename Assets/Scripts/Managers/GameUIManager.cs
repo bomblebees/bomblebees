@@ -9,6 +9,7 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] private RoundStartEnd roundStartEnd = null;
     [SerializeField] private LivesUI livesUI = null;
     [SerializeField] private MessageFeed messageFeed = null;
+    [SerializeField] private Hotbar hotbar = null;
 
 
     // singletons
@@ -142,19 +143,33 @@ public class GameUIManager : NetworkBehaviour
     }
 
     [Server]
-    public void ServerOnSwapEvent(char oldKey, char _, bool combo, GameObject player)
+    public void ServerOnSwapEvent(char oldKey, char newKey, bool combo, GameObject player)
     {
         if (combo)
         {
-            RpcOnSwapEvent(oldKey, player);
+            RpcOnSwapComboEvent(oldKey, player);
         }
+
+        TargetOnSwapEvent(player.GetComponent<NetworkIdentity>().connectionToClient, newKey);
     }
 
     [ClientRpc]
-    public void RpcOnSwapEvent(char comboKey, GameObject player)
+    public void RpcOnSwapComboEvent(char comboKey, GameObject player)
     {
         messageFeed.OnSwapEvent(comboKey, player);
+
+    }
+
+    #endregion
+
+    #region Hotbar
+
+    [TargetRpc]
+    public void TargetOnSwapEvent(NetworkConnection target, char newKey)
+    {
+        hotbar.SwapHexes(newKey);
     }
 
     #endregion
 }
+

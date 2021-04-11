@@ -813,6 +813,7 @@ GameObject:
   - component: {fileID: 2744154941359013148}
   - component: {fileID: 4167359213861107479}
   - component: {fileID: 1598153864524769660}
+  - component: {fileID: 1222881850713041098}
   m_Layer: 0
   m_Name: Hotbar_Canvas
   m_TagString: Untagged
@@ -900,6 +901,20 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1222881850713041098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748682289478237705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85906c246a3a11a4a8755154adc205ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backHex: {fileID: 6869745576482231395}
+  frontHex: {fileID: 7724297958842262069}
 --- !u!1 &1862278954861842938
 GameObject:
   m_ObjectHideFlags: 0
@@ -1135,6 +1150,7 @@ MonoBehaviour:
   roundStartEnd: {fileID: 5562057896471677188}
   livesUI: {fileID: 2960523738965758250}
   messageFeed: {fileID: 3312680770878052239}
+  hotbar: {fileID: 1222881850713041098}
 --- !u!1 &2412957619896399704
 GameObject:
   m_ObjectHideFlags: 0
