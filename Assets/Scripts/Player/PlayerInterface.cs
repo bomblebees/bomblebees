@@ -55,6 +55,8 @@ public class PlayerInterface : NetworkBehaviour
 
     private void Update()
     {
+        if (!isLocalPlayer) return;
+
         if (bombHudTimer > 0)
         {
             float totalDuration = this.GetComponent<Player>().defaultBombCooldown;
