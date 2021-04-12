@@ -13,6 +13,7 @@ public class LivesUI : MonoBehaviour
     {
         public GameObject livesObject;
         public RawImage avatar;
+        public RawImage background;
         public TMP_Text playerName;
         public TMP_Text livesCounter;
     }
@@ -39,7 +40,8 @@ public class LivesUI : MonoBehaviour
 
             // initialize health and username
             livesUIs[i].playerName.text = p.steamName;
-            livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
+            //livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
+            livesUIs[i].background.color = p.playerColor; // sets the color to the color of the player
             livesUIs[i].livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
         }
 
