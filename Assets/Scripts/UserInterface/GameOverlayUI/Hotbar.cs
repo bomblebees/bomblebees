@@ -9,6 +9,8 @@ public class Hotbar : MonoBehaviour
 {
     private Player localPlayer = null;
 
+    private BombHelper bombHelper;
+
 
     [Header("Swap")]
     [SerializeField] private Image backHex;
@@ -27,10 +29,10 @@ public class Hotbar : MonoBehaviour
     //[SerializeField] private GameObject endGameUI;
 
 
-    //private void Start()
-    //{
-    //    localPlayer = GameObject.Find("LocalPlayer").GetComponent<Player>();
-    //}
+    private void Start()
+    {
+        bombHelper = this.gameObject.transform.parent.GetComponent<BombHelper>();
+    }
 
     void Update()
     {
@@ -40,8 +42,8 @@ public class Hotbar : MonoBehaviour
 
             char selectedKey = localPlayer.selectedTile.GetComponentInParent<HexCell>().GetKey();
 
-            backHex.color = GetKeyColor(selectedKey);
-            frontHex.color = GetKeyColor(localPlayer.GetHeldKey());
+            backHex.color = bombHelper.GetKeyColor(selectedKey);
+            frontHex.color = bombHelper.GetKeyColor(localPlayer.GetHeldKey());
         } else
         {
             GameObject player = GameObject.Find("LocalPlayer");
@@ -80,7 +82,7 @@ public class Hotbar : MonoBehaviour
 
     public void SwapHexes(char newFrontKey)
     {
-        frontHex.color = GetKeyColor(newFrontKey);
+        frontHex.color = bombHelper.GetKeyColor(newFrontKey);
     }
 
     void OnStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
@@ -102,7 +104,7 @@ public class Hotbar : MonoBehaviour
             if (i < reversedStack.Count)
             {
                 UpdateStackUI(i, reversedStack[i]);
-                if (i == 0) nextBombText.text = GetBombTextByKey(reversedStack[i]);
+                if (i == 0) nextBombText.text = bombHelper.GetBombTextByKey(reversedStack[i]);
             }
             else // Update the rest of stack
             {
@@ -112,40 +114,21 @@ public class Hotbar : MonoBehaviour
         }
 
 
+        if (op == SyncList<char>.Operation.OP_ADD)
+        {
+            Debug.Log("Move up stack");
+        } else if (op == SyncList<char>.Operation.OP_REMOVEAT)
+        {
+            Debug.Log("Move down stack");
+        }
+
     }
 
     void UpdateStackUI(int idx, char key)
     {
-        placeStack[idx].color = GetKeyColor(key);
-    }
+        //placeStack[idx].color = GetKeyColor(key);
 
-    Color GetKeyColor(char key)
-    {
-        switch (key)
-        {
-            case 'b': return new Color32(0, 217, 255, 255);
-            case 'g': return new Color32(23, 229, 117, 255);
-            case 'y': return new Color32(249, 255, 35, 255);
-            case 'r': return Color.red;
-            case 'p': return new Color32(241, 83, 255, 255);
-            case 'w': return new Color32(178, 178, 178, 255);
-            case 'e': return Color.white;
-            default: return Color.white;
-        }
-    }
-
-    private string GetBombTextByKey(char key)
-    {
-        switch (key)
-        {
-            case 'b': return "Blink";
-            case 'g': return "Plasma";
-            case 'y': return "Laser";
-            case 'r': return "Big";
-            case 'p': return "Sludge";
-            case 'w': return "Queen Bee";
-            default: return "None";
-        }
+        placeStack[idx].sprite = bombHelper.GetKeySprite(key);
     }
 
 }

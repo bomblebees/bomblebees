@@ -21,7 +21,7 @@ public class GameUIManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
+        if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: GameUIManager");
         else _instance = this;
     }
 

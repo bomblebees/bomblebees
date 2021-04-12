@@ -26,6 +26,10 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
 
+    private Player player;
+    private GameUIManager gameUIManager;
+    private BombHelper bombHelper;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -37,6 +41,16 @@ public class PlayerInterface : NetworkBehaviour
         CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
+
+
+        gameUIManager = GameUIManager.Singleton;
+        if (gameUIManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
+        bombHelper = gameUIManager.GetComponent<BombHelper>();
+
+
+        player = this.GetComponent<Player>();
+        player.itemStack.Callback += OnUIStackChange;
     }
 
     private void Update()
@@ -92,23 +106,41 @@ public class PlayerInterface : NetworkBehaviour
         playerName.color = player.GetComponent<Player>().playerColor;
     }
 
+    [Client]
+    void OnUIStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
+    {
+        PlayerInterface hud = this.GetComponent<PlayerInterface>();
+        // for (int i = 0; i < 3; i++)
+        for (int i = 2; i >= 0; i--)
+        {
+            if (i < player.itemStack.Count)
+            {
+                hud.UpdateStackHud(i, player.itemStack[i]);
+            }
+
+            else hud.UpdateStackHud(i, 'e');
+        }
+    }
+
     public void UpdateStackHud(int idx, char key)
     {
-        if (idx == 2 || stackUI[idx+1].color == Color.clear)
-            stackUI[idx].gameObject.transform.localScale = new Vector3(0.25f,0.25f,0.25f);
+        // Enlarge if front of stack (ie. next bomb to drop)
+        if (idx == player.itemStack.Count - 1)
+            stackUI[idx].gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
         else
-            stackUI[idx].gameObject.transform.localScale = new Vector3(0.1904f,0.1904f,0.1904f);
+            stackUI[idx].gameObject.transform.localScale = new Vector3(0.1904f, 0.1904f, 0.1904f);
 
-        if (stackUI[idx].color != GetKeyColor(key))
+        // Set the sprite if it is a bomb, otherwise disable it
+        if (key == 'e')
         {
-            if (GetKeyColor(key) == Color.white)
-                stackUI[idx].color = new Color(0f,0f,0f,0f);
-            else 
-                stackUI[idx].color = GetKeyColor(key);
-
-            // Run bounce anim
-            // stackUI[idx].gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+            stackUI[idx].color = Color.clear;
+        } else
+        {
+            stackUI[idx].color = Color.white;
+            stackUI[idx].sprite = bombHelper.GetKeySprite(key);
         }
+
+
     }
 
     public void UpdateHexHud(char key)
