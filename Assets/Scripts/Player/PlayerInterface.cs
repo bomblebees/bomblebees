@@ -47,11 +47,15 @@ public class PlayerInterface : NetworkBehaviour
             bombCooldownFilter.fillAmount = bombHudTimer / totalDuration;
             bombHudTimer -= Time.deltaTime;
 
-            if (bombHudTimer < 0) bombHudTimer = 0;
+            if (bombHudTimer < 0)
+            {
+                bombHudTimer = 0;
+                bombCooldownFilter.fillAmount = 0;
+            }
         }
     }
 
-    public void OnPlayerTakeDamage(int _, int __)
+    public void OnPlayerTakeDamage(int _, int __, GameObject ___)
     {
         if (isLocalPlayer) damageIndicator.GetComponent<FlashTween>().StartFlash();
     }
