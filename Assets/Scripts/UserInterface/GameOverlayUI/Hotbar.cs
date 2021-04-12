@@ -18,6 +18,11 @@ public class Hotbar : MonoBehaviour
     [SerializeField] private Image[] placeStack = new Image[3];
     [SerializeField] private TMP_Text nextBombText;
 
+    [Header("Spin")]
+    [SerializeField] private Image spinCooldownFilter;
+    [SerializeField] private TMP_Text cooldownText;
+    private float spinHudTimer = 0;
+
     //[Header("End Round")]
     //[SerializeField] private GameObject endGameUI;
 
@@ -46,6 +51,30 @@ public class Hotbar : MonoBehaviour
                 localPlayer.itemStack.Callback += OnStackChange;
             }
 
+        }
+
+        if (spinHudTimer != 0)
+        {
+            float totalDuration = localPlayer.spinTotalCooldown;
+            spinCooldownFilter.fillAmount = spinHudTimer / totalDuration;
+            spinHudTimer -= Time.deltaTime;
+
+            cooldownText.text = spinHudTimer.ToString("F1");
+
+            if (spinHudTimer < 0)
+            {
+                spinHudTimer = 0;
+                spinCooldownFilter.fillAmount = 0;
+                cooldownText.text = "";
+            }
+        }
+    }
+
+    public void StartSpinCooldown()
+    {
+        if (localPlayer != null)
+        {
+            spinHudTimer = localPlayer.spinTotalCooldown;
         }
     }
 

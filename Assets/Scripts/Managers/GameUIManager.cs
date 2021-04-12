@@ -44,6 +44,7 @@ public class GameUIManager : NetworkBehaviour
 
         eventManager.EventPlayerTookDamage += RpcOnKillEvent;
         eventManager.EventPlayerSwap += ServerOnSwapEvent;
+        eventManager.EventPlayerSpin += ServerOnSpinEvent;
     }
 
     [Client]
@@ -163,6 +164,18 @@ public class GameUIManager : NetworkBehaviour
     #endregion
 
     #region Hotbar
+
+    [Server]
+    public void ServerOnSpinEvent(GameObject player, GameObject bomb)
+    {
+        TargetOnSpinEvent(player.GetComponent<NetworkIdentity>().connectionToClient);
+    }
+
+    [TargetRpc]
+    public void TargetOnSpinEvent(NetworkConnection target)
+    {
+        hotbar.StartSpinCooldown();
+    }
 
     [TargetRpc]
     public void TargetOnSwapEvent(NetworkConnection target, char newKey)
