@@ -15035,7 +15035,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bc331e15fe9f2d549b32d6d54b08c68f, type: 2}
+  - {fileID: 2100000, guid: a0781211484dc1a48be45129a20be5a9, type: 2}
   - {fileID: 2100000, guid: d463d6c26cbfef54ab1079f8d22dde87, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -15766,7 +15766,7 @@ GameObject:
   - component: {fileID: 3342596630823727823}
   - component: {fileID: 6157352836541627525}
   m_Layer: 8
-  m_Name: Gravity Object
+  m_Name: Sludge Object
   m_TagString: ComboObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15825,8 +15825,7 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 1203407218020262036}
   fillShaderRatio: 0.9
-  tickDuration: 0
-  pullStrength: 3000
+  slowRate: 0.6
   distThresh: 5
 --- !u!114 &5783496561789443700
 MonoBehaviour:
