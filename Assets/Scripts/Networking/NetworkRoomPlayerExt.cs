@@ -111,10 +111,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Start button
         if (room.allPlayersReady && room.showStartButton)
         {
-            roomUI.buttonStart.SetActive(true);
+            //roomUI.buttonStart.SetActive(true);
+            roomUI.ActivateStartButton();
         } else
         {
-            roomUI.buttonStart.SetActive(false);
+            //roomUI.buttonStart.SetActive(true);
+            roomUI.DeactivateStartButton();
         }
     }
 

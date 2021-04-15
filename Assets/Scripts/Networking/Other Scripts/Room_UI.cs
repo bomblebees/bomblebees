@@ -18,9 +18,16 @@ public class Room_UI : MonoBehaviour
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
     [SerializeField] private GameObject screenBombleList;
-    [Header("Others")]
+    [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
-
+    [SerializeField] private Image buttonStartImage;
+    [SerializeField] private Button buttonStartButton;
+    [SerializeField] private ButtonHoverTween buttonStartButtonHoverTween;
+    
+    [Header("Button Sprite")]
+    [SerializeField] private Sprite buttonActivated;
+    [SerializeField] private Sprite buttonDeactivated;
+    
     [Serializable]
     public class PlayerLobbyCard
     {
@@ -100,6 +107,20 @@ public class Room_UI : MonoBehaviour
         EventReadyButtonClicked?.Invoke();
     }
 
+    public void ActivateStartButton()
+    {
+        buttonStartImage.sprite = buttonActivated;
+        buttonStartButtonHoverTween.enabled = true;
+        buttonStartButton.enabled = true;
+    }
+
+    public void DeactivateStartButton()
+    {
+        buttonStartImage.sprite = buttonDeactivated;
+        buttonStartButtonHoverTween.enabled = false;
+        buttonStartButton.enabled = false;
+    }
+    
     #region Screen: HOW TO PLAY
 
     public void ToggleScreenHowToPlay()
