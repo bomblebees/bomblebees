@@ -11,6 +11,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
 
+    [SerializeField] private Texture2D defaultAvatar;
+
     // List of player colors
     private List<Color> listColors = new List<Color> {
         Color.red,
@@ -78,8 +80,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
-                card.playerCard.SetActive(false);
-                break;
+                //card.playerCard.SetActive(false);
+
+                card.username.text = "Waiting for players...";
+                card.avatar.texture = FlipTexture(defaultAvatar);
+                card.readyStatus.SetActive(false);
+                continue;
             }
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
@@ -151,5 +157,33 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         else CmdChangeReadyState(true);
 
         UpdateLobbyList();
+    }
+    
+    Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
+    {
+
+        Texture2D flipped = new Texture2D(original.width, original.height);
+
+        int xN = original.width;
+        int yN = original.height;
+
+
+        for (int i = 0; i < xN; i++)
+        {
+            for (int j = 0; j < yN; j++)
+            {
+                if (upSideDown)
+                {
+                    flipped.SetPixel(j, xN - i - 1, original.GetPixel(j, i));
+                }
+                else
+                {
+                    flipped.SetPixel(xN - i - 1, j, original.GetPixel(i, j));
+                }
+            }
+        }
+        flipped.Apply();
+
+        return flipped;
     }
 }
