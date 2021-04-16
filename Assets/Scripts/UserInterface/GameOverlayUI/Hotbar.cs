@@ -11,23 +11,24 @@ public class Hotbar : MonoBehaviour
 
     private BombHelper bombHelper;
 
-
     [Header("Swap")]
     [SerializeField] private Image backHex;
     [SerializeField] private Image frontHex;
+    [SerializeField] private GameObject swapDisabledEffect;
 
     [Header("Place")]
     [SerializeField] private Image[] placeStack = new Image[3];
     [SerializeField] private TMP_Text nextBombText;
+    [SerializeField] private GameObject placeDisabledEffect;
 
     [Header("Spin")]
     [SerializeField] private Image spinCooldownFilter;
     [SerializeField] private TMP_Text cooldownText;
+    [SerializeField] private GameObject spinDisabledEffect;
     private float spinHudTimer = 0;
 
-    //[Header("End Round")]
-    //[SerializeField] private GameObject endGameUI;
-
+    [Header("Rotate")]
+    [SerializeField] private GameObject rotateDisabledEffect;
 
     private void Start()
     {
@@ -38,6 +39,10 @@ public class Hotbar : MonoBehaviour
         {
             UpdateStackUI(i, 'e');
         }
+
+        // Turn on Disable place/rotate effect
+        placeDisabledEffect.SetActive(true);
+        rotateDisabledEffect.SetActive(true);
     }
 
     void Update()
@@ -94,6 +99,25 @@ public class Hotbar : MonoBehaviour
     void OnStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
         SyncList<char> stack = localPlayer.itemStack;
+
+        // If stack empty, turn on disable effect, otherwise turn off
+        if (localPlayer.itemStack.Count == 0)
+        {
+            placeDisabledEffect.SetActive(true);
+            rotateDisabledEffect.SetActive(true);
+            swapDisabledEffect.SetActive(false);
+        } else
+        {
+            // if more than one item, can rotate
+            if (localPlayer.itemStack.Count > 1) rotateDisabledEffect.SetActive(false);
+            else rotateDisabledEffect.SetActive(true);
+
+            // if max items, cannot swap
+            if (localPlayer.itemStack.Count == 3) swapDisabledEffect.SetActive(true);
+            else swapDisabledEffect.SetActive(false);
+
+            placeDisabledEffect.SetActive(false);
+        }
 
         List<char> reversedStack = new List<char>();
 

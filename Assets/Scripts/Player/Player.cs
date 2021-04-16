@@ -793,6 +793,15 @@ public class Player : NetworkBehaviour
     [Client]
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
+        // If max inventory stack, player should not be able to swap
+        if (itemStack.Count == 3)
+        {
+            canSwap = false;
+        } else
+        {
+            canSwap = true;
+        }
+
         PlayerInterface hud = this.GetComponent<PlayerInterface>();
         // for (int i = 0; i < 3; i++)
         for (int i = 2; i >= 0; i--)
