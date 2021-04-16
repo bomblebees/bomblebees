@@ -76,7 +76,7 @@ public class HexGrid : NetworkBehaviour
     Canvas gridCanvas;
     HexMesh hexMesh;
 
-    private char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
+    [SerializeField] private char[] tileTypes;
     public float tileRegenDuration = 1.5f;
 
     private EventManager eventManager;
