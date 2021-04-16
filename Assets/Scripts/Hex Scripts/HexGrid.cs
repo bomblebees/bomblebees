@@ -41,10 +41,13 @@ public class HexGrid : NetworkBehaviour
     private string slow_Hex_Name = "SlowHex";
     public GameObject danger_Hex;
     private string danger_Hex_Name = "DangerHex";
+    public GameObject hidden_Hex;
+    private string hidden_Hex_Name = "HiddenHex";
     public GameObject default_Hex;
     private string default_Hex_Name = "EmptyHex";
     static char slow_Hex_char = '$';
     static char danger_Hex_char = '#';
+    static char hidden_Hex_char = 'i';
     static char default_Hex_char = 'e';
 
     public int minTilesForCombo = 3;
@@ -316,6 +319,8 @@ public class HexGrid : NetworkBehaviour
                 return danger_Hex;
             case '$':
                 return slow_Hex;
+            case 'i':
+                return hidden_Hex;
             default:
                 return default_Hex;
         }
@@ -395,7 +400,8 @@ public class HexGrid : NetworkBehaviour
         var c = level.getArray()[z, x];
         if (ignoreRandomGenOnE && (level.getArray()[z, x] == GetDangerTileChar() ||
                                    level.getArray()[z, x] == GetEmptyTileChar() ||
-                                   level.getArray()[z, x] == GetSlowTileChar()))
+                                   level.getArray()[z, x] == GetSlowTileChar() ||
+                                   level.getArray()[z, x] == GetHiddenHexChar()))
         {
             key = c;
         }
@@ -617,15 +623,21 @@ public class HexGrid : NetworkBehaviour
     {
         return default_Hex_char;
     }
+    
+    
+    public static char GetHiddenHexChar()
+    {
+        return hidden_Hex_char;
+    }
 
     public GameObject test;
 
     [Server]
     public void GrowRing()
     {
-        char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetEmptyTileChar()};
+        char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetHiddenHexChar()};
         char[] preDangers = new char[] {GetSlowTileChar()};
-        char[] unchanging = new char[] {GetEmptyTileChar(), GetDangerTileChar()};
+        char[] unchanging = new char[] {GetHiddenHexChar(), GetDangerTileChar()};
         List<HexCell> toSlow = new List<HexCell>();
         List<HexCell> toDanger = new List<HexCell>();
         foreach (var cell in gridList)

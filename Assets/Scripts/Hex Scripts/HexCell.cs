@@ -15,7 +15,11 @@ public class HexCell : NetworkBehaviour
     public bool isGlowing = false; // Im thinking we connect the glowing by finding samecolorneighbors in each dir
     public bool isSelected = false;
     public bool occupiedByComboObject = false;
-    public char[] ignoreKeys;
+
+    public char[] ignoreKeys = new char[]
+    {
+        HexGrid.GetDangerTileChar(), HexGrid.GetEmptyTileChar(), HexGrid.GetSlowTileChar(), HexGrid.GetHiddenHexChar()
+    };
     public int emptyNeighbors = 0;
     
     
