@@ -50,10 +50,10 @@ public class HexGrid : NetworkBehaviour
     public int minTilesForCombo = 3;
     public int minTilesForGlow = 2;
 
-    public int[] phasePlayerDeathMin;
+    public int[] phasePlayersAlive;
     public int[] phaseDelays;
-    public float phaseTimeElapsed = 0;
-    public int phaseIndex = 0;
+    private float phaseTimeElapsed = 0;
+    public int phaseCurrent = 0;
     public int phaseTotal;
     private GameObject roundManager;
 
@@ -132,7 +132,7 @@ public class HexGrid : NetworkBehaviour
 
     public void Update()
     {
-        HandleRingPhases(phaseDelays, phasePlayerDeathMin);
+        HandleRingPhases(phaseDelays, phasePlayersAlive);
     }
 
     // Creates the models for cells in gridList with the colors saved in colorGridList
@@ -181,7 +181,7 @@ public class HexGrid : NetworkBehaviour
             Debug.LogError("minTilesForGlow is >= to minTilesInCombo");
         }
 
-        if (phaseDelays.Length != phaseTotal || phasePlayerDeathMin.Length != phaseTotal)
+        if (phaseDelays.Length != phaseTotal || phasePlayersAlive.Length != phaseTotal)
         {
             Debug.LogError("The length of phaseDelays and/or phasePlayerDeathMin aren't equal to phaseCount.");
         }
@@ -621,7 +621,7 @@ public class HexGrid : NetworkBehaviour
     public GameObject test;
 
     [Server]
-    public void GrowRing(NetworkIdentity server)
+    public void GrowRing()
     {
         char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetEmptyTileChar()};
         char[] preDangers = new char[] {GetSlowTileChar()};
@@ -671,14 +671,14 @@ public class HexGrid : NetworkBehaviour
         roundManager = rm;
     }
 
-    void HandleRingPhases(int[] delays, int[] playerDeathMin)
+    void HandleRingPhases(int[] delays, int[] playersAlive)
     {
         bool goNextPhase = false;
         phaseTimeElapsed += Time.deltaTime;
-        if (phaseIndex < phaseTotal)
+        if (phaseCurrent < phaseTotal)
         {
             // check conditions
-            if (phaseTimeElapsed > delays[phaseIndex])
+            if (phaseTimeElapsed > delays[phaseCurrent])
             {
                 goNextPhase = true;
             }
@@ -687,7 +687,8 @@ public class HexGrid : NetworkBehaviour
 
         if (goNextPhase)
         {
-            phaseIndex++;
+            GrowRing();
+            phaseCurrent++;
             phaseTimeElapsed = 0f;
         }
     }

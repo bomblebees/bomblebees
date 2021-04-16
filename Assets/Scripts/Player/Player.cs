@@ -215,7 +215,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(debugBombPress1))
         {
-            hexGrid.GrowRing(this.gameObject.GetComponent<NetworkIdentity>());
+            hexGrid.GrowRing();
         }
         if (Input.GetKeyDown(debugBombPress2))
         {
