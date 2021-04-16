@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,11 +15,12 @@ public class HexGrid : NetworkBehaviour
     /// cellPrefab: The Hex Cell prefab to be instantiated by HexGrid at runtime
     /// </summary>
     public HexCell cellPrefab;
-    
+
     /// Debug tools
     public Text cellLabelPrefab;
+
     private string cellPrefabName = "Hex Cell Label";
-    
+
     // Runtime Instantiation Tools
     public GameObject r_Hex;
     private string r_Hex_Name = "RedHex";
@@ -34,11 +36,16 @@ public class HexGrid : NetworkBehaviour
     private string w_Hex_Name = "WhiteHex";
     public GameObject wall_Hex;
     private string wall_Hex_Name = "WallHex";
+    public GameObject slow_Hex;
+    private string slow_Hex_Name = "SlowHex";
     public GameObject danger_Hex;
     private string danger_Hex_Name = "DangerHex";
     public GameObject default_Hex;
     private string default_Hex_Name = "EmptyHex";
-    
+    static char slow_Hex_char = '$';
+    static char danger_Hex_char = '#';
+    static char default_Hex_char = 'e';
+
     public int minTilesForCombo = 3;
     public int minTilesForGlow = 2;
 
@@ -46,11 +53,11 @@ public class HexGrid : NetworkBehaviour
     /// <summary>
     /// gridList: Stores every Hex Cell on the board
     /// </summary>
-    public List<HexCell> gridList = new List<HexCell>(); 
+    public List<HexCell> gridList = new List<HexCell>();
 
     // A network-synchronized list of colors of every hex cell on the board
     // Should represent gridList in the form of colors
-    public SyncList<char> colorGridList = new SyncList<char>(); 
+    public SyncList<char> colorGridList = new SyncList<char>();
 
     public bool enableCoords = false;
 
@@ -70,6 +77,7 @@ public class HexGrid : NetworkBehaviour
     public bool enableChainRegen = false;
 
     public Level1 level = new Level1();
+
     // [SerializeField] private int width = 19;
     // [SerializeField] private int height = 17;
     [SerializeField] private int width = 17;
@@ -78,7 +86,7 @@ public class HexGrid : NetworkBehaviour
     Canvas gridCanvas;
     HexMesh hexMesh;
 
-    private char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
+    public char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
     public float tileRegenDuration = 1.5f;
 
     private EventManager eventManager;
@@ -91,7 +99,7 @@ public class HexGrid : NetworkBehaviour
 
         this.gridCanvas = GetComponentInChildren<Canvas>();
         this.hexMesh = GetComponentInChildren<HexMesh>();
-        
+
         GenerateHexGrid();
 
         CreateHexGridModels(); // When dedicated server is introduced, dont need to create models on server
@@ -169,6 +177,7 @@ public class HexGrid : NetworkBehaviour
             this.width = level.getWidth();
             this.height = level.getHeight();
         }
+
         if (width == null || height == null) Debug.LogError("GetGridDimensions: could not get level dimensions.");
 
         // cells = new HexCell[height * width];
@@ -213,10 +222,11 @@ public class HexGrid : NetworkBehaviour
 
             return true;
         }
+
         return false;
     }
 
-    
+
     /// <summary>
     /// ScanListForGlow: Iterate through each tile in the list, checking whether they're
     ///     in a combo with a given minimum, and performing a callback on them.         
@@ -257,7 +267,7 @@ public class HexGrid : NetworkBehaviour
             cell.SetGlow(true);
         }
     }
-    
+
     private void UnSetListToGlow(List<HexCell> list)
     {
         foreach (HexCell cell in list)
@@ -286,11 +296,13 @@ public class HexGrid : NetworkBehaviour
                 return wall_Hex;
             case '#':
                 return danger_Hex;
+            case '$':
+                return slow_Hex;
             default:
                 return default_Hex;
         }
     }
-    
+
     /// <summary>
     /// CreateCell: Creates a hexCell at the given x & z (where x is the 
     ///     vertical axis. z is the horizontal axis. These are NOT
@@ -315,7 +327,7 @@ public class HexGrid : NetworkBehaviour
         // Instantiate cell
         HexCell cell = Instantiate<HexCell>(cellPrefab);
         gridList.Add(cell);
-        
+
         // Set coords and index in gridList
         cell.SetListIndex(i);
         cell.SetSpawnCoords(x, z);
@@ -363,7 +375,9 @@ public class HexGrid : NetworkBehaviour
         }
 
         var c = level.getArray()[z, x];
-        if (ignoreRandomGenOnE && (level.getArray()[z, x] == 'e' || level.getArray()[z, x] == '-' || level.getArray()[z, x] == '#'))
+        if (ignoreRandomGenOnE && (level.getArray()[z, x] == GetDangerTileChar() ||
+                                   level.getArray()[z, x] == GetEmptyTileChar() ||
+                                   level.getArray()[z, x] == GetSlowTileChar()))
         {
             key = c;
         }
@@ -499,7 +513,8 @@ public class HexGrid : NetworkBehaviour
         {
             eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject);
             player.GetComponent<Player>().AddItemCombo(heldKey);
-        } else
+        }
+        else
         {
             eventManager.OnPlayerSwap(heldKey, oldKey, false, player.gameObject);
         }
@@ -568,5 +583,68 @@ public class HexGrid : NetworkBehaviour
         FindGlowCombos(cell);
         HexCell neighbor = cell.GetNeighbor(direction);
         if (neighbor) RecalculateGlowInDirection(neighbor, direction, count + 1);
+    }
+
+    public static char GetSlowTileChar()
+    {
+        return slow_Hex_char;
+    }
+
+    public static char GetDangerTileChar()
+    {
+        return danger_Hex_char;
+    }
+
+    public static char GetEmptyTileChar()
+    {
+        return default_Hex_char;
+    }
+
+    public GameObject test;
+
+    [Server]
+    public void GrowRing(NetworkIdentity server)
+    {
+        char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetEmptyTileChar()};
+        char[] preDangers = new char[] {GetSlowTileChar()};
+        char[] unchanging = new char[] {GetEmptyTileChar(), GetDangerTileChar()};
+        List<HexCell> toSlow = new List<HexCell>();
+        List<HexCell> toDanger = new List<HexCell>();
+        foreach (var cell in gridList)
+        {
+            if (preDangers.Contains(cell.GetKey()))
+            {
+                toDanger.Add(cell);
+            }
+            else if (
+                (cell.HasNeighborOf(slowSpawns) || cell.emptyNeighbors > 0) 
+                     && !unchanging.Contains(cell.GetKey()))
+            {
+                toSlow.Add(cell);
+            }
+        }
+
+        foreach (var cell in toDanger)
+        {
+            ChangeCell(cell, GetDangerTileChar());
+        }
+
+        foreach (var cell in toSlow)
+        {
+            
+            ChangeCell(cell, GetSlowTileChar());
+
+        }
+    }
+
+    void ChangeCell(HexCell cell, char key)
+    {
+        var cellIdx = cell.getListIndex();
+
+        cell.CreateModel(this.ReturnModelByCellKey(key)); // updates on the server!
+        cell.SetKey(key);
+
+        char oldKey = colorGridList[cellIdx];
+        colorGridList[cellIdx] = key;
     }
 }

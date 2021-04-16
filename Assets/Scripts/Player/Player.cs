@@ -26,7 +26,7 @@ public class Player : NetworkBehaviour
     // Assets
     [Header("Debug")]
     public bool debugMode = false;
-    public string debugBombPress1 = "i";
+    public string debugBombPress1 = "8";
     public string debugBombPress2 = "a";
     public string debugBombPress3 = "e";
     public string debugBombPress4 = ";";
@@ -215,7 +215,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(debugBombPress1))
         {
-            SpawnSludgeObject();
+            hexGrid.GrowRing(this.gameObject.GetComponent<NetworkIdentity>());
         }
         if (Input.GetKeyDown(debugBombPress2))
         {

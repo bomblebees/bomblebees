@@ -16,11 +16,28 @@ public class HexCell : NetworkBehaviour
     public bool isSelected = false;
     public bool occupiedByComboObject = false;
     public char[] ignoreKeys;
+    public int emptyNeighbors = 0;
+    
+    
+    
 
     public Color color;
     [SerializeField] public HexCell[] neighbors;
 
     private int listIndex;
+
+    public bool HasNeighborOf(char[] arr)
+    {
+        foreach (var neighbor in neighbors)
+        {
+            if (!neighbor) { emptyNeighbors++; continue;}
+            if (arr.Contains(neighbor.GetKey()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public HexCell GetNeighbor(HexDirection direction)
     {
@@ -31,7 +48,6 @@ public class HexCell : NetworkBehaviour
     {
         neighbors[(int) direction] = cell;
         cell.neighbors[(int) direction.Opposite()] = this;
-        if (cell.neighbors.Length > 6) print("there should not be more than 6 neighbors");
     }
 
     public void SetSpawnCoords(int x, int z)
