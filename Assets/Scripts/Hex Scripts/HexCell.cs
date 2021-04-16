@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 using Mirror;
@@ -14,6 +15,7 @@ public class HexCell : NetworkBehaviour
     public bool isGlowing = false; // Im thinking we connect the glowing by finding samecolorneighbors in each dir
     public bool isSelected = false;
     public bool occupiedByComboObject = false;
+    public char[] ignoreKeys;
 
     public Color color;
     [SerializeField] public HexCell[] neighbors;
@@ -110,7 +112,7 @@ public class HexCell : NetworkBehaviour
         List<HexCell> combosList = new List<HexCell>(15); // To reduce array-doubling
 
         // No combos can be found when its empty
-        if (this.GetKey() == 'e') return checkList;
+        if (ignoreKeys.Contains(this.GetKey())) return checkList;
 
         bool hasAtLeastOneCombo = false;
         for (var direction = 0; direction < 3; direction++)

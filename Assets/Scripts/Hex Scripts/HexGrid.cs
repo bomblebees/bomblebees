@@ -34,6 +34,8 @@ public class HexGrid : NetworkBehaviour
     private string w_Hex_Name = "WhiteHex";
     public GameObject wall_Hex;
     private string wall_Hex_Name = "WallHex";
+    public GameObject danger_Hex;
+    private string danger_Hex_Name = "DangerHex";
     public GameObject default_Hex;
     private string default_Hex_Name = "EmptyHex";
     
@@ -282,6 +284,8 @@ public class HexGrid : NetworkBehaviour
                 return w_Hex;
             case '-':
                 return wall_Hex;
+            case '#':
+                return danger_Hex;
             default:
                 return default_Hex;
         }
@@ -359,7 +363,7 @@ public class HexGrid : NetworkBehaviour
         }
 
         var c = level.getArray()[z, x];
-        if (ignoreRandomGenOnE && (level.getArray()[z, x] == 'e' || level.getArray()[z, x] == '-' ))
+        if (ignoreRandomGenOnE && (level.getArray()[z, x] == 'e' || level.getArray()[z, x] == '-' || level.getArray()[z, x] == '#'))
         {
             key = c;
         }
