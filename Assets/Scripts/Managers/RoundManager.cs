@@ -159,7 +159,7 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
-    public void CheckRoundEnd(int currentHealth, int maxHealth)
+    public void CheckRoundEnd(int currentHealth, int _, GameObject __)
     {
         if (currentHealth < 1)
         {

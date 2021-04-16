@@ -54,11 +54,6 @@ public class VolumeSliderConfiguration : MonoBehaviour
     private bool soundFXIsMuted;
     private bool musicIsMuted;
 
-    private void Awake()
-    {
-        DontDestroyOnLoad(this.gameObject);
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -89,7 +84,7 @@ public class VolumeSliderConfiguration : MonoBehaviour
     
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        SetupMuteState();
+        //SetupMuteState();
         SwitchMusicBetweenScene(scene);
     }
     
