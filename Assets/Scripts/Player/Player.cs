@@ -40,6 +40,7 @@ public class Player : NetworkBehaviour
     [Header("Input")] [SerializeField] private string swapKey = "space";
     [SerializeField] private string spinKey = "o";
     [SerializeField] private string bombKey = "j";
+    [SerializeField] private string rotateKey = "left shift";
 
     [SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
@@ -193,6 +194,7 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
         ListenForBombUse();
         ListenForSpinning();
+        ListenForBombRotation();
         if (debugMode) DebugMode();
     }
 
@@ -712,6 +714,22 @@ public class Player : NetworkBehaviour
         }
     }
 
+    // Listens for key press and rotates the item stack
+    [Client]
+    void ListenForBombRotation()
+    {
+        if (Input.GetKeyDown(rotateKey))
+        {
+            CmdRotateItemStack();
+        }
+    }
+
+    [Command]
+    public void CmdRotateItemStack()
+    {
+        RotateItemStack();
+    }
+
     //[TargetRpc]
     //public void TargetAddItemCombo(NetworkConnection target, char colorKey)
     //{
@@ -753,6 +771,17 @@ public class Player : NetworkBehaviour
     }
 
     [Server]
+    public void RotateItemStack()
+    {
+        if (itemStack.Count > 1)
+        {
+            char tmp = itemStack[itemStack.Count - 1];
+            itemStack.RemoveAt(itemStack.Count - 1);
+            itemStack.Insert(0, tmp);
+        }
+    }
+
+    [Server]
     public void ClearItemStack(bool val = true)
     {
         while (itemStack.Count > 0)
@@ -761,6 +790,7 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [Client]
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
         PlayerInterface hud = this.GetComponent<PlayerInterface>();
