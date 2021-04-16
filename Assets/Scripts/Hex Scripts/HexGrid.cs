@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mirror;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HexGrid : NetworkBehaviour
@@ -48,6 +49,13 @@ public class HexGrid : NetworkBehaviour
 
     public int minTilesForCombo = 3;
     public int minTilesForGlow = 2;
+
+    public int[] phasePlayerDeathMin;
+    public int[] phaseDelays;
+    public float phaseTimeElapsed = 0;
+    public int phaseIndex = 0;
+    public int phaseTotal;
+    private GameObject roundManager;
 
     [Header("Grid Settings")]
     /// <summary>
@@ -122,6 +130,11 @@ public class HexGrid : NetworkBehaviour
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
+    public void Update()
+    {
+        HandleRingPhases(phaseDelays, phasePlayerDeathMin);
+    }
+
     // Creates the models for cells in gridList with the colors saved in colorGridList
     void CreateHexGridModels()
     {
@@ -166,6 +179,11 @@ public class HexGrid : NetworkBehaviour
         if (minTilesForGlow >= minTilesForCombo)
         {
             Debug.LogError("minTilesForGlow is >= to minTilesInCombo");
+        }
+
+        if (phaseDelays.Length != phaseTotal || phasePlayerDeathMin.Length != phaseTotal)
+        {
+            Debug.LogError("The length of phaseDelays and/or phasePlayerDeathMin aren't equal to phaseCount.");
         }
     }
 
@@ -646,5 +664,31 @@ public class HexGrid : NetworkBehaviour
 
         char oldKey = colorGridList[cellIdx];
         colorGridList[cellIdx] = key;
+    }
+
+    void SetRoundManager(GameObject rm)
+    {
+        roundManager = rm;
+    }
+
+    void HandleRingPhases(int[] delays, int[] playerDeathMin)
+    {
+        bool goNextPhase = false;
+        phaseTimeElapsed += Time.deltaTime;
+        if (phaseIndex < phaseTotal)
+        {
+            // check conditions
+            if (phaseTimeElapsed > delays[phaseIndex])
+            {
+                goNextPhase = true;
+            }
+            // else if (roundManager.aliveCount ...)
+        }
+
+        if (goNextPhase)
+        {
+            phaseIndex++;
+            phaseTimeElapsed = 0f;
+        }
     }
 }
