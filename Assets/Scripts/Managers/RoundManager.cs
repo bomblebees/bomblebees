@@ -18,6 +18,8 @@ public class RoundManager : NetworkBehaviour
     }
 
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
+    public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
+    [SyncVar] public int aliveCount = 0;
 
     [Header("Round Settings")]
     [SerializeField] public int startGameFreezeDuration = 5;
@@ -140,12 +142,14 @@ public class RoundManager : NetworkBehaviour
         yield return new WaitForSeconds(startGameFreezeDuration + 1);
         for (int i = 0; i < playerList.Count; i++)
         {
+            alivePlayers.Add(playerList[i]);
             Player p = playerList[i].player;
             p.SetCanPlaceBombs(true);
             p.SetCanSpin(true);
             p.SetCanSwap(true); 
             p.SetCanMove(true);
         }
+        aliveCount = alivePlayers.Count;
     }
 
     [Server]
@@ -163,15 +167,17 @@ public class RoundManager : NetworkBehaviour
     {
         if (currentHealth < 1)
         {
-            int aliveCount = 0;
             for (int i = 0; i < playerList.Count; i++)
             {
-                Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerList[i].health.currentLives);
-                if (playerList[i].health.currentLives > 0)
+                //Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerList[i].health.currentLives);
+                if (playerList[i].health.currentLives <= 0)
                 {
-                    aliveCount++;
+                    alivePlayers.Remove(playerList[i]);
                 }
             }
+
+            // update alive count
+            aliveCount = alivePlayers.Count;
 
             // End the round/game if only one player alive
             if (aliveCount <= 1)
