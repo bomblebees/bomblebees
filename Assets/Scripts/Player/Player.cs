@@ -89,8 +89,9 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
-    private float sludgeInfluence = 1;
-    private bool sludged = false;
+    private float speedScalar = 1f;
+    public float timeSinceSlowed = 0f;
+    public float slowTimeCheckInterval = 0.05f;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -192,6 +193,7 @@ public class Player : NetworkBehaviour
         if (isDead) return; // if dead, disable all player updates
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
+        this.timeSinceSlowed += Time.deltaTime;
         
 
         ApplyMovement();
@@ -643,17 +645,14 @@ public class Player : NetworkBehaviour
                 );
             }
 
-            if (sludged == true)
+            // print("my speedScalar is "+speedScalar);
+            controller.Move((direction * movementSpeed * this.speedScalar) * Time.deltaTime);
+            // I think there's an asynchronicity to the speed of player updates vs health updates. you should check triggerhere
+            if (this.timeSinceSlowed > slowTimeCheckInterval)
             {
-                this.sludgeInfluence = 0.6f;
+                speedScalar = 1.0f;
             }
-            else
-            {
-                this.sludgeInfluence = 1f;
-            }
-            if (this.canMove) controller.Move((direction * movementSpeed * this.sludgeInfluence)
-                                                        * Time.deltaTime);
-            this.sludged = false;
+            
         }
     }
 
@@ -847,9 +846,14 @@ public class Player : NetworkBehaviour
         spinHitbox.SetActive(val);
     }
 
-    public void ApplySludge(bool val)
+    public void ApplySpeedScalar(float val)
     {
-        this.sludged = val;
+        this.speedScalar *= val;
+    }
+    
+    public void SetSpeedScalar(float val)
+    {
+        this.speedScalar = val;
     }
 
     

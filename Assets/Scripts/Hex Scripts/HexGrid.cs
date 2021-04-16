@@ -630,6 +630,7 @@ public class HexGrid : NetworkBehaviour
         List<HexCell> toDanger = new List<HexCell>();
         foreach (var cell in gridList)
         {
+            if (!cell) continue;
             if (preDangers.Contains(cell.GetKey()))
             {
                 toDanger.Add(cell);

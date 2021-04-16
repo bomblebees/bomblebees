@@ -158,11 +158,12 @@ public class Health : NetworkBehaviour
                 return;
         }
 
-        var objName = other.gameObject.transform.root.name;
+        var obj = other.gameObject.transform;
+        var objRootName = obj.root.name;
         if (
             (
-                objName == "Plasma Object(Clone)"
-                || objName == "Blink Object(Clone)"
+                objRootName == "Plasma Object(Clone)"
+                || objRootName == "Blink Object(Clone)"
             )
             && // Make sure prefabs are unpacked
             !other.gameObject.transform.root.GetComponent<ComboObject>()
@@ -172,10 +173,10 @@ public class Health : NetworkBehaviour
             return;
         }
 
-        if (objName == "Sludge Object(Clone)")
+        if (obj.name == "SlowHitbox")
         {
-            var sludge = other.gameObject.transform.root.transform.GetComponent<SludgeObject>();
-            this.playerScript.ApplySludge(true);
+            this.playerScript.SetSpeedScalar(0.5f);
+            playerScript.timeSinceSlowed = 0f;
             return;
         }
 

@@ -116,7 +116,7 @@ public class EventManager : NetworkBehaviour
     [Server]
     public void OnPlayerTookDamage(int newLives, GameObject bomb, GameObject player)
     {
-        if (bomb) {
+        if (bomb && GetComponent<ComboObject>()) {
             sessionLogger.CreateEventDMG(
                 bomb,
                 player,
