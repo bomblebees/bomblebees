@@ -32,6 +32,12 @@ public class Hotbar : MonoBehaviour
     private void Start()
     {
         bombHelper = this.gameObject.transform.parent.GetComponent<BombHelper>();
+
+        // Set all UI to empty initially
+        for (int i = 0; i < 3; i++)
+        {
+            UpdateStackUI(i, 'e');
+        }
     }
 
     void Update()

@@ -223,13 +223,13 @@ public class Player : NetworkBehaviour
         if (!isServer) return;
 
         // Handle default-placing bomb anim
-        if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
-        {
-            Debug.Log("inside");
-            RpcEnableBombPlaceAnimation();
-            playedOnDefaultBombReadyAnim = true;
-        }
-        defaultBombUseTimer += Time.deltaTime;
+        //if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
+        //{
+        //    Debug.Log("inside");
+        //    RpcEnableBombPlaceAnimation();
+        //    playedOnDefaultBombReadyAnim = true;
+        //}
+        //defaultBombUseTimer += Time.deltaTime;
     }
 
     [ClientRpc]
@@ -295,11 +295,11 @@ public class Player : NetworkBehaviour
                             break;
                         case 'y':
                             // Debug.Log("Yellow Bomb Type");
-                            this.SpawnLaserObject(sender.identity.gameObject);
+                            SpawnLaserObject(sender.identity.gameObject);
                             break;
                         case 'r':
                             // Debug.Log("Red Bomb Type");
-                            SpawnBigBombObject(sender.identity.gameObject);
+                            SpawnDefaultBomb(sender.identity.gameObject);
                             break;
                         case 'p':
                             // Debug.Log("Purple Bomb Type");
@@ -314,21 +314,21 @@ public class Player : NetworkBehaviour
                             break;
                     }
                 }
-                else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
-                {
-                    Debug.Log("dropping default bomb");
-                    onDefaultBombReadyAnim.SetActive(false);
-                    playedOnDefaultBombReadyAnim = false;
+                //else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
+                //{
+                //    Debug.Log("dropping default bomb");
+                //    onDefaultBombReadyAnim.SetActive(false);
+                //    playedOnDefaultBombReadyAnim = false;
 
-                    // Else use the default bomb
-                    this.SpawnDefaultBomb(sender.identity.gameObject);
+                //    // Else use the default bomb
+                //    SpawnDefaultBomb(sender.identity.gameObject);
 
-                    // update hud
-                    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
+                //    // update hud
+                //    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
 
-                    defaultBombUseTimer = 0;
+                //    defaultBombUseTimer = 0;
 
-                }
+                //}
                 else // When the default bomb CD isn't up
                 {
 
