@@ -671,6 +671,7 @@ public class HexGrid : NetworkBehaviour
         roundManager = rm;
     }
 
+    // TODO make sure every player sees change in ring size
     void HandleRingPhases(int[] delays, int[] playersAlive)
     {
         bool goNextPhase = false;

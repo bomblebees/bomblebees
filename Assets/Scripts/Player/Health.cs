@@ -143,14 +143,16 @@ public class Health : NetworkBehaviour
     [Mirror.ClientCallback]
     private void OnTriggerStay(Collider other)
     {
-        if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root && other.gameObject.transform.name == "SpinPVP")
+        if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root 
+            && other.gameObject.transform.name == "SpinPVP")
         {
             playerScript.stunnedDuration = 1;
             return;
         }
         if (
             !hasAuthority
-            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+            || (!(playerScript.canBeHit && 
+                  (other.gameObject.CompareTag("ComboHitbox"))))
             )
         {
                 return;
