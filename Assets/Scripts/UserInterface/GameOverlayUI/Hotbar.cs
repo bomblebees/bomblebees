@@ -15,20 +15,24 @@ public class Hotbar : MonoBehaviour
     [SerializeField] private Image backHex;
     [SerializeField] private Image frontHex;
     [SerializeField] private GameObject swapDisabledEffect;
+    [SerializeField] private GameObject swapKey;
 
     [Header("Place")]
     [SerializeField] private Image[] placeStack = new Image[3];
     [SerializeField] private TMP_Text nextBombText;
     [SerializeField] private GameObject placeDisabledEffect;
+    [SerializeField] private GameObject placeKey;
 
     [Header("Spin")]
     [SerializeField] private Image spinCooldownFilter;
     [SerializeField] private TMP_Text cooldownText;
     [SerializeField] private GameObject spinDisabledEffect;
+    [SerializeField] private GameObject spinKey;
     private float spinHudTimer = 0;
 
     [Header("Rotate")]
     [SerializeField] private GameObject rotateDisabledEffect;
+    [SerializeField] private GameObject rotateKey;
 
     private void Start()
     {
@@ -47,15 +51,7 @@ public class Hotbar : MonoBehaviour
 
     void Update()
     {
-        if (localPlayer != null)
-        {
-            if (localPlayer.selectedTile == null) return;
-
-            char selectedKey = localPlayer.selectedTile.GetComponentInParent<HexCell>().GetKey();
-
-            backHex.color = bombHelper.GetKeyColor(selectedKey);
-            frontHex.color = bombHelper.GetKeyColor(localPlayer.GetHeldKey());
-        } else
+        if (localPlayer == null)
         {
             GameObject player = GameObject.Find("LocalPlayer");
             if (player != null)
@@ -63,9 +59,43 @@ public class Hotbar : MonoBehaviour
                 localPlayer = player.GetComponent<Player>();
                 localPlayer.itemStack.Callback += OnStackChange;
             }
-
+        } else
+        {
+            UpdateHexUI();
+            KeyPressListener();
         }
 
+        UpdateSpinDelayTimer();
+    }
+
+    // Plays a button press tween anim when hot keys can be pressed
+    public void KeyPressListener()
+    {
+        if (localPlayer == null) return;
+
+        if (Input.GetKeyDown(localPlayer.spinKey) && spinHudTimer == 0)
+        {
+            spinKey.GetComponent<IconBounceTween>().OnTweenStart();
+        }
+
+        if (Input.GetKeyDown(localPlayer.swapKey) && !swapDisabledEffect.activeSelf)
+        {
+            swapKey.GetComponent<IconBounceTween>().OnTweenStart();
+        }
+
+        if (Input.GetKeyDown(localPlayer.bombKey) && !placeDisabledEffect.activeSelf)
+        {
+            placeKey.GetComponent<IconBounceTween>().OnTweenStart();
+        }
+
+        if (Input.GetKeyDown(localPlayer.rotateKey) && !rotateDisabledEffect.activeSelf)
+        {
+            rotateKey.GetComponent<IconBounceTween>().OnTweenStart();
+        }
+    }
+    
+    public void UpdateSpinDelayTimer()
+    {
         if (spinHudTimer != 0)
         {
             float totalDuration = localPlayer.spinTotalCooldown;
@@ -81,6 +111,16 @@ public class Hotbar : MonoBehaviour
                 cooldownText.text = "";
             }
         }
+    }
+
+    public void UpdateHexUI()
+    {
+        if (localPlayer.selectedTile == null) return;
+
+        char selectedKey = localPlayer.selectedTile.GetComponentInParent<HexCell>().GetKey();
+
+        backHex.color = bombHelper.GetKeyColor(selectedKey);
+        frontHex.color = bombHelper.GetKeyColor(localPlayer.GetHeldKey());
     }
 
     public void StartSpinCooldown()
@@ -156,8 +196,6 @@ public class Hotbar : MonoBehaviour
 
     void UpdateStackUI(int idx, char key)
     {
-        //placeStack[idx].color = GetKeyColor(key);
-
         placeStack[idx].sprite = bombHelper.GetKeySprite(key);
     }
 

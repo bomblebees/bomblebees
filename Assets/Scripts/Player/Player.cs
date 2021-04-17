@@ -37,10 +37,11 @@ public class Player : NetworkBehaviour
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
 
-    [Header("Input")] [SerializeField] private string swapKey = "space";
-    [SerializeField] private string spinKey = "o";
-    [SerializeField] private string bombKey = "j";
-    [SerializeField] private string rotateKey = "left shift";
+    [Header("Input")]
+    [SerializeField] public string swapKey = "space";
+    [SerializeField] public string spinKey = "o";
+    [SerializeField] public string bombKey = "j";
+    [SerializeField] public string rotateKey = "left shift";
 
     [SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
