@@ -639,7 +639,7 @@ public class HexGrid : NetworkBehaviour
     
     public void GrowRing()
     {
-        char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetHiddenHexChar()};
+        char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetHiddenHexChar(), GetEmptyTileChar()};
         char[] preDangers = new char[] {GetSlowTileChar()};
         char[] unchanging = new char[] {GetHiddenHexChar(), GetDangerTileChar()};
         List<HexCell> toSlow = new List<HexCell>();

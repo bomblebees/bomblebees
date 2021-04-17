@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour
     [Header("Debug")]
     public bool debugMode = false;
     public string debugBombPress1 = "8";
-    public string debugBombPress2 = "a";
+    public string debugBombPress2 = "9";
     public string debugBombPress3 = "e";
     public string debugBombPress4 = ";";
     private HexGrid hexGrid;
@@ -223,7 +223,7 @@ public class Player : NetworkBehaviour
         }
         if (Input.GetKeyDown(debugBombPress2))
         {
-            SpawnDefaultBomb();
+            SpawnLaserObject();
         }
         if (Input.GetKeyDown(debugBombPress3))
         {
