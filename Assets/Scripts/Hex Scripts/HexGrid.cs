@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Util;
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -642,6 +643,7 @@ public class HexGrid : NetworkBehaviour
         char[] slowSpawns = new char[] {GetDangerTileChar(), GetHiddenHexChar()};
         char[] preDangers = new char[] {GetSlowTileChar()};
         char[] unchanging = new char[] {GetHiddenHexChar(), GetDangerTileChar()};
+        char[] allmisc = new char[] {GetHiddenHexChar(), GetDangerTileChar(), GetSlowTileChar()};
         List<HexCell> toSlow = new List<HexCell>();
         List<HexCell> toDanger = new List<HexCell>();
         foreach (var cell in gridList)
@@ -652,7 +654,7 @@ public class HexGrid : NetworkBehaviour
                 toDanger.Add(cell);
             }
             else if (
-                (cell.HasNeighborOf(slowSpawns) || (cell.GetKey() == GetEmptyTileChar() && cell.HasNeighborOf(preDangers) || cell.emptyNeighbors > 0))
+                (cell.HasNeighborOf(slowSpawns) || (cell.GetKey() == GetEmptyTileChar() && cell.HasNeighborOf(allmisc) || cell.emptyNeighbors > 0))
                      && !unchanging.Contains(cell.GetKey()))
             {
                 toSlow.Add(cell);
