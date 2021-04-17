@@ -154,6 +154,27 @@ public class ComboObject : NetworkBehaviour
         }
         else return origin.transform.position;
     }
+    
+    protected virtual Vector3 FindCenterBelowOtherInclusive(GameObject origin) 
+        {
+            var objectRay = new Ray(origin.transform.position, Vector3.down);
+            RaycastHit tileUnderneathHit;
+            var status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles"));
+            if (!status)
+            {
+                status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("SlowHex"));
+            }
+            // if (!status)
+            // {
+            //     status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("DangerHex"));
+            // }
+            if (status) {
+                // var tileBelowOrigin = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position ;
+                return result;
+            }
+            else return origin.transform.position;
+        }
 
 
     protected virtual float GetDistanceFrom(Vector3 targetPos)

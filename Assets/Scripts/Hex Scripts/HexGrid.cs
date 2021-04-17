@@ -98,7 +98,8 @@ public class HexGrid : NetworkBehaviour
     Canvas gridCanvas;
     HexMesh hexMesh;
 
-    public char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
+    // public char[] tileTypes = {'r', 'b', 'g', 'y', 'p', 'w'};
+    public char[] tileTypes = {'r', 'g', 'y', 'p'};
     public float tileRegenDuration = 1.5f;
 
     private EventManager eventManager;
@@ -420,7 +421,8 @@ public class HexGrid : NetworkBehaviour
     [Server]
     IEnumerator RegenerateCell(HexCell cell)
     {
-        if (cell.GetKey() == 'e')
+        var ignoreKeys = HexCell.ignoreKeys;
+        if (ignoreKeys.Contains(cell.GetKey()))
         {
             yield break;
         }

@@ -16,7 +16,7 @@ public class HexCell : NetworkBehaviour
     public bool isSelected = false;
     public bool occupiedByComboObject = false;
 
-    public char[] ignoreKeys = new char[]
+    public static char[] ignoreKeys = new char[]
     {
         HexGrid.GetDangerTileChar(), HexGrid.GetEmptyTileChar(), HexGrid.GetSlowTileChar(), HexGrid.GetHiddenHexChar()
     };
