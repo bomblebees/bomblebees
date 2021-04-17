@@ -19,7 +19,9 @@ public class RoundManager : NetworkBehaviour
 
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
-    [SyncVar] public int aliveCount = 0;
+
+    [SyncVar(hook = nameof(UpdateGridsAliveCount))]
+    public int aliveCount = -1;
 
     [Header("Round Settings")]
     [SerializeField] public int startGameFreezeDuration = 5;
@@ -27,6 +29,9 @@ public class RoundManager : NetworkBehaviour
 
     [NonSerialized] public int playersConnected = 0;
     [NonSerialized] public int totalRoomPlayers;
+
+    [NonSerialized]
+    public HexGrid hexGrid;
 
 
     // events
@@ -59,6 +64,13 @@ public class RoundManager : NetworkBehaviour
         // Event manager singleton
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+        hexGrid = GameObject.FindObjectOfType<HexGrid>();
+    }
+
+    public void UpdateGridsAliveCount(int oldAliveCount, int newAliveCount)
+    {
+        if(hexGrid)
+        hexGrid.SetAliveCount(newAliveCount);
     }
     
     [Client]
@@ -150,6 +162,7 @@ public class RoundManager : NetworkBehaviour
             p.SetCanMove(true);
         }
         aliveCount = alivePlayers.Count;
+        UpdateGridsAliveCount(0, aliveCount);
     }
 
     [Server]

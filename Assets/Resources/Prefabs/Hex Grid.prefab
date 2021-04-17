@@ -161,10 +161,12 @@ MonoBehaviour:
     type: 3}
   minTilesForCombo: 3
   minTilesForGlow: 2
-  phasePlayersAlive: 04000000030000000200000001000000
-  phaseDelays: 01000000010000000100000001000000
+  phasePlayersAlive: 0300000002000000ffffffff
+  phaseDelays: 0a0000000a0000000a000000
   phaseCurrent: 0
-  phaseTotal: 4
+  phaseTotal: 3
+  aliveCount: 0
+  roundManager: {fileID: 0}
   gridList: []
   enableCoords: 0
   enableRandomGen: 1

@@ -58,7 +58,8 @@ public class HexGrid : NetworkBehaviour
     private float phaseTimeElapsed = 0;
     public int phaseCurrent = 0;
     public int phaseTotal;
-    private GameObject roundManager;
+    public int aliveCount;
+    public RoundManager roundManager;
 
     [Header("Grid Settings")]
     /// <summary>
@@ -135,6 +136,7 @@ public class HexGrid : NetworkBehaviour
 
     public void Update()
     {
+        
         HandleRingPhases(phaseDelays, phasePlayersAlive);
     }
 
@@ -632,7 +634,7 @@ public class HexGrid : NetworkBehaviour
 
     public GameObject test;
 
-    [Server]
+    
     public void GrowRing()
     {
         char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetHiddenHexChar()};
@@ -664,7 +666,6 @@ public class HexGrid : NetworkBehaviour
         {
             
             ChangeCell(cell, GetSlowTileChar());
-
         }
     }
 
@@ -679,11 +680,12 @@ public class HexGrid : NetworkBehaviour
         colorGridList[cellIdx] = key;
     }
 
-    void SetRoundManager(GameObject rm)
+    void SetRoundManager(RoundManager rm)
     {
         roundManager = rm;
     }
-
+    
+    [Server]
     // TODO make sure every player sees change in ring size
     void HandleRingPhases(int[] delays, int[] playersAlive)
     {
@@ -696,7 +698,10 @@ public class HexGrid : NetworkBehaviour
             {
                 goNextPhase = true;
             }
-            // else if (roundManager.aliveCount ...)
+            else if (aliveCount != -1 && aliveCount <= phasePlayersAlive[phaseCurrent])
+            {
+                goNextPhase = true;
+            }
         }
 
         if (goNextPhase)
@@ -706,4 +711,10 @@ public class HexGrid : NetworkBehaviour
             phaseTimeElapsed = 0f;
         }
     }
+
+    public void SetAliveCount(int newAlive)
+    {
+        aliveCount = newAlive;
+    }
+    
 }
