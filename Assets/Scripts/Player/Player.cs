@@ -735,6 +735,10 @@ public class Player : NetworkBehaviour
             selectedTile = tileHit.transform.gameObject;
             selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
         }
+        else
+        {
+            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+        }
     }
 
     //[TargetRpc]
