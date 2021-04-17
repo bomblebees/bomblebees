@@ -33,22 +33,36 @@ public class LaserObject : TriggerObject
         dir = triggeringPlayer.transform.InverseTransformDirection(dir);
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         // angle = Mathf.Rad2Deg(angle);
-        angle += 90f;
+        angle += 90f+360f;
         float[] roundTo = new float[]{-60f, 0f, 60f, 120f, 180f, 240f, 300f};
-        float remainder = angle % 60;
-        if (remainder < 30f)  // round down
-        {
-            angle -= remainder;
-        }
-        else
-        {
-            angle += (60 - remainder);
-        }
+        targetAngle = RoundAngleToHex(angle);
+        
         // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
-        targetAngle = angle;
+        // targetAngle = angle;
         isRotating = true;
         this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
         this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles = new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex]+270f);
+    }
+
+    protected virtual float RoundAngleToHex(float angle)
+    {
+
+        bool neg = angle < 0 ? true : false;
+        if (neg) angle += 360f;
+        float remainder = Math.Abs(angle) % 60;
+        float newAngle = angle;
+        if (remainder < 30f)  // round down
+        {
+            newAngle -= remainder;
+        }
+        else
+        {
+            newAngle += (60 - remainder);
+        }
+
+        if (neg) newAngle -= 360f;
+        print("angle "+angle+" going to "+newAngle);
+        return newAngle;
     }
     
     // Note: this is when THIS object enters a collision
@@ -77,10 +91,13 @@ public class LaserObject : TriggerObject
             {
                 StepFillShader();
             }
+
             if (isRotating)
             {
-                print("rotating");
-                this.gameObject.transform.eulerAngles = Vector3.Lerp(gameObject.transform.rotation.eulerAngles, new Vector3(0f, targetAngle, 0f), rotateLerpRate);  // move object               
+                var r = model.transform.rotation.eulerAngles;
+                print(r.y+" GOING TO "+targetAngle);
+                this.model.transform.eulerAngles = Vector3.Lerp(new Vector3(r.x, r.y+360f, r.z), 
+                        new Vector3(0f, targetAngle, 0f), rotateLerpRate); // move object               
             }
         }
     }

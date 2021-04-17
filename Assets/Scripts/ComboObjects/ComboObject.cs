@@ -65,6 +65,12 @@ public class ComboObject : NetworkBehaviour
             print("Error: need to assign objectMat to Bomb Object!");
         }
         hasStarted = true;
+
+        var angles = this.model.transform.eulerAngles;
+        // add the start dir
+        // var startAngle = RoundAngleToHex(player.GetComponent<Player>().rotation.eulerAngles.y);
+        // print("start angle is "+startAngle);
+        // this.gameObject.transform.eulerAngles = new Vector3(angles.x, angles.y, angles.z);
     }
 
     protected virtual void IgnoreDamageHitbox()
@@ -398,4 +404,19 @@ public class ComboObject : NetworkBehaviour
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
         fillShaderVal += fillShaderRate * Time.deltaTime;
     }
+    
+    protected virtual float RoundAngleToHex(float angle)
+        {
+            float remainder = angle % 60;
+            if (remainder < 30f)  // round down
+            {
+                angle -= remainder;
+            }
+            else
+            {
+                angle += (60 - remainder);
+            }
+    
+            return angle;
+        }
 }

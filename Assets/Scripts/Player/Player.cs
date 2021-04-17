@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 //using Castle.Core.Smtp;
 using UnityEditor;
@@ -116,6 +117,7 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
+    [NonSerialized] public Quaternion rotation;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
@@ -630,21 +632,17 @@ public class Player : NetworkBehaviour
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
-        {
+        { 
+            rotation = Quaternion.Slerp(
+                playerModel.transform.rotation,
+                Quaternion.LookRotation(direction),
+                turnSpeed * Time.deltaTime);
             if (playerModel.activeSelf)
             {
-                playerModel.transform.rotation = Quaternion.Slerp(
-                    playerModel.transform.rotation,
-                    Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime
-                );
+                playerModel.transform.rotation = rotation;
             } else if (ghostModel.activeSelf)
             {
-                ghostModel.transform.rotation = Quaternion.Slerp(
-                    ghostModel.transform.rotation,
-                    Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime
-                );
+                ghostModel.transform.rotation = rotation;
             }
 
             controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
@@ -682,6 +680,7 @@ public class Player : NetworkBehaviour
                 GameObject modelHit = tileHit.transform.gameObject;
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+                if (HexCell.ignoreKeys.Contains(newKey)) return;
 
                 int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 

@@ -639,7 +639,7 @@ public class HexGrid : NetworkBehaviour
     
     public void GrowRing()
     {
-        char[] slowSpawns = new char[] {GetSlowTileChar(), GetDangerTileChar(), GetHiddenHexChar(), GetEmptyTileChar()};
+        char[] slowSpawns = new char[] {GetDangerTileChar(), GetHiddenHexChar()};
         char[] preDangers = new char[] {GetSlowTileChar()};
         char[] unchanging = new char[] {GetHiddenHexChar(), GetDangerTileChar()};
         List<HexCell> toSlow = new List<HexCell>();
@@ -652,7 +652,7 @@ public class HexGrid : NetworkBehaviour
                 toDanger.Add(cell);
             }
             else if (
-                (cell.HasNeighborOf(slowSpawns) || cell.emptyNeighbors > 0) 
+                (cell.HasNeighborOf(slowSpawns) || (cell.GetKey() == GetEmptyTileChar() && cell.HasNeighborOf(preDangers) || cell.emptyNeighbors > 0))
                      && !unchanging.Contains(cell.GetKey()))
             {
                 toSlow.Add(cell);
