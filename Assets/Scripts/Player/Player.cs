@@ -89,8 +89,11 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
-    private float speedScalar = 1f;
+    private float slowScalar = 1f;
     public float timeSinceSlowed = 0f;
+    private float sludgedScalar = 1f;
+    private float timeSinceSludged = 0f;
+    private float sludgedDuration = 0f;  // set by the sludge object
     public float slowTimeCheckInterval = 0.05f;
 
     // reference to Animator, Network Animator components
@@ -193,7 +196,6 @@ public class Player : NetworkBehaviour
         if (isDead) return; // if dead, disable all player updates
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
-        this.timeSinceSlowed += Time.deltaTime;
         
 
         ApplyMovement();
@@ -645,12 +647,17 @@ public class Player : NetworkBehaviour
                 );
             }
 
-            // print("my speedScalar is "+speedScalar);
-            controller.Move((direction * movementSpeed * this.speedScalar) * Time.deltaTime);
-            // I think there's an asynchronicity to the speed of player updates vs health updates. you should check triggerhere
+            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
+            
+            this.timeSinceSlowed += Time.deltaTime;
             if (this.timeSinceSlowed > slowTimeCheckInterval)
             {
-                speedScalar = 1.0f;
+                slowScalar = 1.0f;
+            }
+            timeSinceSludged -= Time.deltaTime;
+            if (timeSinceSludged < 0)
+            {
+                sludgedScalar = 1.0f;
             }
             
         }
@@ -848,12 +855,20 @@ public class Player : NetworkBehaviour
 
     public void ApplySpeedScalar(float val)
     {
-        this.speedScalar *= val;
+        this.slowScalar *= val;
+    }
+    
+    public void ApplySludgeSlow(float slowRate, float slowDur)
+    {
+        var slowFactor = 1 - slowRate;
+        this.sludgedScalar = slowFactor;
+        this.sludgedDuration = slowDur;
+        this.timeSinceSludged = slowDur;
     }
     
     public void SetSpeedScalar(float val)
     {
-        this.speedScalar = val;
+        this.slowScalar = val;
     }
 
     

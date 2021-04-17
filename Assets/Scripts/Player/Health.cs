@@ -170,19 +170,22 @@ public class Health : NetworkBehaviour
                 .CanHitThisPlayer(this.gameObject) // I want everyone to 
         )
         {
-            return;
         }
-
-        if (obj.name == "SlowHitbox")
+		else if (objRootName == "Sludge Object(Clone)")
+        {
+            var sludge = obj.root.GetComponent<SludgeObject>();
+            playerScript.ApplySludgeSlow(sludge.slowRate, sludge.slowDuration);
+        }
+        else if (obj.name == "SlowHitbox")
         {
             this.playerScript.SetSpeedScalar(0.5f);
             playerScript.timeSinceSlowed = 0f;
-            return;
         }
-
-        
-        playerScript.canBeHit = false; // might remove later. this is for extra security
-        this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
+        else // Bombs
+        {
+            playerScript.canBeHit = false; // might remove later. this is for extra security
+            this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
+        }
     }
     // if (objName == )
 
