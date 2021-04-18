@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
@@ -22,7 +23,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     };
 
     Room_UI roomUI;
-    
+
 
     public override void OnStartClient()
     {
@@ -85,8 +86,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 card.username.text = "Waiting for players...";
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
+                card.characterCard.enabled = false;
                 continue;
             }
+
+            card.characterCard.enabled = true;
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 

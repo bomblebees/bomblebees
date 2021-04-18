@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -4544,7 +4544,7 @@ GameObject:
   - component: {fileID: 536434077}
   - component: {fileID: 536434079}
   m_Layer: 5
-  m_Name: Character
+  m_Name: CharacterCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5141,7 +5141,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 659358539}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
@@ -5776,7 +5776,7 @@ GameObject:
   - component: {fileID: 753722754}
   - component: {fileID: 753722756}
   m_Layer: 5
-  m_Name: Character
+  m_Name: CharacterCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6521,7 +6521,7 @@ GameObject:
   - component: {fileID: 829358786}
   - component: {fileID: 829358788}
   m_Layer: 5
-  m_Name: Character
+  m_Name: CharacterCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7801,7 +7801,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038831724}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
@@ -8356,18 +8356,22 @@ MonoBehaviour:
     avatar: {fileID: 1201809183}
     username: {fileID: 810997124}
     readyStatus: {fileID: 1579508661}
+    characterCard: {fileID: 1224974518}
   - playerCard: {fileID: 118720816}
     avatar: {fileID: 770128168}
     username: {fileID: 514456458}
     readyStatus: {fileID: 1402662701}
+    characterCard: {fileID: 1807718880}
   - playerCard: {fileID: 957095167}
     avatar: {fileID: 1611321605}
     username: {fileID: 242175595}
     readyStatus: {fileID: 1167541811}
+    characterCard: {fileID: 659358541}
   - playerCard: {fileID: 229411519}
     avatar: {fileID: 457227197}
     username: {fileID: 1241461106}
     readyStatus: {fileID: 1782743525}
+    characterCard: {fileID: 1038831726}
   lobbyName: {fileID: 324356051}
 --- !u!1 &1143582882
 GameObject:
@@ -8927,7 +8931,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1224974516}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
@@ -11764,7 +11768,7 @@ GameObject:
   - component: {fileID: 1717474630}
   - component: {fileID: 1717474632}
   m_Layer: 5
-  m_Name: Character
+  m_Name: CharacterCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12551,7 +12555,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807718878}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
