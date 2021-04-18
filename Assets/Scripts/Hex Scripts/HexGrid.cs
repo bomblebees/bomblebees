@@ -54,6 +54,7 @@ public class HexGrid : NetworkBehaviour
     public int minTilesForCombo = 3;
     public int minTilesForGlow = 2;
 
+    public bool enableRings = false;
     public int[] phasePlayersAlive;
     public int[] phaseDelays;
     private float phaseTimeElapsed = 0;
@@ -137,8 +138,8 @@ public class HexGrid : NetworkBehaviour
 
     public void Update()
     {
-        
-        //HandleRingPhases(phaseDelays, phasePlayersAlive);
+
+        if (enableRings) HandleRingPhases(phaseDelays, phasePlayersAlive);
     }
 
     // Creates the models for cells in gridList with the colors saved in colorGridList
