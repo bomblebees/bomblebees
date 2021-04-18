@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
@@ -10,6 +11,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public string steamUsername;
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
+
+    [SerializeField] private Texture2D defaultAvatar;
 
     // List of player colors
     private List<Color> listColors = new List<Color> {
@@ -20,7 +23,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     };
 
     Room_UI roomUI;
-    
+
 
     public override void OnStartClient()
     {
@@ -78,9 +81,16 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
-                card.playerCard.SetActive(false);
-                break;
+                //card.playerCard.SetActive(false);
+
+                card.username.text = "Waiting for players...";
+                card.avatar.texture = FlipTexture(defaultAvatar);
+                card.readyStatus.SetActive(false);
+                card.characterCard.enabled = false;
+                continue;
             }
+
+            card.characterCard.enabled = true;
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
@@ -105,10 +115,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Start button
         if (room.allPlayersReady && room.showStartButton)
         {
-            roomUI.buttonStart.SetActive(true);
+            //roomUI.buttonStart.SetActive(true);
+            roomUI.ActivateStartButton();
         } else
         {
-            roomUI.buttonStart.SetActive(false);
+            //roomUI.buttonStart.SetActive(true);
+            roomUI.DeactivateStartButton();
         }
     }
 
@@ -151,5 +163,33 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         else CmdChangeReadyState(true);
 
         UpdateLobbyList();
+    }
+    
+    Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
+    {
+
+        Texture2D flipped = new Texture2D(original.width, original.height);
+
+        int xN = original.width;
+        int yN = original.height;
+
+
+        for (int i = 0; i < xN; i++)
+        {
+            for (int j = 0; j < yN; j++)
+            {
+                if (upSideDown)
+                {
+                    flipped.SetPixel(j, xN - i - 1, original.GetPixel(j, i));
+                }
+                else
+                {
+                    flipped.SetPixel(xN - i - 1, j, original.GetPixel(i, j));
+                }
+            }
+        }
+        flipped.Apply();
+
+        return flipped;
     }
 }

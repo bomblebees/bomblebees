@@ -17,9 +17,14 @@ public class Room_UI : MonoBehaviour
 
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
-    [SerializeField] private GameObject screenBombleList;
-    [Header("Others")]
+    [SerializeField] private GameObject screenBombList;
+    [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
+    private Button _buttonStartButton;
+    private ButtonHoverTween _buttonStartButtonHoverTween;
+    private CanvasRenderer[] _buttonStartCanvasRenderer;
+    [Range(0f, 1f)]
+    [SerializeField] private float deactivatedOpacity;
 
     [Serializable]
     public class PlayerLobbyCard
@@ -28,6 +33,7 @@ public class Room_UI : MonoBehaviour
         public RawImage avatar;
         public TMP_Text username;
         public GameObject readyStatus;
+        public RawImage characterCard;
     }
 
     [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
@@ -65,11 +71,11 @@ public class Room_UI : MonoBehaviour
         mainMenuUI.gameObject.SetActive(false);
 
         if (matchmaker) lobbyName.text = matchmaker.GetLobbyName();
-    }
 
-    public void Quit()
-    {
-        Application.Quit();
+        // Cache start button components
+        _buttonStartButton = buttonStart.GetComponent<Button>();
+        _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
+        _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
     }
 
     public void Back()
@@ -83,7 +89,7 @@ public class Room_UI : MonoBehaviour
             if (NetworkServer.active) networkManager.StopHost();
             else networkManager.StopClient();
 
-            // For some reason netowrk manager is moved out of dontdestroy, this is to put it back
+            // For some reason network manager is moved out of don't destroy, this is to put it back
             DontDestroyOnLoad(networkManager.gameObject);
 
             mainMenuUI.gameObject.SetActive(true);
@@ -100,6 +106,35 @@ public class Room_UI : MonoBehaviour
         EventReadyButtonClicked?.Invoke();
     }
 
+    public void ActivateStartButton()
+    {
+        // Update functionality
+        _buttonStartButton.enabled = true;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
+        {
+            t.SetAlpha(1f);
+        }
+        buttonStart.transform.localScale.Set(1f,1f,1f);
+        _buttonStartButtonHoverTween.enabled = true;
+    }
+
+    public void DeactivateStartButton()
+    {
+        // Update functionality
+        _buttonStartButton.enabled = false;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
+        {
+            t.SetAlpha(deactivatedOpacity);
+        }
+        
+        _buttonStartButtonHoverTween.enabled = false;
+        buttonStart.transform.localScale.Set(1f,1f,1f);
+    }
+    
     #region Screen: HOW TO PLAY
 
     public void ToggleScreenHowToPlay()
@@ -109,11 +144,11 @@ public class Room_UI : MonoBehaviour
 
     #endregion
 
-    #region Screen: BOMBLE LIST
+    #region Screen: BOMB LIST
 
-    public void ToggleScreenBombleList()
+    public void ToggleScreenBombList()
     {
-        screenBombleList.SetActive(!screenBombleList.activeSelf);
+        screenBombList.SetActive(!screenBombList.activeSelf);
     }
     
     #endregion
