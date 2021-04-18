@@ -138,7 +138,7 @@ public class HexGrid : NetworkBehaviour
     public void Update()
     {
         
-        HandleRingPhases(phaseDelays, phasePlayersAlive);
+        //HandleRingPhases(phaseDelays, phasePlayersAlive);
     }
 
     // Creates the models for cells in gridList with the colors saved in colorGridList
