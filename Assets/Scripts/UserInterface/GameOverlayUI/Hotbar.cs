@@ -69,28 +69,33 @@ public class Hotbar : MonoBehaviour
     }
 
     // Plays a button press tween anim when hot keys can be pressed
+    // Plays a error sound when they cannot be pressed
     public void KeyPressListener()
     {
         if (localPlayer == null) return;
 
-        if (Input.GetKeyDown(localPlayer.spinKey) && spinHudTimer == 0)
+        if (Input.GetKeyDown(localPlayer.spinKey))
         {
-            spinKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (spinHudTimer == 0) spinKey.GetComponent<IconBounceTween>().OnTweenStart();
+            else FindObjectOfType<AudioManager>().PlaySound("error1");
         }
 
-        if (Input.GetKeyDown(localPlayer.swapKey) && !swapDisabledEffect.activeSelf)
+        if (Input.GetKeyDown(localPlayer.swapKey))
         {
-            swapKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (!swapDisabledEffect.activeSelf) swapKey.GetComponent<IconBounceTween>().OnTweenStart();
+            else FindObjectOfType<AudioManager>().PlaySound("error1");
         }
 
-        if (Input.GetKeyDown(localPlayer.bombKey) && !placeDisabledEffect.activeSelf)
+        if (Input.GetKeyDown(localPlayer.bombKey))
         {
-            placeKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<IconBounceTween>().OnTweenStart();
+            else FindObjectOfType<AudioManager>().PlaySound("error1");
         }
 
-        if (Input.GetKeyDown(localPlayer.rotateKey) && !rotateDisabledEffect.activeSelf)
+        if (Input.GetKeyDown(localPlayer.rotateKey))
         {
-            rotateKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<IconBounceTween>().OnTweenStart();
+            else FindObjectOfType<AudioManager>().PlaySound("error1");
         }
     }
     
