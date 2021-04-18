@@ -32,6 +32,7 @@ public class MainMenu_UI : MonoBehaviour
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
+    [SerializeField] private GameObject backButton;
 
     public static MainMenu_UI singleton;
 
@@ -73,18 +74,21 @@ public class MainMenu_UI : MonoBehaviour
         {
             screenOptions.SetActive(false);
             screenMainMenu.SetActive(true);
+            backButton.SetActive(false);
         }
 
         if (screenLobbyList && screenLobbyList.activeSelf)
         {
             screenLobbyList.SetActive(false);
             screenMainMenu.SetActive(true);
+            backButton.SetActive(false);
         }
 
         if (screenLocal.activeSelf)
         {
             screenLocal.SetActive(false);
             screenMainMenu.SetActive(true);
+            backButton.SetActive(false);
         }
     }
     
@@ -105,8 +109,9 @@ public class MainMenu_UI : MonoBehaviour
         {
             screenLocal.SetActive(true);
         }
-
-
+        
+        // Enable back button
+        backButton.SetActive(true);
     }
 
     public void OnClickButtonOptions()
