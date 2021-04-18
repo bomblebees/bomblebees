@@ -143,37 +143,51 @@ public class Health : NetworkBehaviour
     [Mirror.ClientCallback]
     private void OnTriggerStay(Collider other)
     {
+        if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root 
+            && other.gameObject.transform.name == "SpinPVP")
+        {
+            playerScript.stunnedDuration = 1;
+            return;
+        }
         if (
             !hasAuthority
-            || !(playerScript.canBeHit && other.gameObject.CompareTag("ComboHitbox"))
+            || (!(playerScript.canBeHit && 
+                  (other.gameObject.CompareTag("ComboHitbox"))))
             )
         {
                 return;
         }
 
-        var objName = other.gameObject.transform.root.name;
+        var obj = other.gameObject.transform;
+        var objRootName = obj.root.name;
         if (
             (
-                objName == "Plasma Object(Clone)"
-                || objName == "Blink Object(Clone)"
+                objRootName == "Plasma Object(Clone)"
+                || objRootName == "Blink Object(Clone)"
             )
             && // Make sure prefabs are unpacked
             !other.gameObject.transform.root.GetComponent<ComboObject>()
                 .CanHitThisPlayer(this.gameObject) // I want everyone to 
         )
         {
-            return;
         }
-
-        if (objName == "Sludge Object(Clone)")
+		else if (objRootName == "Sludge Object(Clone)")
         {
-            var sludge = other.gameObject.transform.root.transform.GetComponent<SludgeObject>();
-            this.playerScript.ApplySludge(sludge.slowRate);
-            return;
+            var sludge = obj.root.GetComponent<SludgeObject>();
+            playerScript.ApplySludgeSlow(sludge.slowRate, sludge.slowDuration);
         }
-        playerScript.canBeHit = false; // might remove later. this is for extra security
-        this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
+        else if (obj.name == "SlowHitbox")
+        {
+            this.playerScript.SetSpeedScalar(0.5f);
+            playerScript.timeSinceSlowed = 0f;
+        }
+        else // Bombs
+        {
+            playerScript.canBeHit = false; // might remove later. this is for extra security
+            this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
+        }
     }
+    // if (objName == )
 
     [Mirror.Command(ignoreAuthority = true)]
     public void CmdNotifyPlayerDied()

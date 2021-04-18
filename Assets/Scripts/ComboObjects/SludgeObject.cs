@@ -6,7 +6,7 @@ using UnityEngine;
 public class SludgeObject : TickObject
 {
     [SerializeField] public float slowRate = 0.6f;
-    [SerializeField] public float distThresh = 5f;
+    [SerializeField] public float slowDuration = 3f;
     // Start is called before the first frame update
     protected override void StartDangerAnim()
     {

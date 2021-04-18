@@ -15,6 +15,7 @@ public class BlinkObject : TickObject
     private float ignoreTriggererDuration = 10f;  // they'll never be hit by this
     public float breakdownDuration = 5f;
     public bool wasHit = false;
+    public bool triggered = false;
     
     
     public override void _Start(GameObject player)
@@ -22,7 +23,6 @@ public class BlinkObject : TickObject
         base._Start(player);
         EnableObject();
     }
-    
 
     // protected virtual IEnumerator DelayedSpawn()
     // {
@@ -50,15 +50,18 @@ public class BlinkObject : TickObject
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        
-        // Note: PushActions' stuff was here originally
-        // EarlyProc();  // NOTE: keep this here if you want the delay after the bomb is placed
-        StartCoroutine(PushActions(edgeIndex, triggeringPlayer));
-        return true;
+        if (!triggered)
+        {
+            triggered = true;
+            StartCoroutine(PushActions(edgeIndex, triggeringPlayer));
+            return true;
+        }
+        return false;
     }
 
     protected virtual IEnumerator PushActions(int edgeIndex, GameObject triggeringPlayer)
     {
+        print("PushActions ran");
         wasHit = true;
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay);
         else yield return new WaitForSeconds(startupDelay);

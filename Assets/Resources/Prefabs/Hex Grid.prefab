@@ -151,10 +151,22 @@ MonoBehaviour:
   w_Hex: {fileID: 1105639704548485360, guid: 2ffe5189a68dcff4281118e4c6b08486, type: 3}
   wall_Hex: {fileID: 1078958626922311715, guid: 8ab9887f65e3d2e4389180f522eed103,
     type: 3}
-  default_Hex: {fileID: 3574846304584204012, guid: f3c50f8915d60f146bc61f6b26e52f14,
+  slow_Hex: {fileID: 5019543899690969146, guid: e3ff4a5e8a205af479d313a19abd5703,
     type: 3}
-  minTilesForCombo: 4
+  danger_Hex: {fileID: 1974081212180056972, guid: d9918bf4c8927b04e9238aa25780abb9,
+    type: 3}
+  hidden_Hex: {fileID: 1425873413138766244, guid: 42d11e93c4999bd44bf501fc58451331,
+    type: 3}
+  default_Hex: {fileID: 6829881671745468010, guid: 7f3e1f3038262f241820a8032a6e51bc,
+    type: 3}
+  minTilesForCombo: 3
   minTilesForGlow: 2
+  phasePlayersAlive: 0300000002000000ffffffff
+  phaseDelays: 0a0000000a0000000a000000
+  phaseCurrent: 0
+  phaseTotal: 3
+  aliveCount: 0
+  roundManager: {fileID: 0}
   gridList: []
   enableCoords: 0
   enableRandomGen: 1
@@ -162,7 +174,9 @@ MonoBehaviour:
   enableChainRegen: 0
   width: 14
   height: 9
+  tileTypes: 7200700067007900
   tileRegenDuration: 1.5
+  test: {fileID: 2999788111103215642, guid: b2d0193f6fde4dd42ab4e050cc795bf4, type: 3}
 --- !u!114 &6450618751315917604
 MonoBehaviour:
   m_ObjectHideFlags: 0

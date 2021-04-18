@@ -65,6 +65,12 @@ public class ComboObject : NetworkBehaviour
             print("Error: need to assign objectMat to Bomb Object!");
         }
         hasStarted = true;
+
+        var angles = this.model.transform.eulerAngles;
+        // add the start dir
+        // var startAngle = RoundAngleToHex(player.GetComponent<Player>().rotation.eulerAngles.y);
+        // print("start angle is "+startAngle);
+        // this.gameObject.transform.eulerAngles = new Vector3(angles.x, angles.y, angles.z);
     }
 
     protected virtual void IgnoreDamageHitbox()
@@ -123,8 +129,23 @@ public class ComboObject : NetworkBehaviour
             var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
             // var result = GetComponent<Transform>().position;
             nearestCenter = result;
-            RpcFindCenter(result);
+            RpcFindCenter(result, this.gameObject.transform.position);
         }
+    }
+    
+    // Tell all clients the nearest center as calculated by the server
+    [ClientRpc]
+    protected virtual void RpcFindCenter(Vector3 centerPos, Vector3 pos)
+    {
+        var objectRay = new Ray(pos, Vector3.down);
+            RaycastHit tileUnderneathHit;
+            if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
+                nearestCenter = result;
+            }
+        // nearestCenter = centerPos;
     }
     
     protected virtual Vector3 FindCenterBelowOther(GameObject origin) 
@@ -139,13 +160,28 @@ public class ComboObject : NetworkBehaviour
         }
         else return origin.transform.position;
     }
+    
+    protected virtual Vector3 FindCenterBelowOtherInclusive(GameObject origin) 
+        {
+            var objectRay = new Ray(origin.transform.position, Vector3.down);
+            RaycastHit tileUnderneathHit;
+            var status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles"));
+            if (!status)
+            {
+                status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("SlowHex"));
+            }
+            // if (!status)
+            // {
+            //     status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("DangerHex"));
+            // }
+            if (status) {
+                // var tileBelowOrigin = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position ;
+                return result;
+            }
+            else return origin.transform.position;
+        }
 
-    // Tell all clients the nearest center as calculated by the server
-    [ClientRpc]
-    protected virtual void RpcFindCenter(Vector3 centerPos)
-    {
-        nearestCenter = centerPos;
-    }
 
     protected virtual float GetDistanceFrom(Vector3 targetPos)
     {
@@ -168,7 +204,6 @@ public class ComboObject : NetworkBehaviour
     protected virtual void RpcGoToCenter(Vector3 centerPos)
     {
         this.gameObject.transform.position = centerPos;
-        
     }
 
     protected virtual void NotifyOccupiedTile(bool val)
@@ -195,9 +230,11 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableSFX()
     {
-        SFX.SetActive(true);
-        yield return new WaitForSeconds(sfxDuration);
-        SFX.SetActive(false);
+        if (SFX) {
+            SFX.SetActive(true);
+            yield return new WaitForSeconds(sfxDuration);
+            SFX.SetActive(false);
+        }
     }
 
     protected virtual IEnumerator EnableHitbox()
@@ -367,4 +404,19 @@ public class ComboObject : NetworkBehaviour
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
         fillShaderVal += fillShaderRate * Time.deltaTime;
     }
+    
+    protected virtual float RoundAngleToHex(float angle)
+        {
+            float remainder = angle % 60;
+            if (remainder < 30f)  // round down
+            {
+                angle -= remainder;
+            }
+            else
+            {
+                angle += (60 - remainder);
+            }
+    
+            return angle;
+        }
 }

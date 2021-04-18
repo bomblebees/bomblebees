@@ -32,33 +32,14 @@ public class MainMenu_UI : MonoBehaviour
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
+    [SerializeField] private GameObject backButton;
 
     public static MainMenu_UI singleton;
 
     private void Awake()
     {
         singleton = this;
-        //if (NetworkClient.isConnected)
-        //{
-        //    Destroy(mainMenuUIGameObject);
-        //}
     }
-
-    private void Start()
-    {
-        
-    }
-
-    private void Update()
-    {
-        
-    }
-
-    #region Configuration
-    
-    
-    
-    #endregion
 
     #region Continous
     
@@ -73,18 +54,21 @@ public class MainMenu_UI : MonoBehaviour
         {
             screenOptions.SetActive(false);
             screenMainMenu.SetActive(true);
+            backButton.SetActive(false);
         }
 
         if (screenLobbyList && screenLobbyList.activeSelf)
         {
             screenLobbyList.SetActive(false);
             screenMainMenu.SetActive(true);
+            backButton.SetActive(false);
         }
 
         if (screenLocal.activeSelf)
         {
             screenLocal.SetActive(false);
             screenMainMenu.SetActive(true);
+            backButton.SetActive(false);
         }
     }
     
@@ -105,8 +89,9 @@ public class MainMenu_UI : MonoBehaviour
         {
             screenLocal.SetActive(true);
         }
-
-
+        
+        // Enable back button
+        backButton.SetActive(true);
     }
 
     public void OnClickButtonOptions()
@@ -126,8 +111,6 @@ public class MainMenu_UI : MonoBehaviour
     public void HostSteamLobby()
     {
         steamLobby.HostLobby();
-        
-        //mainMenuUIGameObject.SetActive(false);
     }
 
     public void JoinFriendsLobby()
@@ -144,8 +127,6 @@ public class MainMenu_UI : MonoBehaviour
     {
         kcpNetworkManager.networkAddress = customIPAddress.ToString();
         kcpNetworkManager.StartHost();
-        
-        //mainMenuUIGameObject.SetActive(false);
     }
 
     public void JoinLocalLobby()

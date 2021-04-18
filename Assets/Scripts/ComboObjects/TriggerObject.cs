@@ -26,7 +26,7 @@ public class TriggerObject : ComboObject
         ReadyFillShader();
     }
 
-    protected override void Update()
+    protected virtual void Update()
     {
         if (hasStarted == true)
         {

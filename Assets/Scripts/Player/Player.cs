@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 //using Castle.Core.Smtp;
 using UnityEditor;
@@ -26,20 +27,24 @@ public class Player : NetworkBehaviour
     // Assets
     [Header("Debug")]
     public bool debugMode = false;
-    public string debugBombPress1 = "i";
-    public string debugBombPress2 = "a";
+    public string debugBombPress1 = "8";
+    public string debugBombPress2 = "9";
     public string debugBombPress3 = "e";
     public string debugBombPress4 = ";";
     private HexGrid hexGrid;
+    public bool isStunned = false;
+    public float stunnedDuration = 0;
 
     [Header("Respawn")]
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
 
-    [Header("Input")] [SerializeField] private string swapKey = "space";
-    [SerializeField] private string spinKey = "o";
-    [SerializeField] private string bombKey = "j";
+    [Header("Input")]
+    [SerializeField] public string swapKey = "space";
+    [SerializeField] public string spinKey = "o";
+    [SerializeField] public string bombKey = "j";
+    [SerializeField] public string rotateKey = "left shift";
 
     [SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
@@ -78,6 +83,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
     public GameObject spinHit = null; // the bomb that was hit with spin
+    public GameObject spinPVP = null;
 
     // Game Objects
     [Header("Required", order = 2)] public GameObject bomb;
@@ -86,7 +92,12 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
-    private float sludgeInfluence = 1;
+    private float slowScalar = 1f;
+    public float timeSinceSlowed = 0f;
+    private float sludgedScalar = 1f;
+    private float timeSinceSludged = 0f;
+    private float sludgedDuration = 0f;  // set by the sludge object
+    public float slowTimeCheckInterval = 0.05f;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -108,6 +119,7 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
+    [NonSerialized] public Quaternion rotation;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
@@ -128,6 +140,7 @@ public class Player : NetworkBehaviour
         this.Assert();
         LinkAssets();
         spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
+        spinPVP = gameObject.transform.Find("SpinPVP").gameObject;
         spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         UpdateHeldHex(heldKey); // Initialize model
 
@@ -187,24 +200,35 @@ public class Player : NetworkBehaviour
         if (isDead) return; // if dead, disable all player updates
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
+        
 
         ApplyMovement();
         ApplyTileHighlight();
         ListenForSwapping();
         ListenForBombUse();
         ListenForSpinning();
+        ListenForBombRotation();
         if (debugMode) DebugMode();
+        stunnedDuration -= 0.5f * Time.deltaTime;
+        if (stunnedDuration > 0)
+        {
+            canMove = false;
+        }
+        else
+        {
+            canMove = true;
+        }
     }
 
     private void DebugMode()
     {
         if (Input.GetKeyDown(debugBombPress1))
         {
-            SpawnGravityObject();
+            hexGrid.GrowRing();
         }
         if (Input.GetKeyDown(debugBombPress2))
         {
-            SpawnDefaultBomb();
+            SpawnLaserObject();
         }
         if (Input.GetKeyDown(debugBombPress3))
         {
@@ -223,13 +247,13 @@ public class Player : NetworkBehaviour
         if (!isServer) return;
 
         // Handle default-placing bomb anim
-        if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
-        {
-            Debug.Log("inside");
-            RpcEnableBombPlaceAnimation();
-            playedOnDefaultBombReadyAnim = true;
-        }
-        defaultBombUseTimer += Time.deltaTime;
+        //if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
+        //{
+        //    Debug.Log("inside");
+        //    RpcEnableBombPlaceAnimation();
+        //    playedOnDefaultBombReadyAnim = true;
+        //}
+        //defaultBombUseTimer += Time.deltaTime;
     }
 
     [ClientRpc]
@@ -295,18 +319,19 @@ public class Player : NetworkBehaviour
                             break;
                         case 'y':
                             // Debug.Log("Yellow Bomb Type");
-                            this.SpawnLaserObject(sender.identity.gameObject);
+                            SpawnLaserObject(sender.identity.gameObject);
                             break;
                         case 'r':
                             // Debug.Log("Red Bomb Type");
-                            SpawnBigBombObject(sender.identity.gameObject);
+                            SpawnDefaultBomb(sender.identity.gameObject);
                             break;
                         case 'p':
                             // Debug.Log("Purple Bomb Type");
-                            SpawnGravityObject(sender.identity.gameObject);
+                            SpawnSludgeObject(sender.identity.gameObject);
                             break;
                         case 'w':
                             // Debug.Log("White Bomb Type");
+                            SpawnDefaultBomb(sender.identity.gameObject);
                             break;
                         default:
                             // code should not reach here
@@ -314,21 +339,21 @@ public class Player : NetworkBehaviour
                             break;
                     }
                 }
-                else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
-                {
-                    Debug.Log("dropping default bomb");
-                    onDefaultBombReadyAnim.SetActive(false);
-                    playedOnDefaultBombReadyAnim = false;
+                //else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
+                //{
+                //    Debug.Log("dropping default bomb");
+                //    onDefaultBombReadyAnim.SetActive(false);
+                //    playedOnDefaultBombReadyAnim = false;
 
-                    // Else use the default bomb
-                    this.SpawnDefaultBomb(sender.identity.gameObject);
+                /// Else use the default bomb
+                // this.SpawnDefaultBomb(sender.identity.gameObject);
 
-                    // update hud
-                    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
+                //    // update hud
+                //    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
 
-                    defaultBombUseTimer = 0;
+                //    defaultBombUseTimer = 0;
 
-                }
+                //}
                 else // When the default bomb CD isn't up
                 {
 
@@ -340,13 +365,10 @@ public class Player : NetworkBehaviour
     [Server]
     void SpawnDefaultBomb(GameObject placer = null)
     {
-        Debug.Log("spawning bomb");
         GameObject _bomb = (GameObject)Instantiate(bomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
-        _bomb.GetComponent<BombObject>()._Start(placer);
         NetworkServer.Spawn(_bomb);
-
+        // _bomb.GetComponent<BombObject>()._Start(placer);
         RpcSpawnDefaultBomb(_bomb, placer);
 
         eventManager.OnBombPlaced(_bomb, placer); // call event
@@ -355,7 +377,6 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSpawnDefaultBomb(GameObject bomb, GameObject placer)
     {
-        bomb.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         bomb.GetComponent<BombObject>()._Start(placer);
     }
 
@@ -364,10 +385,8 @@ public class Player : NetworkBehaviour
     {
         GameObject _laser = (GameObject) Instantiate(laser,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
-        _laser.GetComponent<LaserObject>()._Start(placer);
         NetworkServer.Spawn(_laser);
-
+        // _laser.GetComponent<LaserObject>()._Start(placer);
         RpcSpawnLaserObject(_laser, placer);
 
         eventManager.OnBombPlaced(_laser, placer); // call event
@@ -376,7 +395,6 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void RpcSpawnLaserObject(GameObject laser, GameObject placer)
     {
-        laser.GetComponent<ComboObject>().SetOwnerPlayer(placer);
         laser.GetComponent<LaserObject>()._Start(placer);
     }
 
@@ -385,11 +403,10 @@ public class Player : NetworkBehaviour
     {
         GameObject _plasma = (GameObject) Instantiate(plasma,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _plasma.GetComponent<PlasmaObject>()._Start(placer);
         NetworkServer.Spawn(_plasma);
-
+        // _plasma.GetComponent<PlasmaObject>()._Start(placer);
         RpcSpawnPlasmaObject(_plasma, placer);
-
+        
         eventManager.OnBombPlaced(_plasma, placer); // call event
     }
 
@@ -404,10 +421,9 @@ public class Player : NetworkBehaviour
     {
         GameObject _blink = (GameObject) Instantiate(blink,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _blink.GetComponent<BlinkObject>()._Start(placer);
         NetworkServer.Spawn(_blink);
-
-        RpcSpawnBlinkObject(_blink, placer);
+        _blink.GetComponent<BlinkObject>()._Start(placer);
+        // RpcSpawnBlinkObject(_blink, placer);
 
         eventManager.OnBombPlaced(_blink, placer); // call event
     }
@@ -419,41 +435,40 @@ public class Player : NetworkBehaviour
     }
 
     [Server]
-    void SpawnGravityObject(GameObject placer = null)
+    void SpawnSludgeObject(GameObject placer = null)
     {
-        GameObject _gravity = (GameObject) Instantiate(gravityObject,
+        GameObject _sludge = (GameObject) Instantiate(gravityObject,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _gravity.GetComponent<SludgeObject>()._Start(placer);
-        NetworkServer.Spawn(_gravity);
-
-        RpcSpawnGravityObject(_gravity, placer);
-
-        eventManager.OnBombPlaced(_gravity, placer); // call event
+        NetworkServer.Spawn(_sludge);
+        // _sludge.GetComponent<SludgeObject>()._Start(placer);
+        RpcSpawnSludgeBomb(_sludge, placer);
+        
+        eventManager.OnBombPlaced(_sludge, placer); // call event
     }
 
     [ClientRpc]
-    void RpcSpawnGravityObject(GameObject gravity, GameObject placer)
+    void RpcSpawnSludgeBomb(GameObject sludge, GameObject placer)
     {
-        gravity.GetComponent<SludgeObject>()._Start(placer);
+        sludge.GetComponent<SludgeObject>()._Start(placer);
     }
 
     [Server]
-    void SpawnBigBombObject(GameObject placer = null)
+    void SpawnPulseObject(GameObject placer = null)
     {
-        GameObject _bigBomb = (GameObject) Instantiate(bigBomb,
+        GameObject _pulse = (GameObject) Instantiate(bigBomb,
             this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        _bigBomb.GetComponent<PulseObject>()._Start(placer);  // TODO change this type
-        NetworkServer.Spawn(_bigBomb);
+        // _pulse.GetComponent<PulseObject>()._Start(placer); // TODO change this type
+        NetworkServer.Spawn(_pulse);
 
-        RpcSpawnGravityObject(_bigBomb, placer);
+        RpcSpawnPulseObject(_pulse, placer);
 
-        eventManager.OnBombPlaced(_bigBomb, placer); // call event
+        eventManager.OnBombPlaced(_pulse, placer); // call event    }
     }
 
     [ClientRpc]
-    void RpcSpawnBigBombObject(GameObject bigBomb, GameObject placer)
+    void RpcSpawnPulseObject(GameObject pulse, GameObject placer)
     {
-        bigBomb.GetComponent<PulseObject>()._Start(placer);
+        pulse.GetComponent<PulseObject>()._Start(placer);
     }
 
     public void SetCanPlaceBombs(bool val)
@@ -525,6 +540,10 @@ public class Player : NetworkBehaviour
         spinHitbox.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinHitboxDuration);
         spinHitbox.gameObject.SetActive(false);
+        
+        spinPVP.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinHitboxDuration);
+        spinPVP.gameObject.SetActive(false);
     }
 
     private IEnumerator HandleSpinAnim()
@@ -616,25 +635,32 @@ public class Player : NetworkBehaviour
 
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
-        {
+        { 
+            rotation = Quaternion.Slerp(
+                playerModel.transform.rotation,
+                Quaternion.LookRotation(direction),
+                turnSpeed * Time.deltaTime);
             if (playerModel.activeSelf)
             {
-                playerModel.transform.rotation = Quaternion.Slerp(
-                    playerModel.transform.rotation,
-                    Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime
-                );
+                playerModel.transform.rotation = rotation;
             } else if (ghostModel.activeSelf)
             {
-                ghostModel.transform.rotation = Quaternion.Slerp(
-                    ghostModel.transform.rotation,
-                    Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime
-                );
+                ghostModel.transform.rotation = rotation;
             }
-            if (this.canMove) controller.Move((direction * movementSpeed * this.sludgeInfluence)
-                                                        * Time.deltaTime);
-            this.sludgeInfluence = 1;
+
+            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
+            
+            this.timeSinceSlowed += Time.deltaTime;
+            if (this.timeSinceSlowed > slowTimeCheckInterval)
+            {
+                slowScalar = 1.0f;
+            }
+            timeSinceSludged -= Time.deltaTime;
+            if (timeSinceSludged < 0)
+            {
+                sludgedScalar = 1.0f;
+            }
+            
         }
     }
 
@@ -657,6 +683,7 @@ public class Player : NetworkBehaviour
                 GameObject modelHit = tileHit.transform.gameObject;
                 //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
                 char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
+                if (HexCell.ignoreKeys.Contains(newKey)) return;
 
                 int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 
@@ -710,6 +737,26 @@ public class Player : NetworkBehaviour
             selectedTile = tileHit.transform.gameObject;
             selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
         }
+        else
+        {
+            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+        }
+    }
+
+    // Listens for key press and rotates the item stack
+    [Client]
+    void ListenForBombRotation()
+    {
+        if (Input.GetKeyDown(rotateKey))
+        {
+            CmdRotateItemStack();
+        }
+    }
+
+    [Command]
+    public void CmdRotateItemStack()
+    {
+        RotateItemStack();
     }
 
     //[TargetRpc]
@@ -727,12 +774,13 @@ public class Player : NetworkBehaviour
     [Server]
     public void AddItemCombo(char colorKey)
     {
-        if (colorKey == 'w')
-        {
-            print("IN HERE");
-            ApplyQueenPoints(1);
-        }
-        else if (itemStack.Count < maxStackSize)
+        // if (colorKey == 'w')
+        // {
+        //     print("IN HERE");
+        //     ApplyQueenPoints(1);
+        // }
+        // else 
+        if (itemStack.Count < maxStackSize)
         {
             itemStack.Add(colorKey); // Push new combo to stack
         }
@@ -753,6 +801,17 @@ public class Player : NetworkBehaviour
     }
 
     [Server]
+    public void RotateItemStack()
+    {
+        if (itemStack.Count > 1)
+        {
+            char tmp = itemStack[itemStack.Count - 1];
+            itemStack.RemoveAt(itemStack.Count - 1);
+            itemStack.Insert(0, tmp);
+        }
+    }
+
+    [Server]
     public void ClearItemStack(bool val = true)
     {
         while (itemStack.Count > 0)
@@ -761,8 +820,18 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [Client]
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
+        // If max inventory stack, player should not be able to swap
+        if (itemStack.Count == 3)
+        {
+            canSwap = false;
+        } else
+        {
+            canSwap = true;
+        }
+
         PlayerInterface hud = this.GetComponent<PlayerInterface>();
         // for (int i = 0; i < 3; i++)
         for (int i = 2; i >= 0; i--)
@@ -827,9 +896,22 @@ public class Player : NetworkBehaviour
         spinHitbox.SetActive(val);
     }
 
-    public void ApplySludge(float val)
+    public void ApplySpeedScalar(float val)
     {
-        this.sludgeInfluence = val;
+        this.slowScalar *= val;
+    }
+    
+    public void ApplySludgeSlow(float slowRate, float slowDur)
+    {
+        var slowFactor = 1 - slowRate;
+        this.sludgedScalar = slowFactor;
+        this.sludgedDuration = slowDur;
+        this.timeSinceSludged = slowDur;
+    }
+    
+    public void SetSpeedScalar(float val)
+    {
+        this.slowScalar = val;
     }
 
     

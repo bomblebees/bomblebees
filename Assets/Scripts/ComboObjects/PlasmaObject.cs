@@ -54,8 +54,12 @@ public class PlasmaObject : TriggerObject
         if (this.hitboxEnabled == true)
         {
             plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
-            var nextPos = FindCenterBelowOther(this.plasmaSphereModel);
-            if (lastPosition != nextPos)
+            var nextPos = FindCenterBelowOtherInclusive(this.plasmaSphereModel);
+            if (nextPos == this.plasmaSphereModel.transform.position)  // Since FindCenter... returns own position on fail
+            {
+                this.hitBox.SetActive(false); 
+            }
+            else if (lastPosition != nextPos)
             {
                 particleSystem.Play();
                 this.hitBox.transform.position = nextPos;

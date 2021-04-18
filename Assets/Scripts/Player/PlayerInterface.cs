@@ -128,9 +128,9 @@ public class PlayerInterface : NetworkBehaviour
     {
         // Enlarge if front of stack (ie. next bomb to drop)
         if (idx == player.itemStack.Count - 1)
-            stackUI[idx].gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+            stackUI[idx].gameObject.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
         else
-            stackUI[idx].gameObject.transform.localScale = new Vector3(0.1904f, 0.1904f, 0.1904f);
+            stackUI[idx].gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
 
         // Set the sprite if it is a bomb, otherwise disable it
         if (key == 'e')
