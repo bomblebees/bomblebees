@@ -17,7 +17,7 @@ public class Room_UI : MonoBehaviour
 
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
-    [SerializeField] private GameObject screenBombleList;
+    [SerializeField] private GameObject screenBombList;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
     private Button _buttonStartButton;
@@ -77,11 +77,6 @@ public class Room_UI : MonoBehaviour
         _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
     }
 
-    public void Quit()
-    {
-        Application.Quit();
-    }
-
     public void Back()
     {
         if (matchmaker)
@@ -93,7 +88,7 @@ public class Room_UI : MonoBehaviour
             if (NetworkServer.active) networkManager.StopHost();
             else networkManager.StopClient();
 
-            // For some reason netowrk manager is moved out of dontdestroy, this is to put it back
+            // For some reason network manager is moved out of don't destroy, this is to put it back
             DontDestroyOnLoad(networkManager.gameObject);
 
             mainMenuUI.gameObject.SetActive(true);
@@ -148,11 +143,11 @@ public class Room_UI : MonoBehaviour
 
     #endregion
 
-    #region Screen: BOMBLE LIST
+    #region Screen: BOMB LIST
 
-    public void ToggleScreenBombleList()
+    public void ToggleScreenBombList()
     {
-        screenBombleList.SetActive(!screenBombleList.activeSelf);
+        screenBombList.SetActive(!screenBombList.activeSelf);
     }
     
     #endregion
