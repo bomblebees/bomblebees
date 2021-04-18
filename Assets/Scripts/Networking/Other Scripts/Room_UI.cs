@@ -20,14 +20,12 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private GameObject screenBombleList;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
-    [SerializeField] private Image buttonStartImage;
-    [SerializeField] private Button buttonStartButton;
-    [SerializeField] private ButtonHoverTween buttonStartButtonHoverTween;
-    
-    [Header("Button Sprite")]
-    [SerializeField] private Sprite buttonActivated;
-    [SerializeField] private Sprite buttonDeactivated;
-    
+    private Button _buttonStartButton;
+    private ButtonHoverTween _buttonStartButtonHoverTween;
+    private CanvasRenderer[] _buttonStartCanvasRenderer;
+    [Range(0f, 1f)]
+    [SerializeField] private float deactivatedOpacity;
+
     [Serializable]
     public class PlayerLobbyCard
     {
@@ -72,6 +70,11 @@ public class Room_UI : MonoBehaviour
         mainMenuUI.gameObject.SetActive(false);
 
         if (matchmaker) lobbyName.text = matchmaker.GetLobbyName();
+
+        // Cache start button components
+        _buttonStartButton = buttonStart.GetComponent<Button>();
+        _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
+        _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
     }
 
     public void Quit()
@@ -109,16 +112,31 @@ public class Room_UI : MonoBehaviour
 
     public void ActivateStartButton()
     {
-        buttonStartImage.sprite = buttonActivated;
-        buttonStartButtonHoverTween.enabled = true;
-        buttonStartButton.enabled = true;
+        // Update functionality
+        _buttonStartButton.enabled = true;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
+        {
+            t.SetAlpha(1f);
+        }
+        buttonStart.transform.localScale.Set(1f,1f,1f);
+        _buttonStartButtonHoverTween.enabled = true;
     }
 
     public void DeactivateStartButton()
     {
-        buttonStartImage.sprite = buttonDeactivated;
-        buttonStartButtonHoverTween.enabled = false;
-        buttonStartButton.enabled = false;
+        // Update functionality
+        _buttonStartButton.enabled = false;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
+        {
+            t.SetAlpha(deactivatedOpacity);
+        }
+        
+        _buttonStartButtonHoverTween.enabled = false;
+        buttonStart.transform.localScale.Set(1f,1f,1f);
     }
     
     #region Screen: HOW TO PLAY
