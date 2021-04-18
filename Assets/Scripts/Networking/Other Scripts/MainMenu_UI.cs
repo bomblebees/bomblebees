@@ -39,27 +39,7 @@ public class MainMenu_UI : MonoBehaviour
     private void Awake()
     {
         singleton = this;
-        //if (NetworkClient.isConnected)
-        //{
-        //    Destroy(mainMenuUIGameObject);
-        //}
     }
-
-    private void Start()
-    {
-        
-    }
-
-    private void Update()
-    {
-        
-    }
-
-    #region Configuration
-    
-    
-    
-    #endregion
 
     #region Continous
     
@@ -131,8 +111,6 @@ public class MainMenu_UI : MonoBehaviour
     public void HostSteamLobby()
     {
         steamLobby.HostLobby();
-        
-        //mainMenuUIGameObject.SetActive(false);
     }
 
     public void JoinFriendsLobby()
@@ -149,8 +127,6 @@ public class MainMenu_UI : MonoBehaviour
     {
         kcpNetworkManager.networkAddress = customIPAddress.ToString();
         kcpNetworkManager.StartHost();
-        
-        //mainMenuUIGameObject.SetActive(false);
     }
 
     public void JoinLocalLobby()
