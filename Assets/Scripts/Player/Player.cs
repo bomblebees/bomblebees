@@ -40,9 +40,11 @@ public class Player : NetworkBehaviour
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
 
-    [Header("Input")] [SerializeField] private string swapKey = "space";
-    [SerializeField] private string spinKey = "o";
-    [SerializeField] private string bombKey = "j";
+    [Header("Input")]
+    [SerializeField] public string swapKey = "space";
+    [SerializeField] public string spinKey = "o";
+    [SerializeField] public string bombKey = "j";
+    [SerializeField] public string rotateKey = "left shift";
 
     [SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
@@ -205,6 +207,7 @@ public class Player : NetworkBehaviour
         ListenForSwapping();
         ListenForBombUse();
         ListenForSpinning();
+        ListenForBombRotation();
         if (debugMode) DebugMode();
         stunnedDuration -= 0.5f * Time.deltaTime;
         if (stunnedDuration > 0)
@@ -244,13 +247,13 @@ public class Player : NetworkBehaviour
         if (!isServer) return;
 
         // Handle default-placing bomb anim
-        if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
-        {
-            Debug.Log("inside");
-            RpcEnableBombPlaceAnimation();
-            playedOnDefaultBombReadyAnim = true;
-        }
-        defaultBombUseTimer += Time.deltaTime;
+        //if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
+        //{
+        //    Debug.Log("inside");
+        //    RpcEnableBombPlaceAnimation();
+        //    playedOnDefaultBombReadyAnim = true;
+        //}
+        //defaultBombUseTimer += Time.deltaTime;
     }
 
     [ClientRpc]
@@ -316,11 +319,11 @@ public class Player : NetworkBehaviour
                             break;
                         case 'y':
                             // Debug.Log("Yellow Bomb Type");
-                            this.SpawnLaserObject(sender.identity.gameObject);
+                            SpawnLaserObject(sender.identity.gameObject);
                             break;
                         case 'r':
                             // Debug.Log("Red Bomb Type");
-                            SpawnPulseObject(sender.identity.gameObject);
+                            SpawnDefaultBomb(sender.identity.gameObject);
                             break;
                         case 'p':
                             // Debug.Log("Purple Bomb Type");
@@ -336,21 +339,21 @@ public class Player : NetworkBehaviour
                             break;
                     }
                 }
-                else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
-                {
-                    Debug.Log("dropping default bomb");
-                    onDefaultBombReadyAnim.SetActive(false);
-                    playedOnDefaultBombReadyAnim = false;
+                //else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
+                //{
+                //    Debug.Log("dropping default bomb");
+                //    onDefaultBombReadyAnim.SetActive(false);
+                //    playedOnDefaultBombReadyAnim = false;
 
-                    /// Else use the default bomb
-                    // this.SpawnDefaultBomb(sender.identity.gameObject);
+                /// Else use the default bomb
+                // this.SpawnDefaultBomb(sender.identity.gameObject);
 
-                    // update hud
-                    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
+                //    // update hud
+                //    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
 
-                    defaultBombUseTimer = 0;
+                //    defaultBombUseTimer = 0;
 
-                }
+                //}
                 else // When the default bomb CD isn't up
                 {
 
@@ -740,6 +743,22 @@ public class Player : NetworkBehaviour
         }
     }
 
+    // Listens for key press and rotates the item stack
+    [Client]
+    void ListenForBombRotation()
+    {
+        if (Input.GetKeyDown(rotateKey))
+        {
+            CmdRotateItemStack();
+        }
+    }
+
+    [Command]
+    public void CmdRotateItemStack()
+    {
+        RotateItemStack();
+    }
+
     //[TargetRpc]
     //public void TargetAddItemCombo(NetworkConnection target, char colorKey)
     //{
@@ -782,6 +801,17 @@ public class Player : NetworkBehaviour
     }
 
     [Server]
+    public void RotateItemStack()
+    {
+        if (itemStack.Count > 1)
+        {
+            char tmp = itemStack[itemStack.Count - 1];
+            itemStack.RemoveAt(itemStack.Count - 1);
+            itemStack.Insert(0, tmp);
+        }
+    }
+
+    [Server]
     public void ClearItemStack(bool val = true)
     {
         while (itemStack.Count > 0)
@@ -790,8 +820,18 @@ public class Player : NetworkBehaviour
         }
     }
 
+    [Client]
     void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
+        // If max inventory stack, player should not be able to swap
+        if (itemStack.Count == 3)
+        {
+            canSwap = false;
+        } else
+        {
+            canSwap = true;
+        }
+
         PlayerInterface hud = this.GetComponent<PlayerInterface>();
         // for (int i = 0; i < 3; i++)
         for (int i = 2; i >= 0; i--)

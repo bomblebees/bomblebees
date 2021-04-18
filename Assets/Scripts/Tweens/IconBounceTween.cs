@@ -5,8 +5,13 @@ using UnityEngine;
 public class IconBounceTween : MonoBehaviour
 {
     private Vector3 originalScale;
+    private bool tweenStarted = false;
 
     public float scaleMultipler = 1.1f;
+
+    public float easeInTime = 0.1f;
+    public float easeOutTime = 0.15f;
+
     public LeanTweenType easeIn = LeanTweenType.easeOutCubic;
     public LeanTweenType easeOut = LeanTweenType.easeOutExpo;
 
@@ -17,7 +22,12 @@ public class IconBounceTween : MonoBehaviour
 
     public void OnTweenStart()
     {
-        LeanTween.scale(this.gameObject, originalScale * scaleMultipler, 0.1f)
+        // Prevents tween anim from running multiple times
+        if (tweenStarted) return;
+
+        tweenStarted = true;
+
+        LeanTween.scale(this.gameObject, originalScale * scaleMultipler, easeInTime)
             .setEase(easeIn)
             .setOnComplete(OnTweenExit);
 
@@ -26,6 +36,13 @@ public class IconBounceTween : MonoBehaviour
 
     public void OnTweenExit()
     {
-        LeanTween.scale(this.gameObject, originalScale, 0.15f).setEase(easeOut);
+        LeanTween.scale(this.gameObject, originalScale, easeOutTime)
+            .setEase(easeOut)
+            .setOnComplete(OnTweenExitComplete);
+    }
+
+    public void OnTweenExitComplete()
+    {
+        tweenStarted = false;
     }
 }
