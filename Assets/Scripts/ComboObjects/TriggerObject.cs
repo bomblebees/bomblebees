@@ -17,6 +17,8 @@ public class TriggerObject : ComboObject
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
 
+    private bool stayPermanent = true; // Whether the deployable stays permanently until hit
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -75,6 +77,19 @@ public class TriggerObject : ComboObject
 
     protected virtual void ListenForDespawn()
     {
+        if (stayPermanent)
+        {
+            // deployables can not get destroyed until it is hit
+            if (canBeExtended && wasHit)
+            {
+                canBeExtended = false;
+                StartCoroutine(DestroySelf(lingerDuration));
+            }
+
+            return;
+        }
+
+        // deployables will be destroyed even if it is not hit
         if (canBeExtended && timeAlive > lingerDuration)
         {
             canBeExtended = false;
@@ -95,6 +110,7 @@ public class TriggerObject : ComboObject
                 StartCoroutine(DestroySelf());
             }
         }
+
     }
 
     protected virtual void ElapseTimeAlive()
