@@ -285,13 +285,14 @@ public class Player : NetworkBehaviour
     public float spinChargeTime = 0f;
     private bool spinHeld = false;
 
-    [SerializeField] private float[] spinTimings = {0.5f, 1.0f, 1.5f};
-    [SerializeField] private int[] spinPowerDist = {1, 2, 3};
+    [SerializeField] public float[] spinTimings = {0.5f, 1.0f, 1.5f, 2.0f};
+    [SerializeField] private int[] spinPowerDist = {1, 2, 3, 4};
     [SerializeField] private float spinScalar = 1f;
 
     // trash variables sry
     private bool spinChargeLevel1Hit = false;
     private bool spinChargeLevel2Hit = false;
+    private bool spinChargeLevel3Hit = false;
 
     [Client]
     public void ListenForSpinning()
@@ -306,6 +307,7 @@ public class Player : NetworkBehaviour
 
             spinChargeLevel1Hit = false;
             spinChargeLevel2Hit = false;
+            spinChargeLevel3Hit = false;
         }
 
         if (Input.GetKey(spinKey) && spinHeld && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
@@ -324,6 +326,13 @@ public class Player : NetworkBehaviour
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
                 this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
                 spinChargeLevel2Hit = true;
+            }
+
+            if (!spinChargeLevel3Hit && spinChargeTime >= spinTimings[2])
+            {
+                FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
+                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                spinChargeLevel3Hit = true;
             }
         }
 
