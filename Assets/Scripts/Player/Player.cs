@@ -222,6 +222,7 @@ public class Player : NetworkBehaviour
         
         if (timeSinceSludged < 0)
         {
+            /* SLUDGE EFFECT ENDS HERE */
             sludgedScalar = 1.0f;
             if (sludgeVFX.activeSelf)
             {
@@ -912,12 +913,17 @@ public class Player : NetworkBehaviour
     
     public void ApplySludgeSlow(float slowRate, float slowDur)
     {
+        /* SLUDGE STATUS EFFECT STARTS HERE*/
         var slowFactor = 1 - slowRate;
         this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;
         sludgeVFX.SetActive(true);
         this.canSpin = false;
+        /* APPLY EFFECTS THAT HAPPEN ONCE PER SLUDGE-EFFECT HERE */
+        if (timeSinceSludged > 0)
+        {
+        }
     }
     
     public void SetSpeedScalar(float val)
