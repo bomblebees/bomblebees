@@ -219,6 +219,21 @@ public class Player : NetworkBehaviour
         {
             canMove = true;
         }
+        
+        if (timeSinceSludged < 0)
+        {
+            sludgedScalar = 1.0f;
+            if (sludgeVFX.activeSelf)
+            {
+                sludgeVFX.SetActive(false);
+                this.canSpin = true;
+            }
+        }
+        
+        if (this.timeSinceSlowed > slowTimeCheckInterval)
+        {
+            slowScalar = 1.0f;
+        }
     }
 
     private void DebugMode()
@@ -652,19 +667,6 @@ public class Player : NetworkBehaviour
                 ghostModel.transform.rotation = rotation;
             }
 
-            if (timeSinceSludged < 0)
-            {
-                sludgedScalar = 1.0f;
-                if (sludgeVFX.activeSelf)
-                {
-                    sludgeVFX.SetActive(false);
-                }
-            }
-            
-            if (this.timeSinceSlowed > slowTimeCheckInterval)
-            {
-                slowScalar = 1.0f;
-            }
             
             controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
             
@@ -915,6 +917,7 @@ public class Player : NetworkBehaviour
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;
         sludgeVFX.SetActive(true);
+        this.canSpin = false;
     }
     
     public void SetSpeedScalar(float val)
