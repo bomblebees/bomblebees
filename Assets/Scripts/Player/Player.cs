@@ -97,6 +97,9 @@ public class Player : NetworkBehaviour
     private float sludgedScalar = 1f;
     private float timeSinceSludged = 0f;
     private float sludgedDuration = 0f;  // set by the sludge object
+    private float timeSinceSludgedEnd = -40f;
+    public float timeSinceSludgedEndDur = 0f;
+
     public float slowTimeCheckInterval = 0.05f;
     public GameObject sludgeVFX;
 
@@ -224,6 +227,10 @@ public class Player : NetworkBehaviour
         if (timeSinceSludged < 0)
         {
             /* SLUDGE EFFECT ENDS HERE */
+            // start coroutine
+            // timeSinceSludgedEnd = -4f;
+            // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -40f);
+
             sludgedScalar = 1.0f;
             if (sludgeVFX.activeSelf)
             {
@@ -232,6 +239,12 @@ public class Player : NetworkBehaviour
             }
         }
         
+        if (timeSinceSludgedEnd > -40f)
+        {
+            timeSinceSludgedEnd -= Time.deltaTime * 3f; // temp
+            playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", timeSinceSludgedEnd);
+        }
+
         if (this.timeSinceSlowed > slowTimeCheckInterval)
         {
             slowScalar = 1.0f;
@@ -1000,6 +1013,9 @@ public class Player : NetworkBehaviour
     public void ApplySludgeSlow(float slowRate, float slowDur)
     {
         /* SLUDGE STATUS EFFECT STARTS HERE*/
+        timeSinceSludgedEnd = -3f;
+        playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", timeSinceSludgedEnd);
+
         var slowFactor = 1 - slowRate;
         this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
