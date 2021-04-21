@@ -338,7 +338,13 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
-            triggeringPlayer = other.transform.parent.gameObject; 
+            triggeringPlayer = other.transform.parent.gameObject;
+
+            int power = triggeringPlayer.GetComponent<Player>().spinPower;
+            Debug.Log("power: " + power);
+
+            this.travelDistanceInHexes = power + 2;
+
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer);

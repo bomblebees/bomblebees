@@ -280,14 +280,49 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public int spinPower = 0;
+
+    float startSpinTime = 0f;
+    float spinChargeTime = 0f;
+
+    bool held = false;
+
     [Client]
     public void ListenForSpinning()
     {
         if (Input.GetKeyDown(spinKey))
         {
+            startSpinTime = Time.time;
+            held = true;
+
+        }
+
+        if (Input.GetKey(spinKey)) {
+            spinChargeTime += Time.deltaTime;
+        }
+
+        if (Input.GetKeyUp(spinKey))
+        {
+            Debug.Log("test spin time: " + spinChargeTime);
+
+            if (spinChargeTime < 0.5f)
+            {
+                spinPower = 0;
+            } else if (spinChargeTime < 1.0f)
+            {
+                spinPower = 1;
+            } else if (spinChargeTime >= 1.0f)
+            {
+                spinPower = 2;
+            }
+
             ExitInvincibility();
             CmdSpin();
+
+            spinChargeTime = 0f;
+            held = true;
         }
+
     }
 
 
@@ -496,6 +531,7 @@ public class Player : NetworkBehaviour
                 FindObjectOfType<AudioManager>().PlaySound("playerSpin");
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
+                spinPower = 0;
                 canSpin = true;
             }
         }
