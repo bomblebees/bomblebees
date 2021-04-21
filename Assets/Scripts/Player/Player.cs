@@ -117,6 +117,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private int maxStackSize = 3;
     public readonly SyncList<char> itemStack = new SyncList<char>();
 
+    private GameObject playerMesh;
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
     [NonSerialized] public Quaternion rotation;
@@ -145,8 +146,8 @@ public class Player : NetworkBehaviour
         UpdateHeldHex(heldKey); // Initialize model
 
         // Set player color
-        GameObject mesh = playerModel.transform.GetChild(0).gameObject;
-        mesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
+        playerMesh = playerModel.transform.GetChild(0).gameObject;
+        playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
 
         itemStack.Callback += OnItemStackChange;
 
@@ -318,6 +319,8 @@ public class Player : NetworkBehaviour
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
                 this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.4f);
                 spinChargeLevel1Hit = true;
             }
 
@@ -325,6 +328,8 @@ public class Player : NetworkBehaviour
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
                 this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 15f);
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.8f);
                 spinChargeLevel2Hit = true;
             }
 
@@ -332,6 +337,8 @@ public class Player : NetworkBehaviour
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
                 this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 20f);
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 1.2f);
                 spinChargeLevel3Hit = true;
             }
         }
@@ -360,6 +367,8 @@ public class Player : NetworkBehaviour
             ExitInvincibility();
             CmdSpin(spinPower);
 
+            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
+            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
             spinScalar = 1f;
             spinChargeTime = 0f;
             spinHeld = false;
