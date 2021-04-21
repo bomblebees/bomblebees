@@ -146,7 +146,7 @@ public class Player : NetworkBehaviour
 
         // Set player color
         GameObject mesh = playerModel.transform.GetChild(0).gameObject;
-        mesh.GetComponent<Renderer>().material.SetColor("_BaseColor", playerColor);
+        mesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
 
         itemStack.Callback += OnItemStackChange;
 
