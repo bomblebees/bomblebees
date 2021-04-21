@@ -16,7 +16,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private Image[] stackUI = new Image[3];
     [SerializeField] private RawImage hexUI;
     [SerializeField] private Image bombCooldownFilter;
-    [SerializeField] private Image spinChargeBar;
+    [SerializeField] public Image spinChargeBar;
     private float bombHudTimer = 0;
 
     [Header("User Interface")]
