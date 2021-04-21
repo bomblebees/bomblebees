@@ -317,18 +317,19 @@ public class Player : NetworkBehaviour
     {
         if (!canSpin) return;
 
-        if (Input.GetKeyDown(spinKey))
-        {
-            spinScalar = 0.5f;
-            startSpinTime = Time.time;
-            spinHeld = true;
+        if (Input.GetKey(spinKey) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+            if (!spinHeld)
+            {
+                spinScalar = 0.5f;
+                startSpinTime = Time.time;
 
-            spinChargeLevel1Hit = false;
-            spinChargeLevel2Hit = false;
-            spinChargeLevel3Hit = false;
-        }
+                spinChargeLevel1Hit = false;
+                spinChargeLevel2Hit = false;
+                spinChargeLevel3Hit = false;
 
-        if (Input.GetKey(spinKey) && spinHeld && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+                spinHeld = true;
+            }
+
             spinChargeTime += Time.deltaTime;
 
             // Play anims and sounds
