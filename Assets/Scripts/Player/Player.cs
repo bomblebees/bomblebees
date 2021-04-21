@@ -317,7 +317,7 @@ public class Player : NetworkBehaviour
             }
 
             ExitInvincibility();
-            CmdSpin();
+            CmdSpin(spinPower);
 
             spinChargeTime = 0f;
             held = true;
@@ -516,7 +516,7 @@ public class Player : NetworkBehaviour
         this.canSpin = val;
     }
 
-    public IEnumerator Spin()
+    public IEnumerator Spin(int spinPower)
     {
         if (canSpin)
         {
@@ -526,31 +526,32 @@ public class Player : NetworkBehaviour
             }
             else
             {
+                this.spinPower = spinPower;
                 StartCoroutine(HandleSpinHitbox());
                 StartCoroutine(HandleSpinAnim());
                 FindObjectOfType<AudioManager>().PlaySound("playerSpin");
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
-                spinPower = 0;
+                this.spinPower = 0;
                 canSpin = true;
             }
         }
     }
 
     [Command(ignoreAuthority=true)]
-    void CmdSpin(NetworkConnectionToClient sender = null)
+    void CmdSpin(int spinPower, NetworkConnectionToClient sender = null)
     {
         // Spin for server
         if (canSpin) StartCoroutine(WaitSpinHit(sender.identity.gameObject));
-        StartCoroutine(Spin());
-        RpcSpin();
+        StartCoroutine(Spin(spinPower));
+        RpcSpin(spinPower);
     }
 
     [ClientRpc]
-    void RpcSpin()
+    void RpcSpin(int spinPower)
     {
         // Client will spin for all observers
-        StartCoroutine(Spin());
+        StartCoroutine(Spin(spinPower));
     }
 
     // Wait to check if spin hit a bomb

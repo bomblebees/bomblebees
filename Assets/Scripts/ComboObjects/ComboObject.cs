@@ -263,8 +263,9 @@ public class ComboObject : NetworkBehaviour
     }
 
     [ClientRpc]
-    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer)
+    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, int newTravelDistance)
     {
+        this.travelDistanceInHexes = newTravelDistance;
         this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
         Push(edgeIndex, triggeringPlayer);
     }
@@ -340,14 +341,15 @@ public class ComboObject : NetworkBehaviour
 
             triggeringPlayer = other.transform.parent.gameObject;
 
+            // Adjust travel distance based on spin power
             int power = triggeringPlayer.GetComponent<Player>().spinPower;
             Debug.Log("power: " + power);
 
-            this.travelDistanceInHexes = power + 2;
+            int newTravelDistanceInHexes = power + 2;
 
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
-            RpcPush(edgeIndex, triggeringPlayer);
+            RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
 
             // Set spin hit on player, for event logger
             triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
