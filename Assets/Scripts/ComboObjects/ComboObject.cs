@@ -345,7 +345,7 @@ public class ComboObject : NetworkBehaviour
             int power = triggeringPlayer.GetComponent<Player>().spinPower;
             Debug.Log("power: " + power);
 
-            int newTravelDistanceInHexes = power + 2;
+            int newTravelDistanceInHexes = power + 1;
 
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too

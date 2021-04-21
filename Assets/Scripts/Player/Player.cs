@@ -280,47 +280,59 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public int spinPower = 0;
+    public int spinPower = 1;
+    private float startSpinTime = 0f;
+    public float spinChargeTime = 0f;
+    private bool spinHeld = false;
 
-    float startSpinTime = 0f;
-    float spinChargeTime = 0f;
-
-    bool held = false;
+    [SerializeField] private float[] spinTimings = {0.5f, 1.0f, 1.5f};
+    [SerializeField] private int[] spinPowerDist = {1, 2, 3};
+    [SerializeField] private float spinScalar = 1f;
 
     [Client]
     public void ListenForSpinning()
     {
+        if (!canSpin) return;
+
         if (Input.GetKeyDown(spinKey))
         {
+            spinScalar = 0.5f;
             startSpinTime = Time.time;
-            held = true;
+            spinHeld = true;
 
         }
 
-        if (Input.GetKey(spinKey)) {
+        if (Input.GetKey(spinKey) && spinHeld && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
             spinChargeTime += Time.deltaTime;
         }
 
-        if (Input.GetKeyUp(spinKey))
+        if (Input.GetKeyUp(spinKey) && spinHeld)
         {
             Debug.Log("test spin time: " + spinChargeTime);
 
-            if (spinChargeTime < 0.5f)
+            for (int i = 0; i < spinTimings.Length; i++)
             {
-                spinPower = 0;
-            } else if (spinChargeTime < 1.0f)
-            {
-                spinPower = 1;
-            } else if (spinChargeTime >= 1.0f)
-            {
-                spinPower = 2;
+                // If maximum power, dont need to check timing
+                if (i == spinTimings.Length - 1)
+                {
+                    spinPower = spinPowerDist[i];
+                    break;
+                }
+
+                // Set power in ascending order
+                if (spinChargeTime < spinTimings[i])
+                {
+                    spinPower = spinPowerDist[i];
+                    break;
+                }
             }
 
             ExitInvincibility();
             CmdSpin(spinPower);
 
+            spinScalar = 1f;
             spinChargeTime = 0f;
-            held = true;
+            spinHeld = false;
         }
 
     }
@@ -532,7 +544,6 @@ public class Player : NetworkBehaviour
                 FindObjectOfType<AudioManager>().PlaySound("playerSpin");
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
-                this.spinPower = 0;
                 canSpin = true;
             }
         }
@@ -577,7 +588,7 @@ public class Player : NetworkBehaviour
         spinHitbox.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinHitboxDuration);
         spinHitbox.gameObject.SetActive(false);
-        
+
         spinPVP.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinHitboxDuration);
         spinPVP.gameObject.SetActive(false);
@@ -685,7 +696,7 @@ public class Player : NetworkBehaviour
                 ghostModel.transform.rotation = rotation;
             }
 
-            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
+            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * spinScalar * Time.deltaTime);
             
             this.timeSinceSlowed += Time.deltaTime;
             if (this.timeSinceSlowed > slowTimeCheckInterval)
