@@ -98,6 +98,7 @@ public class Player : NetworkBehaviour
     private float timeSinceSludged = 0f;
     private float sludgedDuration = 0f;  // set by the sludge object
     public float slowTimeCheckInterval = 0.05f;
+    public GameObject sludgeVFX;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -633,6 +634,9 @@ public class Player : NetworkBehaviour
             }
         }
 
+
+        this.timeSinceSlowed += Time.deltaTime;
+        timeSinceSludged -= Time.deltaTime;
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         { 
@@ -648,18 +652,21 @@ public class Player : NetworkBehaviour
                 ghostModel.transform.rotation = rotation;
             }
 
-            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
+            if (timeSinceSludged < 0)
+            {
+                sludgedScalar = 1.0f;
+                if (sludgeVFX.activeSelf)
+                {
+                    sludgeVFX.SetActive(false);
+                }
+            }
             
-            this.timeSinceSlowed += Time.deltaTime;
             if (this.timeSinceSlowed > slowTimeCheckInterval)
             {
                 slowScalar = 1.0f;
             }
-            timeSinceSludged -= Time.deltaTime;
-            if (timeSinceSludged < 0)
-            {
-                sludgedScalar = 1.0f;
-            }
+            
+            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
             
         }
     }
@@ -907,6 +914,7 @@ public class Player : NetworkBehaviour
         this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;
+        sludgeVFX.SetActive(true);
     }
     
     public void SetSpeedScalar(float val)
