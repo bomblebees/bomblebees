@@ -25,10 +25,10 @@ public class SludgeObject : TickObject
             {
                 this.EarlyProc();
             }
-            // else if (_root.Equals("Laser Object(Clone)"))
-            // {
-            //     this.EarlyProc();
-            // }
+            else if (_root.Equals("Laser Object(Clone)"))
+            {
+                this.EarlyProc();
+            }
             // else if (_root.Equals("Blink Object(Clone)"))
             // {
             //     this.EarlyProc();
