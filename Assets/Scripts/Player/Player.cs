@@ -377,8 +377,6 @@ public class Player : NetworkBehaviour
 
         if (Input.GetKeyUp(spinKey) && spinHeld)
         {
-            Debug.Log("test spin time: " + spinChargeTime);
-
             for (int i = 0; i < spinTimings.Length; i++)
             {
                 // If maximum power, dont need to check timing
