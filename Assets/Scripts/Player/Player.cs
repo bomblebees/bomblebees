@@ -226,8 +226,6 @@ public class Player : NetworkBehaviour
 
             if (sludgeEndAnim > -40f)
             {
-
-                Debug.Log("hello?");
                 sludgeEndAnim -= Time.deltaTime * 20f; // temp
                 playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
             }
