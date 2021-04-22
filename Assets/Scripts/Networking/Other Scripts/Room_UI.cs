@@ -70,11 +70,7 @@ public class Room_UI : MonoBehaviour
 
         mainMenuUI.gameObject.SetActive(false);
 
-        if (matchmaker)
-        {
-            lobbyName.text = matchmaker.GetLobbyName();
-            matchmaker.OnMirrorSetStatus("In Lobby");
-        }
+        if (matchmaker) lobbyName.text = matchmaker.GetLobbyName();
 
         // Cache start button components
         _buttonStartButton = buttonStart.GetComponent<Button>();
@@ -103,7 +99,6 @@ public class Room_UI : MonoBehaviour
     public void OnStartButtonClick()
     {
         EventStartButtonClicked?.Invoke();
-        matchmaker.OnMirrorSetStatus("In Game");
     }
 
     public void OnReadyButtonClick()
