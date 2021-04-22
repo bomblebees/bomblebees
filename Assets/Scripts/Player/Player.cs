@@ -636,7 +636,7 @@ public class Player : NetworkBehaviour
                 FindObjectOfType<AudioManager>().PlaySound("playerSpin");
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
-                canSpin = true;
+                if (sludgeEffectEnded) canSpin = true;
             }
         }
     }
@@ -1041,6 +1041,7 @@ public class Player : NetworkBehaviour
         if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
         else CmdApplySludgeSlow(slowRate, slowDur);
 
+        spinChargeTime = 0;
         this.canSpin = false;
     }
 
