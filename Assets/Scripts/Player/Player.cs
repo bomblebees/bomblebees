@@ -100,6 +100,8 @@ public class Player : NetworkBehaviour
     private float sludgeEndAnim = -40f;
     // private float timeSinceSludgedEnd = -40f;
     public float timeSinceSludgedEndDur = 0f;
+    private bool sludgeEffectEnded = false;
+    private bool sludgeEffectStarted = false;
 
     public float slowTimeCheckInterval = 0.05f;
     public GameObject sludgeVFX;
@@ -201,6 +203,37 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
+
+        if (timeSinceSludged < 0 && sludgeEffectStarted)
+        {
+            sludgeEffectStarted = false;
+            CmdSetSludgeEffectEnded(true);
+        }
+
+        if (sludgeEffectEnded)
+        {
+            /* SLUDGE EFFECT ENDS HERE */
+            // start coroutine
+            // timeSinceSludgedEnd = -4f;
+            // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -40f);
+
+            sludgedScalar = 1.0f;
+            if (sludgeVFX.activeSelf)
+            {
+                sludgeVFX.SetActive(false);
+                this.canSpin = true;
+            }
+
+            if (sludgeEndAnim > -40f)
+            {
+
+                Debug.Log("hello?");
+                sludgeEndAnim -= Time.deltaTime * 20f; // temp
+                playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
+            }
+        }
+
+
         if (!isLocalPlayer) return;
 
         if (isDead) return; // if dead, disable all player updates
@@ -224,32 +257,24 @@ public class Player : NetworkBehaviour
         {
             canMove = true;
         }
-        
-        if (timeSinceSludged < 0)
-        {
-            /* SLUDGE EFFECT ENDS HERE */
-            // start coroutine
-            // timeSinceSludgedEnd = -4f;
-            // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -40f);
 
-            sludgedScalar = 1.0f;
-            if (sludgeVFX.activeSelf)
-            {
-                sludgeVFX.SetActive(false);
-                this.canSpin = true;
-            }
-        }
-        
-        if (sludgeEndAnim > -40f && timeSinceSludged < 0)
-        {
-            sludgeEndAnim -= Time.deltaTime * 20f; // temp
-            playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
-        }
+        //Debug.Log("tme sine cludge" + timeSinceSludged);
+
 
         if (this.timeSinceSlowed > slowTimeCheckInterval)
         {
             slowScalar = 1.0f;
         }
+    }
+
+    [Command] public void CmdSetSludgeEffectEnded(bool cond)
+    {
+        RpcSetSludgeEffectEnded(cond);
+    }
+
+    [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
+    {
+        sludgeEffectEnded = cond;
     }
 
     private void DebugMode()
@@ -1011,6 +1036,13 @@ public class Player : NetworkBehaviour
     
     public void ApplySludgeSlow(float slowRate, float slowDur)
     {
+        if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
+        else CmdApplySludgeSlow(slowRate, slowDur);
+    }
+
+    [Command] public void CmdApplySludgeSlow(float slowRate, float slowDur) { RpcApplySludgeSlow(slowRate, slowDur); }
+    [ClientRpc] public void RpcApplySludgeSlow(float slowRate, float slowDur)
+    {
         /* SLUDGE STATUS EFFECT STARTS HERE*/
         sludgeEndAnim = -3f;
         playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
@@ -1019,6 +1051,8 @@ public class Player : NetworkBehaviour
         this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;
+        this.sludgeEffectStarted = true;
+        this.sludgeEffectEnded = false;
         sludgeVFX.SetActive(true);
         this.canSpin = false;
         /* APPLY EFFECTS THAT HAPPEN ONCE PER SLUDGE-EFFECT HERE */
@@ -1026,7 +1060,7 @@ public class Player : NetworkBehaviour
         {
         }
     }
-    
+
     public void SetSpeedScalar(float val)
     {
         this.slowScalar = val;
