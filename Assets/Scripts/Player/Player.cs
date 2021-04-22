@@ -416,17 +416,21 @@ public class Player : NetworkBehaviour
                     break;
                 }
             }
-
             ExitInvincibility();
             CmdSpin(spinPower);
 
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
-            spinScalar = 1f;
-            spinChargeTime = 0f;
-            spinHeld = false;
+            ResetSpinCharge();
         }
 
+    }
+
+    public void ResetSpinCharge()
+    {
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
+        spinScalar = 1f;
+        spinChargeTime = 0f;
+        spinHeld = false;
     }
 
 
@@ -1041,7 +1045,7 @@ public class Player : NetworkBehaviour
         if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
         else CmdApplySludgeSlow(slowRate, slowDur);
 
-        spinChargeTime = 0;
+        ResetSpinCharge();
         this.canSpin = false;
     }
 
