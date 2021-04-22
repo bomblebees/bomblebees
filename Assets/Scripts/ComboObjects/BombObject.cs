@@ -35,6 +35,10 @@ public class BombObject : TickObject
             { 
                 this.EarlyProc();
             }
+            else if (_root.Equals("Plasma Object(Clone)"))
+            { 
+                this.EarlyProc();
+            }
         }
     }
 }
