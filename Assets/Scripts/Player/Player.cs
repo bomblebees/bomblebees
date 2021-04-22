@@ -226,8 +226,6 @@ public class Player : NetworkBehaviour
 
             if (sludgeEndAnim > -40f)
             {
-
-                Debug.Log("hello?");
                 sludgeEndAnim -= Time.deltaTime * 20f; // temp
                 playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
             }
@@ -1042,6 +1040,8 @@ public class Player : NetworkBehaviour
     {
         if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
         else CmdApplySludgeSlow(slowRate, slowDur);
+
+        this.canSpin = false;
     }
 
     [Command] public void CmdApplySludgeSlow(float slowRate, float slowDur) { RpcApplySludgeSlow(slowRate, slowDur); }
@@ -1058,7 +1058,6 @@ public class Player : NetworkBehaviour
         this.sludgeEffectStarted = true;
         this.sludgeEffectEnded = false;
         sludgeVFX.SetActive(true);
-        this.canSpin = false;
         /* APPLY EFFECTS THAT HAPPEN ONCE PER SLUDGE-EFFECT HERE */
         if (timeSinceSludged > 0)
         {
