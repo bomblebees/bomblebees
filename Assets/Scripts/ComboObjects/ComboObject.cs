@@ -5,6 +5,7 @@ using Mirror;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 // Required Children:
 // - VFX
@@ -17,6 +18,7 @@ public class ComboObject : NetworkBehaviour
     public GameObject hitBox;
     public Collider collider;
     [SerializeField] public GameObject SFX;
+    public Image bombRadialTimerImage;
     
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)] public float travelDistanceInHexes = 4;
@@ -410,9 +412,15 @@ public class ComboObject : NetworkBehaviour
     protected virtual void StepFillShader()
     {
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
+
+        
+        bombRadialTimerImage.fillAmount = 1 - ((fillShaderVal + 0.51f) / (1 + (1 - fillShaderRatio)));
+
+        //Debug.Log(startupDelay);
+
         fillShaderVal += fillShaderRate * Time.deltaTime;
     }
-    
+
     protected virtual float RoundAngleToHex(float angle)
         {
             float remainder = angle % 60;
