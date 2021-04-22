@@ -9,10 +9,13 @@ public class RoundTimer : MonoBehaviour
     [Header("Start Round")]
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private Image timerRing;
+    [SerializeField] private float flashUnderSeconds = 10f;
 
     private bool timerStarted = false;
     private float roundDuration = 0f;
     private float currentTime = 0f;
+
+    private bool timerFlashing = false;
 
     private void Update()
     {
@@ -22,6 +25,11 @@ public class RoundTimer : MonoBehaviour
             {
                 Debug.Log("round finished");
                 timerStarted = false;
+                timerText.gameObject.GetComponent<FlashTextTween>().StopFlashContinuous();
+            } else if (roundDuration - currentTime < flashUnderSeconds && !timerFlashing)
+            {
+                timerText.gameObject.GetComponent<FlashTextTween>().FlashContinuous();
+                timerFlashing = true;
             }
 
             timerText.text = (roundDuration - currentTime).ToString("F1");
