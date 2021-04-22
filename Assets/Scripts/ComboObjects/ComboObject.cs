@@ -52,11 +52,11 @@ public class ComboObject : NetworkBehaviour
 
     // player who placed the bomb (set in Player.cs, SERVER only variable)
     protected GameObject ownerPlayer;
-    [Server] public void SetOwnerPlayer(GameObject p) { 
+    public void SetOwnerPlayer(GameObject p) { 
         ownerPlayer = p;
         ownerIsQueen = p.GetComponent<Player>().isQueen; 
     }
-    [Server] public GameObject GetOwnerPlayer() { return ownerPlayer; }
+    public GameObject GetOwnerPlayer() { return ownerPlayer; }
 
     public virtual void _Start(GameObject player)
     {
@@ -402,9 +402,9 @@ public class ComboObject : NetworkBehaviour
     // To be called in TickObject and TriggerObject individually
     protected virtual void ReadyFillShader()
     {
-        if (ownerIsQueen) 
+        if (ownerIsQueen)
             fillShaderRate = 1 / (queenStartupDelay * fillShaderRatio);
-        else 
+        else
             fillShaderRate = 1 / (startupDelay * fillShaderRatio);
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
     }
@@ -412,11 +412,8 @@ public class ComboObject : NetworkBehaviour
     protected virtual void StepFillShader()
     {
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
-
         
         bombRadialTimerImage.fillAmount = 1 - ((fillShaderVal + 0.51f) / (1 + (1 - fillShaderRatio)));
-
-        //Debug.Log(startupDelay);
 
         fillShaderVal += fillShaderRate * Time.deltaTime;
     }
