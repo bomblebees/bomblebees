@@ -43,6 +43,7 @@ public class Matchmaking : MonoBehaviour
         if (SteamMatchmaking.GetLobbyMemberData(currentLobby, SteamUser.GetSteamID(), "PlayerState") == "Ready")
         {
             SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "InGame");
+            SteamMatchmaking.SetLobbyData(currentLobby, "gameStatus", "In Game");
 
             // Change to game scene
             networkManager.ServerChangeScene(networkManager.GameplayScene);
@@ -72,11 +73,15 @@ public class Matchmaking : MonoBehaviour
         OnLobbyCreatedCallResult.Set(handle);
     }
 
+    public void OnMirrorSetStatus(string status)
+    {
+        SteamMatchmaking.SetLobbyData(currentLobby, "gameStatus", status);
+    }
+
     public void OnMirrorLobbyCreated()
     {
         // Start Mirror host
         networkManager.StartHost();
-
     }
 
     public void OnMirrorLobbyEnter(LobbyEnter_t callback)
@@ -101,13 +106,15 @@ public class Matchmaking : MonoBehaviour
 
     public void SetInitiatedLobbyData()
     {
-        SteamMatchmaking.SetLobbyData(currentLobby, "LobbyVersion", lobbyVersion);
+        SteamMatchmaking.SetLobbyData(currentLobby, "LobbyVersion", Application.version);
         SteamMatchmaking.SetLobbyData(currentLobby, LOBBY_MATCHING_KEY, LOBBY_MATCHING_VALUE);
 
         SteamMatchmaking.SetLobbyData(
             currentLobby,
             HostAddressKey,
             SteamUser.GetSteamID().ToString());
+
+        SteamMatchmaking.SetLobbyData(currentLobby, "gameStatus", "In Lobby");
 
         if (!string.IsNullOrEmpty(inputLobbyName.text))
         {
@@ -130,7 +137,8 @@ public class Matchmaking : MonoBehaviour
 
     public void uiJoinLobby(ulong l)
     {
-        if (lobbyVersion != SteamMatchmaking.GetLobbyData((CSteamID)l, "LobbyVersion"))
+        if (lobbyVersion != SteamMatchmaking.GetLobbyData((CSteamID)l, "LobbyVersion")
+            || SteamMatchmaking.GetLobbyData((CSteamID)l, "gameStatus") == "In Game")
         {
             return;
         }
@@ -174,7 +182,7 @@ public class Matchmaking : MonoBehaviour
         MainMenu_UI menu = MainMenu_UI.singleton;
         menu.gameObject.SetActive(true);
 
-        GetLobbies(); // refresh lobbies
+        PresentLobbies(); // refresh lobbies
     }
 
     public string GetLobbyName()
@@ -299,11 +307,15 @@ public class Matchmaking : MonoBehaviour
             RowComponents rc = r.GetComponent<RowComponents>();
             rc.txtLobbyName.text = SteamMatchmaking.GetLobbyData(l, "LobbyName");
             rc.txtNumMem.text = SteamMatchmaking.GetNumLobbyMembers(l) + " / " + (SteamMatchmaking.GetLobbyMemberLimit(l) - 1);
-            rc.txtVer.text = "Ver.\n" + SteamMatchmaking.GetLobbyData(l, "LobbyVersion");
+            rc.txtVer.text = SteamMatchmaking.GetLobbyData(l, "LobbyVersion");
+            rc.txtStatus.text = SteamMatchmaking.GetLobbyData(l, "gameStatus");
+
+
 
             rc.button1.interactable = true;
 
-            if (SteamMatchmaking.GetNumLobbyMembers(l) == SteamMatchmaking.GetLobbyMemberLimit(l) - 1)
+            if (SteamMatchmaking.GetNumLobbyMembers(l) == SteamMatchmaking.GetLobbyMemberLimit(l) - 1
+                || SteamMatchmaking.GetLobbyData(l, "gameStatus") == "In Game")
             {
                 rc.button1.interactable = false;
             }
