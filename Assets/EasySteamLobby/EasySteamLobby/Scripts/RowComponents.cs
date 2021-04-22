@@ -9,5 +9,6 @@ public class RowComponents : MonoBehaviour
     public TMP_Text txtLobbyName;
     public TMP_Text txtNumMem;
     public TMP_Text txtVer;
+    public TMP_Text txtStatus;
     public Button button1;
 }

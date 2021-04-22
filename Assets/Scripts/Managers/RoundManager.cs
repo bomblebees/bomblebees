@@ -27,6 +27,9 @@ public class RoundManager : NetworkBehaviour
     [SerializeField] public int startGameFreezeDuration = 5;
     [SerializeField] public int endGameFreezeDuration = 5;
 
+    [SerializeField] public bool useRoundTimer = true;
+    [SerializeField] public float roundDuration = 60.0f;
+
     [NonSerialized] public int playersConnected = 0;
     [NonSerialized] public int totalRoomPlayers;
 
@@ -126,6 +129,14 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
+    public IEnumerator StartRoundTimer()
+    {
+        yield return new WaitForSeconds(roundDuration);
+        EndRound();
+        Debug.Log("round finished (round manager)");
+    }
+
+    [Server]
     public void EndRound()
     {
         // Append all player objects to player list for event manager
@@ -163,6 +174,7 @@ public class RoundManager : NetworkBehaviour
         }
         aliveCount = alivePlayers.Count;
         UpdateGridsAliveCount(0, aliveCount);
+        if (useRoundTimer) StartCoroutine(StartRoundTimer());
     }
 
     [Server]

@@ -5,6 +5,7 @@ using Mirror;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 // Required Children:
 // - VFX
@@ -17,6 +18,7 @@ public class ComboObject : NetworkBehaviour
     public GameObject hitBox;
     public Collider collider;
     [SerializeField] public GameObject SFX;
+    public Image bombRadialTimerImage;
     
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)] public float travelDistanceInHexes = 4;
@@ -50,11 +52,11 @@ public class ComboObject : NetworkBehaviour
 
     // player who placed the bomb (set in Player.cs, SERVER only variable)
     protected GameObject ownerPlayer;
-    [Server] public void SetOwnerPlayer(GameObject p) { 
+    public void SetOwnerPlayer(GameObject p) { 
         ownerPlayer = p;
         ownerIsQueen = p.GetComponent<Player>().isQueen; 
     }
-    [Server] public GameObject GetOwnerPlayer() { return ownerPlayer; }
+    public GameObject GetOwnerPlayer() { return ownerPlayer; }
 
     public virtual void _Start(GameObject player)
     {
@@ -263,8 +265,9 @@ public class ComboObject : NetworkBehaviour
     }
 
     [ClientRpc]
-    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer)
+    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, int newTravelDistance)
     {
+        this.travelDistanceInHexes = newTravelDistance;
         this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
         Push(edgeIndex, triggeringPlayer);
     }
@@ -338,10 +341,17 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
-            triggeringPlayer = other.transform.parent.gameObject; 
+            triggeringPlayer = other.transform.parent.gameObject;
+
+            // Adjust travel distance based on spin power
+            int power = triggeringPlayer.GetComponent<Player>().spinPower;
+            Debug.Log("power: " + power);
+
+            int newTravelDistanceInHexes = power + 1;
+
             NotifyOccupiedTile(false); // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
-            RpcPush(edgeIndex, triggeringPlayer);
+            RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
 
             // Set spin hit on player, for event logger
             triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
@@ -392,9 +402,9 @@ public class ComboObject : NetworkBehaviour
     // To be called in TickObject and TriggerObject individually
     protected virtual void ReadyFillShader()
     {
-        if (ownerIsQueen) 
+        if (ownerIsQueen)
             fillShaderRate = 1 / (queenStartupDelay * fillShaderRatio);
-        else 
+        else
             fillShaderRate = 1 / (startupDelay * fillShaderRatio);
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
     }
@@ -402,9 +412,12 @@ public class ComboObject : NetworkBehaviour
     protected virtual void StepFillShader()
     {
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);  // Fill shader
+        
+        bombRadialTimerImage.fillAmount = 1 - ((fillShaderVal + 0.51f) / (1 + (1 - fillShaderRatio)));
+
         fillShaderVal += fillShaderRate * Time.deltaTime;
     }
-    
+
     protected virtual float RoundAngleToHex(float angle)
         {
             float remainder = angle % 60;

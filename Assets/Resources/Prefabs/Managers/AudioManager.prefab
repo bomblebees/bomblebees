@@ -49,37 +49,37 @@ MonoBehaviour:
   sounds:
   - name: playerSwap
     clip: {fileID: 8300000, guid: c0be3e51f111a8745bbc0d47c67001f5, type: 3}
-    volume: 0.7
+    volume: 0.86
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
   - name: playerDeath
     clip: {fileID: 8300000, guid: 40fd7f284bbdb9349b4a75c01cba0064, type: 3}
-    volume: 0.6
+    volume: 0.75
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
   - name: playerSpin
     clip: {fileID: 8300000, guid: 2a0454a2dbffd0f478a067b477686f6a, type: 3}
-    volume: 0.45
+    volume: 0.7
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
   - name: playerRespawn
     clip: {fileID: 8300000, guid: 725d95cfb628efb409713a739574deb8, type: 3}
-    volume: 0.75
+    volume: 0.8
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
   - name: comboCreation
     clip: {fileID: 8300000, guid: ea81a75b060b34b48b0996dc23deb882, type: 3}
-    volume: 0.75
+    volume: 0.6
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
   - name: bombPlace
     clip: {fileID: 8300000, guid: 38673dc6e01f7564eb9676816a8b89c9, type: 3}
-    volume: 0.75
+    volume: 0.55
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
@@ -91,7 +91,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: laserCharge
     clip: {fileID: 8300000, guid: 409a07cddb4a595419f7cb2ce26c5c0d, type: 3}
-    volume: 0.75
+    volume: 0.8
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
@@ -101,9 +101,33 @@ MonoBehaviour:
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
+  - name: spinCharge2
+    clip: {fileID: 8300000, guid: d8a29752271b6a7468280bf388ec00e9, type: 3}
+    volume: 0.9
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: spinCharge3
+    clip: {fileID: 8300000, guid: 06651819275005f4a9e2c21742665b22, type: 3}
+    volume: 0.9
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: spinCharge4
+    clip: {fileID: 8300000, guid: f447f9df2d74f1b4b9b4efd484aad3c6, type: 3}
+    volume: 0.9
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
   - name: error1
     clip: {fileID: 8300000, guid: 4716672c8b455e143990b45f12560dd8, type: 3}
-    volume: 0.75
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: bombrotation
+    clip: {fileID: 8300000, guid: 00851c42565cf7a4087a38a08b78bf7f, type: 3}
+    volume: 0.5
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}

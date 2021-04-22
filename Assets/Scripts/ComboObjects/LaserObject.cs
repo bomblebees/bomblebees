@@ -13,7 +13,9 @@ public class LaserObject : TriggerObject
     private float targetAngle = 0f;
     private float startAngle;
     public float rotateLerpRate = 0.15f;
-    
+
+    public GameObject arrowUI;
+
     protected override void StartDangerAnim()
     {
         this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
@@ -46,6 +48,7 @@ public class LaserObject : TriggerObject
             startAngle += 360f;
         }
         print(startAngle+" GOING TO "+targetAngle);
+
         // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
         // targetAngle = angle;
         isRotating = true;

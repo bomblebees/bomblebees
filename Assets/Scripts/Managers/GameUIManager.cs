@@ -7,6 +7,7 @@ public class GameUIManager : NetworkBehaviour
 {
     // Game UIs
     [SerializeField] private RoundStartEnd roundStartEnd = null;
+    [SerializeField] private RoundTimer roundTimer = null;
     [SerializeField] private LivesUI livesUI = null;
     [SerializeField] private MessageFeed messageFeed = null;
     [SerializeField] private Hotbar hotbar = null;
@@ -74,6 +75,8 @@ public class GameUIManager : NetworkBehaviour
     [Client] public void ClientStartRound()
     {
         StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
+        StartCoroutine(roundTimer.InitTimer(roundManager.roundDuration, roundManager.startGameFreezeDuration));
+
     }
     [Client] public void ClientEndRound()
     {

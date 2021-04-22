@@ -148,7 +148,7 @@ public class MessageFeed : MonoBehaviour
             case 'b': return "<color=#00D9FF>Blink Combo</color>";
             case 'g': return "<color=#17E575>Plasma Combo</color>";
             case 'y': return "<color=#F9FF23>Laser Combo</color>";
-            case 'r': return "unimpl";
+            case 'r': return "<color=#E21616>Big Bomb</color>";
             case 'p': return "<color=#F153FF>Sludge Combo</color>";
             case 'w': return "<color=#B2B2B2>Queen Bee Combo</color>";
             default: return "Error: Key " + key + " not found";

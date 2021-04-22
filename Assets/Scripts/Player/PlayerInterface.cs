@@ -16,6 +16,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private Image[] stackUI = new Image[3];
     [SerializeField] private RawImage hexUI;
     [SerializeField] private Image bombCooldownFilter;
+    [SerializeField] public Image spinChargeBar;
     private float bombHudTimer = 0;
 
     [Header("User Interface")]
@@ -57,6 +58,18 @@ public class PlayerInterface : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
+        UpdateSpinChargeBar();
+        UpdateBombFilterCooldown();
+    }
+
+    public void UpdateSpinChargeBar()
+    {
+        float[] spinTimes = this.GetComponent<Player>().spinTimings;
+        spinChargeBar.fillAmount = player.spinChargeTime / spinTimes[spinTimes.Length - 2];
+    }
+
+    public void UpdateBombFilterCooldown()
+    {
         if (bombHudTimer > 0)
         {
             float totalDuration = this.GetComponent<Player>().defaultBombCooldown;

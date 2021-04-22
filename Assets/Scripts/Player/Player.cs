@@ -97,7 +97,14 @@ public class Player : NetworkBehaviour
     private float sludgedScalar = 1f;
     private float timeSinceSludged = 0f;
     private float sludgedDuration = 0f;  // set by the sludge object
+    private float sludgeEndAnim = -40f;
+    // private float timeSinceSludgedEnd = -40f;
+    public float timeSinceSludgedEndDur = 0f;
+    private bool sludgeEffectEnded = true;
+    private bool sludgeEffectStarted = false;
+
     public float slowTimeCheckInterval = 0.05f;
+    public GameObject sludgeVFX;
 
     // reference to Animator, Network Animator components
     public Animator animator;
@@ -117,6 +124,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private int maxStackSize = 3;
     public readonly SyncList<char> itemStack = new SyncList<char>();
 
+    private GameObject playerMesh;
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
     [NonSerialized] public Quaternion rotation;
@@ -145,8 +153,8 @@ public class Player : NetworkBehaviour
         UpdateHeldHex(heldKey); // Initialize model
 
         // Set player color
-        GameObject mesh = playerModel.transform.GetChild(0).gameObject;
-        mesh.GetComponent<Renderer>().material.SetColor("_BaseColor", playerColor);
+        playerMesh = playerModel.transform.GetChild(0).gameObject;
+        playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
 
         itemStack.Callback += OnItemStackChange;
 
@@ -195,6 +203,35 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
+
+        if (timeSinceSludged < 0 && sludgeEffectStarted)
+        {
+            sludgeEffectStarted = false;
+            CmdSetSludgeEffectEnded(true);
+        }
+
+        if (sludgeEffectEnded)
+        {
+            /* SLUDGE EFFECT ENDS HERE */
+            // start coroutine
+            // timeSinceSludgedEnd = -4f;
+            // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -40f);
+
+            sludgedScalar = 1.0f;
+            if (sludgeVFX.activeSelf)
+            {
+                sludgeVFX.SetActive(false);
+                this.canSpin = true;
+            }
+
+            if (sludgeEndAnim > -40f)
+            {
+                sludgeEndAnim -= Time.deltaTime * 20f; // temp
+                playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
+            }
+        }
+
+
         if (!isLocalPlayer) return;
 
         if (isDead) return; // if dead, disable all player updates
@@ -218,6 +255,24 @@ public class Player : NetworkBehaviour
         {
             canMove = true;
         }
+
+        //Debug.Log("tme sine cludge" + timeSinceSludged);
+
+
+        if (this.timeSinceSlowed > slowTimeCheckInterval)
+        {
+            slowScalar = 1.0f;
+        }
+    }
+
+    [Command] public void CmdSetSludgeEffectEnded(bool cond)
+    {
+        RpcSetSludgeEffectEnded(cond);
+    }
+
+    [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
+    {
+        sludgeEffectEnded = cond;
     }
 
     private void DebugMode()
@@ -280,14 +335,102 @@ public class Player : NetworkBehaviour
         }
     }
 
+    public int spinPower = 1;
+    private float startSpinTime = 0f;
+    public float spinChargeTime = 0f;
+    private bool spinHeld = false;
+
+    [SerializeField] public float[] spinTimings = {0.5f, 1.0f, 1.5f, 2.0f};
+    [SerializeField] private int[] spinPowerDist = {1, 2, 3, 4};
+    [SerializeField] private float spinScalar = 1f;
+
+    // trash variables sry
+    private bool spinChargeLevel1Hit = false;
+    private bool spinChargeLevel2Hit = false;
+    private bool spinChargeLevel3Hit = false;
+
     [Client]
     public void ListenForSpinning()
     {
-        if (Input.GetKeyDown(spinKey))
-        {
-            ExitInvincibility();
-            CmdSpin();
+        if (!canSpin) return;
+
+        if (Input.GetKey(spinKey) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+            if (!spinHeld)
+            {
+                spinScalar = 0.5f;
+                startSpinTime = Time.time;
+
+                spinChargeLevel1Hit = false;
+                spinChargeLevel2Hit = false;
+                spinChargeLevel3Hit = false;
+
+                spinHeld = true;
+            }
+
+            spinChargeTime += Time.deltaTime;
+
+            // Play anims and sounds
+            if (!spinChargeLevel1Hit && spinChargeTime > spinTimings[0])
+            {
+                FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
+                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.4f);
+                spinChargeLevel1Hit = true;
+            }
+
+            if (!spinChargeLevel2Hit && spinChargeTime > spinTimings[1])
+            {
+                FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
+                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 15f);
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.8f);
+                spinChargeLevel2Hit = true;
+            }
+
+            if (!spinChargeLevel3Hit && spinChargeTime >= spinTimings[2])
+            {
+                FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
+                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 20f);
+                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 1.2f);
+                spinChargeLevel3Hit = true;
+            }
         }
+
+        if (Input.GetKeyUp(spinKey) && spinHeld)
+        {
+            for (int i = 0; i < spinTimings.Length; i++)
+            {
+                // If maximum power, dont need to check timing
+                if (i == spinTimings.Length - 1)
+                {
+                    spinPower = spinPowerDist[i];
+                    break;
+                }
+
+                // Set power in ascending order
+                if (spinChargeTime < spinTimings[i])
+                {
+                    spinPower = spinPowerDist[i];
+                    break;
+                }
+            }
+            ExitInvincibility();
+            CmdSpin(spinPower);
+
+            ResetSpinCharge();
+        }
+
+    }
+
+    public void ResetSpinCharge()
+    {
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
+        spinScalar = 1f;
+        spinChargeTime = 0f;
+        spinHeld = false;
     }
 
 
@@ -481,7 +624,7 @@ public class Player : NetworkBehaviour
         this.canSpin = val;
     }
 
-    public IEnumerator Spin()
+    public IEnumerator Spin(int spinPower)
     {
         if (canSpin)
         {
@@ -491,30 +634,31 @@ public class Player : NetworkBehaviour
             }
             else
             {
+                this.spinPower = spinPower;
                 StartCoroutine(HandleSpinHitbox());
                 StartCoroutine(HandleSpinAnim());
                 FindObjectOfType<AudioManager>().PlaySound("playerSpin");
                 canSpin = false;
                 yield return new WaitForSeconds(spinTotalCooldown);
-                canSpin = true;
+                if (sludgeEffectEnded) canSpin = true;
             }
         }
     }
 
     [Command(ignoreAuthority=true)]
-    void CmdSpin(NetworkConnectionToClient sender = null)
+    void CmdSpin(int spinPower, NetworkConnectionToClient sender = null)
     {
         // Spin for server
         if (canSpin) StartCoroutine(WaitSpinHit(sender.identity.gameObject));
-        StartCoroutine(Spin());
-        RpcSpin();
+        StartCoroutine(Spin(spinPower));
+        RpcSpin(spinPower);
     }
 
     [ClientRpc]
-    void RpcSpin()
+    void RpcSpin(int spinPower)
     {
         // Client will spin for all observers
-        StartCoroutine(Spin());
+        StartCoroutine(Spin(spinPower));
     }
 
     // Wait to check if spin hit a bomb
@@ -540,7 +684,7 @@ public class Player : NetworkBehaviour
         spinHitbox.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinHitboxDuration);
         spinHitbox.gameObject.SetActive(false);
-        
+
         spinPVP.gameObject.SetActive(true);
         yield return new WaitForSeconds(spinHitboxDuration);
         spinPVP.gameObject.SetActive(false);
@@ -633,6 +777,9 @@ public class Player : NetworkBehaviour
             }
         }
 
+
+        this.timeSinceSlowed += Time.deltaTime;
+        timeSinceSludged -= Time.deltaTime;
         Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
         if (direction != Vector3.zero)
         { 
@@ -648,19 +795,7 @@ public class Player : NetworkBehaviour
                 ghostModel.transform.rotation = rotation;
             }
 
-            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
-            
-            this.timeSinceSlowed += Time.deltaTime;
-            if (this.timeSinceSlowed > slowTimeCheckInterval)
-            {
-                slowScalar = 1.0f;
-            }
-            timeSinceSludged -= Time.deltaTime;
-            if (timeSinceSludged < 0)
-            {
-                sludgedScalar = 1.0f;
-            }
-            
+            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * spinScalar * Time.deltaTime);
         }
     }
 
@@ -749,8 +884,12 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(rotateKey))
         {
+			if (itemStack.Count > 1)
+			{
+				FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+			}
             CmdRotateItemStack();
-        }
+		}
     }
 
     [Command]
@@ -903,12 +1042,33 @@ public class Player : NetworkBehaviour
     
     public void ApplySludgeSlow(float slowRate, float slowDur)
     {
+        if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
+        else CmdApplySludgeSlow(slowRate, slowDur);
+
+        ResetSpinCharge();
+        this.canSpin = false;
+    }
+
+    [Command] public void CmdApplySludgeSlow(float slowRate, float slowDur) { RpcApplySludgeSlow(slowRate, slowDur); }
+    [ClientRpc] public void RpcApplySludgeSlow(float slowRate, float slowDur)
+    {
+        /* SLUDGE STATUS EFFECT STARTS HERE*/
+        sludgeEndAnim = -3f;
+        playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
+
         var slowFactor = 1 - slowRate;
         this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;
+        this.sludgeEffectStarted = true;
+        this.sludgeEffectEnded = false;
+        sludgeVFX.SetActive(true);
+        /* APPLY EFFECTS THAT HAPPEN ONCE PER SLUDGE-EFFECT HERE */
+        if (timeSinceSludged > 0)
+        {
+        }
     }
-    
+
     public void SetSpeedScalar(float val)
     {
         this.slowScalar = val;

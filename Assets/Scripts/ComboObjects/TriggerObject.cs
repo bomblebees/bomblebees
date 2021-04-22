@@ -17,11 +17,13 @@ public class TriggerObject : ComboObject
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
 
-    private bool stayPermanent = true; // Whether the deployable stays permanently until hit
+    public bool stayPermanent = true; // Whether the deployable stays permanently until hit
 
-    public override void OnStartServer()
+    public virtual void _Start(GameObject player)
     {
-        base.OnStartServer();
+        base._Start(player);
+        base.ReadyFillShader();
+        //base.OnStartServer();
         FindCenter();
         GoToCenter();
         NotifyOccupiedTile(true);

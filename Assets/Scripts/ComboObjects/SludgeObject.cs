@@ -13,4 +13,30 @@ public class SludgeObject : TickObject
         this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
         this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
+
+    protected override void OnTriggerEnter(Collider other)
+    {
+        base.OnTriggerEnter(other);
+        var gameObjHit = other.gameObject;
+        if (gameObjHit.CompareTag("ComboHitbox"))
+        {
+            var _root = gameObjHit.transform.root.name;
+            if (_root.Equals("Bomb Object(Clone)"))
+            {
+                this.EarlyProc();
+            }
+            else if (_root.Equals("Laser Object(Clone)"))
+            {
+                this.EarlyProc();
+            }
+            // else if (_root.Equals("Blink Object(Clone)"))
+            // {
+            //     this.EarlyProc();
+            // }
+            // else if (_root.Equals("Plasma Object(Clone)"))
+            // {
+            //     this.EarlyProc();
+            // }
+        }
+    }
 }

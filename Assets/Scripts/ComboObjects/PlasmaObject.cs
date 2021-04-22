@@ -12,6 +12,7 @@ public class PlasmaObject : TriggerObject
     private bool hitboxEnabled = false;
     private Vector3 targetDir;
     private float projectileSpeed = 3f;
+    public float breakdownDuration = 3f;
     [SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
     public float ignoreTriggererDuration = 1f;
@@ -74,5 +75,31 @@ public class PlasmaObject : TriggerObject
         // this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = targetDir;
         // this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles =
         //     new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex] + 270f);
+    }
+    
+    
+    protected override void OnTriggerEnter(Collider other)
+    {
+        base.OnTriggerEnter(other);
+        var gameObjHit = other.gameObject;
+        if (gameObjHit.CompareTag("ComboHitbox"))
+        {
+            var _root = gameObjHit.transform.root.name;
+            if (_root.Equals("Bomb Object(Clone)"))
+            {
+                StartCoroutine(Breakdown());
+            }
+        }
+    }
+    
+    public IEnumerator Breakdown()
+    {
+        didEarlyEffects = true;
+        StartCoroutine(DisableObjectCollider());
+        StartCoroutine(DisableObjectModel());
+        NotifyOccupiedTile(false);
+        yield return new WaitForSeconds(breakdownDuration);
+        // play breakdown anim here
+        DestroySelf();
     }
 }
