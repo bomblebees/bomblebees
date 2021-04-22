@@ -100,7 +100,7 @@ public class Player : NetworkBehaviour
     private float sludgeEndAnim = -40f;
     // private float timeSinceSludgedEnd = -40f;
     public float timeSinceSludgedEndDur = 0f;
-    private bool sludgeEffectEnded = false;
+    private bool sludgeEffectEnded = true;
     private bool sludgeEffectStarted = false;
 
     public float slowTimeCheckInterval = 0.05f;
