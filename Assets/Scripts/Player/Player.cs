@@ -882,8 +882,12 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(rotateKey))
         {
+			if (itemStack.Count > 1)
+			{
+				FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+			}
             CmdRotateItemStack();
-        }
+		}
     }
 
     [Command]
