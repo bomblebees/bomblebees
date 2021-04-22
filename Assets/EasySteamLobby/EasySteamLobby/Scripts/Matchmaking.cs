@@ -137,8 +137,7 @@ public class Matchmaking : MonoBehaviour
 
     public void uiJoinLobby(ulong l)
     {
-        if (lobbyVersion != SteamMatchmaking.GetLobbyData((CSteamID)l, "LobbyVersion")
-            || SteamMatchmaking.GetLobbyData((CSteamID)l, "gameStatus") == "In Game")
+        if (SteamMatchmaking.GetLobbyData((CSteamID)l, "gameStatus") == "In Game")
         {
             return;
         }
