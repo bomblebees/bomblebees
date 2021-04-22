@@ -346,7 +346,7 @@ MonoBehaviour:
   tileUnderneath: {fileID: 0}
   vfxDuration: 4
   sfxDuration: 4
-  hitboxDuration: 0.1
+  hitboxDuration: 4
   lingerDuration: 8
   startupDelay: 1
   queenStartupDelay: 0
@@ -876,7 +876,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7138946257445458459}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -887,7 +887,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: cafd457a6acfbd84597356f225b00f98, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -999,10 +999,30 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4969612749365553990, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4969612749365553991, guid: 31bbba3f89fb12e47841e5a59be3f32c,
         type: 3}
       propertyPath: moveWithTransform
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969612749365553991, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969612749365553991, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.atime0
+      value: 56476
+      objectReference: {fileID: 0}
+    - target: {fileID: 4969612749365553991, guid: 31bbba3f89fb12e47841e5a59be3f32c,
+        type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.ctime0
+      value: 55898
       objectReference: {fileID: 0}
     - target: {fileID: 4969612749365554008, guid: 31bbba3f89fb12e47841e5a59be3f32c,
         type: 3}

@@ -5078,7 +5078,6 @@ MonoBehaviour:
   gravityObject: {fileID: 3054166276888100986, guid: 6d52e75544367dd4cbf619680eaebc4e,
     type: 3}
   timeSinceSlowed: 0
-  sludgedScalar: 0.2
   timeSinceSludgedEndDur: 0
   slowTimeCheckInterval: 0.05
   sludgeVFX: {fileID: 2841311880343033178}
@@ -36604,6 +36603,41 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[2]
       value: 
       objectReference: {fileID: 2100000, guid: 836548c5e846c2b42a5b3cd4c8dcd681, type: 2}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.259962
+      objectReference: {fileID: 0}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -1.1641531e-10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.96561885
+      objectReference: {fileID: 0}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.000000058518108
+      objectReference: {fileID: 0}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.052649494
+      objectReference: {fileID: 0}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 30.136002
+      objectReference: {fileID: 0}
+    - target: {fileID: 4436805663696350335, guid: 37f3e26f15b559e439724ae350bd8a9a,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37f3e26f15b559e439724ae350bd8a9a, type: 3}
 --- !u!4 &4776731333535001757 stripped
