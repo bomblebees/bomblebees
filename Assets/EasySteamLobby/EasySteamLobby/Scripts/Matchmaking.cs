@@ -137,7 +137,8 @@ public class Matchmaking : MonoBehaviour
 
     public void uiJoinLobby(ulong l)
     {
-        if (lobbyVersion != SteamMatchmaking.GetLobbyData((CSteamID)l, "LobbyVersion"))
+        if (lobbyVersion != SteamMatchmaking.GetLobbyData((CSteamID)l, "LobbyVersion")
+            || SteamMatchmaking.GetLobbyData((CSteamID)l, "gameStatus") == "In Game")
         {
             return;
         }
@@ -313,7 +314,8 @@ public class Matchmaking : MonoBehaviour
 
             rc.button1.interactable = true;
 
-            if (SteamMatchmaking.GetNumLobbyMembers(l) == SteamMatchmaking.GetLobbyMemberLimit(l) - 1)
+            if (SteamMatchmaking.GetNumLobbyMembers(l) == SteamMatchmaking.GetLobbyMemberLimit(l) - 1
+                || SteamMatchmaking.GetLobbyData(l, "gameStatus") == "In Game")
             {
                 rc.button1.interactable = false;
             }
