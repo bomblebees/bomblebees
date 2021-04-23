@@ -94,15 +94,15 @@ public class PlayerInterface : NetworkBehaviour
         // WARN: lazy way to disable player after death, may still be able to place bombs
         //playerModelsAndVfx.SetActive(false); 
 
-        deathUI.SetActive(true);
-        yield return new WaitForSeconds(deathUItime);
-        deathUI.SetActive(false);
+        //deathUI.SetActive(true);
+        yield return new WaitForSeconds(0);
+        //deathUI.SetActive(false);
     }
 
     public void EnableGameOverUI()
     {
-        deathUI.SetActive(false);
-        gameOverUI.SetActive(true);
+        //deathUI.SetActive(false);
+        //gameOverUI.SetActive(true);
     }
 
 
