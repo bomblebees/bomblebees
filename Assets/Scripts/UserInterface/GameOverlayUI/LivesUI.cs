@@ -19,6 +19,7 @@ public class LivesUI : MonoBehaviour
     }
 
     [SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
+    [SerializeField] GameUIManager gameUIManager = null;
 
     public void EnableLivesUI(GameObject[] players)
     {

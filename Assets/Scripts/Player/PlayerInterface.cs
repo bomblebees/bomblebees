@@ -65,7 +65,7 @@ public class PlayerInterface : NetworkBehaviour
     public void UpdateSpinChargeBar()
     {
         float[] spinTimes = this.GetComponent<Player>().spinTimings;
-        spinChargeBar.fillAmount = player.spinChargeTime / spinTimes[spinTimes.Length - 2];
+        spinChargeBar.fillAmount = this.GetComponent<Player>().spinChargeTime / spinTimes[spinTimes.Length - 2];
     }
 
     public void UpdateBombFilterCooldown()

@@ -1405,6 +1405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85906c246a3a11a4a8755154adc205ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameUIManager: {fileID: 1505816159847837507}
   backHex: {fileID: 6869745576482231395}
   frontHex: {fileID: 7724297958842262069}
   swapDisabledEffect: {fileID: 1806132925267823509}
@@ -1542,7 +1543,7 @@ GameObject:
   - component: {fileID: 8430228255469937762}
   - component: {fileID: 2658447113656010620}
   m_Layer: 0
-  m_Name: TitleFeed_Canvas
+  m_Name: WarningFeed_Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1644,6 +1645,7 @@ MonoBehaviour:
     type: 3}
   messageFeedCanvas: {fileID: 2051151447084290424}
   messsageFeedAnchor: {fileID: 6674799925460988399}
+  maxMessages: 3
   fadeDelay: 4
 --- !u!1 &2184001570309079530
 GameObject:
@@ -1988,6 +1990,7 @@ MonoBehaviour:
   roundTimer: {fileID: 5311767239752000249}
   livesUI: {fileID: 2960523738965758250}
   messageFeed: {fileID: 3312680770878052239}
+  warningFeed: {fileID: 2658447113656010620}
   hotbar: {fileID: 1222881850713041098}
 --- !u!114 &7313398870296235083
 MonoBehaviour:
@@ -7187,6 +7190,7 @@ MonoBehaviour:
     type: 3}
   messageFeedCanvas: {fileID: 8484244340684492868}
   messsageFeedAnchor: {fileID: 3046251628530346145}
+  maxMessages: 5
   fadeDelay: 4
 --- !u!1 &8533518821498075454
 GameObject:
@@ -8063,7 +8067,7 @@ PrefabInstance:
     - target: {fileID: 84228145205705458, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7933164392646439457, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}
@@ -8093,7 +8097,7 @@ PrefabInstance:
     - target: {fileID: 7933164392646439457, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8688043872554924943, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}
@@ -8158,7 +8162,7 @@ PrefabInstance:
     - target: {fileID: 8688043872554924943, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 326
+      value: 213
       objectReference: {fileID: 0}
     - target: {fileID: 8688043872554924943, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}

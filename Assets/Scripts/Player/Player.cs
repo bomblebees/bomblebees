@@ -135,10 +135,9 @@ public class Player : NetworkBehaviour
     // Event manager singleton
     private EventManager eventManager;
 
-    // Added for easy referencing of local player from anywhere
-    public override void OnStartLocalPlayer()
+    //// Added for easy referencing of local player from anywhere
+    private void Awake()
     {
-        base.OnStartLocalPlayer();
         gameObject.name = "LocalPlayer";
     }
 

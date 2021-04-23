@@ -10,6 +10,7 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] private RoundTimer roundTimer = null;
     [SerializeField] private LivesUI livesUI = null;
     [SerializeField] private MessageFeed messageFeed = null;
+    [SerializeField] private MessageFeed warningFeed = null;
     [SerializeField] private Hotbar hotbar = null;
 
 
@@ -56,6 +57,8 @@ public class GameUIManager : NetworkBehaviour
         // Subscribe to client round events
         roundManager.EventRoundStart += ClientStartRound;
         roundManager.EventRoundEnd += ClientEndRound;
+
+        GameObject.Find("LocalPlayer").GetComponent<Health>().EventLivesChanged += ClientOnDamage;
     }
 
     // When a player loads into the game (on server)
@@ -187,5 +190,23 @@ public class GameUIManager : NetworkBehaviour
     }
 
     #endregion
+
+    [Client] public void ClientCreateWarningMessage(string message)
+    {
+        warningFeed.CreateMessage(message);
+    }
+
+    [Client] public void ClientOnDamage(int currentHealth, int maxHealth, GameObject player)
+    {
+        if (currentHealth == 0)
+        {
+            string errorMessage = "<color=#FF0000>You Died!</color>";
+            ClientCreateWarningMessage(errorMessage);
+        } else
+        {
+            string errorMessage = "<color=#FF0000>-1   Life</color>";
+            ClientCreateWarningMessage(errorMessage);
+        }
+    }
 }
 
