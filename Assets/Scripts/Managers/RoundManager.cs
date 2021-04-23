@@ -40,7 +40,7 @@ public class RoundManager : NetworkBehaviour
     // events
     public delegate void PlayerConnectedDelegate(PlayerInfo p);
     public delegate void RoundStartDelegate();
-    public delegate void RoundEndDelegate();
+    public delegate void RoundEndDelegate(GameObject winner);
     public event PlayerConnectedDelegate EventPlayerConnected;
     public event RoundStartDelegate EventRoundStart;
     public event RoundEndDelegate EventRoundEnd;
@@ -109,7 +109,7 @@ public class RoundManager : NetworkBehaviour
         EventPlayerConnected?.Invoke(playerInfo);
 
         // Subscribe to life change event
-        live.EventLivesChanged += CheckRoundEnd;
+        live.EventLivesChanged += OnLivesChanged;
 
 
         if (totalRoomPlayers == playersConnected)
@@ -132,19 +132,33 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator StartRoundTimer()
     {
         yield return new WaitForSeconds(roundDuration);
-        EndRound();
-        Debug.Log("round finished (round manager)");
+
+        if (!CheckRoundEnd())
+        {
+
+            // Player with lowest lives win
+            Player winner = GetWinnerPlayerByLives();
+            if (winner != null)
+            {
+                EndRound(winner);
+            } else
+            {
+                // Else, some other way to determine winner here
+
+            }
+        }
+
     }
 
     [Server]
-    public void EndRound()
+    public void EndRound(Player winner = null)
     {
         // Append all player objects to player list for event manager
         List<Player> players = new List<Player>();
         playerList.ForEach(pi => players.Add(pi.player));
 
         eventManager.OnEndRound(players);
-        RpcEndRound();
+        RpcEndRound(winner.gameObject);
         StartCoroutine(ServerEndRound());
     }
 
@@ -154,9 +168,9 @@ public class RoundManager : NetworkBehaviour
         EventRoundStart?.Invoke();
 
     }
-    [ClientRpc] public void RpcEndRound() 
+    [ClientRpc] public void RpcEndRound(GameObject winner) 
     {
-        EventRoundEnd?.Invoke();
+        EventRoundEnd?.Invoke(winner);
     }
 
     [Server]
@@ -188,10 +202,11 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
-    public void CheckRoundEnd(int currentHealth, int _, GameObject __)
+    public void OnLivesChanged(int currentHealth, int _, GameObject __)
     {
         if (currentHealth < 1)
         {
+            // Remove players that are dead
             for (int i = 0; i < playerList.Count; i++)
             {
                 //Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerList[i].health.currentLives);
@@ -204,11 +219,52 @@ public class RoundManager : NetworkBehaviour
             // update alive count
             aliveCount = alivePlayers.Count;
 
-            // End the round/game if only one player alive
-            if (aliveCount <= 1)
-            {
-                EndRound();
-            }
+            // check if the round has ended
+            CheckRoundEnd();
+        }
+    }
+
+    [Server] // returns true if the round ended successfully, false otherwise
+    public bool CheckRoundEnd()
+    {
+        // End the round if only one player alive
+        if (aliveCount <= 1)
+        {
+            if (aliveCount == 0) EndRound(playerList[0].player);
+            else EndRound(alivePlayers[0].player);
+            return true;
+        }
+
+        return false;
+    }
+
+    // returns the player than won this round, null if there is a tie
+    public Player GetWinnerPlayerByLives()
+    {
+        int minLife = -1;
+
+        foreach (PlayerInfo pi in alivePlayers)
+        {
+            int l = pi.health.currentLives;
+
+            // First life becomes the minLife
+            if (minLife == -1) minLife = l;
+
+            // If two players have same lives, then no winner
+            if (l == minLife) { minLife = -1; break; }
+
+            // If player life is new min, set that as minLife
+            if (l < minLife) minLife = l;
+        }
+
+        if (minLife >= 0)
+        {
+            // There is a winner
+            return alivePlayers.Find(e => e.health.currentLives == minLife).player;
+        } else 
+        {
+            // There was a tie (we can check further win conditions here, ex. player with most combos)
+            return null;
         }
     }
 }

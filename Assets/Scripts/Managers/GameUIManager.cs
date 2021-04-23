@@ -81,9 +81,9 @@ public class GameUIManager : NetworkBehaviour
         StartCoroutine(roundTimer.InitTimer(roundManager.roundDuration, roundManager.startGameFreezeDuration));
 
     }
-    [Client] public void ClientEndRound()
+    [Client] public void ClientEndRound(GameObject winner)
     {
-        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration));
+        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration, winner));
     }
 
     #endregion
