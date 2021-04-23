@@ -43,11 +43,14 @@ public class HexGrid : NetworkBehaviour
     private string danger_Hex_Name = "DangerHex";
     public GameObject hidden_Hex;
     private string hidden_Hex_Name = "HiddenHex";
+    public GameObject terrain_Hex;
+    private string terrain_Hex_Name = "TerrainHex";
     public GameObject default_Hex;
     private string default_Hex_Name = "EmptyHex";
     static char slow_Hex_char = '$';
     static char danger_Hex_char = '#';
     static char hidden_Hex_char = 'i';
+    static char terrain_Hex_char = 't';
     static char default_Hex_char = 'e';
 
     public int minTilesForCombo = 3;
@@ -316,6 +319,8 @@ public class HexGrid : NetworkBehaviour
                 return p_Hex;
             case 'w':
                 return w_Hex;
+            case 't':
+                return terrain_Hex;
             case '-':
                 return wall_Hex;
             case '#':
@@ -433,7 +438,7 @@ public class HexGrid : NetworkBehaviour
         yield return new WaitForSeconds(tileRegenDuration);
 
         char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-        while (newKey == 'e') newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+        while (newKey == 'w') newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
 
         cell.SetKey(newKey);
         cell.CreateModel(ReturnModelByCellKey(newKey));
@@ -632,6 +637,11 @@ public class HexGrid : NetworkBehaviour
     
     
     public static char GetHiddenHexChar()
+    {
+        return hidden_Hex_char;
+    }
+
+    public static char GetTerrainHexChar()
     {
         return hidden_Hex_char;
     }
