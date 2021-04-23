@@ -59,6 +59,18 @@ public class Health : NetworkBehaviour
     private void OnLivesChanged(int oldLives, int newLives)
     {
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
+		switch(UnityEngine.Random.Range(1,4))
+		{
+			case 1:
+				FindObjectOfType<AudioManager>().PlaySound("playerDeath");
+				break;
+			case 2:
+				FindObjectOfType<AudioManager>().PlaySound("playerDeath2");
+				break;
+			case 3:
+				FindObjectOfType<AudioManager>().PlaySound("playerDeath3");
+				break;
+		}
         if (newLives == 0) CmdNotifyPlayerDied();
         else this.CmdBeginGhostMode();
     }
