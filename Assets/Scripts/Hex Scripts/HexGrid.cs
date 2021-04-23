@@ -438,7 +438,7 @@ public class HexGrid : NetworkBehaviour
         yield return new WaitForSeconds(tileRegenDuration);
 
         char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
-        while (newKey == 'w') newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
+        while (newKey == 't') newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
 
         cell.SetKey(newKey);
         cell.CreateModel(ReturnModelByCellKey(newKey));
