@@ -643,7 +643,7 @@ public class HexGrid : NetworkBehaviour
 
     public static char GetTerrainHexChar()
     {
-        return hidden_Hex_char;
+        return terrain_Hex_char;
     }
 
     public GameObject test;
