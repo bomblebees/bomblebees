@@ -5008,7 +5008,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 8.5
-  m_Radius: 3
+  m_Radius: 1.5
   m_SlopeLimit: 0
   m_StepOffset: 1
   m_SkinWidth: 0.08
@@ -5122,6 +5122,7 @@ MonoBehaviour:
   revivingModel: {fileID: 5401300670555800704}
   playerInv: {fileID: 4849357194100230548}
   playerScript: {fileID: 493922037362194891}
+  cachedCollider: {fileID: 0}
 --- !u!114 &5921287484511493969
 MonoBehaviour:
   m_ObjectHideFlags: 0
