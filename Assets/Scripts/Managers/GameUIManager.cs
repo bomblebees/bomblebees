@@ -13,6 +13,8 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] private MessageFeed warningFeed = null;
     [SerializeField] private Hotbar hotbar = null;
 
+    private GameObject localPlayer;
+
 
     // singletons
     public static GameUIManager _instance;
@@ -58,7 +60,9 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundStart += ClientStartRound;
         roundManager.EventRoundEnd += ClientEndRound;
 
-        GameObject.Find("LocalPlayer").GetComponent<Health>().EventLivesChanged += ClientOnDamage;
+        localPlayer = GameObject.Find("LocalPlayer");
+
+        localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
     }
 
     // When a player loads into the game (on server)
@@ -202,7 +206,7 @@ public class GameUIManager : NetworkBehaviour
         {
             string errorMessage = "<color=#FF0000>You Died!</color>";
             ClientCreateWarningMessage(errorMessage);
-        } else
+        } else if (player == localPlayer)
         {
             string errorMessage = "<color=#FF0000>-1   Life</color>";
             ClientCreateWarningMessage(errorMessage);
