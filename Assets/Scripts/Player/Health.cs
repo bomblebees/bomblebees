@@ -59,6 +59,18 @@ public class Health : NetworkBehaviour
     private void OnLivesChanged(int oldLives, int newLives)
     {
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
+		switch(UnityEngine.Random.Range(1,4))
+		{
+			case 1:
+				FindObjectOfType<AudioManager>().PlaySound("playerDeath");
+				break;
+			case 2:
+				FindObjectOfType<AudioManager>().PlaySound("playerDeath2");
+				break;
+			case 3:
+				FindObjectOfType<AudioManager>().PlaySound("playerDeath3");
+				break;
+		}
         if (newLives == 0) CmdNotifyPlayerDied();
         else this.CmdBeginGhostMode();
     }
@@ -140,8 +152,10 @@ public class Health : NetworkBehaviour
         playerModel.SetActive(true);
     }
 
+    public GameObject cachedCollider = null;
+
     [Mirror.ClientCallback]
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root 
             && other.gameObject.transform.name == "SpinPVP")
@@ -158,6 +172,9 @@ public class Health : NetworkBehaviour
                 return;
         }
 
+        if (cachedCollider == other.gameObject.transform.parent.gameObject) return;
+        else cachedCollider = other.gameObject.transform.parent.gameObject;
+
         var obj = other.gameObject.transform;
         var objRootName = obj.root.name;
         if (
@@ -170,9 +187,12 @@ public class Health : NetworkBehaviour
                 .CanHitThisPlayer(this.gameObject) // I want everyone to 
         )
         {
+            cachedCollider = null;
         }
 		else if (objRootName == "Sludge Object(Clone)")
         {
+            Debug.Log("triggered");
+
             var sludge = obj.root.GetComponent<SludgeObject>();
             playerScript.ApplySludgeSlow(sludge.slowRate, sludge.slowDuration);
         }

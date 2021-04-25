@@ -8,12 +8,16 @@ public class MessageFeed : MonoBehaviour
     [SerializeField] private GameObject messageFeedPrefab;
     [SerializeField] private GameObject messageFeedCanvas;
     [SerializeField] private GameObject messsageFeedAnchor;
+    [SerializeField] private int maxMessages = 10;
     [SerializeField] private float fadeDelay = 4f;
 
     private List<GameObject> feedUIs = new List<GameObject>();
 
     public void CreateMessage(string messageText)
     {
+        // Do not create more messages than max messages
+        if (feedUIs.Count >= maxMessages) return;
+
         // Create the killfeed object
         GameObject message = Instantiate(
             messageFeedPrefab,

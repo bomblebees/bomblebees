@@ -5,19 +5,15 @@ using TMPro;
 
 public class RoundStartEnd : MonoBehaviour
 {
-    [Header("Start Round")]
-    [SerializeField] private GameObject startGameUI;
-    [SerializeField] private TMP_Text waitText;
+    [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text timerText;
-
-    [Header("End Round")]
-    [SerializeField] private GameObject endGameUI;
 
     public IEnumerator StartRoundFreezetime(int freezetime)
     {
-        waitText.text = "All players loaded!";
+        titleText.text = "All players loaded!";
         yield return new WaitForSeconds(1);
-        waitText.text = "Game Starting in";
+        FindObjectOfType<AudioManager>().PlaySound("startCountdown");
+        titleText.text = "Game Starting in";
         timerText.gameObject.SetActive(true);
 
         for (int i = freezetime; i > 0; i--)
@@ -25,25 +21,26 @@ public class RoundStartEnd : MonoBehaviour
             timerText.text = i.ToString();
             yield return new WaitForSeconds(1);
         }
+        timerText.gameObject.SetActive(false);
 
-        waitText.gameObject.SetActive(false);
-        timerText.text = "Begin!";
-
+        titleText.text = "Begin!";
         yield return new WaitForSeconds(1);
-        startGameUI.SetActive(false);
+        titleText.text = "";
     }
 
-    public IEnumerator EndRoundFreezetime(int freezetime)
+    public IEnumerator EndRoundFreezetime(int freezetime, GameObject winner)
     {
-        endGameUI.SetActive(true);
+        if (winner != null) titleText.text = winner.GetComponent<Player>().steamName + " won!";
+        else titleText.text = "Tied!";
+
         yield return new WaitForSeconds(freezetime);
-        endGameUI.SetActive(false);
+        titleText.text = "";
     }
 
     public void UpdateRoundWaitUI(int connPlayers, int totalPlayers)
     {
         // ex. Waiting for players... (2/4)
-        waitText.text = "Waiting for players... (" +
+        titleText.text = "Waiting for players... (" +
             connPlayers +
             "/" +
             totalPlayers +

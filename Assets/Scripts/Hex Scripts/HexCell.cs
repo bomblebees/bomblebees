@@ -18,7 +18,7 @@ public class HexCell : NetworkBehaviour
 
     public static char[] ignoreKeys = new char[]
     {
-        HexGrid.GetDangerTileChar(), HexGrid.GetEmptyTileChar(), HexGrid.GetSlowTileChar(), HexGrid.GetHiddenHexChar()
+        HexGrid.GetDangerTileChar(), HexGrid.GetEmptyTileChar(), HexGrid.GetSlowTileChar(), HexGrid.GetHiddenHexChar(), HexGrid.GetTerrainHexChar(),
     };
     public int emptyNeighbors = 0;
     
@@ -133,6 +133,11 @@ public class HexCell : NetworkBehaviour
 
         // No combos can be found when its empty
         if (ignoreKeys.Contains(this.GetKey())) return checkList;
+
+		if (this.GetKey() == 'w')
+		{
+			return checkList;
+		}
 
         bool hasAtLeastOneCombo = false;
         for (var direction = 0; direction < 3; direction++)

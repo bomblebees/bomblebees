@@ -8,6 +8,7 @@ using Mirror;
 public class Hotbar : MonoBehaviour
 {
     private Player localPlayer = null;
+    [SerializeField] GameUIManager gameUIManager = null;
 
     private BombHelper bombHelper;
 
@@ -77,25 +78,42 @@ public class Hotbar : MonoBehaviour
         if (Input.GetKeyDown(localPlayer.spinKey))
         {
             if (spinHudTimer == 0) spinKey.GetComponent<IconBounceTween>().OnTweenStart();
-            else FindObjectOfType<AudioManager>().PlaySound("error1");
+            else
+            {
+                FindObjectOfType<AudioManager>().PlaySound("error1");
+            }
         }
 
         if (Input.GetKeyDown(localPlayer.swapKey))
         {
             if (!swapDisabledEffect.activeSelf) swapKey.GetComponent<IconBounceTween>().OnTweenStart();
-            else FindObjectOfType<AudioManager>().PlaySound("error1");
+            else
+            {
+                FindObjectOfType<AudioManager>().PlaySound("error1");
+
+                string errorMessage = "<color=#FF0000>Inventory stack full</color>";
+                gameUIManager.ClientCreateWarningMessage(errorMessage);
+            }
         }
 
         if (Input.GetKeyDown(localPlayer.bombKey))
         {
             if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<IconBounceTween>().OnTweenStart();
-            else FindObjectOfType<AudioManager>().PlaySound("error1");
+            else
+            {
+                FindObjectOfType<AudioManager>().PlaySound("error1");
+                string errorMessage = "<color=#FF0000>No bombs to place</color>";
+                gameUIManager.ClientCreateWarningMessage(errorMessage);
+            }
         }
 
         if (Input.GetKeyDown(localPlayer.rotateKey))
         {
             if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<IconBounceTween>().OnTweenStart();
-            else FindObjectOfType<AudioManager>().PlaySound("error1");
+            else
+            {
+                FindObjectOfType<AudioManager>().PlaySound("error1");
+            }
         }
     }
     

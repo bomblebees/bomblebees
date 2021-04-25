@@ -234,6 +234,8 @@ public class Player : NetworkBehaviour
 
         if (!isLocalPlayer) return;
 
+        if (gameObject.name != "LocalPlayer") gameObject.name = "LocalPlayer";
+
         if (isDead) return; // if dead, disable all player updates
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
@@ -1056,7 +1058,20 @@ public class Player : NetworkBehaviour
         sludgeEndAnim = -3f;
         playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
 
-        var slowFactor = 1 - slowRate;
+		switch (UnityEngine.Random.Range(1, 4))
+		{
+			case 1:
+				FindObjectOfType<AudioManager>().PlaySound("playerEw1");
+				break;
+			case 2:
+				FindObjectOfType<AudioManager>().PlaySound("playerEw2");
+				break;
+			case 3:
+				FindObjectOfType<AudioManager>().PlaySound("playerEw3");
+				break;
+		}
+
+		var slowFactor = 1 - slowRate;
         this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;

@@ -10,6 +10,7 @@ public class HandleEntry : MonoBehaviour
     // so this trigger that handles if the player is in the object should be smaller than the invis blocker
     public Collider invisibleBlocker;
     private bool allowingEntry = true;
+    public bool canGetIn = false;
 
     //public override void OnStartServer()
     //{
@@ -23,6 +24,7 @@ public class HandleEntry : MonoBehaviour
             var gameObjHit = other.gameObject;
             if (gameObjHit.CompareTag("Player"))
             {
+                print("hi1");
                 SetPlayerEntry(other, true); // This needs to run before the invisibleBlocker scans for collision
             }
 
@@ -37,17 +39,19 @@ public class HandleEntry : MonoBehaviour
         // Debug.Log(gameObjHit.name);
         if (gameObjHit.CompareTag("Player"))
         {
+            print("hi2");
             SetPlayerEntry(other, false);
-            Physics.IgnoreCollision(gameObjHit.GetComponent<CapsuleCollider>(), this.GetComponent<SphereCollider>(),
-                true);
+            // Physics.IgnoreCollision(gameObjHit.GetComponent<CapsuleCollider>(), this.GetComponent<SphereCollider>(),
+            //     true);
         }
     }
 
     protected virtual void SetPlayerEntry(Collider playerCollider, bool val)
     {
-        
+        print("hi3");
         if (!playerCollider) Debug.LogError("HandleEntry.cs: Need to update collider type of plaer");
         Physics.IgnoreCollision(playerCollider, invisibleBlocker, val);
+        canGetIn = val;
     }
 
     public virtual void Restart()

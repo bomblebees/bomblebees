@@ -10,7 +10,10 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] private RoundTimer roundTimer = null;
     [SerializeField] private LivesUI livesUI = null;
     [SerializeField] private MessageFeed messageFeed = null;
+    [SerializeField] private MessageFeed warningFeed = null;
     [SerializeField] private Hotbar hotbar = null;
+
+    private GameObject localPlayer;
 
 
     // singletons
@@ -58,6 +61,17 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundEnd += ClientEndRound;
     }
 
+    private void Update()
+    {
+        if (localPlayer == null)
+        {
+            localPlayer = GameObject.Find("LocalPlayer");
+            
+            if (localPlayer != null) localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
+        }
+        
+    }
+
     // When a player loads into the game (on server)
     [Server] public void ServerPlayerConnected(RoundManager.PlayerInfo p)
     {
@@ -78,9 +92,9 @@ public class GameUIManager : NetworkBehaviour
         StartCoroutine(roundTimer.InitTimer(roundManager.roundDuration, roundManager.startGameFreezeDuration));
 
     }
-    [Client] public void ClientEndRound()
+    [Client] public void ClientEndRound(GameObject winner)
     {
-        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration));
+        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration, winner));
     }
 
     #endregion
@@ -187,5 +201,23 @@ public class GameUIManager : NetworkBehaviour
     }
 
     #endregion
+
+    [Client] public void ClientCreateWarningMessage(string message)
+    {
+        warningFeed.CreateMessage(message);
+    }
+
+    [Client] public void ClientOnDamage(int currentHealth, int maxHealth, GameObject player)
+    {
+        if (currentHealth == 0)
+        {
+            string errorMessage = "<color=#FF0000>You Died!</color>";
+            ClientCreateWarningMessage(errorMessage);
+        } else if (player == localPlayer)
+        {
+            string errorMessage = "<color=#FF0000>-1   Life</color>";
+            ClientCreateWarningMessage(errorMessage);
+        }
+    }
 }
 

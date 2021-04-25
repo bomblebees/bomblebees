@@ -300,6 +300,8 @@ MonoBehaviour:
   fillShaderRatio: 0.9
   minimumLifeDuration: 4
   stayPermanent: 1
+  projectileSpeed: 9
+  breakdownDuration: 3
   plasmaSphereModel: {fileID: 4085552186968079639}
   particleSystem: {fileID: 7751750280610379946}
   ignoreTriggererDuration: 1
@@ -6284,6 +6286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   invisibleBlocker: {fileID: 8375950572193654199}
+  canGetIn: 0
 --- !u!1 &3592288816524646084
 GameObject:
   m_ObjectHideFlags: 0
