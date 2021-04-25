@@ -135,9 +135,10 @@ public class Player : NetworkBehaviour
     // Event manager singleton
     private EventManager eventManager;
 
-    //// Added for easy referencing of local player from anywhere
-    private void Awake()
+    // Added for easy referencing of local player from anywhere
+    public override void OnStartLocalPlayer()
     {
+        base.OnStartLocalPlayer();
         gameObject.name = "LocalPlayer";
     }
 
@@ -232,6 +233,8 @@ public class Player : NetworkBehaviour
 
 
         if (!isLocalPlayer) return;
+
+        if (gameObject.name != "LocalPlayer") gameObject.name = "LocalPlayer";
 
         if (isDead) return; // if dead, disable all player updates
 

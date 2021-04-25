@@ -59,10 +59,17 @@ public class GameUIManager : NetworkBehaviour
         // Subscribe to client round events
         roundManager.EventRoundStart += ClientStartRound;
         roundManager.EventRoundEnd += ClientEndRound;
+    }
 
-        localPlayer = GameObject.Find("LocalPlayer");
-
-        localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
+    private void Update()
+    {
+        if (localPlayer == null)
+        {
+            localPlayer = GameObject.Find("LocalPlayer");
+            
+            if (localPlayer != null) localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
+        }
+        
     }
 
     // When a player loads into the game (on server)

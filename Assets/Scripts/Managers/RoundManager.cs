@@ -138,27 +138,32 @@ public class RoundManager : NetworkBehaviour
 
             // Player with lowest lives win
             Player winner = GetWinnerPlayerByLives();
+
+            //Debug.Log("winner: " + winner.gameObject.transform.name);
+
             if (winner != null)
             {
-                EndRound(winner);
+                EndRound(winner.gameObject);
             } else
             {
                 // Else, some other way to determine winner here
+                Debug.Log("round finished, but null");
 
+                EndRound();
             }
         }
 
     }
 
     [Server]
-    public void EndRound(Player winner = null)
+    public void EndRound(GameObject winner = null)
     {
         // Append all player objects to player list for event manager
         List<Player> players = new List<Player>();
         playerList.ForEach(pi => players.Add(pi.player));
 
         eventManager.OnEndRound(players);
-        RpcEndRound(winner.gameObject);
+        RpcEndRound(winner);
         StartCoroutine(ServerEndRound());
     }
 
@@ -230,8 +235,8 @@ public class RoundManager : NetworkBehaviour
         // End the round if only one player alive
         if (aliveCount <= 1)
         {
-            if (aliveCount == 0) EndRound(playerList[0].player);
-            else EndRound(alivePlayers[0].player);
+            if (aliveCount == 0) EndRound();
+            else EndRound(alivePlayers[0].player.gameObject);
             return true;
         }
 
@@ -247,15 +252,21 @@ public class RoundManager : NetworkBehaviour
         {
             int l = pi.health.currentLives;
 
+            // If any two players have same lives, then no winner
+            if (l == minLife) { minLife = -1; break; }
+
             // First life becomes the minLife
             if (minLife == -1) minLife = l;
-
-            // If two players have same lives, then no winner
-            if (l == minLife) { minLife = -1; break; }
 
             // If player life is new min, set that as minLife
             if (l < minLife) minLife = l;
         }
+
+        Debug.Log("min life is " + minLife.ToString());
+
+        //Player p = alivePlayers.Find(e => e.health.currentLives == minLife).player;
+
+        //if (p == null) Debug.Log("winner player is null");
 
         if (minLife >= 0)
         {

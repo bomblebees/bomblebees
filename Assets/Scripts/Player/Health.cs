@@ -153,7 +153,7 @@ public class Health : NetworkBehaviour
     }
 
     [Mirror.ClientCallback]
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root 
             && other.gameObject.transform.name == "SpinPVP")

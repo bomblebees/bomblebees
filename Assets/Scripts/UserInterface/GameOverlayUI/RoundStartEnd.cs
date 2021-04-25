@@ -30,7 +30,9 @@ public class RoundStartEnd : MonoBehaviour
 
     public IEnumerator EndRoundFreezetime(int freezetime, GameObject winner)
     {
-        titleText.text = "Game Over! " + winner.GetComponent<Player>().steamName + " won!";
+        if (winner != null) titleText.text = winner.GetComponent<Player>().steamName + " won!";
+        else titleText.text = "Tied!";
+
         yield return new WaitForSeconds(freezetime);
         titleText.text = "";
     }

@@ -746,7 +746,7 @@ MonoBehaviour:
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 50
+  m_fontSizeMax: 30
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -5789,6 +5789,7 @@ MonoBehaviour:
     background: {fileID: 3446125031207113316}
     playerName: {fileID: 220515769455217331}
     livesCounter: {fileID: 1865738013427228299}
+  gameUIManager: {fileID: 0}
 --- !u!1 &6739916063188271545
 GameObject:
   m_ObjectHideFlags: 0
@@ -7928,6 +7929,12 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7933164392646439457, guid: bd3e187f75f58574f99f9ef7da1ff021,
+        type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 3074828514974314926, guid: c2f49fe8c22d94f9a9e6cd06ad490155,
+        type: 2}
     - target: {fileID: 8688043872554924943, guid: bd3e187f75f58574f99f9ef7da1ff021,
         type: 3}
       propertyPath: m_LocalPosition.x
