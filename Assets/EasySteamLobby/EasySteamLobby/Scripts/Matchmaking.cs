@@ -314,7 +314,8 @@ public class Matchmaking : MonoBehaviour
             rc.button1.interactable = true;
 
             if (SteamMatchmaking.GetNumLobbyMembers(l) == SteamMatchmaking.GetLobbyMemberLimit(l) - 1
-                || SteamMatchmaking.GetLobbyData(l, "gameStatus") == "In Game")
+                || SteamMatchmaking.GetLobbyData(l, "gameStatus") == "In Game"
+                || SteamMatchmaking.GetLobbyData(l, "LobbyVersion") != Application.version)
             {
                 rc.button1.interactable = false;
             }
