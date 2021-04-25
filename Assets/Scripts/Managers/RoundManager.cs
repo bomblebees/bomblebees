@@ -147,8 +147,7 @@ public class RoundManager : NetworkBehaviour
             } else
             {
                 // Else, some other way to determine winner here
-                Debug.Log("round finished, but null");
-
+                // EndRound() ends the round as a tie
                 EndRound();
             }
         }
@@ -261,8 +260,6 @@ public class RoundManager : NetworkBehaviour
             // If player life is new max, set that as maxLife
             if (l > maxLife) maxLife = l;
         }
-
-        Debug.Log("max life is " + maxLife.ToString());
 
         if (maxLife >= 0)
         {
