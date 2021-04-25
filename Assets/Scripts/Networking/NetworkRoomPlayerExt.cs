@@ -1,9 +1,7 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
-using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
@@ -13,6 +11,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public Color playerColor;
 
     [SerializeField] private Texture2D defaultAvatar;
+    [SerializeField] private Texture2D[] characterCardList;
+
+    [SerializeField] private CharacterSelectionInfo characterSelectionInfo;
 
     // List of player colors
     private List<Color> listColors = new List<Color> {
@@ -21,9 +22,23 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         Color.yellow,
         Color.green,
     };
-
+    
     Room_UI roomUI;
 
+    private void Awake()
+    {
+        characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        
+        characterSelectionInfo.player1 = 0;
+        characterSelectionInfo.player2 = 1;
+        characterSelectionInfo.player3 = 2;
+        characterSelectionInfo.player4 = 3;
+    }
 
     public override void OnStartClient()
     {
@@ -32,6 +47,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         roomUI = Room_UI.singleton;
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
+
+        characterSelectionInfo.EventTogglePlayer1 += UpdateLobbyList;
+        characterSelectionInfo.EventTogglePlayer2 += UpdateLobbyList;
+        characterSelectionInfo.EventTogglePlayer3 += UpdateLobbyList;
+        characterSelectionInfo.EventTogglePlayer4 += UpdateLobbyList;
 
         base.OnStartClient();
     }
@@ -81,12 +101,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
-                //card.playerCard.SetActive(false);
-
                 card.username.text = "Waiting for players...";
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
                 card.characterCard.enabled = false;
+                card.characterCard.texture = characterCardList[i];
                 continue;
             }
 
@@ -106,6 +125,23 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
             if (imgId > 0) card.avatar.texture = GetSteamImageAsTexture(imgId);
             else { Debug.LogWarning("ImgId invalid!");  }
+            
+            // Character selection
+            switch (i)
+            {
+                case 0:
+                    card.characterCard.texture = characterCardList[characterSelectionInfo.player1];
+                    break;
+                case 1:
+                    card.characterCard.texture = characterCardList[characterSelectionInfo.player2];
+                    break;
+                case 2:
+                    card.characterCard.texture = characterCardList[characterSelectionInfo.player3];
+                    break;
+                case 3:
+                    card.characterCard.texture = characterCardList[characterSelectionInfo.player4];
+                    break;
+            }
 
             // Ready check mark
             if (player.readyToBegin) card.readyStatus.SetActive(true);
@@ -124,8 +160,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-
-    public Texture2D GetSteamImageAsTexture(int iImage)
+    private Texture2D GetSteamImageAsTexture(int iImage)
     {
         Texture2D texture = null;
 
