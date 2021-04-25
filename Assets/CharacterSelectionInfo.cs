@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Mirror;
+﻿using Mirror;
 using UnityEngine;
 
 public class CharacterSelectionInfo : NetworkBehaviour
@@ -12,37 +10,31 @@ public class CharacterSelectionInfo : NetworkBehaviour
     
     [SerializeField] public Texture2D[] characterCardList;
 
-    public delegate void TogglePlayer1();
-    public delegate void TogglePlayer2();
-    public delegate void TogglePlayer3();
-    public delegate void TogglePlayer4();
-    
-    public event TogglePlayer1 EventTogglePlayer1;
-    public event TogglePlayer2 EventTogglePlayer2;
-    public event TogglePlayer3 EventTogglePlayer3;
-    public event TogglePlayer4 EventTogglePlayer4;
+    public delegate void CharacterChanged();
 
-    public void OnEventTogglePlayer1()
+    public event CharacterChanged EventCharacterChanged;
+
+    public void ChangePlayer1()
     {
         player1 = (player1 + 1) % 4;
-        EventTogglePlayer1?.Invoke();
+        EventCharacterChanged?.Invoke();
     }
     
-    public void OnEventTogglePlayer2()
+    public void ChangePlayer2()
     {
         player2 = (player2 + 1) % 4;
-        EventTogglePlayer2?.Invoke();
+        EventCharacterChanged?.Invoke();
     }
     
-    public void OnEventTogglePlayer3()
+    public void ChangePlayer3()
     {
         player3 = (player3 + 1) % 4;
-        EventTogglePlayer3?.Invoke();
+        EventCharacterChanged?.Invoke();
     }
     
-    public void OnEventTogglePlayer4()
+    public void ChangePlayer4()
     {
         player4 = (player4 + 1) % 4;
-        EventTogglePlayer4?.Invoke();
+        EventCharacterChanged?.Invoke();
     }
 }

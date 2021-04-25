@@ -47,10 +47,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
 
-        characterSelectionInfo.EventTogglePlayer1 += UpdateLobbyList;
-        characterSelectionInfo.EventTogglePlayer2 += UpdateLobbyList;
-        characterSelectionInfo.EventTogglePlayer3 += UpdateLobbyList;
-        characterSelectionInfo.EventTogglePlayer4 += UpdateLobbyList;
+        characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
 
         base.OnStartClient();
     }
@@ -196,6 +193,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (readyToBegin) CmdChangeReadyState(false);
         else CmdChangeReadyState(true);
 
+        UpdateLobbyList();
+    }
+    
+    public void OnCharacterChanged()
+    {
         UpdateLobbyList();
     }
     
