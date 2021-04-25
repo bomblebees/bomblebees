@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Mirror;
+﻿using Mirror;
 using UnityEngine;
 
 public class CharacterSelectionInfo : NetworkBehaviour
@@ -24,25 +22,49 @@ public class CharacterSelectionInfo : NetworkBehaviour
 
     public void OnEventTogglePlayer1()
     {
-        player1 = (player1 + 1) % 4;
+        CmdTogglePlayer1();
         EventTogglePlayer1?.Invoke();
     }
     
     public void OnEventTogglePlayer2()
     {
-        player2 = (player2 + 1) % 4;
+        CmdTogglePlayer2();
         EventTogglePlayer2?.Invoke();
     }
     
     public void OnEventTogglePlayer3()
     {
-        player3 = (player3 + 1) % 4;
+        CmdTogglePlayer3();
         EventTogglePlayer3?.Invoke();
     }
     
     public void OnEventTogglePlayer4()
     {
-        player4 = (player4 + 1) % 4;
+        CmdTogglePlayer4();
         EventTogglePlayer4?.Invoke();
+    }
+
+    [Command]
+    private void CmdTogglePlayer1()
+    {
+        player1 = (player1 + 1) % 4;
+    }
+    
+    [Command]
+    private void CmdTogglePlayer2()
+    {
+        player2 = (player2 + 1) % 4;
+    }
+    
+    [Command]
+    private void CmdTogglePlayer3()
+    {
+        player3 = (player3 + 1) % 4;
+    }
+    
+    [Command]
+    private void CmdTogglePlayer4()
+    {
+        player4 = (player4 + 1) % 4;
     }
 }
