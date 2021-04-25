@@ -11,7 +11,7 @@ public class PlasmaObject : TriggerObject
 {
     private bool hitboxEnabled = false;
     private Vector3 targetDir;
-    private float projectileSpeed = 3f;
+    public float projectileSpeed = 3f;
     public float breakdownDuration = 3f;
     [SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
