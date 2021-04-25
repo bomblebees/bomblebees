@@ -246,32 +246,28 @@ public class RoundManager : NetworkBehaviour
     // returns the player than won this round, null if there is a tie
     public Player GetWinnerPlayerByLives()
     {
-        int minLife = -1;
+        int maxLife = -1;
 
         foreach (PlayerInfo pi in alivePlayers)
         {
             int l = pi.health.currentLives;
 
             // If any two players have same lives, then no winner
-            if (l == minLife) { minLife = -1; break; }
+            if (l == maxLife) { maxLife = -1; break; }
 
             // First life becomes the minLife
-            if (minLife == -1) minLife = l;
+            if (maxLife == -1) maxLife = l;
 
-            // If player life is new min, set that as minLife
-            if (l < minLife) minLife = l;
+            // If player life is new max, set that as maxLife
+            if (l > maxLife) maxLife = l;
         }
 
-        Debug.Log("min life is " + minLife.ToString());
+        Debug.Log("max life is " + maxLife.ToString());
 
-        //Player p = alivePlayers.Find(e => e.health.currentLives == minLife).player;
-
-        //if (p == null) Debug.Log("winner player is null");
-
-        if (minLife >= 0)
+        if (maxLife >= 0)
         {
             // There is a winner
-            return alivePlayers.Find(e => e.health.currentLives == minLife).player;
+            return alivePlayers.Find(e => e.health.currentLives == maxLife).player;
         } else 
         {
             // There was a tie (we can check further win conditions here, ex. player with most combos)
