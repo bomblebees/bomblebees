@@ -152,6 +152,8 @@ public class Health : NetworkBehaviour
         playerModel.SetActive(true);
     }
 
+    public GameObject cachedCollider = null;
+
     [Mirror.ClientCallback]
     private void OnTriggerEnter(Collider other)
     {
@@ -170,6 +172,9 @@ public class Health : NetworkBehaviour
                 return;
         }
 
+        if (cachedCollider == other.gameObject.transform.parent.gameObject) return;
+        else cachedCollider = other.gameObject.transform.parent.gameObject;
+
         var obj = other.gameObject.transform;
         var objRootName = obj.root.name;
         if (
@@ -182,9 +187,12 @@ public class Health : NetworkBehaviour
                 .CanHitThisPlayer(this.gameObject) // I want everyone to 
         )
         {
+            cachedCollider = null;
         }
 		else if (objRootName == "Sludge Object(Clone)")
         {
+            Debug.Log("triggered");
+
             var sludge = obj.root.GetComponent<SludgeObject>();
             playerScript.ApplySludgeSlow(sludge.slowRate, sludge.slowDuration);
         }
