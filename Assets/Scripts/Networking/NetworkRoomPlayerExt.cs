@@ -11,7 +11,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public Color playerColor;
 
     [SerializeField] private Texture2D defaultAvatar;
-    [SerializeField] private Texture2D[] characterCardList;
 
     [SerializeField] private CharacterSelectionInfo characterSelectionInfo;
 
@@ -105,7 +104,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
                 card.characterCard.enabled = false;
-                card.characterCard.texture = characterCardList[i];
+                card.characterCard.texture = characterSelectionInfo.characterCardList[i];
                 continue;
             }
 
@@ -130,16 +129,16 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             switch (i)
             {
                 case 0:
-                    card.characterCard.texture = characterCardList[characterSelectionInfo.player1];
+                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player1];
                     break;
                 case 1:
-                    card.characterCard.texture = characterCardList[characterSelectionInfo.player2];
+                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player2];
                     break;
                 case 2:
-                    card.characterCard.texture = characterCardList[characterSelectionInfo.player3];
+                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player3];
                     break;
                 case 3:
-                    card.characterCard.texture = characterCardList[characterSelectionInfo.player4];
+                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player4];
                     break;
             }
 

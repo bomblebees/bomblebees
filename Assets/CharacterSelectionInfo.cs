@@ -9,6 +9,8 @@ public class CharacterSelectionInfo : NetworkBehaviour
     [SyncVar] public int player2;
     [SyncVar] public int player3;
     [SyncVar] public int player4;
+    
+    [SerializeField] public Texture2D[] characterCardList;
 
     public delegate void TogglePlayer1();
     public delegate void TogglePlayer2();
