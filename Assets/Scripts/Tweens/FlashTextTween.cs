@@ -18,6 +18,7 @@ public class FlashTextTween : MonoBehaviour
 
     private Color originalColor;
     private bool flashStopped = false;
+    private bool firstFlash = true;
 
     TMP_Text text;
 
@@ -50,10 +51,21 @@ public class FlashTextTween : MonoBehaviour
     {
         if (flashStopped) return;
 
-        LeanTween.value(gameObject, updateColorCallback, originalColor, flashColor, easeInTime)
-            .setEase(easeIn)
-            .setDelay(timeBetweenFlashes)
-            .setOnComplete(FlashLoop);
+        if (firstFlash)
+        {
+            LeanTween.value(gameObject, updateColorCallback, originalColor, flashColor, easeInTime)
+                .setEase(easeIn)
+                .setOnComplete(FlashLoop);
+            firstFlash = false;
+        } else
+        {
+            LeanTween.value(gameObject, updateColorCallback, originalColor, flashColor, easeInTime)
+                .setEase(easeIn)
+                .setDelay(timeBetweenFlashes)
+                .setOnComplete(FlashLoop);
+        }
+
+
     }
 
     public void FlashLoop()
