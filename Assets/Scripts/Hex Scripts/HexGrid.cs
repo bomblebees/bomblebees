@@ -547,7 +547,7 @@ public class HexGrid : NetworkBehaviour
         if (comboCells.Count > 0)
         {
             eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject);
-            player.GetComponent<Player>().AddItemCombo(heldKey);
+            player.GetComponent<PlayerInventory>().AddInventoryBomb(heldKey, comboCells.Count);
         }
         else
         {

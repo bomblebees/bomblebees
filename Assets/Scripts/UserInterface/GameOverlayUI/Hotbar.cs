@@ -58,7 +58,7 @@ public class Hotbar : MonoBehaviour
             if (player != null)
             {
                 localPlayer = player.GetComponent<Player>();
-                localPlayer.itemStack.Callback += OnStackChange;
+                //localPlayer.itemStack.Callback += OnStackChange;
             }
         } else
         {
@@ -101,9 +101,9 @@ public class Hotbar : MonoBehaviour
             if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<IconBounceTween>().OnTweenStart();
             else
             {
-                FindObjectOfType<AudioManager>().PlaySound("error1");
-                string errorMessage = "<color=#FF0000>No bombs to place</color>";
-                gameUIManager.ClientCreateWarningMessage(errorMessage);
+                //FindObjectOfType<AudioManager>().PlaySound("error1");
+                //string errorMessage = "<color=#FF0000>No bombs to place</color>";
+                //gameUIManager.ClientCreateWarningMessage(errorMessage);
             }
         }
 
@@ -161,59 +161,59 @@ public class Hotbar : MonoBehaviour
 
     void OnStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
     {
-        SyncList<char> stack = localPlayer.itemStack;
+        //SyncList<char> stack = localPlayer.itemStack;
 
-        // If stack empty, turn on disable effect, otherwise turn off
-        if (localPlayer.itemStack.Count == 0)
-        {
-            placeDisabledEffect.SetActive(true);
-            rotateDisabledEffect.SetActive(true);
-            swapDisabledEffect.SetActive(false);
-        } else
-        {
-            // if more than one item, can rotate
-            if (localPlayer.itemStack.Count > 1) rotateDisabledEffect.SetActive(false);
-            else rotateDisabledEffect.SetActive(true);
+        //// If stack empty, turn on disable effect, otherwise turn off
+        //if (localPlayer.itemStack.Count == 0)
+        //{
+        //    placeDisabledEffect.SetActive(true);
+        //    rotateDisabledEffect.SetActive(true);
+        //    swapDisabledEffect.SetActive(false);
+        //} else
+        //{
+        //    // if more than one item, can rotate
+        //    if (localPlayer.itemStack.Count > 1) rotateDisabledEffect.SetActive(false);
+        //    else rotateDisabledEffect.SetActive(true);
 
-            // if max items, cannot swap
-            if (localPlayer.itemStack.Count == 3) swapDisabledEffect.SetActive(true);
-            else swapDisabledEffect.SetActive(false);
+        //    // if max items, cannot swap
+        //    if (localPlayer.itemStack.Count == 3) swapDisabledEffect.SetActive(true);
+        //    else swapDisabledEffect.SetActive(false);
 
-            placeDisabledEffect.SetActive(false);
-        }
+        //    placeDisabledEffect.SetActive(false);
+        //}
 
-        List<char> reversedStack = new List<char>();
+        //List<char> reversedStack = new List<char>();
 
-        // Reverse the stack
-        for (int i = stack.Count - 1; i >= 0; i--)
-        {
-            reversedStack.Add(stack[i]);
-        }
+        //// Reverse the stack
+        //for (int i = stack.Count - 1; i >= 0; i--)
+        //{
+        //    reversedStack.Add(stack[i]);
+        //}
 
-        // Apply to UI
-        for (int i = 0; i < 3; i++)
-        {
-            // Update the stack with player stack
-            if (i < reversedStack.Count)
-            {
-                UpdateStackUI(i, reversedStack[i]);
-                if (i == 0) nextBombText.text = bombHelper.GetBombTextByKey(reversedStack[i]);
-            }
-            else // Update the rest of stack
-            {
-                UpdateStackUI(i, 'e');
-                if (i == 0) nextBombText.text = "None";
-            }
-        }
+        //// Apply to UI
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    // Update the stack with player stack
+        //    if (i < reversedStack.Count)
+        //    {
+        //        UpdateStackUI(i, reversedStack[i]);
+        //        if (i == 0) nextBombText.text = bombHelper.GetBombTextByKey(reversedStack[i]);
+        //    }
+        //    else // Update the rest of stack
+        //    {
+        //        UpdateStackUI(i, 'e');
+        //        if (i == 0) nextBombText.text = "None";
+        //    }
+        //}
 
 
-        if (op == SyncList<char>.Operation.OP_ADD)
-        {
-            Debug.Log("Move up stack");
-        } else if (op == SyncList<char>.Operation.OP_REMOVEAT)
-        {
-            Debug.Log("Move down stack");
-        }
+        //if (op == SyncList<char>.Operation.OP_ADD)
+        //{
+        //    Debug.Log("Move up stack");
+        //} else if (op == SyncList<char>.Operation.OP_REMOVEAT)
+        //{
+        //    Debug.Log("Move down stack");
+        //}
 
     }
 
