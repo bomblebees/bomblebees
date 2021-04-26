@@ -75,6 +75,12 @@ public class PlayerInventory : NetworkBehaviour
         else selectedSlot++;
     }
 
+	// Changes the selected swap to the hotkey button pressed
+	[Server] public void SwitchToSlot(int index)
+	{
+		selectedSlot = index;
+	}
+
     [Client] private void OnSelectedSlotChange(int oldSlot, int newSlot)
     {
         // Update the player interface when selected slot changes

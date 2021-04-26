@@ -45,8 +45,12 @@ public class Player : NetworkBehaviour
     [SerializeField] public string spinKey = "o";
     [SerializeField] public string bombKey = "j";
     [SerializeField] public string rotateKey = "left shift";
+	[SerializeField] public string slot1 = "1";
+	[SerializeField] public string slot2 = "2";
+	[SerializeField] public string slot3 = "3";
+	[SerializeField] public string slot4 = "4";
 
-    [SerializeField] public float defaultBombCooldown = 3f;
+	[SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
     [SerializeField] private GameObject onDefaultBombReadyAnim;
     private bool playedOnDefaultBombReadyAnim = true;
@@ -862,18 +866,44 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForBombRotation()
     {
-        if (Input.GetKeyDown(rotateKey))
+		if (Input.GetKeyDown(rotateKey))
         {
-			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
             CmdRotateItemStack();
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-    }
+		if (Input.GetKeyDown(slot1))
+		{
+			CmdSelectItemSlot(0);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+		if (Input.GetKeyDown(slot2))
+		{
+			CmdSelectItemSlot(1);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+		if (Input.GetKeyDown(slot3))
+		{
+			CmdSelectItemSlot(2);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+		if (Input.GetKeyDown(slot4))
+		{
+			CmdSelectItemSlot(3);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+	}
 
     [Command]
     public void CmdRotateItemStack()
     {
         this.GetComponent<PlayerInventory>().RotateSelectedSlot();
     }
+
+	[Command]
+	public void CmdSelectItemSlot(int index)
+	{
+		this.GetComponent<PlayerInventory>().SwitchToSlot(index);
+	}
 
     [Server]
     public void ClearItemStack(bool val = true)

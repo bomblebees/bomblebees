@@ -112,7 +112,7 @@ public class Hotbar : MonoBehaviour
             if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<IconBounceTween>().OnTweenStart();
             else
             {
-                FindObjectOfType<AudioManager>().PlaySound("error1");
+                // FindObjectOfType<AudioManager>().PlaySound("error1");
             }
         }
     }
