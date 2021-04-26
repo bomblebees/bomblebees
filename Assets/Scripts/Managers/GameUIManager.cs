@@ -200,6 +200,12 @@ public class GameUIManager : NetworkBehaviour
         hotbar.SwapHexes(newKey);
     }
 
+    [Client]
+    public void ClientOnInventorySelectChanged(char key, int amt)
+    {
+        hotbar.UpdateInventoryUI(key, amt);
+    }
+
     #endregion
 
     [Client] public void ClientCreateWarningMessage(string message)

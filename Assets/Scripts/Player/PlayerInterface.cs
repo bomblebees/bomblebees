@@ -18,7 +18,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private Image[] invSlots = new Image[4];
     [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
 
-    [SerializeField] private RawImage hexUI;
+    [SerializeField] private Image hexUI;
     [SerializeField] private Image bombCooldownFilter;
     [SerializeField] public Image spinChargeBar;
     private float bombHudTimer = 0;

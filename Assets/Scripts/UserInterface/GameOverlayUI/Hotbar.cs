@@ -19,8 +19,8 @@ public class Hotbar : MonoBehaviour
     [SerializeField] private GameObject swapKey;
 
     [Header("Place")]
-    [SerializeField] private Image[] placeStack = new Image[3];
-    [SerializeField] private TMP_Text nextBombText;
+    [SerializeField] private Image nextBomb;
+    [SerializeField] private TMP_Text bombQuantityText;
     [SerializeField] private GameObject placeDisabledEffect;
     [SerializeField] private GameObject placeKey;
 
@@ -39,15 +39,8 @@ public class Hotbar : MonoBehaviour
     {
         bombHelper = this.gameObject.transform.parent.GetComponent<BombHelper>();
 
-        // Set all UI to empty initially
-        for (int i = 0; i < 3; i++)
-        {
-            UpdateStackUI(i, 'e');
-        }
-
-        // Turn on Disable place/rotate effect
-        placeDisabledEffect.SetActive(true);
-        rotateDisabledEffect.SetActive(true);
+        // Set place UI to red bomb initially
+        UpdateInventoryUI('r', 0);
     }
 
     void Update()
@@ -101,9 +94,9 @@ public class Hotbar : MonoBehaviour
             if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<IconBounceTween>().OnTweenStart();
             else
             {
-                //FindObjectOfType<AudioManager>().PlaySound("error1");
-                //string errorMessage = "<color=#FF0000>No bombs to place</color>";
-                //gameUIManager.ClientCreateWarningMessage(errorMessage);
+                FindObjectOfType<AudioManager>().PlaySound("error1");
+                string errorMessage = "<color=#FF0000>No bombs to place</color>";
+                gameUIManager.ClientCreateWarningMessage(errorMessage);
             }
         }
 
@@ -159,67 +152,14 @@ public class Hotbar : MonoBehaviour
         frontHex.color = bombHelper.GetKeyColor(newFrontKey);
     }
 
-    void OnStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
+    public void UpdateInventoryUI(char key, int amt)
     {
-        //SyncList<char> stack = localPlayer.itemStack;
+        if (amt > 0) placeDisabledEffect.SetActive(false);
+        else placeDisabledEffect.SetActive(true);
 
-        //// If stack empty, turn on disable effect, otherwise turn off
-        //if (localPlayer.itemStack.Count == 0)
-        //{
-        //    placeDisabledEffect.SetActive(true);
-        //    rotateDisabledEffect.SetActive(true);
-        //    swapDisabledEffect.SetActive(false);
-        //} else
-        //{
-        //    // if more than one item, can rotate
-        //    if (localPlayer.itemStack.Count > 1) rotateDisabledEffect.SetActive(false);
-        //    else rotateDisabledEffect.SetActive(true);
+        bombQuantityText.text = amt.ToString();
 
-        //    // if max items, cannot swap
-        //    if (localPlayer.itemStack.Count == 3) swapDisabledEffect.SetActive(true);
-        //    else swapDisabledEffect.SetActive(false);
-
-        //    placeDisabledEffect.SetActive(false);
-        //}
-
-        //List<char> reversedStack = new List<char>();
-
-        //// Reverse the stack
-        //for (int i = stack.Count - 1; i >= 0; i--)
-        //{
-        //    reversedStack.Add(stack[i]);
-        //}
-
-        //// Apply to UI
-        //for (int i = 0; i < 3; i++)
-        //{
-        //    // Update the stack with player stack
-        //    if (i < reversedStack.Count)
-        //    {
-        //        UpdateStackUI(i, reversedStack[i]);
-        //        if (i == 0) nextBombText.text = bombHelper.GetBombTextByKey(reversedStack[i]);
-        //    }
-        //    else // Update the rest of stack
-        //    {
-        //        UpdateStackUI(i, 'e');
-        //        if (i == 0) nextBombText.text = "None";
-        //    }
-        //}
-
-
-        //if (op == SyncList<char>.Operation.OP_ADD)
-        //{
-        //    Debug.Log("Move up stack");
-        //} else if (op == SyncList<char>.Operation.OP_REMOVEAT)
-        //{
-        //    Debug.Log("Move down stack");
-        //}
-
-    }
-
-    void UpdateStackUI(int idx, char key)
-    {
-        placeStack[idx].sprite = bombHelper.GetKeySprite(key);
+        nextBomb.sprite = bombHelper.GetKeySprite(key);
     }
 
 }

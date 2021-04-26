@@ -17,8 +17,14 @@ public class PlayerInventory : NetworkBehaviour
     // The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
     [SyncVar(hook=nameof(OnSelectedSlotChange))] public int selectedSlot = 0;
 
+    // Singleton
+    private GameUIManager gameUIManager;
+
     public override void OnStartClient()
     {
+        gameUIManager = GameUIManager.Singleton;
+        if (gameUIManager == null) Debug.LogError("Cannot find Singleton: GameUIManager");
+
         // Subscribe to the synclist hook
         inventoryList.Callback += OnInventoryChange;
     }
@@ -71,8 +77,8 @@ public class PlayerInventory : NetworkBehaviour
     [Server] public void RotateSelectedSlot()
     {
         // Increment selected slot, if at the last slot rotate back to the beginning
-        if (selectedSlot + 1 >= INVEN_BOMB_TYPES.Length) selectedSlot = 0;
-        else selectedSlot++;
+        if (selectedSlot + 1 >= INVEN_BOMB_TYPES.Length) SwitchToSlot(0);
+        else SwitchToSlot(selectedSlot + 1);
     }
 
 	// Changes the selected swap to the hotkey button pressed
@@ -85,6 +91,8 @@ public class PlayerInventory : NetworkBehaviour
     {
         // Update the player interface when selected slot changes
         this.GetComponent<PlayerInterface>().UpdateInventorySelected();
+
+        if (isLocalPlayer) gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
     }
 
     [Client] private void OnInventoryChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
@@ -101,6 +109,11 @@ public class PlayerInventory : NetworkBehaviour
 
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
+
+        if (idx == selectedSlot && isLocalPlayer)
+        {
+            gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[idx], inventoryList[idx]);
+        }
     }
 
     // Returns the bomb type corresponding to the currently selected bomb
