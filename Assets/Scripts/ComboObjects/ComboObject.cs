@@ -163,9 +163,9 @@ public class ComboObject : NetworkBehaviour
         else return origin.transform.position;
     }
     
-    protected virtual Vector3 FindCenterBelowOtherInclusive(GameObject origin) 
+    protected virtual Vector3 FindCenterBelowOtherInclusive(Vector3 origin) 
         {
-            var objectRay = new Ray(origin.transform.position, Vector3.down);
+            var objectRay = new Ray(origin, Vector3.down);
             RaycastHit tileUnderneathHit;
             var status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles"));
             if (!status)
@@ -181,7 +181,7 @@ public class ComboObject : NetworkBehaviour
                 var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position ;
                 return result;
             }
-            else return origin.transform.position;
+            else return origin;
         }
 
 
