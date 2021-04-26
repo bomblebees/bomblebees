@@ -10,11 +10,13 @@ public class LaserObject : TriggerObject
 {
     public float breakdownDuration = 3f;
     private bool isRotating = false;
+	private bool isActivated = false;
     private float targetAngle = 0f;
     private float startAngle;
     public float rotateLerpRate = 0.15f;
 
     public GameObject arrowUI;
+	public GameObject chargeSFX;
 
     protected override void StartDangerAnim()
     {
@@ -23,8 +25,13 @@ public class LaserObject : TriggerObject
     }
     
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
-    {
-        FindObjectOfType<AudioManager>().PlaySound("laserCharge");
+    {		
+		if (!isActivated)
+		{
+			isActivated = true;
+			chargeSFX.SetActive(true);
+		}
+
         UpdateLaserDirection(edgeIndex, triggeringPlayer);
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
