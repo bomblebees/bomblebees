@@ -97,7 +97,8 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
-    private float slowScalar = 1f;
+	public GameObject groundItemPickupHitbox;
+	private float slowScalar = 1f;
     public float timeSinceSlowed = 0f;
     private float sludgedScalar = 1f;
     private float timeSinceSludged = 0f;

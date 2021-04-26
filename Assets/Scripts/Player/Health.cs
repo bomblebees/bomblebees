@@ -55,6 +55,18 @@ public class Health : NetworkBehaviour
         EventLivesChanged?.Invoke(currentHealth, maxHealth, this.gameObject);
     }
 
+	[Client]
+	private void DisableItemPickup()
+	{
+		playerScript.groundItemPickupHitbox.SetActive(false);
+	}
+
+	[Client]
+	private void EnableItemPickup()
+	{
+		playerScript.groundItemPickupHitbox.SetActive(true);
+	}
+
     [Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
@@ -63,11 +75,6 @@ public class Health : NetworkBehaviour
 		playerModel.SetActive(false);
 
 
-		if (isLocalPlayer)
-		{
-			Debug.Log("test in ghost mode console");
-			CmdDropItems();
-		}
 		switch (UnityEngine.Random.Range(1,4))
 		{
 			case 1:
@@ -111,9 +118,10 @@ public class Health : NetworkBehaviour
     }
 
 	[Command]
-	public void CmdDropItems(NetworkConnectionToClient sender = null)
+	public void CmdDropItems()
 	{
-
+		
+		DisableItemPickup();
 		//Debug.Log(_groundItem);
 		/*
 		for (int i = 0; i < 5; i++)
@@ -130,21 +138,20 @@ public class Health : NetworkBehaviour
 			NetworkServer.Spawn(groundItemObject);
 		}
 		*/
-		Debug.Log(sender.identity.name);
-		PlayerInventory deadPlayerInventory = sender.identity.GetComponent<PlayerInventory>();
+		Debug.Log(hasAuthority);
+		// Debug.Log(sender.identity.name);
+		PlayerInventory deadPlayerInventory = GetComponent<PlayerInventory>();
 		Debug.Log(deadPlayerInventory.inventoryList);
 		for (int i = 0; i < deadPlayerInventory.inventoryList.Count; i++)
 		{
 			for (int j = 0; j < deadPlayerInventory.inventoryList[i]; j++)
 			{
 				char bombType = deadPlayerInventory.GetBombTypes()[i];
-				Debug.Log("dropping ground item: " + bombType);
 				Vector3 randomTransform = this.gameObject.transform.position;
 				randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
 				randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
 				GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
 							randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
-				Debug.Log(groundItemObject);
 				GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
 				_groundItem.bombType = bombType;
 				NetworkServer.Spawn(groundItemObject);
@@ -195,7 +202,8 @@ public class Health : NetworkBehaviour
         //ghostModel.SetActive(false);
         revivingModel.SetActive(false);
         playerModel.SetActive(true);
-    }
+		EnableItemPickup();
+	}
 
     public GameObject cachedCollider = null;
 
@@ -248,6 +256,7 @@ public class Health : NetworkBehaviour
         }
         else // Bombs
         {
+			CmdDropItems();
             playerScript.canBeHit = false; // might remove later. this is for extra security
             this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
         }
