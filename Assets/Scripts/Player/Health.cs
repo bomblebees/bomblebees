@@ -120,28 +120,13 @@ public class Health : NetworkBehaviour
 	[Command]
 	public void CmdDropItems()
 	{
-		
+		// on client, disable the item pickup hitbox until SignalExit() (end of invincibility) is called
 		DisableItemPickup();
-		//Debug.Log(_groundItem);
-		/*
-		for (int i = 0; i < 5; i++)
-		{
-			Vector3 randomTransform = this.gameObject.transform.position;
-			randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
-			randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
-			GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
-						randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
-			Debug.Log(groundItemObject);
-			GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
-			_groundItem.bombType = "r";
-			_groundItem.color = Color.red;
-			NetworkServer.Spawn(groundItemObject);
-		}
-		*/
-		Debug.Log(hasAuthority);
-		// Debug.Log(sender.identity.name);
+
+		// grab the inventory to-process from the attached PlayerInventory:
 		PlayerInventory deadPlayerInventory = GetComponent<PlayerInventory>();
-		Debug.Log(deadPlayerInventory.inventoryList);
+		
+		// for each bomb type in the inventory list, go through and spawn that amount of ground items for each bomb in inv:
 		for (int i = 0; i < deadPlayerInventory.inventoryList.Count; i++)
 		{
 			for (int j = 0; j < deadPlayerInventory.inventoryList[i]; j++)
@@ -256,7 +241,9 @@ public class Health : NetworkBehaviour
         }
         else // Bombs
         {
+			// if hit/life is taken, drop the player's stuff
 			CmdDropItems();
+
             playerScript.canBeHit = false; // might remove later. this is for extra security
             this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
         }

@@ -17,32 +17,30 @@ public class GroundItem : NetworkBehaviour
 	// Start is called before the first frame update
 	public override void OnStartClient()
     {
-		// this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", color);
-		transform.position = transform.position + new Vector3(0.0f, UnityEngine.Random.Range(-.3f, .3f), 0.0f);
+		// offset by random float for better look
 		thisOffset = Random.Range(0f, sinTimeOffsetRange);
 	}
 
     // Update is called once per frame
     void FixedUpdate()
     {
+		// Gives a sin-based animation based on editable parameters
 		transform.position = transform.position + new Vector3(0.0f, Mathf.Sin(Time.time * bobFrequency + thisOffset) * amplitude, 0.0f);
     }
 
 	private void OnTriggerEnter(Collider other)
 	{
-		// Debug.Log("Ground Item collided with: " + other.name);
-		// NetworkServer.Destroy(this.gameObject);
+		// to-do: if collision is detected while inventory is already full, it will still destroy the grounditem objects it comes into contact with, fix later
 		if (other.gameObject.layer == 18)
 		{
-			Debug.Log(other.transform.parent);
+			// play sound if local player
 			if (other.transform.parent.GetComponent<Player>().isLocalPlayer)
 			{
 				FindObjectOfType<AudioManager>().PlaySound("inventorypop");
 			}
+
+			// then, add this ground item's type to the collided player's inventory:
 			AddToInventory(other);
-
-			// other.transform.parent
-
 		}
 		
 	}
@@ -50,9 +48,13 @@ public class GroundItem : NetworkBehaviour
 	[Server]
 	private void AddToInventory(Collider collider)
 	{
+		// if the parent of the collider (the Player object) exists:
 		if (collider.transform.parent)
 		{
+			// grab the inventory
 			PlayerInventory collidedInventory = collider.transform.parent.GetComponent<PlayerInventory>();
+
+			// and then add this grounditem's bomb type to the inventory, then destroy
 			collidedInventory.AddInventoryBomb(bombType, 1);
 
 			NetworkServer.Destroy(this.gameObject);
@@ -61,7 +63,7 @@ public class GroundItem : NetworkBehaviour
 
 	private void OnBombTypeChanged(char oldValue, char newValue)
 	{
-		// how do i not hard code these bomb type values? help
+		// to-do: how do i not hard code these bomb type values? help
 		switch (newValue)
 		{
 			case 'r':
