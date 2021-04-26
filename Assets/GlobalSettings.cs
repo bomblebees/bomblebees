@@ -54,5 +54,10 @@ public class GlobalSettings : MonoBehaviour
                 break;
         }
     }
+
+    public void OnClickQuitGameButton()
+    {
+        Application.Quit();
+    }
 }
 
