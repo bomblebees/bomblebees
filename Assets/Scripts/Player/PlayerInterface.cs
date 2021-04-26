@@ -50,6 +50,8 @@ public class PlayerInterface : NetworkBehaviour
         bombHelper = gameUIManager.GetComponent<BombHelper>();
 
         player = this.GetComponent<Player>();
+
+        UpdateInventoryQuantity();
     }
 
     private void Update()
@@ -113,6 +115,9 @@ public class PlayerInterface : NetworkBehaviour
         for (int i = 0; i < list.Count; i++)
         {
             invCounters[i].text = list[i].ToString();
+
+            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
+            else invSlots[i].color = new Color(1f, 1f, 1f);
         }
     }
 
