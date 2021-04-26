@@ -3,15 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
-using UnityEngine.Networking;
-using NetworkBehaviour = Mirror.NetworkBehaviour;
+// using UnityEngine.Networking;
 
 // No generics in Mirror
 public class Health : NetworkBehaviour
 {
     [Header("Settings")] [SerializeField] public int maxLives = 3;
 
-    [Mirror.SyncVar(hook = nameof(OnLivesChanged))]
+    [SyncVar(hook = nameof(OnLivesChanged))]
     public int currentLives;
 
     [SerializeField] float ghostDuration = 5.0f;
@@ -27,11 +26,12 @@ public class Health : NetworkBehaviour
 
     public delegate void InvincibleExitDelegate();
 
-    [Header("Required")] 
+    [Header("Required")]
     public GameObject playerModel;
     public GameObject ghostModel;
     public GameObject revivingModel;
     public GameObject playerInv;
+	public GameObject groundItemPrefab;
     public Player playerScript;
 
     // All the subscribed subscribed will receive this event
@@ -49,17 +49,26 @@ public class Health : NetworkBehaviour
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
-    [Mirror.ClientRpc]
+    [ClientRpc]
     private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
     {
         EventLivesChanged?.Invoke(currentHealth, maxHealth, this.gameObject);
     }
 
-    [Mirror.Client]
+    [Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
-		switch(UnityEngine.Random.Range(1,4))
+
+		playerModel.SetActive(false);
+
+
+		if (isLocalPlayer)
+		{
+			Debug.Log("test in ghost mode console");
+			CmdDropItems();
+		}
+		switch (UnityEngine.Random.Range(1,4))
 		{
 			case 1:
 				FindObjectOfType<AudioManager>().PlaySound("playerDeath");
@@ -71,13 +80,17 @@ public class Health : NetworkBehaviour
 				FindObjectOfType<AudioManager>().PlaySound("playerDeath3");
 				break;
 		}
-        if (newLives == 0) CmdNotifyPlayerDied();
-        else this.CmdBeginGhostMode();
-    }
+		if (newLives == 0) NotifyPlayerDied();
+		else
+		{
+
+			StartCoroutine(BeginGhostMode());
+		}
+	}
 
     #region Server
 
-    [Mirror.Server] // Only server can call this
+    [Server] // Only server can call this
     private void SetHealth(int value)
     {
         currentLives = value;
@@ -90,29 +103,59 @@ public class Health : NetworkBehaviour
         SetHealth(maxLives);
     }
 
-    [Mirror.Command(ignoreAuthority = true)]
+    [Command(ignoreAuthority = true)]
     private void CmdTakeDamage(int damage, GameObject bomb, GameObject player)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
         eventManager.OnPlayerTookDamage(currentLives, bomb, player);
     }
 
+	[Command]
+	public void CmdDropItems(NetworkConnectionToClient sender = null)
+	{
+
+		//Debug.Log(_groundItem);
+		/*
+		for (int i = 0; i < 5; i++)
+		{
+			Vector3 randomTransform = this.gameObject.transform.position;
+			randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
+			randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
+			GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
+						randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
+			Debug.Log(groundItemObject);
+			GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
+			_groundItem.bombType = "r";
+			_groundItem.color = Color.red;
+			NetworkServer.Spawn(groundItemObject);
+		}
+		*/
+		Debug.Log(sender.identity.name);
+		PlayerInventory deadPlayerInventory = sender.identity.GetComponent<PlayerInventory>();
+		Debug.Log(deadPlayerInventory.inventoryList);
+		for (int i = 0; i < deadPlayerInventory.inventoryList.Count; i++)
+		{
+			for (int j = 0; j < deadPlayerInventory.inventoryList[i]; j++)
+			{
+				char bombType = deadPlayerInventory.GetBombTypes()[i];
+				Debug.Log("dropping ground item: " + bombType);
+				Vector3 randomTransform = this.gameObject.transform.position;
+				randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
+				randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
+				GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
+							randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
+				Debug.Log(groundItemObject);
+				GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
+				_groundItem.bombType = bombType;
+				NetworkServer.Spawn(groundItemObject);
+			}
+		}
+	}
+
     #endregion
 
     #region Client
-
-    [Mirror.Command(ignoreAuthority = true)]
-    public void CmdBeginGhostMode()
-    {
-        RpcBeginGhostMode();
-    }
-
-    [Mirror.ClientRpc]
-    public void RpcBeginGhostMode()
-    {
-        StartCoroutine(BeginGhostMode());
-    }
-
+	
     public IEnumerator BeginGhostMode()
     {
         // TODO: place ghost anim here
@@ -120,9 +163,11 @@ public class Health : NetworkBehaviour
         // Anims
         ghostModel.SetActive(true);
         revivingModel.SetActive(false);
-        playerModel.SetActive(false);
+        // playerModel.SetActive(false);
 
-        EventLivesLowered?.Invoke(false); // keep
+		
+
+		EventLivesLowered?.Invoke(false); // keep
 
         // Debug.Log("begin ghost mode");
         yield return new WaitForSeconds(ghostDuration);
@@ -154,7 +199,7 @@ public class Health : NetworkBehaviour
 
     public GameObject cachedCollider = null;
 
-    [Mirror.ClientCallback]
+    [ClientCallback]
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root 
@@ -209,17 +254,6 @@ public class Health : NetworkBehaviour
     }
     // if (objName == )
 
-    [Mirror.Command(ignoreAuthority = true)]
-    public void CmdNotifyPlayerDied()
-    {
-        RpcNotifyPlayerDied();
-    }
-
-    [Mirror.ClientRpc]
-    public void RpcNotifyPlayerDied()
-    {
-        NotifyPlayerDied();
-    }
 
     public void NotifyPlayerDied()
     {

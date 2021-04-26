@@ -5169,6 +5169,7 @@ MonoBehaviour:
   debugBombPress2: 9
   debugBombPress3: 0
   debugBombPress4: '-'
+  debugGroundItemSpawn: g
   isStunned: 0
   stunnedDuration: 0
   invincibilityDuration: 2
@@ -5178,6 +5179,10 @@ MonoBehaviour:
   spinKey: k
   bombKey: j
   rotateKey: left shift
+  slot1: 1
+  slot2: 2
+  slot3: 3
+  slot4: 4
   defaultBombCooldown: 1.5
   onDefaultBombReadyAnim: {fileID: 239481183322107874}
   queenPoints: 0
@@ -5253,6 +5258,8 @@ MonoBehaviour:
   ghostModel: {fileID: 8062245979255692024}
   revivingModel: {fileID: 5401300670555800704}
   playerInv: {fileID: 4849357194100230548}
+  groundItemPrefab: {fileID: 763655508682416159, guid: b046c0fefa7bf3343a3e25df1951a3c8,
+    type: 3}
   playerScript: {fileID: 493922037362194891}
   cachedCollider: {fileID: 0}
 --- !u!114 &5921287484511493969

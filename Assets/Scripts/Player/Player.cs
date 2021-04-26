@@ -30,7 +30,8 @@ public class Player : NetworkBehaviour
     public string debugBombPress1 = "8";
     public string debugBombPress2 = "9";
     public string debugBombPress3 = "e";
-    public string debugBombPress4 = ";";
+	public string debugBombPress4 = ";";
+	public string debugGroundItemSpawn = "g";
     private HexGrid hexGrid;
     public bool isStunned = false;
     public float stunnedDuration = 0;
@@ -294,6 +295,13 @@ public class Player : NetworkBehaviour
         {
             SpawnBlinkObject();
         }
+		if (Input.GetKeyDown(debugGroundItemSpawn))
+		{
+			Debug.Log("G pressed in Debug mode");
+			healthScript.CmdDropItems();
+			
+
+		}
     }
 
     // Update version for server
