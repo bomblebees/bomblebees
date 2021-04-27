@@ -198,7 +198,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public void OnReadyButtonClick()
     {
         if (!hasAuthority) return;
-
+        
+        // Test purposes only
+        _characterSelectionInfo.CharacterAvailabilityInfo.character1 =
+            !_characterSelectionInfo.CharacterAvailabilityInfo.character1;
+        
         if (readyToBegin) CmdChangeReadyState(false);
         else CmdChangeReadyState(true);
 
