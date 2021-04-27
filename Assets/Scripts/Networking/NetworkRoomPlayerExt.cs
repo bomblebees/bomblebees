@@ -11,7 +11,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public Color playerColor;
     
     [Header("Character Selection")]
-    [SyncVar] public int characterCode;
+    [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
     private CharacterSelectionInfo _characterSelectionInfo;
     
     [Header("Default UI")]
@@ -36,15 +36,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
 
-
-        base.OnStartClient();
-    }
-
-    public override void OnStartLocalPlayer()
-    {
         _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
         _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-        base.OnStartLocalPlayer();
+
+        base.OnStartClient();
     }
 
     public override void OnClientEnterRoom()
@@ -175,9 +170,16 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         UpdateLobbyList();
     }
-    
+
+    public void OnChangeCharacterCode(int oldCode, int newCode)
+    {
+        UpdateLobbyList();
+    }
+
     public void OnCharacterChanged()
     {
+        if (!hasAuthority) return;
+
         CmdChangeCharacterCode();
 
         UpdateLobbyList();
