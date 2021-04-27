@@ -46,6 +46,11 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
+	public char[] GetBombTypes()
+	{
+		return INVEN_BOMB_TYPES;
+	}
+
     // Removes a bomb type from the inventory
     [Server] public void RemoveInventoryBomb(char type)
     {
