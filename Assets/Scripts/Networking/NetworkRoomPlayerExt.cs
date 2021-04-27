@@ -3,6 +3,7 @@ using Mirror;
 using Steamworks;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
@@ -134,6 +135,18 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             
             // Character selection
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
+
+            // Disable clicking another player's character portrait
+            if (card.username.text.Equals(SteamFriends.GetPersonaName()))
+            {
+                card.changeCharacterButton.enabled = true;
+                card.changeCharacterButtonHoverTween.enabled = true;
+            }
+            else
+            {
+                card.changeCharacterButton.enabled = false;
+                card.changeCharacterButtonHoverTween.enabled = false;
+            }
 
             // Ready check mark
             if (player.readyToBegin) card.readyStatus.SetActive(true);

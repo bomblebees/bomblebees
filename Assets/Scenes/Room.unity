@@ -4616,7 +4616,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 536434075}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
   m_Name: 
@@ -4631,7 +4631,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 536434075}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -5903,7 +5903,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 753722752}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
   m_Name: 
@@ -5918,7 +5918,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 753722752}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -6703,7 +6703,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 829358784}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
   m_Name: 
@@ -6718,7 +6718,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 829358784}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -8522,21 +8522,29 @@ MonoBehaviour:
     username: {fileID: 810997124}
     readyStatus: {fileID: 1579508661}
     characterPortrait: {fileID: 1224974518}
+    changeCharacterButton: {fileID: 753722757}
+    changeCharacterButtonHoverTween: {fileID: 753722756}
   - playerCard: {fileID: 118720816}
     avatar: {fileID: 770128168}
     username: {fileID: 514456458}
     readyStatus: {fileID: 1402662701}
     characterPortrait: {fileID: 1807718880}
+    changeCharacterButton: {fileID: 1717474633}
+    changeCharacterButtonHoverTween: {fileID: 1717474632}
   - playerCard: {fileID: 957095167}
     avatar: {fileID: 1611321605}
     username: {fileID: 242175595}
     readyStatus: {fileID: 1167541811}
     characterPortrait: {fileID: 659358541}
+    changeCharacterButton: {fileID: 536434080}
+    changeCharacterButtonHoverTween: {fileID: 536434079}
   - playerCard: {fileID: 229411519}
     avatar: {fileID: 457227197}
     username: {fileID: 1241461106}
     readyStatus: {fileID: 1782743525}
     characterPortrait: {fileID: 1038831726}
+    changeCharacterButton: {fileID: 829358789}
+    changeCharacterButtonHoverTween: {fileID: 829358788}
   lobbyName: {fileID: 324356051}
 --- !u!1 &1143582882
 GameObject:
@@ -12005,7 +12013,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1717474628}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
   m_Name: 
@@ -12020,7 +12028,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1717474628}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
