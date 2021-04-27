@@ -28,11 +28,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     Room_UI roomUI;
 
-    private void Awake()
-    {
-        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-    }
-
     public override void OnStartClient()
     {
         this.playerColor = listColors[index];
@@ -41,9 +36,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
 
-        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
 
         base.OnStartClient();
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+        base.OnStartLocalPlayer();
     }
 
     public override void OnClientEnterRoom()
@@ -167,7 +168,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public void OnReadyButtonClick()
     {
-        //if (!hasAuthority) return;
+        if (!hasAuthority) return;
 
         if (readyToBegin) CmdChangeReadyState(false);
         else CmdChangeReadyState(true);
@@ -177,15 +178,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     public void OnCharacterChanged()
     {
-        SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
-        if (!(room is null))
-        {
-            NetworkRoomPlayerExt player = room.roomSlots[index] as NetworkRoomPlayerExt;
-
-            if (!(player is null)) player.characterCode = (player.characterCode + 1) % 4;
-        }
+        CmdChangeCharacterCode();
 
         UpdateLobbyList();
+    }
+
+    [Command]
+    public void CmdChangeCharacterCode()
+    {
+        characterCode = (characterCode + 1) % 4;
     }
     
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
