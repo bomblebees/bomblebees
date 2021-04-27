@@ -137,7 +137,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait
-            if (player.steamUsername == card.username.text)
+            if (card.username.text.Equals(steamUsername))
             {
                 card.playerCard.GetComponentInChildren<Button>().enabled = true;
                 card.playerCard.GetComponentInChildren<ButtonHoverTween>().enabled = true;
