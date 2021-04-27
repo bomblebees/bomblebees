@@ -199,9 +199,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (!hasAuthority) return;
         
-        // Test purposes only
-        _characterSelectionInfo.CharacterAvailabilityInfo.character1 =
-            !_characterSelectionInfo.CharacterAvailabilityInfo.character1;
+        // TODO: 
+        CmdTest();
         
         if (readyToBegin) CmdChangeReadyState(false);
         else CmdChangeReadyState(true);
@@ -227,6 +226,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public void CmdChangeCharacterCode()
     {
         characterCode = (characterCode + 1) % 4;
+    }
+
+    [Command]
+    public void CmdTest()
+    {
+        // TODO:
+        _characterSelectionInfo.CharacterAvailabilityInfo.character1 =
+            !_characterSelectionInfo.CharacterAvailabilityInfo.character1;
     }
     
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
