@@ -52,6 +52,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
         if (!room) return;
         Debug.Log("exit room count" + room.roomSlots.Count);
+
+        this.playerColor = listColors[index];
         UpdateLobbyList();
     }
 
