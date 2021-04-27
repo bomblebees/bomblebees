@@ -139,13 +139,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Disable clicking another player's character portrait
             if (card.username.text.Equals(SteamFriends.GetPersonaName()))
             {
-                card.playerCard.GetComponentInChildren<Button>().enabled = true;
-                card.playerCard.GetComponentInChildren<ButtonHoverTween>().enabled = true;
+                card.changeCharacterButton.enabled = true;
+                card.changeCharacterButtonHoverTween.enabled = true;
             }
             else
             {
-                card.playerCard.GetComponentInChildren<Button>().enabled = false;
-                card.playerCard.GetComponentInChildren<ButtonHoverTween>().enabled = false;
+                card.changeCharacterButton.enabled = false;
+                card.changeCharacterButtonHoverTween.enabled = false;
             }
 
             // Ready check mark
