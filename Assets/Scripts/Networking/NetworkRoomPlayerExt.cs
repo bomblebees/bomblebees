@@ -2,6 +2,7 @@ using UnityEngine;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
@@ -40,6 +41,24 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
 
         base.OnStartClient();
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode loadSceneMode)
+    {
+        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
     }
 
     public override void OnClientEnterRoom()
