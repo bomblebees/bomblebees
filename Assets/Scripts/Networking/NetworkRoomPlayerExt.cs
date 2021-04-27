@@ -9,11 +9,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public string steamUsername;
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
-
+    
+    [Header("Character Selection")]
+    [SyncVar] public int characterCode;
+    private CharacterSelectionInfo _characterSelectionInfo;
+    
+    [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
-
-    [SerializeField] private CharacterSelectionInfo characterSelectionInfo;
-
+    [SerializeField] private string defaultUsername;
+    
     // List of player colors
     private List<Color> listColors = new List<Color> {
         Color.red,
@@ -26,17 +30,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void Awake()
     {
-        characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        
-        characterSelectionInfo.player1 = 0;
-        characterSelectionInfo.player2 = 1;
-        characterSelectionInfo.player3 = 2;
-        characterSelectionInfo.player4 = 3;
+        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
     }
 
     public override void OnStartClient()
@@ -47,7 +41,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
 
-        characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
 
         base.OnStartClient();
     }
@@ -97,15 +91,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
-                card.username.text = "Waiting for players...";
+                card.username.text = defaultUsername;
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
-                card.characterCard.enabled = false;
-                card.characterCard.texture = characterSelectionInfo.characterCardList[i];
+                card.characterPortrait.enabled = false;
                 continue;
             }
 
-            card.characterCard.enabled = true;
+            card.characterPortrait.enabled = true;
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
@@ -123,21 +116,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             else { Debug.LogWarning("ImgId invalid!");  }
             
             // Character selection
-            switch (i)
-            {
-                case 0:
-                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player1];
-                    break;
-                case 1:
-                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player2];
-                    break;
-                case 2:
-                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player3];
-                    break;
-                case 3:
-                    card.characterCard.texture = characterSelectionInfo.characterCardList[characterSelectionInfo.player4];
-                    break;
-            }
+            card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Ready check mark
             if (player.readyToBegin) card.readyStatus.SetActive(true);
@@ -188,7 +167,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public void OnReadyButtonClick()
     {
-        if (!hasAuthority) return;
+        //if (!hasAuthority) return;
 
         if (readyToBegin) CmdChangeReadyState(false);
         else CmdChangeReadyState(true);
@@ -198,6 +177,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     public void OnCharacterChanged()
     {
+        characterCode = (characterCode + 1) % 4;
         UpdateLobbyList();
     }
     

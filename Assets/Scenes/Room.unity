@@ -4668,7 +4668,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1756401978}
-        m_MethodName: ChangePlayer3
+        m_MethodName: OnChangeCharacter
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5955,7 +5955,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1756401978}
-        m_MethodName: ChangePlayer1
+        m_MethodName: OnChangeCharacter
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6755,7 +6755,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1756401978}
-        m_MethodName: ChangePlayer4
+        m_MethodName: OnChangeCharacter
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8521,22 +8521,22 @@ MonoBehaviour:
     avatar: {fileID: 1201809183}
     username: {fileID: 810997124}
     readyStatus: {fileID: 1579508661}
-    characterCard: {fileID: 1224974518}
+    characterPortrait: {fileID: 1224974518}
   - playerCard: {fileID: 118720816}
     avatar: {fileID: 770128168}
     username: {fileID: 514456458}
     readyStatus: {fileID: 1402662701}
-    characterCard: {fileID: 1807718880}
+    characterPortrait: {fileID: 1807718880}
   - playerCard: {fileID: 957095167}
     avatar: {fileID: 1611321605}
     username: {fileID: 242175595}
     readyStatus: {fileID: 1167541811}
-    characterCard: {fileID: 659358541}
+    characterPortrait: {fileID: 659358541}
   - playerCard: {fileID: 229411519}
     avatar: {fileID: 457227197}
     username: {fileID: 1241461106}
     readyStatus: {fileID: 1782743525}
-    characterCard: {fileID: 1038831726}
+    characterPortrait: {fileID: 1038831726}
   lobbyName: {fileID: 324356051}
 --- !u!1 &1143582882
 GameObject:
@@ -12057,7 +12057,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1756401978}
-        m_MethodName: ChangePlayer2
+        m_MethodName: OnChangeCharacter
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12538,11 +12538,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  player1: 0
-  player2: 0
-  player3: 0
-  player4: 0
-  characterCardList:
+  characterPortraitList:
   - {fileID: 2800000, guid: b3b498f9390a44f4787bc82d8374075d, type: 3}
   - {fileID: 2800000, guid: d8851c7b44fa113489e95798e32f0351, type: 3}
   - {fileID: 2800000, guid: 7bdf6fc7abf53cd46aea1888af02c1d0, type: 3}

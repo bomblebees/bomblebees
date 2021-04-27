@@ -33,7 +33,7 @@ public class Room_UI : MonoBehaviour
         public RawImage avatar;
         public TMP_Text username;
         public GameObject readyStatus;
-        public RawImage characterCard;
+        public RawImage characterPortrait;
     }
 
     [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
