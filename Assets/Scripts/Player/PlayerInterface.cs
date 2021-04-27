@@ -13,8 +13,12 @@ public class PlayerInterface : NetworkBehaviour
 
     [Header("Player HUD")]
     [SerializeField] private TMP_Text playerName;
-    [SerializeField] private Image[] stackUI = new Image[3];
-    [SerializeField] private RawImage hexUI;
+
+    [SerializeField] private Image selectedHighlight;
+    [SerializeField] private Image[] invSlots = new Image[4];
+    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+
+    [SerializeField] private Image hexUI;
     [SerializeField] private Image bombCooldownFilter;
     [SerializeField] public Image spinChargeBar;
     private float bombHudTimer = 0;
@@ -35,10 +39,6 @@ public class PlayerInterface : NetworkBehaviour
     {
         base.OnStartClient();
 
-        //ulong steamId = this.GetComponent<Player>().steamId;
-
-        //Debug.Log("server transfer steamid " + steamId);
-
         CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
@@ -49,39 +49,25 @@ public class PlayerInterface : NetworkBehaviour
 
         bombHelper = gameUIManager.GetComponent<BombHelper>();
 
-
         player = this.GetComponent<Player>();
-        player.itemStack.Callback += OnUIStackChange;
+
+        UpdateInventoryQuantity();
     }
 
     private void Update()
     {
         if (!isLocalPlayer) return;
 
+        // If player null, return
+        if (!player) return;
+
         UpdateSpinChargeBar();
-        UpdateBombFilterCooldown();
     }
 
     public void UpdateSpinChargeBar()
     {
-        float[] spinTimes = this.GetComponent<Player>().spinTimings;
-        spinChargeBar.fillAmount = this.GetComponent<Player>().spinChargeTime / spinTimes[spinTimes.Length - 2];
-    }
-
-    public void UpdateBombFilterCooldown()
-    {
-        if (bombHudTimer > 0)
-        {
-            float totalDuration = this.GetComponent<Player>().defaultBombCooldown;
-            bombCooldownFilter.fillAmount = bombHudTimer / totalDuration;
-            bombHudTimer -= Time.deltaTime;
-
-            if (bombHudTimer < 0)
-            {
-                bombHudTimer = 0;
-                bombCooldownFilter.fillAmount = 0;
-            }
-        }
+        float[] spinTimes = player.spinTimings;
+        spinChargeBar.fillAmount = player.spinChargeTime / spinTimes[spinTimes.Length - 2];
     }
 
     public void OnPlayerTakeDamage(int _, int __, GameObject ___)
@@ -122,40 +108,25 @@ public class PlayerInterface : NetworkBehaviour
     }
 
     [Client]
-    void OnUIStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
+    public void UpdateInventoryQuantity()
     {
-        PlayerInterface hud = this.GetComponent<PlayerInterface>();
-        // for (int i = 0; i < 3; i++)
-        for (int i = 2; i >= 0; i--)
-        {
-            if (i < player.itemStack.Count)
-            {
-                hud.UpdateStackHud(i, player.itemStack[i]);
-            }
+        SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
 
-            else hud.UpdateStackHud(i, 'e');
+        for (int i = 0; i < list.Count; i++)
+        {
+            invCounters[i].text = list[i].ToString();
+
+            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
+            else invSlots[i].color = new Color(1f, 1f, 1f);
         }
     }
 
-    public void UpdateStackHud(int idx, char key)
+    [Client]
+    public void UpdateInventorySelected()
     {
-        // Enlarge if front of stack (ie. next bomb to drop)
-        if (idx == player.itemStack.Count - 1)
-            stackUI[idx].gameObject.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-        else
-            stackUI[idx].gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+        int selected = this.GetComponent<PlayerInventory>().selectedSlot;
 
-        // Set the sprite if it is a bomb, otherwise disable it
-        if (key == 'e')
-        {
-            stackUI[idx].color = Color.clear;
-        } else
-        {
-            stackUI[idx].color = Color.white;
-            stackUI[idx].sprite = bombHelper.GetKeySprite(key);
-        }
-
-
+        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
     }
 
     public void UpdateHexHud(char key)
@@ -195,8 +166,4 @@ public class PlayerInterface : NetworkBehaviour
     }
 
     #endregion
-
-
-
-
 }

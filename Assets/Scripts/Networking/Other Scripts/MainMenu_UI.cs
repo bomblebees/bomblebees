@@ -29,6 +29,7 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] public GameObject screenLoading;
     [SerializeField] public GameObject screenError;
     [SerializeField] public GameObject screenCredits;
+    [SerializeField] public GameObject screenHowToPlay;
     [Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
@@ -102,6 +103,28 @@ public class MainMenu_UI : MonoBehaviour
         // Enable options screen
         screenOptions.SetActive(true);
         
+    }
+
+    public void OnClickButtonHowToPlay()
+    {
+        // Disable main menu screen
+        screenMainMenu.SetActive(false);
+
+        // Enable how to play screen
+        screenHowToPlay.SetActive(true);
+    }
+
+    #endregion
+
+    #region Screen: How To Play
+
+    public void OnClickButtonExitHowToPlay()
+    {
+        // Enable main menu screen
+        screenMainMenu.SetActive(true);
+
+        // Disable how to play screen
+        screenHowToPlay.SetActive(false);
     }
 
     #endregion

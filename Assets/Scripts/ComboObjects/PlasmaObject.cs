@@ -13,6 +13,7 @@ public class PlasmaObject : TriggerObject
     private Vector3 targetDir;
     public float projectileSpeed = 3f;
     public float breakdownDuration = 3f;
+    public float startOffset = 3.5f;
     [SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
     public float ignoreTriggererDuration = 1f;
@@ -25,7 +26,14 @@ public class PlasmaObject : TriggerObject
     
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
+        if (wasHit) return true;
         wasHit = true;
+        FindTriggerDirection(edgeIndex);
+        ////
+        var nextPos = FindCenterBelowOtherInclusive(plasmaSphereModel.transform.position + targetDir * startOffset);
+        this.plasmaSphereModel.transform.position = nextPos;
+        this.hitBox.transform.position = nextPos;
+        ////
         StartCoroutine(SpawnBall(edgeIndex, triggeringPlayer));
         return true;
     }
@@ -42,9 +50,8 @@ public class PlasmaObject : TriggerObject
             yield return new WaitForSeconds(startupDelay);
         }
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
-        FindTriggerDirection(edgeIndex);
-        // plasmaSphereModel.transform.position = plasmaSphereModel.transform.position + targetDir * 5;  // This was the starting offset
         this.hitboxEnabled = true;
+        this.hitBox.SetActive(true); 
         this.plasmaSphereModel.SetActive(true);
         base.Push(edgeIndex, triggeringPlayer);  // This shoulda been at the top lol
     }
@@ -55,16 +62,17 @@ public class PlasmaObject : TriggerObject
         if (this.hitboxEnabled == true)
         {
             plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
-            var nextPos = FindCenterBelowOtherInclusive(this.plasmaSphereModel);
+            var nextPos = FindCenterBelowOtherInclusive(this.plasmaSphereModel.transform.position);
             if (nextPos == this.plasmaSphereModel.transform.position)  // Since FindCenter... returns own position on fail
             {
-                this.hitBox.SetActive(false); 
+                // this.hitBox.SetActive(false); 
             }
             else if (lastPosition != nextPos)
             {
                 particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
                 lastPosition = nextPos;
+                this.hitBox.SetActive(true); 
             }
         }
     }

@@ -30,7 +30,8 @@ public class Player : NetworkBehaviour
     public string debugBombPress1 = "8";
     public string debugBombPress2 = "9";
     public string debugBombPress3 = "e";
-    public string debugBombPress4 = ";";
+	public string debugBombPress4 = ";";
+	public string debugGroundItemSpawn = "g";
     private HexGrid hexGrid;
     public bool isStunned = false;
     public float stunnedDuration = 0;
@@ -45,8 +46,12 @@ public class Player : NetworkBehaviour
     [SerializeField] public string spinKey = "o";
     [SerializeField] public string bombKey = "j";
     [SerializeField] public string rotateKey = "left shift";
+	[SerializeField] public string slot1 = "1";
+	[SerializeField] public string slot2 = "2";
+	[SerializeField] public string slot3 = "3";
+	[SerializeField] public string slot4 = "4";
 
-    [SerializeField] public float defaultBombCooldown = 3f;
+	[SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
     [SerializeField] private GameObject onDefaultBombReadyAnim;
     private bool playedOnDefaultBombReadyAnim = true;
@@ -92,7 +97,8 @@ public class Player : NetworkBehaviour
     public GameObject bigBomb;
     public GameObject blink;
     public GameObject gravityObject;
-    private float slowScalar = 1f;
+	public GameObject groundItemPickupHitbox;
+	private float slowScalar = 1f;
     public float timeSinceSlowed = 0f;
     private float sludgedScalar = 1f;
     private float timeSinceSludged = 0f;
@@ -122,7 +128,6 @@ public class Player : NetworkBehaviour
     private GameObject heldHexModel;
 
     [SerializeField] private int maxStackSize = 3;
-    public readonly SyncList<char> itemStack = new SyncList<char>();
 
     private GameObject playerMesh;
     [SerializeField] private GameObject playerModel;
@@ -155,10 +160,6 @@ public class Player : NetworkBehaviour
         // Set player color
         playerMesh = playerModel.transform.GetChild(0).gameObject;
         playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
-
-        itemStack.Callback += OnItemStackChange;
-
-        //Debug.Log("local started");
     }
 
     public override void OnStartServer()
@@ -295,6 +296,13 @@ public class Player : NetworkBehaviour
         {
             SpawnBlinkObject();
         }
+		if (Input.GetKeyDown(debugGroundItemSpawn))
+		{
+			Debug.Log("G pressed in Debug mode");
+			healthScript.CmdDropItems();
+			
+
+		}
     }
 
     // Update version for server
@@ -446,62 +454,45 @@ public class Player : NetworkBehaviour
             var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
             if (!hexCell.IsOccupiedByComboObject())
             {
-                if (itemStack.Count > 0)
+                // Get the players inventory who called this function
+                PlayerInventory inv = sender.identity.GetComponent<PlayerInventory>();
+
+                char bombType = inv.GetSelectedBombType(); // get the currently selected bomb type
+
+                if (bombType == 'e') return; // if selected bomb type empty, return
+
+                inv.RemoveInventoryBomb(bombType); // Subtract the bomb type from the player inventory by 1
+
+                switch (bombType)
                 {
-                    char bombType = itemStack[itemStack.Count - 1]; // peek top of stack
-
-                    sender.identity.GetComponent<Player>().RemoveItemCombo(); // pop it off
-
-                    switch (bombType)
-                    {
-                        case 'b':
-                            // Debug.Log("Blue Bomb Type");
-                            SpawnBlinkObject(sender.identity.gameObject);
-                            break;
-                        case 'g':
-                            // Debug.Log("Green Bomb Type");
-                            SpawnPlasmaObject(sender.identity.gameObject);
-                            break;
-                        case 'y':
-                            // Debug.Log("Yellow Bomb Type");
-                            SpawnLaserObject(sender.identity.gameObject);
-                            break;
-                        case 'r':
-                            // Debug.Log("Red Bomb Type");
-                            SpawnDefaultBomb(sender.identity.gameObject);
-                            break;
-                        case 'p':
-                            // Debug.Log("Purple Bomb Type");
-                            SpawnSludgeObject(sender.identity.gameObject);
-                            break;
-                        case 'w':
-                            // Debug.Log("White Bomb Type");
-                            SpawnDefaultBomb(sender.identity.gameObject);
-                            break;
-                        default:
-                            // code should not reach here
-                            Debug.Log("Bomb type not found");
-                            break;
-                    }
-                }
-                //else if (defaultBombUseTimer > defaultBombCooldown)  // we should play a flashing anim when its ready.
-                //{
-                //    Debug.Log("dropping default bomb");
-                //    onDefaultBombReadyAnim.SetActive(false);
-                //    playedOnDefaultBombReadyAnim = false;
-
-                /// Else use the default bomb
-                // this.SpawnDefaultBomb(sender.identity.gameObject);
-
-                //    // update hud
-                //    this.GetComponent<PlayerInterface>().StartBombHudCooldown(defaultBombCooldown);
-
-                //    defaultBombUseTimer = 0;
-
-                //}
-                else // When the default bomb CD isn't up
-                {
-
+                    case 'b':
+                        // Debug.Log("Blue Bomb Type");
+                        SpawnBlinkObject(sender.identity.gameObject);
+                        break;
+                    case 'g':
+                        // Debug.Log("Green Bomb Type");
+                        SpawnPlasmaObject(sender.identity.gameObject);
+                        break;
+                    case 'y':
+                        // Debug.Log("Yellow Bomb Type");
+                        SpawnLaserObject(sender.identity.gameObject);
+                        break;
+                    case 'r':
+                        // Debug.Log("Red Bomb Type");
+                        SpawnDefaultBomb(sender.identity.gameObject);
+                        break;
+                    case 'p':
+                        // Debug.Log("Purple Bomb Type");
+                        SpawnSludgeObject(sender.identity.gameObject);
+                        break;
+                    case 'w':
+                        // Debug.Log("White Bomb Type");
+                        SpawnDefaultBomb(sender.identity.gameObject);
+                        break;
+                    default:
+                        // code should not reach here
+                        Debug.Log("Bomb type not found");
+                        break;
                 }
             }
         }
@@ -884,102 +875,49 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForBombRotation()
     {
-        if (Input.GetKeyDown(rotateKey))
+		if (Input.GetKeyDown(rotateKey))
         {
-			if (itemStack.Count > 1)
-			{
-				FindObjectOfType<AudioManager>().PlaySound("bombrotation");
-			}
             CmdRotateItemStack();
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-    }
+		if (Input.GetKeyDown(slot1))
+		{
+			CmdSelectItemSlot(0);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+		if (Input.GetKeyDown(slot2))
+		{
+			CmdSelectItemSlot(1);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+		if (Input.GetKeyDown(slot3))
+		{
+			CmdSelectItemSlot(2);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+		if (Input.GetKeyDown(slot4))
+		{
+			CmdSelectItemSlot(3);
+			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+		}
+	}
 
     [Command]
     public void CmdRotateItemStack()
     {
-        RotateItemStack();
+        this.GetComponent<PlayerInventory>().RotateSelectedSlot();
     }
 
-    //[TargetRpc]
-    //public void TargetAddItemCombo(NetworkConnection target, char colorKey)
-    //{
-    //    CmdAddItemCombo(colorKey);
-    //}
-
-    //public void AddItemCombo(char colorKey)
-    //{
-    //    if (!isLocalPlayer) return;
-    //    CmdAddItemCombo(colorKey);
-    //}
-
-    [Server]
-    public void AddItemCombo(char colorKey)
-    {
-        // if (colorKey == 'w')
-        // {
-        //     print("IN HERE");
-        //     ApplyQueenPoints(1);
-        // }
-        // else 
-        if (itemStack.Count < maxStackSize)
-        {
-            itemStack.Add(colorKey); // Push new combo to stack
-        }
-        else
-        {
-            itemStack.RemoveAt(0); // Remove oldest combo (bottom of stack)
-            itemStack.Add(colorKey); // Push new combo to stack
-        }
-    }
-
-    [Server]
-    public void RemoveItemCombo()
-    {
-        if (itemStack.Count > 0)
-        {
-            itemStack.RemoveAt(itemStack.Count - 1); // pop it off
-        }
-    }
-
-    [Server]
-    public void RotateItemStack()
-    {
-        if (itemStack.Count > 1)
-        {
-            char tmp = itemStack[itemStack.Count - 1];
-            itemStack.RemoveAt(itemStack.Count - 1);
-            itemStack.Insert(0, tmp);
-        }
-    }
+	[Command]
+	public void CmdSelectItemSlot(int index)
+	{
+		this.GetComponent<PlayerInventory>().SwitchToSlot(index);
+	}
 
     [Server]
     public void ClearItemStack(bool val = true)
     {
-        while (itemStack.Count > 0)
-        {
-            itemStack.RemoveAt(itemStack.Count - 1); // pop it off
-        }
-    }
-
-    [Client]
-    void OnItemStackChange(SyncList<char>.Operation op, int idx, char oldColor, char newColor)
-    {
-        // If max inventory stack, player should not be able to swap
-        if (itemStack.Count == 3)
-        {
-            canSwap = false;
-        } else
-        {
-            canSwap = true;
-        }
-
-        PlayerInterface hud = this.GetComponent<PlayerInterface>();
-        // for (int i = 0; i < 3; i++)
-        for (int i = 2; i >= 0; i--)
-        {
-            if (i < itemStack.Count) hud.UpdateStackHud(i, itemStack[i]);
-            else hud.UpdateStackHud(i, 'e');
-        }
+        this.GetComponent<PlayerInventory>().ResetInventory();
     }
 
     [Command]

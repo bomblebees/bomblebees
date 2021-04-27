@@ -1,8 +1,8 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
@@ -11,9 +11,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public string steamUsername;
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
-
+    
+    [Header("Character Selection")]
+    [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
+    private CharacterSelectionInfo _characterSelectionInfo;
+    
+    [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
-
+    [SerializeField] private string defaultUsername;
+    
     // List of player colors
     private List<Color> listColors = new List<Color> {
         Color.red,
@@ -21,9 +27,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         Color.yellow,
         Color.green,
     };
-
+    
     Room_UI roomUI;
-
 
     public override void OnStartClient()
     {
@@ -33,7 +38,28 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
 
+        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+
         base.OnStartClient();
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode loadSceneMode)
+    {
+        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
     }
 
     public override void OnClientEnterRoom()
@@ -46,6 +72,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
         if (!room) return;
         Debug.Log("exit room count" + room.roomSlots.Count);
+
+        this.playerColor = listColors[index];
         UpdateLobbyList();
     }
 
@@ -81,16 +109,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
-                //card.playerCard.SetActive(false);
-
-                card.username.text = "Waiting for players...";
+                card.username.text = defaultUsername;
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
-                card.characterCard.enabled = false;
+                card.characterPortrait.enabled = false;
                 continue;
             }
 
-            card.characterCard.enabled = true;
+            card.characterPortrait.enabled = true;
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
@@ -106,6 +132,21 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
             if (imgId > 0) card.avatar.texture = GetSteamImageAsTexture(imgId);
             else { Debug.LogWarning("ImgId invalid!");  }
+            
+            // Character selection
+            card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
+
+            // Disable clicking another player's character portrait
+            if (card.username.text.Equals(SteamFriends.GetPersonaName()))
+            {
+                card.changeCharacterButton.enabled = true;
+                card.changeCharacterButtonHoverTween.enabled = true;
+            }
+            else
+            {
+                card.changeCharacterButton.enabled = false;
+                card.changeCharacterButtonHoverTween.enabled = false;
+            }
 
             // Ready check mark
             if (player.readyToBegin) card.readyStatus.SetActive(true);
@@ -124,8 +165,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-
-    public Texture2D GetSteamImageAsTexture(int iImage)
+    private Texture2D GetSteamImageAsTexture(int iImage)
     {
         Texture2D texture = null;
 
@@ -163,6 +203,26 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         else CmdChangeReadyState(true);
 
         UpdateLobbyList();
+    }
+
+    public void OnChangeCharacterCode(int oldCode, int newCode)
+    {
+        UpdateLobbyList();
+    }
+
+    public void OnCharacterChanged()
+    {
+        if (!hasAuthority) return;
+
+        CmdChangeCharacterCode();
+
+        UpdateLobbyList();
+    }
+
+    [Command]
+    public void CmdChangeCharacterCode()
+    {
+        characterCode = (characterCode + 1) % 4;
     }
     
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)

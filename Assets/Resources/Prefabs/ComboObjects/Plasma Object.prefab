@@ -300,8 +300,9 @@ MonoBehaviour:
   fillShaderRatio: 0.9
   minimumLifeDuration: 4
   stayPermanent: 1
-  projectileSpeed: 9
+  projectileSpeed: 2
   breakdownDuration: 3
+  startOffset: 9
   plasmaSphereModel: {fileID: 4085552186968079639}
   particleSystem: {fileID: 7751750280610379946}
   ignoreTriggererDuration: 1
@@ -6198,7 +6199,7 @@ Transform:
   m_GameObject: {fileID: 3275824003628949206}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.7, y: 1, z: 1.7}
   m_Children:
   - {fileID: 3458376578031227243}
   - {fileID: 7624084671803026054}
@@ -6484,7 +6485,7 @@ GameObject:
   - component: {fileID: 4316326132765927598}
   - component: {fileID: 2834753113556041949}
   - component: {fileID: 8070663097628439087}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: center ball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6561,7 +6562,7 @@ SphereCollider:
   m_GameObject: {fileID: 3960696930250748198}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -6658,7 +6659,7 @@ GameObject:
   - component: {fileID: 4085552186968079632}
   - component: {fileID: 4085552186968079633}
   - component: {fileID: 4085552186968079638}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PlasmaSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6737,7 +6738,7 @@ SphereCollider:
   m_GameObject: {fileID: 4085552186968079639}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -7201,7 +7202,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7624084671803026054
 Transform:
   m_ObjectHideFlags: 0
@@ -7277,7 +7278,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3458376578031227243
 Transform:
   m_ObjectHideFlags: 0
@@ -12701,7 +12702,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7376844994490737294}
   - component: {fileID: 5589649924629927975}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: SFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12731,11 +12732,11 @@ AudioSource:
   m_GameObject: {fileID: 8451613306942955731}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: 18ca679d8b5f0e54aa062b5e40b9afde,
+  OutputAudioMixerGroup: {fileID: -1533089387255095081, guid: 18ca679d8b5f0e54aa062b5e40b9afde,
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 2a4f3486b3a97a1449d066cf22a1d0da, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.47
+  m_Volume: 0.45
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -13042,6 +13043,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: ComboHitbox
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &3542364700677943859 stripped
@@ -13161,6 +13167,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: ComboHitbox
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
@@ -13282,6 +13293,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: ComboHitbox
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &1819210876579573595 stripped
@@ -13401,6 +13417,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: ComboHitbox
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
@@ -13522,6 +13543,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: ComboHitbox
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &7154039032406056483 stripped
@@ -13642,6 +13668,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: ComboHitbox
       objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
 --- !u!4 &5173084058743204629 stripped
@@ -13761,6 +13792,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_TagString
       value: ComboHitbox
+      objectReference: {fileID: 0}
+    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}

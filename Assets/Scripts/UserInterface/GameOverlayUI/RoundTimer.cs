@@ -32,7 +32,19 @@ public class RoundTimer : MonoBehaviour
                 timerFlashing = true;
             }
 
-            timerText.text = (roundDuration - currentTime).ToString("F1");
+            float remainingTimeInSeconds = roundDuration - currentTime;
+
+            if (remainingTimeInSeconds > 0)
+            {
+                int minutes = Mathf.FloorToInt(remainingTimeInSeconds / 60F);
+                int seconds = Mathf.FloorToInt(remainingTimeInSeconds - minutes * 60);
+
+                timerText.text = string.Format("{0:0}:{1:00}", minutes, seconds);
+            } else
+            {
+                timerText.text = "0:00";
+            }
+
             timerRing.fillAmount = 1 - (currentTime / roundDuration);
 
             currentTime += Time.deltaTime;
@@ -48,7 +60,10 @@ public class RoundTimer : MonoBehaviour
 
     public IEnumerator InitTimer(float duration, float freezeTime)
     {
-        timerText.text = duration.ToString("F1");
+        int minutes = Mathf.FloorToInt(duration / 60F);
+        int seconds = Mathf.FloorToInt(duration - minutes * 60);
+
+        timerText.text = string.Format("{0:0}:{1:00}", minutes, seconds);
         yield return new WaitForSeconds(freezeTime + 1);
         StartTimer(duration);
     }
