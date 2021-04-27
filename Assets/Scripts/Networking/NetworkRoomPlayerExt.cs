@@ -177,7 +177,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     public void OnCharacterChanged()
     {
-        characterCode = (characterCode + 1) % 4;
+        SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
+        if (!(room is null))
+        {
+            NetworkRoomPlayerExt player = room.roomSlots[index] as NetworkRoomPlayerExt;
+
+            if (!(player is null)) player.characterCode = (player.characterCode + 1) % 4;
+        }
+
         UpdateLobbyList();
     }
     
