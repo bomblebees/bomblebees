@@ -14,6 +14,8 @@ public class LivesUI : MonoBehaviour
         public GameObject livesObject;
         public RawImage avatar;
         public RawImage background;
+        public GameObject heart1;
+        public GameObject heart2;
         public TMP_Text playerName;
         public TMP_Text livesCounter;
     }
@@ -27,8 +29,10 @@ public class LivesUI : MonoBehaviour
         {
             Player p = players[i].GetComponent<Player>();
 
+            LivesElem elem = livesUIs[i];
+
             // enable ui for players
-            livesUIs[i].livesObject.SetActive(true);
+            elem.livesObject.SetActive(true);
 
             // Set steam user avatar
             if (p.steamId != 0)
@@ -36,14 +40,20 @@ public class LivesUI : MonoBehaviour
                 CSteamID steamID = new CSteamID(p.steamId);
                 int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
                 if (imageId == -1) return;
-                livesUIs[i].avatar.texture = GetSteamImageAsTexture(imageId);
+                elem.avatar.texture = GetSteamImageAsTexture(imageId);
             }
 
             // initialize health and username
-            livesUIs[i].playerName.text = p.steamName;
+            elem.playerName.text = p.steamName;
             //livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
-            livesUIs[i].background.color = p.playerColor; // sets the color to the color of the player
-            livesUIs[i].livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
+            elem.background.color = p.playerColor; // sets the color to the color of the player
+
+            // Set the lives
+            elem.livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
+
+            elem.heart2.SetActive(true);
+            elem.heart1.SetActive(true);
+            
         }
 
     }
@@ -75,6 +85,9 @@ public class LivesUI : MonoBehaviour
             int lifeCount = players[i].GetComponent<Health>().currentLives;
 
             livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
+
+            if (lifeCount <= 1) { livesUIs[i].heart2.SetActive(false); }
+            if (lifeCount <= 0) { livesUIs[i].heart1.SetActive(false); }
         }
     }
 
