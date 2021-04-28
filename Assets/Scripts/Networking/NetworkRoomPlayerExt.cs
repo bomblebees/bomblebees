@@ -228,12 +228,17 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         characterCode = (characterCode + 1) % 4;
     }
 
+    // TODO:
+    private CharacterAvailabilityInfo _characterAvailabilityInfo;
     [Command]
     public void CmdTest()
     {
         // TODO:
-        _characterSelectionInfo.CharacterAvailabilityInfo.character1 =
-            !_characterSelectionInfo.CharacterAvailabilityInfo.character1;
+        if (_characterAvailabilityInfo == null)
+        {
+            _characterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
+        }
+        _characterAvailabilityInfo.character1 = !_characterAvailabilityInfo.character1;
     }
     
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)

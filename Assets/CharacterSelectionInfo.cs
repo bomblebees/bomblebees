@@ -8,13 +8,13 @@ public class CharacterSelectionInfo : NetworkBehaviour
     
     [Header("Character Availability Info")]
     [SerializeField] private GameObject characterAvailabilityInfo;
-    public CharacterAvailabilityInfo CharacterAvailabilityInfo;
+    //public CharacterAvailabilityInfo CharacterAvailabilityInfo;
 
     private void Start()
     {
         NetworkServer.Spawn(Instantiate(characterAvailabilityInfo));
         
-        CharacterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
+        //CharacterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
     }
 
     public delegate void ChangeCharacterDelegate();
