@@ -143,8 +143,8 @@ public class Player : NetworkBehaviour
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
     {
-        base.OnStartLocalPlayer();
         gameObject.name = "LocalPlayer";
+        base.OnStartLocalPlayer();
     }
 
     public override void OnStartClient()
@@ -384,8 +384,7 @@ public class Player : NetworkBehaviour
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
                 this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.4f);
+                CmdSetSpinChargeFlashEffect(10f, 0.4f);
                 spinChargeLevel1Hit = true;
             }
 
@@ -393,8 +392,7 @@ public class Player : NetworkBehaviour
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
                 this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 15f);
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.8f);
+                CmdSetSpinChargeFlashEffect(15f, 0.8f);
                 spinChargeLevel2Hit = true;
             }
 
@@ -402,8 +400,7 @@ public class Player : NetworkBehaviour
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
                 this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 20f);
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 1.2f);
+                CmdSetSpinChargeFlashEffect(20f, 1.2f);
                 spinChargeLevel3Hit = true;
             }
         }
@@ -434,15 +431,24 @@ public class Player : NetworkBehaviour
 
     }
 
+    [Command] public void CmdSetSpinChargeFlashEffect(float flashSpeed, float glowAmt)
+    {
+        RpcSetSpinChargeFlashEffect(flashSpeed, glowAmt);
+    }
+
+    [ClientRpc] public void RpcSetSpinChargeFlashEffect(float flashSpeed, float glowAmt)
+    {
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeed);
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmt);
+    }
+
     public void ResetSpinCharge()
     {
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
+        CmdSetSpinChargeFlashEffect(0f, 0f);
         spinScalar = 1f;
         spinChargeTime = 0f;
         spinHeld = false;
     }
-
 
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)

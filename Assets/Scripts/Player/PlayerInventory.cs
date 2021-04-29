@@ -78,12 +78,29 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
-    // Changes the selected slot to the next slot
+    // Changes the selected slot to the next available slot
+    // If no slots are available, does not move slot
     [Server] public void RotateSelectedSlot()
     {
+        // Start at current slot
+        int nextSlot = selectedSlot;
+
+        // Set it to the next available slot
+        for (int i = 1; i <= inventoryList.Count; i++)
+        {
+            // Set to next slot
+            nextSlot = selectedSlot + i;
+
+            // If past the last slot rotate back to the beginning
+            if (nextSlot >= inventoryList.Count) nextSlot = nextSlot - inventoryList.Count;
+
+            // If this slot has bombs, leave loop
+            if (inventoryList[nextSlot] > 0) break;
+        }
+
         // Increment selected slot, if at the last slot rotate back to the beginning
-        if (selectedSlot + 1 >= INVEN_BOMB_TYPES.Length) SwitchToSlot(0);
-        else SwitchToSlot(selectedSlot + 1);
+        if (nextSlot >= INVEN_BOMB_TYPES.Length) SwitchToSlot(0);
+        else SwitchToSlot(nextSlot);
     }
 
 	// Changes the selected swap to the hotkey button pressed
@@ -95,25 +112,15 @@ public class PlayerInventory : NetworkBehaviour
     [Client] private void OnSelectedSlotChange(int oldSlot, int newSlot)
     {
         // Update the player interface when selected slot changes
-        this.GetComponent<PlayerInterface>().UpdateInventorySelected();
+        FindObjectOfType<GameUIManager>().hotbar.UpdateInventorySelected();
 
         if (isLocalPlayer) gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
     }
 
     [Client] private void OnInventoryChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
     {
-        //Debug.Log("inventory idx:" + idx + " changed from " + oldAmt + " to " + newAmt);
-
-        //string d = "Inventory: ";
-        //foreach (int q in inventoryList)
-        //{
-        //    d += q.ToString() + " ";
-        //}
-
-        //Debug.Log(d);
-
         // Update the player interface everytime the inventory changes
-        this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
+        FindObjectOfType<GameUIManager>().hotbar.UpdateInventoryQuantity();
 
         if (idx == selectedSlot && isLocalPlayer)
         {

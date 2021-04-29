@@ -46,7 +46,7 @@ public class LivesUI : MonoBehaviour
             // initialize health and username
             elem.playerName.text = p.steamName;
             //livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
-            elem.background.color = p.playerColor; // sets the color to the color of the player
+            //elem.background.color = p.playerColor; // sets the color to the color of the player
 
             // Set the lives
             elem.livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();

@@ -11,7 +11,7 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] private LivesUI livesUI = null;
     [SerializeField] private MessageFeed messageFeed = null;
     [SerializeField] private MessageFeed warningFeed = null;
-    [SerializeField] private Hotbar hotbar = null;
+    [SerializeField] public Hotbar hotbar = null;
 
     private GameObject localPlayer;
 
@@ -61,16 +61,22 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundEnd += ClientEndRound;
     }
 
-    private void Update()
+    public override void OnStartLocalPlayer()
     {
-        if (localPlayer == null)
-        {
-            localPlayer = GameObject.Find("LocalPlayer");
-            
-            if (localPlayer != null) localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
-        }
-        
+        base.OnStartLocalPlayer();
+        localPlayer = GameObject.Find("LocalPlayer");
     }
+
+    //private void Update()
+    //{
+    //    if (localPlayer == null)
+    //    {
+    //        localPlayer = GameObject.Find("LocalPlayer");
+            
+    //        if (localPlayer != null) localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
+    //    }
+        
+    //}
 
     // When a player loads into the game (on server)
     [Server] public void ServerPlayerConnected(RoundManager.PlayerInfo p)

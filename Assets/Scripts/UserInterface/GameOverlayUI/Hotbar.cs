@@ -35,6 +35,11 @@ public class Hotbar : MonoBehaviour
     [SerializeField] private GameObject rotateDisabledEffect;
     [SerializeField] private GameObject rotateKey;
 
+    [Header("Inventory")]
+    [SerializeField] private Image selectedHighlight;
+    [SerializeField] private Image[] invSlots = new Image[4];
+    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+
     private void Start()
     {
         bombHelper = this.gameObject.transform.parent.GetComponent<BombHelper>();
@@ -57,9 +62,10 @@ public class Hotbar : MonoBehaviour
         {
             UpdateHexUI();
             KeyPressListener();
+            UpdateSpinDelayTimer();
+            UpdateInventoryQuantity();
         }
 
-        UpdateSpinDelayTimer();
     }
 
     // Plays a button press tween anim when hot keys can be pressed
@@ -160,6 +166,27 @@ public class Hotbar : MonoBehaviour
         bombQuantityText.text = amt.ToString();
 
         nextBomb.sprite = bombHelper.GetKeySprite(key);
+    }
+
+
+    public void UpdateInventoryQuantity()
+    {
+        SyncList<int> list = localPlayer.GetComponent<PlayerInventory>().inventoryList;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            invCounters[i].text = list[i].ToString();
+
+            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
+            else invSlots[i].color = new Color(1f, 1f, 1f);
+        }
+    }
+
+    public void UpdateInventorySelected()
+    {
+        int selected = localPlayer.GetComponent<PlayerInventory>().selectedSlot;
+
+        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
     }
 
 }

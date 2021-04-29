@@ -157,8 +157,6 @@ public class Health : NetworkBehaviour
         revivingModel.SetActive(false);
         // playerModel.SetActive(false);
 
-		
-
 		EventLivesLowered?.Invoke(false); // keep
 
         // Debug.Log("begin ghost mode");
@@ -248,17 +246,9 @@ public class Health : NetworkBehaviour
             this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
         }
     }
-    // if (objName == )
-
 
     public void NotifyPlayerDied()
     {
-        if (isLocalPlayer)
-        {
-            PlayerInterface playerUI = playerScript.gameObject.GetComponent<PlayerInterface>();
-            StartCoroutine(playerUI.EnableDeathUI());
-        }
-
         playerInv.SetActive(false);
         playerModel.SetActive(false);
         playerScript.canBeHit = false;

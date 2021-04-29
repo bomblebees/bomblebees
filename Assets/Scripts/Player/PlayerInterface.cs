@@ -14,14 +14,9 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Player HUD")]
     [SerializeField] private TMP_Text playerName;
 
-    [SerializeField] private Image selectedHighlight;
-    [SerializeField] private Image[] invSlots = new Image[4];
-    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
-
     [SerializeField] private Image hexUI;
-    [SerializeField] private Image bombCooldownFilter;
     [SerializeField] public Image spinChargeBar;
-    private float bombHudTimer = 0;
+    [SerializeField] public GameObject spinUI;
 
     [Header("User Interface")]
     [SerializeField] private GameObject deathUI;
@@ -33,11 +28,17 @@ public class PlayerInterface : NetworkBehaviour
 
     private Player player;
     private GameUIManager gameUIManager;
-    private BombHelper bombHelper;
 
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        // Turn off held hex and spin charge UI for other players
+        if (!isLocalPlayer)
+        {
+            hexUI.gameObject.SetActive(false);
+            spinUI.SetActive(false);
+        }
 
         CmdUpdatePlayerName(this.gameObject);
 
@@ -47,11 +48,7 @@ public class PlayerInterface : NetworkBehaviour
         gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
 
-        bombHelper = gameUIManager.GetComponent<BombHelper>();
-
         player = this.GetComponent<Player>();
-
-        UpdateInventoryQuantity();
     }
 
     private void Update()
@@ -75,22 +72,6 @@ public class PlayerInterface : NetworkBehaviour
         if (isLocalPlayer) damageIndicator.GetComponent<FlashTween>().StartFlash();
     }
 
-    public IEnumerator EnableDeathUI()
-    {
-        // WARN: lazy way to disable player after death, may still be able to place bombs
-        //playerModelsAndVfx.SetActive(false); 
-
-        //deathUI.SetActive(true);
-        yield return new WaitForSeconds(0);
-        //deathUI.SetActive(false);
-    }
-
-    public void EnableGameOverUI()
-    {
-        //deathUI.SetActive(false);
-        //gameOverUI.SetActive(true);
-    }
-
 
     #region Heads Up Display (HUD)
 
@@ -105,28 +86,6 @@ public class PlayerInterface : NetworkBehaviour
     {
         playerName.text = player.GetComponent<Player>().steamName;
         playerName.color = player.GetComponent<Player>().playerColor;
-    }
-
-    [Client]
-    public void UpdateInventoryQuantity()
-    {
-        SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
-
-        for (int i = 0; i < list.Count; i++)
-        {
-            invCounters[i].text = list[i].ToString();
-
-            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
-            else invSlots[i].color = new Color(1f, 1f, 1f);
-        }
-    }
-
-    [Client]
-    public void UpdateInventorySelected()
-    {
-        int selected = this.GetComponent<PlayerInventory>().selectedSlot;
-
-        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
     }
 
     public void UpdateHexHud(char key)
@@ -151,18 +110,6 @@ public class PlayerInterface : NetworkBehaviour
             case 'e': return Color.white;
             default: return Color.white;
         }
-    }
-
-    [Server]
-    public void StartBombHudCooldown(float duration)
-    {
-        RpcStartBombHudCooldown(duration);
-    }
-
-    [ClientRpc]
-    public void RpcStartBombHudCooldown(float duration)
-    {
-        bombHudTimer = duration;
     }
 
     #endregion
