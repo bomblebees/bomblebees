@@ -1,5 +1,4 @@
-﻿using System;
-using Mirror;
+﻿using Mirror;
 using UnityEngine;
 
 public class CharacterSelectionInfo : NetworkBehaviour
@@ -8,19 +7,21 @@ public class CharacterSelectionInfo : NetworkBehaviour
     
     [Header("Character Availability Info")]
     [SerializeField] private GameObject characterAvailabilityInfo;
-    //public CharacterAvailabilityInfo CharacterAvailabilityInfo;
+
+    public delegate void ChangeCharacterDelegate();
+    public event ChangeCharacterDelegate EventCharacterChanged;
 
     private void Start()
     {
-        NetworkServer.Spawn(Instantiate(characterAvailabilityInfo));
-        
-        //CharacterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
+        InstantiateCharacterAvailabilityInfo();
     }
 
-    public delegate void ChangeCharacterDelegate();
-
-    public event ChangeCharacterDelegate EventCharacterChanged;
-
+    [Server]
+    private void InstantiateCharacterAvailabilityInfo()
+    {
+        NetworkServer.Spawn(Instantiate(characterAvailabilityInfo));
+    }
+    
     public void OnChangeCharacter()
     {
         EventCharacterChanged?.Invoke();
