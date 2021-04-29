@@ -86,7 +86,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public void UpdateLobbyList()
     {
         bool[] characterAvailable = {true, true, true, true};
-        
+
         if (!roomUI)
         {
             // reenable and resubscribe to events
@@ -108,6 +108,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         for (int i = 0; i < 4; i++)
         {
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+            bool isYourself = card.username.text.Equals(SteamFriends.GetPersonaName());
 
             // if player does not exist
             if (i >= room.roomSlots.Count)
@@ -140,7 +141,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait && lock character on ready
-            if (card.username.text.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
+            if (isYourself && !player.readyToBegin)
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -155,14 +156,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.readyStatus.SetActive(player.readyToBegin);
             
             // Cache character Availability
-            if (player.readyToBegin)
+            if (player.readyToBegin && !isYourself)
             {
                 characterAvailable[player.characterCode] = false;
             }
         }
 
         // Ready button
-        if (!characterAvailable[characterCode] && !room.roomSlots[index].readyToBegin)
+        if (!characterAvailable[characterCode])
         {
             roomUI.DeactivateReadyButton();
         } else
@@ -213,52 +214,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public void OnReadyButtonClick()
     {
         if (!hasAuthority) return;
-        
-        /*if (_characterAvailabilityInfo == null)
-        {
-            _characterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
-        }
 
-        if (!CharacterAvailability() && !readyToBegin) return;
-
-        UpdateCharacterAvailability(characterCode);*/
-        
         CmdChangeReadyState(!readyToBegin);
         UpdateLobbyList();
-    }
-
-    private bool CharacterAvailability()
-    {
-        switch (characterCode)
-        {
-            case 0 when _characterAvailabilityInfo.character1:
-            case 1 when _characterAvailabilityInfo.character2:
-            case 2 when _characterAvailabilityInfo.character3:
-            case 3 when _characterAvailabilityInfo.character4:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    [Command]
-    private void UpdateCharacterAvailability(int character)
-    {
-        switch (character)
-        {
-            case 0:
-                _characterAvailabilityInfo.character1 = !_characterAvailabilityInfo.character1;
-                break;
-            case 1:
-                _characterAvailabilityInfo.character2 = !_characterAvailabilityInfo.character2;
-                break;
-            case 2:
-                _characterAvailabilityInfo.character3 = !_characterAvailabilityInfo.character3;
-                break;
-            case 3:
-                _characterAvailabilityInfo.character4 = !_characterAvailabilityInfo.character4;
-                break;
-        }
     }
 
     [Command]
