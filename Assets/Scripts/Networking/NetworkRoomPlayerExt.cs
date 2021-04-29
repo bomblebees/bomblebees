@@ -85,6 +85,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public void UpdateLobbyList()
     {
+        bool[] characterAvailable = {true, true, true, true};
+        
         if (!roomUI)
         {
             // reenable and resubscribe to events
@@ -101,7 +103,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
         if (!room) return;
-
+        
         // update all existing players
         for (int i = 0; i < 4; i++)
         {
@@ -137,8 +139,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Character selection
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
-            // Disable clicking another player's character portrait
-            if (card.username.text.Equals(SteamFriends.GetPersonaName()))
+            // Disable clicking another player's character portrait && lock character on ready
+            if (card.username.text.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -152,14 +154,22 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Ready check mark
             card.readyStatus.SetActive(player.readyToBegin);
             
-            // Lock character on ready
-            if (readyToBegin)
+            // Cache character Availability
+            if (player.readyToBegin)
             {
-                card.changeCharacterButton.enabled = false;
-                card.changeCharacterButtonHoverTween.enabled = false;
+                characterAvailable[player.characterCode] = false;
             }
         }
 
+        // Ready button
+        if (!characterAvailable[characterCode] && !readyToBegin)
+        {
+            roomUI.DeactivateReadyButton();
+        } else
+        {
+            roomUI.ActivateReadyButton();
+        }
+        
         // Start button
         if (room.allPlayersReady && room.showStartButton)
         {
@@ -204,14 +214,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (!hasAuthority) return;
         
-        if (_characterAvailabilityInfo == null)
+        /*if (_characterAvailabilityInfo == null)
         {
             _characterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
         }
 
         if (!CharacterAvailability() && !readyToBegin) return;
 
-        UpdateCharacterAvailability(characterCode);
+        UpdateCharacterAvailability(characterCode);*/
+        
         CmdChangeReadyState(!readyToBegin);
         UpdateLobbyList();
     }
