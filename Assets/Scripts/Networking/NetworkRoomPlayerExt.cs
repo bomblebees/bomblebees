@@ -86,6 +86,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     public void UpdateLobbyList()
     {
         bool[] characterAvailable = {true, true, true, true};
+        bool selfReady = false;
 
         if (!roomUI)
         {
@@ -130,7 +131,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
             // User name
             card.username.text = player.steamUsername;
-            bool isYourself = player.steamUsername.Equals(SteamFriends.GetPersonaName());
 
             // User avatar
             int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
@@ -141,7 +141,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait && lock character on ready
-            if (isYourself && !player.readyToBegin)
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -155,15 +155,21 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Ready check mark
             card.readyStatus.SetActive(player.readyToBegin);
             
+            // Check if you are ready
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()))
+            {
+                selfReady = player.readyToBegin;
+            }
+            
             // Cache character Availability
-            if (player.readyToBegin && !isYourself)
+            if (player.readyToBegin)
             {
                 characterAvailable[player.characterCode] = false;
             }
         }
 
         // Ready button
-        if (!characterAvailable[characterCode])
+        if (!characterAvailable[characterCode] && !selfReady)
         {
             roomUI.DeactivateReadyButton();
         } else
