@@ -93,6 +93,10 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButton = buttonReady.GetComponent<Button>();
         _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
         _buttonReadyCanvasRenderer = buttonReady.GetComponentsInChildren<CanvasRenderer>();
+        
+        // Initialize button states
+        DeactivateStartButton();
+        DeactivateReadyButton();
     }
 
     public void Back()

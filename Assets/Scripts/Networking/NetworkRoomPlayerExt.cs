@@ -185,6 +185,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         {
             roomUI.DeactivateStartButton();
         }
+        
+        // Prevent buttons from infinitely growing
+        roomUI.buttonReady.transform.localScale = new Vector3(1f, 1f, 1f);
+        roomUI.buttonStart.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     private Texture2D GetSteamImageAsTexture(int iImage)
