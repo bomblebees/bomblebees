@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class TickObject : ComboObject
 {
+
+    private bool tickStarted = false;
     
     public override void OnStartClient()
     {
@@ -14,8 +16,6 @@ public class TickObject : ComboObject
     public virtual void _Start(GameObject player)
     {
         base._Start(player);
-        base.ReadyFillShader();
-        StartCoroutine(TickDown());
     }
     
     public override void OnStartServer()
@@ -34,6 +34,9 @@ public class TickObject : ComboObject
     
     protected virtual IEnumerator TickDown()
     {
+        tickStarted = true;
+        base.EnableBeepSFX();
+        base.ReadyFillShader();
         if (!didEarlyEffects)
         {
             if (ownerIsQueen)
@@ -104,6 +107,7 @@ public class TickObject : ComboObject
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
+        if (!tickStarted) StartCoroutine(TickDown());
         bool result = base.Push(edgeIndex, triggeringPlayer);
         if (result)
         {

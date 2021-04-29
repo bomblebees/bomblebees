@@ -294,6 +294,7 @@ MonoBehaviour:
   hitBox: {fileID: 9095178392891195692}
   collider: {fileID: 4833367962059186298}
   SFX: {fileID: 6587800827991595459}
+  BeepSFX: {fileID: 5498084997378173717}
   bombRadialTimerImage: {fileID: 2574470246567174100}
   travelDistanceInHexes: 3
   lerpRate: 0.15
@@ -305,7 +306,7 @@ MonoBehaviour:
   sfxDuration: 4
   hitboxDuration: 0.02
   lingerDuration: 2
-  startupDelay: 6
+  startupDelay: 2
   queenStartupDelay: 2
   ownerIsQueen: 0
   hasStarted: 0
@@ -475,7 +476,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5490637928233656024
 Transform:
   m_ObjectHideFlags: 0
@@ -501,7 +502,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300002, guid: 18ca679d8b5f0e54aa062b5e40b9afde,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: 86f83ee8767c79c479587a747e75be49, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 9f4c30538bb91694ea2f99a2e74edd75, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.7
   m_Pitch: 1

@@ -18,6 +18,7 @@ public class ComboObject : NetworkBehaviour
     public GameObject hitBox;
     public Collider collider;
     [SerializeField] public GameObject SFX;
+    [SerializeField] public GameObject BeepSFX;
     public Image bombRadialTimerImage;
     
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
@@ -236,6 +237,14 @@ public class ComboObject : NetworkBehaviour
             SFX.SetActive(true);
             yield return new WaitForSeconds(sfxDuration);
             SFX.SetActive(false);
+        }
+    }
+
+    protected virtual void EnableBeepSFX()
+    {
+        if (BeepSFX)
+        {
+            BeepSFX.SetActive(true);
         }
     }
 
