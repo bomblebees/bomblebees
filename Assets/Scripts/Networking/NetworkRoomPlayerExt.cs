@@ -162,7 +162,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
 
         // Ready button
-        if (!characterAvailable[characterCode] && !readyToBegin)
+        if (!characterAvailable[characterCode] && !room.roomSlots[index].readyToBegin)
         {
             roomUI.DeactivateReadyButton();
         } else
