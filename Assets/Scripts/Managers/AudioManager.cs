@@ -87,9 +87,26 @@ public class AudioManager : NetworkBehaviour
     [ClientRpc]
     public void RpcPlayComboSound(char comboKey, int numBombs, GameObject player)
     {
+		
 		if (player.name == "LocalPlayer")
+		Debug.Log("combo made, sound playing for size " + numBombs);
 		{
-			PlaySound("comboCreation");
+			switch (numBombs)
+			{
+				case 1:
+					PlaySound("comboCreation1");
+					break;
+				case 2:
+					PlaySound("comboCreation2");
+					break;
+				case 3:
+					PlaySound("comboCreation3");
+					break;
+				default:
+					PlaySound("comboCreation3");
+					break;
+			}
+			// PlaySound("comboCreation");
 		}
     }
 
