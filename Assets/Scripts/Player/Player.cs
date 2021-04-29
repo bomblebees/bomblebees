@@ -455,6 +455,11 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)
     {
+        BombUse(sender);
+    }
+
+    void BombUse(NetworkConnectionToClient sender)
+    {
         Ray tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
@@ -917,10 +922,11 @@ public class Player : NetworkBehaviour
     }
 
 	[Command]
-	public void CmdSelectItemSlot(int index)
+	public void CmdSelectItemSlot(int index, NetworkConnectionToClient sender = null)
 	{
 		this.GetComponent<PlayerInventory>().SwitchToSlot(index);
-	}
+        BombUse(sender);
+    }
 
     [Server]
     public void ClearItemStack(bool val = true)
