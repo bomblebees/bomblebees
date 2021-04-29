@@ -14,8 +14,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
-    private CharacterSelectionInfo _characterSelectionInfo;
-    
+    private CharacterSelectionInfo _characterSelectionInfo; // local only
+    private CharacterAvailabilityInfo _characterAvailabilityInfo; // server only
+    private bool _canReadyOnSelectedCharacter = true;
+
     [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
     [SerializeField] private string defaultUsername;
@@ -137,7 +139,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait
-            if (card.username.text.Equals(SteamFriends.GetPersonaName()))
+            if (card.username.text.Equals(SteamFriends.GetPersonaName()) && !readyToBegin)
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -149,18 +151,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             }
 
             // Ready check mark
-            if (player.readyToBegin) card.readyStatus.SetActive(true);
-            else card.readyStatus.SetActive(false);
+            card.readyStatus.SetActive(player.readyToBegin);
         }
 
         // Start button
         if (room.allPlayersReady && room.showStartButton)
         {
-            //roomUI.buttonStart.SetActive(true);
             roomUI.ActivateStartButton();
         } else
         {
-            //roomUI.buttonStart.SetActive(true);
             roomUI.DeactivateStartButton();
         }
     }
@@ -194,18 +193,70 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         room.showStartButton = false;
         room.ServerChangeScene(room.GameplayScene);
     }
-
+    
     public void OnReadyButtonClick()
     {
         if (!hasAuthority) return;
         
-        // TODO: 
-        CmdTest();
+        CmdTestCharacterAvailability(characterCode);
+        if (!_canReadyOnSelectedCharacter)
+        {
+            _canReadyOnSelectedCharacter = true;
+            return;
+        }
         
-        if (readyToBegin) CmdChangeReadyState(false);
-        else CmdChangeReadyState(true);
+        CmdChangeReadyState(!readyToBegin);
 
         UpdateLobbyList();
+    }
+
+    [Command]
+    private void CmdTestCharacterAvailability(int character)
+    {
+        if (_characterAvailabilityInfo == null)
+        {
+            _characterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
+        }
+        
+        switch (character)
+        {
+            case 0 when !readyToBegin && !_characterAvailabilityInfo.character1:
+                RpcNotAvailable(connectionToClient);
+                break;
+            case 0:
+                _characterAvailabilityInfo.character1 = !_characterAvailabilityInfo.character1;
+                break;
+            case 1 when !readyToBegin && !_characterAvailabilityInfo.character2:
+                RpcNotAvailable(connectionToClient);
+                break;
+            case 1:
+                _characterAvailabilityInfo.character2 = !_characterAvailabilityInfo.character2;
+                break;
+            case 2 when !readyToBegin && !_characterAvailabilityInfo.character3:
+                RpcNotAvailable(connectionToClient);
+                break;
+            case 2:
+                _characterAvailabilityInfo.character3 = !_characterAvailabilityInfo.character3;
+                break;
+            case 3 when !readyToBegin && !_characterAvailabilityInfo.character4:
+                RpcNotAvailable(connectionToClient);
+                break;
+            case 3:
+                _characterAvailabilityInfo.character4 = !_characterAvailabilityInfo.character4;
+                break;
+        }
+    }
+
+    [TargetRpc]
+    private void RpcNotAvailable(NetworkConnection connection)
+    {
+        _canReadyOnSelectedCharacter = false;
+    }
+    
+    [Command]
+    private void CmdChangeCharacterCode()
+    {
+        characterCode = (characterCode + 1) % 4;
     }
 
     public void OnChangeCharacterCode(int oldCode, int newCode)
@@ -222,25 +273,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
-    [Command]
-    public void CmdChangeCharacterCode()
-    {
-        characterCode = (characterCode + 1) % 4;
-    }
-
-    // TODO:
-    private CharacterAvailabilityInfo _characterAvailabilityInfo;
-    [Command]
-    public void CmdTest()
-    {
-        // TODO:
-        if (_characterAvailabilityInfo == null)
-        {
-            _characterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
-        }
-        _characterAvailabilityInfo.character1 = !_characterAvailabilityInfo.character1;
-    }
-    
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
     {
 

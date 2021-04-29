@@ -5,5 +5,5 @@ using UnityEngine;
 
 public class CharacterAvailabilityInfo : NetworkBehaviour
 {
-    [SyncVar] public bool character1, character2, character3, character4;
+    [SyncVar] public bool character1 = true, character2 = true, character3 = true, character4 = true;
 }
