@@ -112,7 +112,7 @@ public class PlayerInventory : NetworkBehaviour
     [Client] private void OnSelectedSlotChange(int oldSlot, int newSlot)
     {
         // Update the player interface when selected slot changes
-        FindObjectOfType<GameUIManager>().hotbar.UpdateInventorySelected();
+        this.GetComponent<PlayerInterface>().UpdateInventorySelected();
 
         if (isLocalPlayer) gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
     }
@@ -120,7 +120,7 @@ public class PlayerInventory : NetworkBehaviour
     [Client] private void OnInventoryChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
     {
         // Update the player interface everytime the inventory changes
-        FindObjectOfType<GameUIManager>().hotbar.UpdateInventoryQuantity();
+        this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
 
         if (idx == selectedSlot && isLocalPlayer)
         {

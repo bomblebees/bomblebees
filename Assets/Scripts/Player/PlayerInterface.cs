@@ -26,6 +26,11 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
 
+    [Header("Inventory")]
+    [SerializeField] private Image selectedHighlight;
+    [SerializeField] private Image[] invSlots = new Image[4];
+    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+
     private Player player;
     private GameUIManager gameUIManager;
 
@@ -37,13 +42,14 @@ public class PlayerInterface : NetworkBehaviour
         if (!isLocalPlayer)
         {
             hexUI.gameObject.SetActive(false);
-            spinUI.SetActive(false);
+            //spinUI.SetActive(false);
         }
 
         CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
 
+        UpdateInventoryQuantity();
 
         gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
@@ -110,6 +116,26 @@ public class PlayerInterface : NetworkBehaviour
             case 'e': return Color.white;
             default: return Color.white;
         }
+    }
+
+    public void UpdateInventoryQuantity()
+    {
+        SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            invCounters[i].text = list[i].ToString();
+
+            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
+            else invSlots[i].color = new Color(1f, 1f, 1f);
+        }
+    }
+
+    public void UpdateInventorySelected()
+    {
+        int selected = this.GetComponent<PlayerInventory>().selectedSlot;
+
+        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
     }
 
     #endregion
