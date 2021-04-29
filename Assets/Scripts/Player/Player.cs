@@ -383,7 +383,7 @@ public class Player : NetworkBehaviour
             if (!spinChargeLevel1Hit && spinChargeTime > spinTimings[0])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
-                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
                 playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
                 playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.4f);
                 spinChargeLevel1Hit = true;
@@ -392,7 +392,7 @@ public class Player : NetworkBehaviour
             if (!spinChargeLevel2Hit && spinChargeTime > spinTimings[1])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
-                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
                 playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 15f);
                 playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.8f);
                 spinChargeLevel2Hit = true;
@@ -401,7 +401,7 @@ public class Player : NetworkBehaviour
             if (!spinChargeLevel3Hit && spinChargeTime >= spinTimings[2])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
-                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
                 playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 20f);
                 playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 1.2f);
                 spinChargeLevel3Hit = true;
