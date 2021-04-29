@@ -15,7 +15,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
     private CharacterSelectionInfo _characterSelectionInfo;
-    
+
     [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
     [SerializeField] private string defaultUsername;
@@ -84,6 +84,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public void UpdateLobbyList()
     {
+        bool[] characterAvailable = {true, true, true, true};
+        bool selfReady = false;
+
         if (!roomUI)
         {
             // reenable and resubscribe to events
@@ -100,7 +103,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
         if (!room) return;
-
+        
         // update all existing players
         for (int i = 0; i < 4; i++)
         {
@@ -136,8 +139,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Character selection
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
-            // Disable clicking another player's character portrait
-            if (card.username.text.Equals(SteamFriends.GetPersonaName()))
+            // Disable clicking another player's character portrait && lock character on ready
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -149,20 +152,42 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             }
 
             // Ready check mark
-            if (player.readyToBegin) card.readyStatus.SetActive(true);
-            else card.readyStatus.SetActive(false);
+            card.readyStatus.SetActive(player.readyToBegin);
+            
+            // Check if you are ready
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()))
+            {
+                selfReady = player.readyToBegin;
+            }
+            
+            // Cache character Availability
+            if (player.readyToBegin)
+            {
+                characterAvailable[player.characterCode] = false;
+            }
         }
 
+        // Ready button
+        if (!characterAvailable[characterCode] && !selfReady)
+        {
+            roomUI.DeactivateReadyButton();
+        } else
+        {
+            roomUI.ActivateReadyButton();
+        }
+        
         // Start button
         if (room.allPlayersReady && room.showStartButton)
         {
-            //roomUI.buttonStart.SetActive(true);
             roomUI.ActivateStartButton();
         } else
         {
-            //roomUI.buttonStart.SetActive(true);
             roomUI.DeactivateStartButton();
         }
+        
+        // Prevent buttons from infinitely growing
+        roomUI.buttonReady.transform.localScale = new Vector3(1f, 1f, 1f);
+        roomUI.buttonStart.transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
     private Texture2D GetSteamImageAsTexture(int iImage)
@@ -194,15 +219,19 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         room.showStartButton = false;
         room.ServerChangeScene(room.GameplayScene);
     }
-
+    
     public void OnReadyButtonClick()
     {
         if (!hasAuthority) return;
 
-        if (readyToBegin) CmdChangeReadyState(false);
-        else CmdChangeReadyState(true);
-
+        CmdChangeReadyState(!readyToBegin);
         UpdateLobbyList();
+    }
+
+    [Command]
+    private void CmdChangeCharacterCode()
+    {
+        characterCode = (characterCode + 1) % 4;
     }
 
     public void OnChangeCharacterCode(int oldCode, int newCode)
@@ -219,12 +248,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
-    [Command]
-    public void CmdChangeCharacterCode()
-    {
-        characterCode = (characterCode + 1) % 4;
-    }
-    
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
     {
 

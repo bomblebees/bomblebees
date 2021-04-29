@@ -18,13 +18,19 @@ public class Room_UI : MonoBehaviour
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
     [SerializeField] private GameObject screenBombList;
+    [Header("Opacity Configuration")]
+    [Range(0f, 1f)]
+    [SerializeField] private float deactivatedOpacity;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
     private Button _buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
     private CanvasRenderer[] _buttonStartCanvasRenderer;
-    [Range(0f, 1f)]
-    [SerializeField] private float deactivatedOpacity;
+    [Header("Ready Button")]
+    [SerializeField] public GameObject buttonReady;
+    private Button _buttonReadyButton;
+    private ButtonHoverTween _buttonReadyButtonHoverTween;
+    private CanvasRenderer[] _buttonReadyCanvasRenderer;
 
     [Serializable]
     public class PlayerLobbyCard
@@ -82,6 +88,15 @@ public class Room_UI : MonoBehaviour
         _buttonStartButton = buttonStart.GetComponent<Button>();
         _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
         _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
+        
+        // Cache ready button components
+        _buttonReadyButton = buttonReady.GetComponent<Button>();
+        _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
+        _buttonReadyCanvasRenderer = buttonReady.GetComponentsInChildren<CanvasRenderer>();
+        
+        // Initialize button states
+        DeactivateStartButton();
+        DeactivateReadyButton();
     }
 
     public void Back()
@@ -140,6 +155,34 @@ public class Room_UI : MonoBehaviour
         
         _buttonStartButtonHoverTween.enabled = false;
         buttonStart.transform.localScale.Set(1f,1f,1f);
+    }
+    
+    public void ActivateReadyButton()
+    {
+        // Update functionality
+        _buttonReadyButton.enabled = true;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
+        {
+            t.SetAlpha(1f);
+        }
+        buttonReady.transform.localScale.Set(1f,1f,1f);
+        _buttonReadyButtonHoverTween.enabled = true;
+    }
+
+    public void DeactivateReadyButton()
+    {
+        // Update functionality
+        _buttonReadyButton.enabled = false;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
+        {
+            t.SetAlpha(deactivatedOpacity);
+        }
+        _buttonReadyButtonHoverTween.enabled = false;
+        buttonReady.transform.localScale.Set(1f,1f,1f);
     }
     
     #region Screen: HOW TO PLAY
