@@ -29,8 +29,9 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] public GameObject screenLoading;
     [SerializeField] public GameObject screenError;
     [SerializeField] public GameObject screenCredits;
-    [SerializeField] public GameObject screenHowToPlay;
-    [Header("Other")]
+    [SerializeField] public GameObject screenControls;
+	[SerializeField] public GameObject screenHowToPlay;
+	[Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
     [SerializeField] private GameObject backButton;
@@ -105,33 +106,55 @@ public class MainMenu_UI : MonoBehaviour
         
     }
 
-    public void OnClickButtonHowToPlay()
+    public void OnClickButtonControls()
     {
         // Disable main menu screen
         screenMainMenu.SetActive(false);
 
-        // Enable how to play screen
-        screenHowToPlay.SetActive(true);
+        // Enable controls screen
+        screenControls.SetActive(true);
     }
 
     #endregion
 
-    #region Screen: How To Play
+    #region Screen: Controls
 
-    public void OnClickButtonExitHowToPlay()
+    public void OnClickButtonExitControls()
     {
         // Enable main menu screen
         screenMainMenu.SetActive(true);
 
-        // Disable how to play screen
-        screenHowToPlay.SetActive(false);
+        // Disable controls screen
+        screenControls.SetActive(false);
     }
 
-    #endregion
+	#endregion
 
-    #region Screen: Connect with Steam
+	#region Screen: How To Play
 
-    public void HostSteamLobby()
+	public void OnClickButtonHowToPlay()
+	{
+		// Disable main menu screen
+		screenMainMenu.SetActive(false);
+
+		// Enable How To Play screen
+		screenHowToPlay.SetActive(true);
+	}
+
+	public void OnClickButtonExitHowToPlay()
+	{
+		// Enable main menu screen
+		screenMainMenu.SetActive(true);
+
+		// Disable How To Play screen
+		screenHowToPlay.SetActive(false);
+	}
+
+	#endregion
+
+	#region Screen: Connect with Steam
+
+	public void HostSteamLobby()
     {
         steamLobby.HostLobby();
     }
