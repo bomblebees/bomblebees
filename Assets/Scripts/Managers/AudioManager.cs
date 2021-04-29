@@ -87,10 +87,10 @@ public class AudioManager : NetworkBehaviour
     [ClientRpc]
     public void RpcPlayComboSound(char comboKey, int numBombs, GameObject player)
     {
-		
+		// if the client player game object is local player (name gets changed on client start in Player)
 		if (player.name == "LocalPlayer")
-		Debug.Log("combo made, sound playing for size " + numBombs);
 		{
+			// play different bomb sounds for different size combo
 			switch (numBombs)
 			{
 				case 1:
