@@ -23,7 +23,7 @@ public class RoundStartEnd : MonoBehaviour
         }
         timerText.gameObject.SetActive(false);
 
-        titleText.text = "Begin!";
+        titleText.text = "Fight!";
         yield return new WaitForSeconds(1);
         titleText.text = "";
     }
