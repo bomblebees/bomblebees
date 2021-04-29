@@ -348,7 +348,9 @@ public class Player : NetworkBehaviour
     public int spinPower = 1;
     private float startSpinTime = 0f;
     public float spinChargeTime = 0f;
-    private bool spinHeld = false;
+
+    [SyncVar] public bool spinHeld = false;
+    [Command] private void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [SerializeField] public float[] spinTimings = {0.5f, 1.0f, 1.5f, 2.0f};
     [SerializeField] private int[] spinPowerDist = {1, 2, 3, 4};
@@ -374,7 +376,7 @@ public class Player : NetworkBehaviour
                 spinChargeLevel2Hit = false;
                 spinChargeLevel3Hit = false;
 
-                spinHeld = true;
+                CmdSetSpinHeld(true);
             }
 
             spinChargeTime += Time.deltaTime;
@@ -447,7 +449,7 @@ public class Player : NetworkBehaviour
         CmdSetSpinChargeFlashEffect(0f, 0f);
         spinScalar = 1f;
         spinChargeTime = 0f;
-        spinHeld = false;
+        CmdSetSpinHeld(false);
     }
 
     [Command]

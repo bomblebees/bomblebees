@@ -17,6 +17,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private Image hexUI;
     [SerializeField] public Image spinChargeBar;
     [SerializeField] public GameObject spinUI;
+    [SerializeField] public GameObject inventoryUI;
 
     [Header("User Interface")]
     [SerializeField] private GameObject deathUI;
@@ -38,10 +39,14 @@ public class PlayerInterface : NetworkBehaviour
     {
         base.OnStartClient();
 
-        // Turn off held hex and spin charge UI for other players
+        // Turn off held hex and inventory UI for other players
         if (!isLocalPlayer)
         {
             hexUI.gameObject.SetActive(false);
+            inventoryUI.gameObject.SetActive(false);
+
+            playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
+
             //spinUI.SetActive(false);
         }
 
@@ -57,20 +62,31 @@ public class PlayerInterface : NetworkBehaviour
         player = this.GetComponent<Player>();
     }
 
+    bool spinChargeStarted = false;
+    float spinChargeTime = 0;
+    
+
     private void Update()
     {
-        if (!isLocalPlayer) return;
+        //if (!isLocalPlayer) return;
 
         // If player null, return
         if (!player) return;
 
-        UpdateSpinChargeBar();
+        if (player.spinHeld) { spinChargeStarted = true; }
+        else if (spinChargeStarted) { spinChargeTime = 0; spinChargeStarted = false; UpdateSpinChargeBar(); }
+
+        if (spinChargeStarted)
+        {
+            UpdateSpinChargeBar();
+        }
     }
 
     public void UpdateSpinChargeBar()
     {
         float[] spinTimes = player.spinTimings;
-        spinChargeBar.fillAmount = player.spinChargeTime / spinTimes[spinTimes.Length - 2];
+        spinChargeTime += Time.deltaTime;
+        spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 2];
     }
 
     public void OnPlayerTakeDamage(int _, int __, GameObject ___)
