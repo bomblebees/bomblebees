@@ -15,7 +15,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
     private CharacterSelectionInfo _characterSelectionInfo;
-    private CharacterAvailabilityInfo _characterAvailabilityInfo;
 
     [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
