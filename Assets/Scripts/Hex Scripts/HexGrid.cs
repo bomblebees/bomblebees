@@ -546,14 +546,14 @@ public class HexGrid : NetworkBehaviour
 
         if (comboCells.Count > 0)
         {
-            eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject);
+            eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject, comboCells.Count - 2);
             // player.GetComponent<PlayerInventory>().AddInventoryBomb(heldKey, comboCells.Count);
             // trying 1f instead of Count
             player.GetComponent<PlayerInventory>().AddInventoryBomb(heldKey, comboCells.Count - 2);
         }
         else
         {
-            eventManager.OnPlayerSwap(heldKey, oldKey, false, player.gameObject);
+            eventManager.OnPlayerSwap(heldKey, oldKey, false, player.gameObject, 0);
         }
 
         ComboCallback(comboCells);

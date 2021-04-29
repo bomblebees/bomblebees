@@ -167,7 +167,7 @@ public class GameUIManager : NetworkBehaviour
     }
 
     [Server]
-    public void ServerOnSwapEvent(char oldKey, char newKey, bool combo, GameObject player)
+    public void ServerOnSwapEvent(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
     {
         if (combo)
         {

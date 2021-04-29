@@ -23,7 +23,7 @@ public class EventManager : NetworkBehaviour
     public delegate void ReturnToLobbyDelegate();
     public delegate void BombPlacedDelegate(GameObject bomb, GameObject player);
     public delegate void PlayerTookDamageDelegate(int newLives, GameObject bomb, GameObject player);
-    public delegate void PlayerSwapDelegate(char oldKey, char newKey, bool combo, GameObject player);
+    public delegate void PlayerSwapDelegate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded);
     public delegate void PlayerSpinDelegate(GameObject player, GameObject bomb);
 
     public event StartRoundDelegate EventStartRound;
@@ -139,13 +139,13 @@ public class EventManager : NetworkBehaviour
     /// <param name="combo">Whether or not the swap made a combo</param>
     /// <param name="player">The player who swapped</param>
     [Server]
-    public void OnPlayerSwap(char oldKey, char newKey, bool combo, GameObject player)
+    public void OnPlayerSwap(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
     {
         sessionLogger.CreateEventSWP(oldKey, newKey, combo, player, Time.time - roundStartTime);
 
         //Debug.Log("player swapped hand " + oldKey + " with " + newKey + ", player: " + player.name);
         //if (combo) Debug.Log("MADE A COMBO " + oldKey);
-        EventPlayerSwap?.Invoke(oldKey, newKey, combo, player);
+        EventPlayerSwap?.Invoke(oldKey, newKey, combo, player, numBombsAwarded);
     }
 
     /// <summary>
