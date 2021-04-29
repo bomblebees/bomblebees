@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Mirror;
 using Steamworks;
@@ -11,6 +12,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public string steamUsername;
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
+    
+    [Header("Update Interval & Timer")]
+    [SerializeField] private float updateLobbyInterval = 1f;
+    public float timer = 1f;
     
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
@@ -29,6 +34,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     };
     
     Room_UI roomUI;
+
+    private void Update()
+    {
+        if (Time.time > timer ) {
+            timer += updateLobbyInterval;
+            UpdateLobbyList();
+        }
+    }
 
     public override void OnStartClient()
     {
