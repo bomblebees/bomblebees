@@ -78,20 +78,19 @@ public class AudioManager : NetworkBehaviour
     [Server]
     public void ServerPlayComboSound(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
     {
-        if (combo) RpcPlayComboSound(oldKey, numBombsAwarded);
+        if (combo) RpcPlayComboSound(oldKey, numBombsAwarded, player);
 
         // For specific combo noises, add switch statement here.
         // Use variable oldKey to determine what color combo was made
     }
 
     [ClientRpc]
-    public void RpcPlayComboSound(char comboKey, int numBombs)
+    public void RpcPlayComboSound(char comboKey, int numBombs, GameObject player)
     {
-		if (isClient)
+		if (player.name == "LocalPlayer")
 		{
 			PlaySound("comboCreation");
 		}
-        
     }
 
     [ClientRpc]
