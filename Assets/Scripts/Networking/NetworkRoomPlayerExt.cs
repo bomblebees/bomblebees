@@ -108,7 +108,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         for (int i = 0; i < 4; i++)
         {
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
-            bool isYourself = card.username.text.Equals(SteamFriends.GetPersonaName());
 
             // if player does not exist
             if (i >= room.roomSlots.Count)
@@ -131,6 +130,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
             // User name
             card.username.text = player.steamUsername;
+            bool isYourself = player.steamUsername.Equals(SteamFriends.GetPersonaName());
 
             // User avatar
             int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
