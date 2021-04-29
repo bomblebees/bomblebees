@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IconBounceTween : MonoBehaviour
+public class ScaleTween : MonoBehaviour
 {
     private Vector3 originalScale;
     private bool tweenStarted = false;
@@ -20,7 +20,7 @@ public class IconBounceTween : MonoBehaviour
         originalScale = this.gameObject.transform.localScale;
     }
 
-    public void OnTweenStart()
+    public void StartTween()
     {
         // Prevents tween anim from running multiple times
         if (tweenStarted) return;

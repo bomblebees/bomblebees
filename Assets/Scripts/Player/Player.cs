@@ -385,7 +385,7 @@ public class Player : NetworkBehaviour
             if (!spinChargeLevel1Hit && spinChargeTime > spinTimings[0])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
                 CmdSetSpinChargeFlashEffect(10f, 0.4f);
                 spinChargeLevel1Hit = true;
             }
@@ -393,7 +393,7 @@ public class Player : NetworkBehaviour
             if (!spinChargeLevel2Hit && spinChargeTime > spinTimings[1])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
                 CmdSetSpinChargeFlashEffect(15f, 0.8f);
                 spinChargeLevel2Hit = true;
             }
@@ -401,7 +401,7 @@ public class Player : NetworkBehaviour
             if (!spinChargeLevel3Hit && spinChargeTime >= spinTimings[2])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
                 CmdSetSpinChargeFlashEffect(20f, 1.2f);
                 spinChargeLevel3Hit = true;
             }

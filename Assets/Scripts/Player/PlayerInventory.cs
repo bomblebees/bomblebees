@@ -39,10 +39,16 @@ public class PlayerInventory : NetworkBehaviour
         if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
         {
             inventoryList[idx] = INVEN_MAX_VALUES[idx];
-        } else
+
+            this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, INVEN_MAX_VALUES[idx]);
+
+        }
+        else
         {
             // Otherwise add the amount
             inventoryList[idx] += amt;
+
+            this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
         }
     }
 

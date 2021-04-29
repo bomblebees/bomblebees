@@ -31,6 +31,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private Image selectedHighlight;
     [SerializeField] private Image[] invSlots = new Image[4];
     [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+    [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
 
     private Player player;
     private GameUIManager gameUIManager;
@@ -91,7 +92,7 @@ public class PlayerInterface : NetworkBehaviour
 
     public void OnPlayerTakeDamage(int _, int __, GameObject ___)
     {
-        if (isLocalPlayer) damageIndicator.GetComponent<FlashTween>().StartFlash();
+        if (isLocalPlayer) damageIndicator.GetComponent<AlphaTween>().StartTween();
     }
 
 
@@ -115,7 +116,7 @@ public class PlayerInterface : NetworkBehaviour
         hexUI.color = GetKeyColor(key);
 
         // Run bounce anim
-        hexUI.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+        hexUI.gameObject.GetComponent<ScaleTween>().StartTween();
     }
 
     // get color associated with key
@@ -132,6 +133,17 @@ public class PlayerInterface : NetworkBehaviour
             case 'e': return Color.white;
             default: return Color.white;
         }
+    }
+
+    public void DisplayInventoryAdd(int slot, int amt)
+    {
+        invAddTexts[slot].text = "+" + amt.ToString();
+        //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
+
+
+
+        invAddTexts[slot].GetComponent<AlphaTextTween>().StartTween();
+        invAddTexts[slot].GetComponent<MoveTween>().StartTween();
     }
 
     public void UpdateInventoryQuantity()
