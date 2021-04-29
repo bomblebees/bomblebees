@@ -14,9 +14,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
-    private CharacterSelectionInfo _characterSelectionInfo; // local only
-    private CharacterAvailabilityInfo _characterAvailabilityInfo; // server only
-    private bool _canReadyOnSelectedCharacter = true;
+    private CharacterSelectionInfo _characterSelectionInfo;
+    private CharacterAvailabilityInfo _characterAvailabilityInfo;
 
     [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
@@ -139,7 +138,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait
-            if (card.username.text.Equals(SteamFriends.GetPersonaName()) && !readyToBegin)
+            if (card.username.text.Equals(SteamFriends.GetPersonaName()))
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -152,6 +151,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
             // Ready check mark
             card.readyStatus.SetActive(player.readyToBegin);
+            
+            // Lock character on ready
+            if (readyToBegin)
+            {
+                card.changeCharacterButton.enabled = false;
+                card.changeCharacterButtonHoverTween.enabled = false;
+            }
         }
 
         // Start button
@@ -198,48 +204,45 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (!hasAuthority) return;
         
-        CmdTestCharacterAvailability(characterCode);
-        if (!_canReadyOnSelectedCharacter)
-        {
-            _canReadyOnSelectedCharacter = true;
-            return;
-        }
-        
-        CmdChangeReadyState(!readyToBegin);
-
-        UpdateLobbyList();
-    }
-
-    [Command]
-    private void CmdTestCharacterAvailability(int character)
-    {
         if (_characterAvailabilityInfo == null)
         {
             _characterAvailabilityInfo = FindObjectOfType<CharacterAvailabilityInfo>();
         }
-        
+
+        if (!CharacterAvailability() && !readyToBegin) return;
+
+        UpdateCharacterAvailability(characterCode);
+        CmdChangeReadyState(!readyToBegin);
+        UpdateLobbyList();
+    }
+
+    private bool CharacterAvailability()
+    {
+        switch (characterCode)
+        {
+            case 0 when _characterAvailabilityInfo.character1:
+            case 1 when _characterAvailabilityInfo.character2:
+            case 2 when _characterAvailabilityInfo.character3:
+            case 3 when _characterAvailabilityInfo.character4:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    [Command]
+    private void UpdateCharacterAvailability(int character)
+    {
         switch (character)
         {
-            case 0 when !readyToBegin && !_characterAvailabilityInfo.character1:
-                RpcNotAvailable(connectionToClient);
-                break;
             case 0:
                 _characterAvailabilityInfo.character1 = !_characterAvailabilityInfo.character1;
-                break;
-            case 1 when !readyToBegin && !_characterAvailabilityInfo.character2:
-                RpcNotAvailable(connectionToClient);
                 break;
             case 1:
                 _characterAvailabilityInfo.character2 = !_characterAvailabilityInfo.character2;
                 break;
-            case 2 when !readyToBegin && !_characterAvailabilityInfo.character3:
-                RpcNotAvailable(connectionToClient);
-                break;
             case 2:
                 _characterAvailabilityInfo.character3 = !_characterAvailabilityInfo.character3;
-                break;
-            case 3 when !readyToBegin && !_characterAvailabilityInfo.character4:
-                RpcNotAvailable(connectionToClient);
                 break;
             case 3:
                 _characterAvailabilityInfo.character4 = !_characterAvailabilityInfo.character4;
@@ -247,12 +250,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-    [TargetRpc]
-    private void RpcNotAvailable(NetworkConnection connection)
-    {
-        _canReadyOnSelectedCharacter = false;
-    }
-    
     [Command]
     private void CmdChangeCharacterCode()
     {
