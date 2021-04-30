@@ -927,7 +927,7 @@ public class Player : NetworkBehaviour
 	public void CmdSelectItemSlot(int index, NetworkConnectionToClient sender = null)
 	{
 		this.GetComponent<PlayerInventory>().SwitchToSlot(index);
-        BombUse(sender);
+        //BombUse(sender);
     }
 
     [Server]
