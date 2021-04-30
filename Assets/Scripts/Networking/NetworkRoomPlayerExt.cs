@@ -142,10 +142,17 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait && lock character on ready
-            if (player == this && !player.readyToBegin)
+            if (player == this)
             {
-                card.changeCharacterButton.enabled = true;
-                card.changeCharacterButtonHoverTween.enabled = true;
+                if (player.readyToBegin)
+                {
+                    card.changeCharacterButton.enabled = false;
+                    card.changeCharacterButtonHoverTween.enabled = false;
+                } else
+                {
+                    card.changeCharacterButton.enabled = true;
+                    card.changeCharacterButtonHoverTween.enabled = true;
+                }
             }
             else
             {
