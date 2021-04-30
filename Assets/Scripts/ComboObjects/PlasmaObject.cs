@@ -97,7 +97,11 @@ public class PlasmaObject : TriggerObject
             {
                 StartCoroutine(Breakdown());
             }
-        }
+			if (_root.Equals("Laser Object(Clone)"))
+			{
+				StartCoroutine(Breakdown());
+			}
+		}
     }
     
     public IEnumerator Breakdown()

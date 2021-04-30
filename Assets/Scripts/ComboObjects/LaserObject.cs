@@ -91,7 +91,11 @@ public class LaserObject : TriggerObject
             {
                 StartCoroutine(Breakdown());
             }
-        }
+			if (_root.Equals("Laser Object(Clone)"))
+			{
+				StartCoroutine(Breakdown());
+			}
+		}
     }
     
     protected virtual void Update()
