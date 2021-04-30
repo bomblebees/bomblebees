@@ -22,7 +22,7 @@ public class SteamNetworkManager : NetworkRoomManagerExt
         gamePlayer.GetComponent<Player>().steamName = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamUsername;
         gamePlayer.GetComponent<Player>().playerColor = roomPlayer.GetComponent<NetworkRoomPlayerExt>().playerColor;
 
-        Destroy(roomPlayer);
+        NetworkServer.Destroy(roomPlayer);
 
         return true;
     }
