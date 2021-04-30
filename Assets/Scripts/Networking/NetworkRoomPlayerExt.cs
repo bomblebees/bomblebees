@@ -156,21 +156,31 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Ready check mark
             card.readyStatus.SetActive(player.readyToBegin);
             
-            // Check if you are ready
-            if (player == this)
-            {
-                selfReady = player.readyToBegin;
-            }
+            //// Check if you are ready
+            //if (player == this)
+            //{
+            //    selfReady = player.readyToBegin;
+            //}
             
             // Cache character Availability
             if (player.readyToBegin)
             {
                 characterAvailable[player.characterCode] = false;
+            } else
+            {
+                characterAvailable[player.characterCode] = true;
             }
         }
 
+        string t = "";
+        for (int i = 0; i < 4; i++)
+        {
+            t += characterAvailable[i] + ", ";
+        }
+        Debug.Log(t);
+
         // Ready button
-        if (!characterAvailable[characterCode] && !selfReady)
+        if (!characterAvailable[characterCode] && !this.readyToBegin)
         {
             roomUI.DeactivateReadyButton();
         } else
@@ -227,7 +237,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (!hasAuthority) return;
 
         CmdChangeReadyState(!readyToBegin);
-        UpdateLobbyList();
     }
 
     [Command]
