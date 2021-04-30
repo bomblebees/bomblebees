@@ -113,7 +113,32 @@ public class AudioManager : NetworkBehaviour
     [ClientRpc]
     public void RpcPlayPlaceSound(GameObject bomb, GameObject player)
     {
-        PlaySound("bombPlace");
+		// Play different bomb sound for different component (bomb) type
+
+		if (bomb.TryGetComponent(out BombObject bombComponent)) {
+			// "Kickable" bomb placed, play respective play sound type
+			PlaySound("bombPlace");
+		}
+		else if (bomb.TryGetComponent(out SludgeObject sludgeComponent))
+		{
+			// Deployable placed, play deployable sound fx
+			PlaySound("bombPlace");
+		}
+		else if (bomb.TryGetComponent(out LaserObject laserComponent))
+		{
+			// Deployable placed, play deployable sound fx
+			PlaySound("deployablePlace");
+		}
+		else if (bomb.TryGetComponent(out PlasmaObject plasmaComponent))
+		{
+			// Deployable placed, play deployable sound fx
+			PlaySound("deployablePlace");
+		}
+		else
+		{
+			// Play default sound if type is none of these
+			PlaySound("bombPlace");
+		}
     }
 
     [Server] public void ServerPlayerWhistleSound(List<Player> players) { RpcPlayWhistleSound(); }

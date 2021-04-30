@@ -70,6 +70,7 @@ public class PlasmaObject : TriggerObject
 			// Debug.Log("nextPosition: " + nextPos);
 			if (nextPos == this.plasmaSphereModel.transform.position)  // Since FindCenter... returns own position on fail
             {
+				// Plasma has reached edge of stage, disable hitbox
                 this.hitBox.SetActive(false); 
             }
             else if (lastPosition != nextPos)
