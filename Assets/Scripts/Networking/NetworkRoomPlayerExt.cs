@@ -142,8 +142,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait && lock character on ready
-            if (player == this)
+            if (isLocalPlayer && player.index == this.index)
             {
+                Debug.Log("this is the player " + i.ToString());
                 if (player.readyToBegin)
                 {
                     card.changeCharacterButton.enabled = false;
@@ -241,8 +242,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     public void OnReadyButtonClick()
     {
-        if (!hasAuthority) return;
-
         CmdChangeReadyState(!readyToBegin);
     }
 
@@ -259,11 +258,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public void OnCharacterChanged()
     {
-        if (!hasAuthority) return;
-
         CmdChangeCharacterCode();
-
-        UpdateLobbyList();
     }
 
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
