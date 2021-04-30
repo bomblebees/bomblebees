@@ -366,6 +366,7 @@ public class Player : NetworkBehaviour
     {
         if (!canSpin) return;
 
+        // When key is pressed down
         if (Input.GetKey(spinKey) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
             if (!spinHeld)
             {
@@ -407,7 +408,8 @@ public class Player : NetworkBehaviour
             }
         }
 
-        if (Input.GetKeyUp(spinKey) && spinHeld)
+        // When key is let go
+        if (Input.GetKeyUp(spinKey))
         {
             for (int i = 0; i < spinTimings.Length; i++)
             {
