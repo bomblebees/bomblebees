@@ -12,9 +12,11 @@ public class PlasmaObject : TriggerObject
     private bool hitboxEnabled = false;
     private Vector3 targetDir;
     public float projectileSpeed = 3f;
-    public float breakdownDuration = 3f;
     public float startOffset = 3.5f;
-    [SerializeField] public GameObject plasmaSphereModel;
+
+	protected IEnumerator spawnBallCoroutine = null; // When starting the coroutine to spawn plasma, store to variable so in case of early destroy we can stop it
+
+	[SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
     public float ignoreTriggererDuration = 1f;
     
@@ -34,7 +36,8 @@ public class PlasmaObject : TriggerObject
         this.plasmaSphereModel.transform.position = nextPos;
         this.hitBox.transform.position = nextPos;
         ////
-        StartCoroutine(SpawnBall(edgeIndex, triggeringPlayer));
+        spawnBallCoroutine = SpawnBall(edgeIndex, triggeringPlayer);
+		StartCoroutine(spawnBallCoroutine);
         return true;
     }
 
@@ -49,6 +52,7 @@ public class PlasmaObject : TriggerObject
         {
             yield return new WaitForSeconds(startupDelay);
         }
+		Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         this.hitboxEnabled = true;
         this.hitBox.SetActive(true); 
@@ -61,11 +65,12 @@ public class PlasmaObject : TriggerObject
     {
         if (this.hitboxEnabled == true)
         {
-            plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
+			plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
             var nextPos = FindCenterBelowOtherInclusive(this.plasmaSphereModel.transform.position);
-            if (nextPos == this.plasmaSphereModel.transform.position)  // Since FindCenter... returns own position on fail
+			// Debug.Log("nextPosition: " + nextPos);
+			if (nextPos == this.plasmaSphereModel.transform.position)  // Since FindCenter... returns own position on fail
             {
-                // this.hitBox.SetActive(false); 
+                this.hitBox.SetActive(false); 
             }
             else if (lastPosition != nextPos)
             {
@@ -103,15 +108,18 @@ public class PlasmaObject : TriggerObject
 			}
 		}
     }
+
+	public override IEnumerator Breakdown()
+	{
+		// Same breakdown code as base class, plus the spawn ball coroutine stopping
+
+		if (spawnBallCoroutine != null)
+		{
+			StopCoroutine(spawnBallCoroutine);
+		}
+		
+		yield return StartCoroutine(base.Breakdown());
+	}
     
-    public IEnumerator Breakdown()
-    {
-        didEarlyEffects = true;
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        NotifyOccupiedTile(false);
-        yield return new WaitForSeconds(breakdownDuration);
-        // play breakdown anim here
-        DestroySelf();
-    }
+
 }

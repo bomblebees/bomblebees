@@ -8,11 +8,14 @@ using UnityEngine;
 // - TickDown() to not 
 public class TriggerObject : ComboObject
 {
-    protected bool wasHit = false;
+	public float breakdownDuration = 3f;
+	protected bool wasHit = false;
     protected bool canBeTriggered = true; // to make sure it's only hit once.
     protected float timeAlive = 0f; // Seconds since object was instantiated
     protected float timeTriggered = 0f;
     public float minimumLifeDuration = 4f; // Minimum time the object needs to use effect for
+
+	protected IEnumerator procCoroutine = null; // when Proc coroutine starts, store to this null var so that we can reference and stop it in Breakdown() even after Proc happens
 
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
@@ -46,9 +49,11 @@ public class TriggerObject : ComboObject
 
     protected virtual void ListenForTrigger()
     {
-        if (canBeTriggered && wasHit)
+		// If the coroutine hasn't been started yet, start the Proc coroutine
+        if (canBeTriggered && wasHit && procCoroutine == null)
         {
-            StartCoroutine(Proc());
+			procCoroutine = Proc();
+            StartCoroutine(procCoroutine);
         }
     }
     
@@ -60,6 +65,7 @@ public class TriggerObject : ComboObject
 
     protected virtual IEnumerator Proc()
     {
+
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay * fillShaderRatio);
         
@@ -67,7 +73,7 @@ public class TriggerObject : ComboObject
         
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
-        
+
         canBeTriggered = false;  // To stop it from being triggered twice
         timeTriggered = timeAlive;
         StartCoroutine(EnableSFX());
@@ -123,7 +129,9 @@ public class TriggerObject : ComboObject
     protected override IEnumerator EnableHitbox()
     {
         var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
-        hitbox.SetActive(true);
+
+		Debug.Log("enabling hitbox");
+		hitbox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitbox.SetActive(false);
     }
@@ -134,5 +142,26 @@ public class TriggerObject : ComboObject
         wasHit = true;
         return true;
     }
+
+	public virtual IEnumerator Breakdown()
+	{
+		didEarlyEffects = true;
+		StartCoroutine(DisableObjectCollider());
+		StartCoroutine(DisableObjectModel());
+		
+		NotifyOccupiedTile(false);
+
+		// if the laser has already been procced when the breakdown happens, stop the proc prematurely before destroying
+		if (procCoroutine != null)
+		{
+			Debug.Log("Stopping Proc coroutine");
+			StopCoroutine(procCoroutine);
+		}
+
+		// play breakdown anim here
+		yield return new WaitForSeconds(breakdownDuration);
+
+		DestroySelf();
+	}
 
 }

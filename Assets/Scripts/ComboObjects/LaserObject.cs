@@ -8,7 +8,6 @@ using UnityEngine;
 // - TickDown() to not 
 public class LaserObject : TriggerObject
 {
-    public float breakdownDuration = 3f;
     private bool isRotating = false;
 	private bool isActivated = false;
     private float targetAngle = 0f;
@@ -123,14 +122,5 @@ public class LaserObject : TriggerObject
         }
     }
     
-    public IEnumerator Breakdown()
-    {
-        didEarlyEffects = true;
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        // play breakdown anim here
-        NotifyOccupiedTile(false);
-        yield return new WaitForSeconds(breakdownDuration);
-        DestroySelf();
-    }
+
 }
