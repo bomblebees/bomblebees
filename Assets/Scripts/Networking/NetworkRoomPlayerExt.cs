@@ -83,10 +83,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
+    bool[] characterAvailable = { true, true, true, true };
+    bool selfReady = false;
+
     public void UpdateLobbyList()
     {
-        bool[] characterAvailable = {true, true, true, true};
-        bool selfReady = false;
 
         if (!roomUI)
         {
