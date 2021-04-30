@@ -87,13 +87,19 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
+    public override void OnClientEnterRoom()
+    {
+        this.playerColor = listColors[index];
+        base.OnClientEnterRoom();
+    }
+
     public override void OnClientExitRoom()
     {
         SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
         if (!room) return;
         Debug.Log("exit room count" + room.roomSlots.Count);
 
-        this.playerColor = listColors[index];
+        //this.playerColor = listColors[index];
         Debug.Log("player " + index + " left");
     }
 
@@ -254,6 +260,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         //UpdateLobbyList();
         Debug.Log("player " + index + " changed ready state to " + newReadyState);
+
+        if (!_characterSelectionInfo) return;
 
         if (newReadyState == true)
         {

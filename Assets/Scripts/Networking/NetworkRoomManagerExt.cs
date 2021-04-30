@@ -49,7 +49,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         // transfer the color over
         gamePlayer.GetComponent<Player>().playerColor = roomPlayer.GetComponent<NetworkRoomPlayerExt>().playerColor;
 
-        Destroy(roomPlayer);
+        //Destroy(roomPlayer);
 
         return true;
     }
