@@ -13,6 +13,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
     
+    [Header("Update Interval & Timer")]
+    [SerializeField] private float updateLobbyInterval = 1f;
+    public float timer = 1f;
+    
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
     private CharacterSelectionInfo _characterSelectionInfo;
@@ -30,6 +34,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     };
     
     Room_UI roomUI;
+
+    private void Update()
+    {
+        if (Time.time > timer ) {
+            timer += updateLobbyInterval;
+            UpdateLobbyList();
+        }
+    }
 
     public override void OnStartClient()
     {
@@ -141,7 +153,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait && lock character on ready
-            if (player == this && !player.readyToBegin)
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
@@ -156,7 +168,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.readyStatus.SetActive(player.readyToBegin);
             
             // Check if you are ready
-            if (player == this)
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()))
             {
                 selfReady = player.readyToBegin;
             }
