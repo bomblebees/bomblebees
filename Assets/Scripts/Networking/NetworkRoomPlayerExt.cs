@@ -13,6 +13,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
     
+    [Header("Update Interval & Timer")]
+    [SerializeField] private float updateLobbyInterval = 1f;
+    public float timer = 1f;
+    
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
     private CharacterSelectionInfo _characterSelectionInfo;
@@ -30,6 +34,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     };
     
     Room_UI roomUI;
+
+    private void Update()
+    {
+        if (Time.time > timer ) {
+            timer += updateLobbyInterval;
+            UpdateLobbyList();
+        }
+    }
 
     public override void OnStartClient()
     {
@@ -83,11 +95,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
-    bool[] characterAvailable = { true, true, true, true };
-    bool selfReady = false;
-
     public void UpdateLobbyList()
     {
+        bool[] characterAvailable = {true, true, true, true};
+        bool selfReady = false;
 
         if (!roomUI)
         {
@@ -142,17 +153,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
 
             // Disable clicking another player's character portrait && lock character on ready
-            if (player == this)
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
             {
-                if (player.readyToBegin)
-                {
-                    card.changeCharacterButton.enabled = false;
-                    card.changeCharacterButtonHoverTween.enabled = false;
-                } else
-                {
-                    card.changeCharacterButton.enabled = true;
-                    card.changeCharacterButtonHoverTween.enabled = true;
-                }
+                card.changeCharacterButton.enabled = true;
+                card.changeCharacterButtonHoverTween.enabled = true;
             }
             else
             {
@@ -163,31 +167,21 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Ready check mark
             card.readyStatus.SetActive(player.readyToBegin);
             
-            //// Check if you are ready
-            //if (player == this)
-            //{
-            //    selfReady = player.readyToBegin;
-            //}
+            // Check if you are ready
+            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()))
+            {
+                selfReady = player.readyToBegin;
+            }
             
             // Cache character Availability
             if (player.readyToBegin)
             {
                 characterAvailable[player.characterCode] = false;
-            } else
-            {
-                characterAvailable[player.characterCode] = true;
             }
         }
 
-        string t = "";
-        for (int i = 0; i < 4; i++)
-        {
-            t += characterAvailable[i] + ", ";
-        }
-        Debug.Log(t);
-
         // Ready button
-        if (!characterAvailable[characterCode] && !this.readyToBegin)
+        if (!characterAvailable[characterCode] && !selfReady)
         {
             roomUI.DeactivateReadyButton();
         } else
@@ -244,6 +238,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (!hasAuthority) return;
 
         CmdChangeReadyState(!readyToBegin);
+        UpdateLobbyList();
     }
 
     [Command]
