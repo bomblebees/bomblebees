@@ -8,6 +8,8 @@ public class CharacterSelectionInfo : NetworkBehaviour
     public delegate void ChangeCharacterDelegate();
     public event ChangeCharacterDelegate EventCharacterChanged;
 
+    public bool[] characterAvailable = { true, true, true, true };
+
     public void OnChangeCharacter()
     {
         EventCharacterChanged?.Invoke();

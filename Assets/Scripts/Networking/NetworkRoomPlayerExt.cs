@@ -8,14 +8,10 @@ using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
-    [SyncVar] public ulong steamId;
-    [SyncVar] public string steamUsername;
+    [SyncVar] public ulong steamId = 0;
+    [SyncVar] public string steamUsername = "Username";
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
-    
-    [Header("Update Interval & Timer")]
-    [SerializeField] private float updateLobbyInterval = 1f;
-    public float timer = 1f;
     
     [Header("Character Selection")]
     [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
@@ -35,49 +31,64 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     
     Room_UI roomUI;
 
+    NetworkRoomManagerExt room;
+
     private void Update()
     {
-        if (Time.time > timer ) {
-            timer += updateLobbyInterval;
-            UpdateLobbyList();
+        if (!isLocalPlayer) return;
+
+        if (!room)
+        {
+            room = NetworkManager.singleton as SteamNetworkManager;
+            if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
+            return;
+        }
+        if (!_characterSelectionInfo) { _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>(); return; }
+
+        if (!roomUI) return;
+
+
+        if (room.allPlayersReady && room.showStartButton)
+        {
+            roomUI.ActivateStartButton();
+        }
+        else
+        {
+            roomUI.DeactivateStartButton();
+        }
+
+        // If not ready, and character portrait is unavailable, deactive ready button
+        if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
+        {
+            roomUI.DeactivateReadyButton();
+        } else
+        {
+            roomUI.ActivateReadyButton();
         }
     }
 
-    public override void OnStartClient()
-    {
-        this.playerColor = listColors[index];
+    //void OnEnable()
+    //{
+    //    SceneManager.sceneLoaded += OnSceneLoaded;
+    //}
 
-        roomUI = Room_UI.singleton;
-        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-        roomUI.EventStartButtonClicked += OnStartButtonClick;
+    //public override void OnDisable()
+    //{
+    //    base.OnDisable();
 
-        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+    //    SceneManager.sceneLoaded -= OnSceneLoaded;
+    //}
 
-        base.OnStartClient();
-    }
-
-    void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    public override void OnDisable()
-    {
-        base.OnDisable();
-        
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void OnSceneLoaded(Scene arg0, LoadSceneMode loadSceneMode)
-    {
-        _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-    }
+    //private void OnSceneLoaded(Scene arg0, LoadSceneMode loadSceneMode)
+    //{
+    //    _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+    //    _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+    //}
 
     public override void OnClientEnterRoom()
     {
-        UpdateLobbyList();
+        //Debug.Log("player " + index + " joined");
+        UpdateLobbyListPlayer();
     }
 
     public override void OnClientExitRoom()
@@ -87,25 +98,23 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         Debug.Log("exit room count" + room.roomSlots.Count);
 
         this.playerColor = listColors[index];
-        UpdateLobbyList();
+        Debug.Log("player " + index + " left");
     }
 
-    public override void ReadyStateChanged(bool _, bool newReadyState)
+    // Updates the lobby information for the specific player
+    public void UpdateLobbyListPlayer()
     {
-        UpdateLobbyList();
-    }
-
-    public void UpdateLobbyList()
-    {
-        bool[] characterAvailable = {true, true, true, true};
-        bool selfReady = false;
-
         if (!roomUI)
         {
-            // reenable and resubscribe to events
+            // enable room UI
             roomUI = Room_UI.singleton;
-            roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-            roomUI.EventStartButtonClicked += OnStartButtonClick;
+
+            // only subscribe to events if we are the local player
+            if (isLocalPlayer)
+            {
+                roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+                roomUI.EventStartButtonClicked += OnStartButtonClick;
+            }
 
             if (!roomUI)
             {
@@ -114,93 +123,73 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             }
         }
 
-        SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
-        if (!room) return;
-        
-        // update all existing players
-        for (int i = 0; i < 4; i++)
+        if (!_characterSelectionInfo)
         {
-            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+            _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
 
-            // if player does not exist
-            if (i >= room.roomSlots.Count)
+            // only subscribe to events if we are the local player
+            if (isLocalPlayer)
             {
-                card.username.text = defaultUsername;
-                card.avatar.texture = FlipTexture(defaultAvatar);
-                card.readyStatus.SetActive(false);
-                card.characterPortrait.enabled = false;
-                continue;
+                _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
             }
 
-            card.characterPortrait.enabled = true;
+            if (!_characterSelectionInfo)
+            {
+                Debug.LogWarning("_characterSelectionInfo not found!");
+                return;
+            }
+        }
 
-            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
+        Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[this.index];
 
-            CSteamID steamid = new CSteamID(player.steamId);
-
-            // Player list background
-            card.playerCard.SetActive(true);
-
-            // User name
-            card.username.text = player.steamUsername;
-
-            // User avatar
-            int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
-            if (imgId > 0) card.avatar.texture = GetSteamImageAsTexture(imgId);
-            else { Debug.LogWarning("ImgId invalid!");  }
-            
-            // Character selection
-            card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
-
-            // Disable clicking another player's character portrait && lock character on ready
-            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()) && !player.readyToBegin)
+        // If it is the local player, allow them to change the portrait
+        if (isLocalPlayer)
+        {
+            if (this.readyToBegin)
+            {
+                card.changeCharacterButton.enabled = false;
+                card.changeCharacterButtonHoverTween.enabled = false;
+            } else
             {
                 card.changeCharacterButton.enabled = true;
                 card.changeCharacterButtonHoverTween.enabled = true;
             }
-            else
-            {
-                card.changeCharacterButton.enabled = false;
-                card.changeCharacterButtonHoverTween.enabled = false;
-            }
-
-            // Ready check mark
-            card.readyStatus.SetActive(player.readyToBegin);
-            
-            // Check if you are ready
-            if (player.steamUsername.Equals(SteamFriends.GetPersonaName()))
-            {
-                selfReady = player.readyToBegin;
-            }
-            
-            // Cache character Availability
-            if (player.readyToBegin)
-            {
-                characterAvailable[player.characterCode] = false;
-            }
         }
 
-        // Ready button
-        if (!characterAvailable[characterCode] && !selfReady)
+        // Player list background
+        card.playerCard.SetActive(true);
+
+        // User name
+        card.username.text = this.steamUsername;
+
+        // If steam is active, set steam avatars
+        if (steamId != 0)
         {
-            roomUI.DeactivateReadyButton();
-        } else
-        {
-            roomUI.ActivateReadyButton();
+            CSteamID steamid = new CSteamID(this.steamId);
+
+            // User avatar
+            int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
+            if (imgId > 0) card.avatar.texture = GetSteamImageAsTexture(imgId);
+            else { Debug.LogWarning("ImgId invalid!"); }
         }
-        
-        // Start button
-        if (room.allPlayersReady && room.showStartButton)
-        {
-            roomUI.ActivateStartButton();
-        } else
-        {
-            roomUI.DeactivateStartButton();
-        }
-        
-        // Prevent buttons from infinitely growing
-        roomUI.buttonReady.transform.localScale = new Vector3(1f, 1f, 1f);
-        roomUI.buttonStart.transform.localScale = new Vector3(1f, 1f, 1f);
+
+        // Character selection
+        card.characterPortrait.enabled = true;
+        card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[this.characterCode];
+
+        // Ready status
+        card.readyStatus.SetActive(this.readyToBegin);
+
+        //string t = "";
+        //for (int i = 0; i < 4; i++)
+        //{
+        //    t += _characterSelectionInfo.characterAvailable[i] + ", ";
+        //}
+        //Debug.Log(t);
+
+
+        //if (this.readyToBegin) roomUI.DeactivateReadyButton();
+        //else roomUI.ActivateReadyButton();
     }
 
     private Texture2D GetSteamImageAsTexture(int iImage)
@@ -226,39 +215,56 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         return texture;
     }
 
-    public void OnStartButtonClick()
+
+    // Called when the start button is clicked
+    [Client] public void OnStartButtonClick()
     {
-        SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
         room.showStartButton = false;
         room.ServerChangeScene(room.GameplayScene);
     }
-    
-    public void OnReadyButtonClick()
-    {
-        if (!hasAuthority) return;
 
+    // Called by the local player when ready button is clicked
+    [Client] public void OnReadyButtonClick()
+    {
         CmdChangeReadyState(!readyToBegin);
-        UpdateLobbyList();
+        //UpdateLobbyListPlayer();
     }
 
-    [Command]
-    private void CmdChangeCharacterCode()
+    // Syncvar Callback for ready status
+    [ClientCallback] public override void ReadyStateChanged(bool _, bool newReadyState)
+    {
+        //UpdateLobbyList();
+        //Debug.Log("player " + index + " changed ready state to " + newReadyState);
+
+        if (newReadyState == true)
+        {
+            _characterSelectionInfo.characterAvailable[characterCode] = false;
+        } else
+        {
+            _characterSelectionInfo.characterAvailable[characterCode] = true;
+        }
+
+        UpdateLobbyListPlayer();
+    }
+
+
+    // Called by the local player when the character card is pressed
+    [Client] public void OnCharacterChanged()
+    {
+        CmdChangeCharacterCode();
+    }
+
+    [Command] private void CmdChangeCharacterCode()
     {
         characterCode = (characterCode + 1) % 4;
     }
 
-    public void OnChangeCharacterCode(int oldCode, int newCode)
+    // Syncvar Callback for character code
+    [ClientCallback]
+    public void OnChangeCharacterCode(int _, int __)
     {
-        UpdateLobbyList();
-    }
-
-    public void OnCharacterChanged()
-    {
-        if (!hasAuthority) return;
-
-        CmdChangeCharacterCode();
-
-        UpdateLobbyList();
+        //UpdateLobbyList();
+        UpdateLobbyListPlayer();
     }
 
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)

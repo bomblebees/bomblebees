@@ -23,7 +23,7 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private float deactivatedOpacity;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
-    private Button _buttonStartButton;
+    public Button _buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
     private CanvasRenderer[] _buttonStartCanvasRenderer;
     [Header("Ready Button")]
@@ -96,7 +96,7 @@ public class Room_UI : MonoBehaviour
         
         // Initialize button states
         DeactivateStartButton();
-        DeactivateReadyButton();
+        ActivateReadyButton();
     }
 
     public void Back()
