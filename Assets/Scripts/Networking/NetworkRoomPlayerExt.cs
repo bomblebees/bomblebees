@@ -14,7 +14,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public Color playerColor;
     
     [Header("Character Selection")]
-    [SyncVar(hook = nameof(OnChangeCharacterCode))] public int characterCode;
+    [SyncVar] public int characterCode;
     private CharacterSelectionInfo _characterSelectionInfo;
 
     [Header("Default UI")]
@@ -35,18 +35,36 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void Update()
     {
-        if (!isLocalPlayer) return;
+
+        if (!_characterSelectionInfo)
+        {
+            _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+            if (!_characterSelectionInfo) return;
+            if (isLocalPlayer)
+            {
+                _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+            }
+        }
 
         if (!room)
         {
             room = NetworkManager.singleton as SteamNetworkManager;
             if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
-            return;
         }
-        if (!_characterSelectionInfo) { _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>(); return; }
 
-        if (!roomUI) return;
+        if (!roomUI)
+        {
+            roomUI = Room_UI.singleton;
+            if (!roomUI) return;
+            if (isLocalPlayer)
+            {
+                roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+                roomUI.EventStartButtonClicked += OnStartButtonClick;
+            }
+        }
 
+        // EXIT IF IS LOCAL PLAYER
+        if (!isLocalPlayer) return;
 
         if (room.allPlayersReady && room.showStartButton)
         {
@@ -65,30 +83,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         {
             roomUI.ActivateReadyButton();
         }
-    }
 
-    //void OnEnable()
-    //{
-    //    SceneManager.sceneLoaded += OnSceneLoaded;
-    //}
-
-    //public override void OnDisable()
-    //{
-    //    base.OnDisable();
-
-    //    SceneManager.sceneLoaded -= OnSceneLoaded;
-    //}
-
-    //private void OnSceneLoaded(Scene arg0, LoadSceneMode loadSceneMode)
-    //{
-    //    _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-    //    _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-    //}
-
-    public override void OnClientEnterRoom()
-    {
-        //Debug.Log("player " + index + " joined");
-        UpdateLobbyListPlayer();
+        UpdateLobbyList();
     }
 
     public override void OnClientExitRoom()
@@ -101,9 +97,65 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         Debug.Log("player " + index + " left");
     }
 
+    public void UpdateLobbyList()
+    {
+        // Update all existing players
+        for (int i = 0; i < 4; i++)
+        {
+            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+
+            // if player does not exist
+            if (i >= room.roomSlots.Count)
+            {
+                card.username.text = defaultUsername;
+                card.avatar.texture = FlipTexture(defaultAvatar);
+                card.readyStatus.SetActive(false);
+                card.characterPortrait.enabled = false;
+                continue;
+            }
+
+            card.characterPortrait.enabled = true;
+
+            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
+
+            // If it is the local player, allow them to change the portrait
+            if (player == this)
+            {
+                if (this.readyToBegin)
+                {
+                    card.changeCharacterButton.enabled = false;
+                    card.changeCharacterButtonHoverTween.enabled = false;
+                }
+                else
+                {
+                    card.changeCharacterButton.enabled = true;
+                    card.changeCharacterButtonHoverTween.enabled = true;
+                }
+            }
+
+            // Player list background
+            card.playerCard.SetActive(true);
+
+            // User name
+            card.username.text = player.steamUsername;
+
+            // If steam is active, set steam avatars
+            //card.avatar.texture = GetSteamImageAsTexture(player.steamAvatarId);
+
+            // Character selection
+            card.characterPortrait.enabled = true;
+            card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
+
+            // Ready status
+            card.readyStatus.SetActive(player.readyToBegin);
+        }
+    }
+
     // Updates the lobby information for the specific player
     public void UpdateLobbyListPlayer()
     {
+        return;
+
         if (!roomUI)
         {
             // enable room UI
@@ -162,16 +214,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // User name
         card.username.text = this.steamUsername;
 
-        // If steam is active, set steam avatars
-        if (steamId != 0)
-        {
-            CSteamID steamid = new CSteamID(this.steamId);
 
-            // User avatar
-            int imgId = SteamFriends.GetLargeFriendAvatar(steamid);
-            if (imgId > 0) card.avatar.texture = GetSteamImageAsTexture(imgId);
-            else { Debug.LogWarning("ImgId invalid!"); }
-        }
 
         // Character selection
         card.characterPortrait.enabled = true;
@@ -192,30 +235,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         //else roomUI.ActivateReadyButton();
     }
 
-    private Texture2D GetSteamImageAsTexture(int iImage)
-    {
-        Texture2D texture = null;
-
-        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
-
-        if (isValid)
-        {
-            byte[] image = new byte[width * height * 4];
-
-            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
-
-            if (isValid)
-            {
-                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
-                texture.LoadRawTextureData(image);
-                texture.Apply();
-            }
-        }
-
-        return texture;
-    }
-
-
     // Called when the start button is clicked
     [Client] public void OnStartButtonClick()
     {
@@ -234,7 +253,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [ClientCallback] public override void ReadyStateChanged(bool _, bool newReadyState)
     {
         //UpdateLobbyList();
-        //Debug.Log("player " + index + " changed ready state to " + newReadyState);
+        Debug.Log("player " + index + " changed ready state to " + newReadyState);
 
         if (newReadyState == true)
         {
@@ -243,8 +262,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         {
             _characterSelectionInfo.characterAvailable[characterCode] = true;
         }
-
-        UpdateLobbyListPlayer();
     }
 
 
@@ -259,12 +276,36 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         characterCode = (characterCode + 1) % 4;
     }
 
-    // Syncvar Callback for character code
-    [ClientCallback]
-    public void OnChangeCharacterCode(int _, int __)
+    //// Syncvar Callback for character code
+    //[ClientCallback]
+    //public void OnChangeCharacterCode(int _, int __)
+    //{
+    //    //UpdateLobbyList();
+    //    //UpdateLobbyListPlayer();
+    //}
+
+    private Texture2D GetSteamImageAsTexture(int iImage)
     {
-        //UpdateLobbyList();
-        UpdateLobbyListPlayer();
+        Texture2D texture = null;
+
+        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
+
+
+        if (isValid)
+        {
+            byte[] image = new byte[width * height * 4];
+
+            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
+
+            if (isValid)
+            {
+                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
+                texture.LoadRawTextureData(image);
+                texture.Apply();
+            }
+        }
+
+        return texture;
     }
 
     Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
