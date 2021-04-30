@@ -82,20 +82,20 @@ public class SteamNetworkManager : NetworkRoomManagerExt
 
     public override void OnRoomServerPlayersReady()
     {
-        //foreach(NetworkRoomPlayerExt p in roomSlots)
-        //{
-        //    showStartButton = true;
-        //    p.UpdateLobbyList();
-        //}
+        foreach(NetworkRoomPlayerExt p in roomSlots)
+        {
+            showStartButton = true;
+            p.UpdateLobbyList();
+        }
     }
 
     public override void OnRoomServerPlayersNotReady()
     {
-        //foreach (NetworkRoomPlayerExt p in roomSlots)
-        //{
-        //    showStartButton = false;
-        //    p.UpdateLobbyList();
-        //}
+        foreach (NetworkRoomPlayerExt p in roomSlots)
+        {
+            showStartButton = false;
+            p.UpdateLobbyList();
+        }
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
