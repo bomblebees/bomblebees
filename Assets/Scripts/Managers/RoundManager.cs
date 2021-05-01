@@ -41,9 +41,11 @@ public class RoundManager : NetworkBehaviour
     public delegate void PlayerConnectedDelegate(PlayerInfo p);
     public delegate void RoundStartDelegate();
     public delegate void RoundEndDelegate(GameObject winner);
+	public delegate void PlayerEliminatedDelegate(GameObject eliminatedPlayer);
     public event PlayerConnectedDelegate EventPlayerConnected;
     public event RoundStartDelegate EventRoundStart;
     public event RoundEndDelegate EventRoundEnd;
+	public event PlayerEliminatedDelegate EventPlayerEliminated;
 
     // singletons
     public static RoundManager _instance;
@@ -177,6 +179,13 @@ public class RoundManager : NetworkBehaviour
         EventRoundEnd?.Invoke(winner);
     }
 
+	// Call this event when player gets eliminated, but for now not if player is last kill/in 1v1 duel (otherwise whistle plays)
+	[ClientRpc]
+	public void RpcPlayerEliminated(GameObject eliminatedPlayer)
+	{
+		EventPlayerEliminated?.Invoke(eliminatedPlayer);
+	}
+
     [Server]
     public IEnumerator ServerStartRound()
     {
@@ -223,8 +232,12 @@ public class RoundManager : NetworkBehaviour
             // update alive count
             aliveCount = alivePlayers.Count;
 
-            // check if the round has ended
-            CheckRoundEnd();
+			Debug.Log(__.name);
+
+			// check if the round has ended
+			CheckRoundEnd();
+			EventPlayerEliminated?.Invoke(__);
+			
         }
     }
 

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 public class AudioManager : NetworkBehaviour
 {
     private EventManager eventManager;
+	private RoundManager roundManager;
 
     [ServerCallback]
     public override void OnStartServer()
@@ -14,13 +15,25 @@ public class AudioManager : NetworkBehaviour
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
+		roundManager = RoundManager.Singleton;
+		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
         eventManager.EventPlayerSwap += ServerPlayComboSound;
         eventManager.EventBombPlaced += RpcPlayPlaceSound;
         eventManager.EventEndRound += ServerPlayerWhistleSound;
         eventManager.EventPlayerSpin += RpcPlayHitSound;
+
+		Debug.Log("eventManager: " + eventManager);
+		Debug.Log("roundManager: " + roundManager);
+		// wanted to try subscribing to an event in RoundManager instead of EventManager for player eliminated sound
+		// The other way would be to put the event in EventManager instead of RoundManager and invoke in RoundManager?
+
+		roundManager.EventPlayerEliminated += RpcPlayPlayerEliminatedSound;
     }
 
-    [System.Serializable]
+
+
+	[System.Serializable]
     public class Sound
     {
         public string name;
@@ -141,9 +154,16 @@ public class AudioManager : NetworkBehaviour
 		}
     }
 
-    [Server] public void ServerPlayerWhistleSound(List<Player> players) { RpcPlayWhistleSound(); }
+	[Server] public void ServerPlayerWhistleSound(List<Player> players) { RpcPlayWhistleSound(); }
 
-    [ClientRpc]
+	[ClientRpc]
+	public void RpcPlayPlayerEliminatedSound(GameObject eliminatedPlayer)
+	{
+		Debug.Log("Play player eliminated sound");
+		PlaySound("playerEliminated");
+	}
+
+	[ClientRpc]
     public void RpcPlayWhistleSound()
     {
         PlaySound("endWhistle");
