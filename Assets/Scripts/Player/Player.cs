@@ -134,6 +134,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
     [NonSerialized] public Quaternion rotation;
+    [SerializeField] private GameObject highlightModel;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
@@ -878,15 +879,17 @@ public class Player : NetworkBehaviour
             // Debug.Log("hit");
 
             // Apply indicator to hex tile to show the tile selected
-            if (selectedTile)
-                selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+            // if (selectedTile)
+            //     selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f); // toggles off prev selected
+            
             selectedTile = tileHit.transform.gameObject;
-            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
+            // selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);    // toggle on current
+            highlightModel.transform.position = new Vector3(selectedTile.transform.position.x, -6f, selectedTile.transform.position.z);
         }
-        else
-        {
-            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
-        }
+        // else
+        // {
+        //     selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+        // }
     }
 
     // Listens for key press and rotates the item stack
