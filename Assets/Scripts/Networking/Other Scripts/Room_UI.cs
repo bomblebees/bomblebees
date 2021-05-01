@@ -17,7 +17,7 @@ public class Room_UI : MonoBehaviour
 
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
-    [SerializeField] private GameObject screenBombList;
+    [SerializeField] private GameObject screenControls;
     [Header("Opacity Configuration")]
     [Range(0f, 1f)]
     [SerializeField] private float deactivatedOpacity;
@@ -42,6 +42,7 @@ public class Room_UI : MonoBehaviour
         public RawImage characterPortrait;
         public Button changeCharacterButton;
         public ButtonHoverTween changeCharacterButtonHoverTween;
+        public Image[] colorFrames;
     }
 
     [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
@@ -68,7 +69,7 @@ public class Room_UI : MonoBehaviour
         if (mainMenuUI.screenLoading.activeSelf)
         {
             mainMenuUI.screenLoading.SetActive(false);
-            
+
         }
 
         if (!mainMenuUI.screenNavigation.activeSelf)
@@ -88,12 +89,12 @@ public class Room_UI : MonoBehaviour
         _buttonStartButton = buttonStart.GetComponent<Button>();
         _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
         _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
-        
+
         // Cache ready button components
         _buttonReadyButton = buttonReady.GetComponent<Button>();
         _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
         _buttonReadyCanvasRenderer = buttonReady.GetComponentsInChildren<CanvasRenderer>();
-        
+
         // Initialize button states
         DeactivateStartButton();
         ActivateReadyButton();
@@ -196,9 +197,9 @@ public class Room_UI : MonoBehaviour
 
     #region Screen: BOMB LIST
 
-    public void ToggleScreenBombList()
+    public void ToggleScreenControls()
     {
-        screenBombList.SetActive(!screenBombList.activeSelf);
+        screenControls.SetActive(!screenControls.activeSelf);
     }
     
     #endregion

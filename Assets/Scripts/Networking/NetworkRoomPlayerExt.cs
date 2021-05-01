@@ -21,7 +21,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SerializeField] private Texture2D defaultAvatar;
     [SerializeField] private string defaultUsername;
     
-    // List of player colors
+    // Temp list of player colors
     private List<Color> listColors = new List<Color> {
         Color.red,
         Color.blue,
@@ -89,7 +89,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public override void OnClientEnterRoom()
     {
-        this.playerColor = listColors[index];
+        //this.playerColor = listColors[index];
         base.OnClientEnterRoom();
     }
 
@@ -154,6 +154,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
             // Ready status
             card.readyStatus.SetActive(player.readyToBegin);
+
+            foreach (Image elem in card.colorFrames)
+            {
+                elem.color = listColors[player.characterCode];
+            }
         }
     }
 
@@ -252,15 +257,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] public void OnReadyButtonClick()
     {
         CmdChangeReadyState(!readyToBegin);
-        //UpdateLobbyListPlayer();
     }
 
     // Syncvar Callback for ready status
     [ClientCallback] public override void ReadyStateChanged(bool _, bool newReadyState)
     {
-        //UpdateLobbyList();
-        Debug.Log("player " + index + " changed ready state to " + newReadyState);
-
         if (!_characterSelectionInfo) return;
 
         if (newReadyState == true)
@@ -283,14 +284,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         characterCode = (characterCode + 1) % 4;
     }
-
-    //// Syncvar Callback for character code
-    //[ClientCallback]
-    //public void OnChangeCharacterCode(int _, int __)
-    //{
-    //    //UpdateLobbyList();
-    //    //UpdateLobbyListPlayer();
-    //}
 
     private Texture2D GetSteamImageAsTexture(int iImage)
     {

@@ -27,6 +27,9 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnRoomStopServer();
     }
 
+    // Temp list of player colors
+    private Color[] listColors = { Color.red, Color.blue, Color.yellow, Color.green };
+
     /// <summary>
     /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
     /// This is the ideal point to pass any data like player name, credentials, tokens, colors, etc.
@@ -47,9 +50,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         gamePlayer.GetComponent<Player>().playerId = timeId;
 
         // transfer the color over
-        gamePlayer.GetComponent<Player>().playerColor = roomPlayer.GetComponent<NetworkRoomPlayerExt>().playerColor;
-
-        //Destroy(roomPlayer);
+        gamePlayer.GetComponent<Player>().playerColor = listColors[roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode];
 
         return true;
     }
