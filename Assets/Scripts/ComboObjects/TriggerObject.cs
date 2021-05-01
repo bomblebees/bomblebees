@@ -185,12 +185,16 @@ public class TriggerObject : ComboObject
         angle += 90f;
         targetAngle = RoundAngleToHex(angle);
 
+        targetAngle = HexMetrics.edgeAngles[edgeIndex] -90f; // testing!
+
         startAngle = model.transform.eulerAngles.y;
         if (Math.Abs(startAngle - targetAngle) >= 180) // if angle diff is > 180, rotate in opp direction
         {
             if (startAngle >= targetAngle) targetAngle += 360f;  // wraparound
             startAngle += 360f;  // reset
         }
+
+        // should we base rotate angle off edgeIndex here?
 
         // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
         // targetAngle = angle;
