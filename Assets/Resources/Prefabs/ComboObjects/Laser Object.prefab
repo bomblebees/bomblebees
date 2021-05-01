@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 1208115712000211102}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.26, y: 0.26, z: 0.26}
+  m_LocalScale: {x: 0.24, y: 0.24, z: 0.24}
   m_Children: []
   m_Father: {fileID: 3089520251592577978}
   m_RootOrder: 0
@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.29803923}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -445,9 +445,9 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 4570919758972788173}
   fillShaderRatio: 0.9
+  breakdownDuration: 0
   minimumLifeDuration: 4
   stayPermanent: 1
-  breakdownDuration: 0
   rotateLerpRate: 0.15
   arrowUI: {fileID: 0}
   chargeSFX: {fileID: 3973222658390231761}

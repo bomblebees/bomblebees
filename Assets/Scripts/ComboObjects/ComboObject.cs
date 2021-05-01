@@ -335,6 +335,9 @@ public class ComboObject : NetworkBehaviour
 
         if (other.gameObject.CompareTag("Spin"))
         {
+            bombRadialTimerImage.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+            bombRadialTimerImage.color = new Vector4(1,1,1,1);
+
             var playerPosition = other.transform.parent.gameObject.transform.position;
             // note: Don't use Vector3.Angle
             var angleInRad = Mathf.Atan2(playerPosition.x - transform.position.x,
