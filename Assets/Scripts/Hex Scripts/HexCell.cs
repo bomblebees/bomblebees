@@ -18,7 +18,15 @@ public class HexCell : NetworkBehaviour
 
     public static char[] ignoreKeys = new char[]
     {
-        HexGrid.GetDangerTileChar(), HexGrid.GetEmptyTileChar(), HexGrid.GetSlowTileChar(), HexGrid.GetHiddenHexChar(), HexGrid.GetTerrainHexChar(),
+        HexGrid.GetDangerTileChar(),
+        HexGrid.GetEmptyTileChar(),
+        HexGrid.GetSlowTileChar(),
+        HexGrid.GetHiddenHexChar(),
+        HexGrid.GetTerrainHexChar(),
+        HexGrid.GetRedComboTileChar(),
+        HexGrid.GetGreenComboTileChar(),
+        HexGrid.GetPurpleComboTileChar(),
+        HexGrid.GetYellowComboTileChar(),
     };
     public int emptyNeighbors = 0;
     

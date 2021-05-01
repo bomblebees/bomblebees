@@ -171,16 +171,16 @@ public class GameUIManager : NetworkBehaviour
     {
         if (combo)
         {
-            RpcOnSwapComboEvent(oldKey, player);
+            RpcOnSwapComboEvent(oldKey, player, numBombsAwarded);
         }
 
         TargetOnSwapEvent(player.GetComponent<NetworkIdentity>().connectionToClient, newKey);
     }
 
     [ClientRpc]
-    public void RpcOnSwapComboEvent(char comboKey, GameObject player)
+    public void RpcOnSwapComboEvent(char comboKey, GameObject player, int numBombsAwarded)
     {
-        messageFeed.OnSwapEvent(comboKey, player);
+        messageFeed.OnSwapEvent(comboKey, player, numBombsAwarded);
 
     }
 

@@ -12,7 +12,7 @@ public class LivesUI : MonoBehaviour
     public class LivesElem
     {
         public GameObject livesObject;
-        public RawImage avatar;
+        public Image avatar;
         public RawImage background;
         public GameObject heart1;
         public GameObject heart2;
@@ -20,11 +20,9 @@ public class LivesUI : MonoBehaviour
         public TMP_Text livesCounter;
     }
 
-    [SerializeField] public Sprite[] heartColors = new Sprite[4];
-    [SerializeField] public Texture2D[] characterPictures = new Texture2D[4];
-
     [SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
     [SerializeField] GameUIManager gameUIManager = null;
+
 
     public void EnableLivesUI(GameObject[] players)
     {
@@ -46,8 +44,8 @@ public class LivesUI : MonoBehaviour
             //    elem.avatar.texture = GetSteamImageAsTexture(imageId);
             //}
 
-            elem.avatar.texture = characterPictures[p.characterCode];
-
+            elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
+                
             // initialize health and username
             elem.playerName.text = p.steamName;
             //livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
@@ -57,10 +55,10 @@ public class LivesUI : MonoBehaviour
             elem.livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
 
             elem.heart1.SetActive(true);
-            elem.heart1.GetComponent<Image>().overrideSprite = heartColors[p.characterCode];
+            elem.heart1.GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
 
             elem.heart2.SetActive(true);
-            elem.heart2.GetComponent<Image>().overrideSprite = heartColors[p.characterCode];
+            elem.heart2.GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
             
         }
 
