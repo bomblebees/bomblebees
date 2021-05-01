@@ -153,6 +153,7 @@ public class PlayerInterface : NetworkBehaviour
         for (int i = 0; i < list.Count; i++)
         {
             invCounters[i].text = list[i].ToString();
+            // update color if stack is full
             if (invCounters[i].text == "5") invCounters[i].color = Color.yellow;
             else                            invCounters[i].color = Color.white;
 
