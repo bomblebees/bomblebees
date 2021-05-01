@@ -431,6 +431,10 @@ public class HexGrid : NetworkBehaviour
         var c = level.getArray()[z, x];
         if (ignoreRandomGenOnE && (level.getArray()[z, x] == GetDangerTileChar() ||
                                    level.getArray()[z, x] == GetEmptyTileChar() ||
+                                   level.getArray()[z, x] == GetRedComboTileChar() ||
+                                   level.getArray()[z, x] == GetGreenComboTileChar() ||
+                                   level.getArray()[z, x] == GetPurpleComboTileChar() ||
+                                   level.getArray()[z, x] == GetYellowComboTileChar() ||
                                    level.getArray()[z, x] == GetSlowTileChar() ||
                                    level.getArray()[z, x] == GetHiddenHexChar()))
         {
@@ -677,7 +681,25 @@ public class HexGrid : NetworkBehaviour
         return danger_Hex_char;
     }
 
-    // terence: seen
+    public static char GetRedComboTileChar()
+    {
+        return r_Combo_Hex_char;
+    }
+    public static char GetGreenComboTileChar()
+    {
+        return g_Combo_Hex_char;
+    }
+    public static char GetPurpleComboTileChar()
+    {
+        return p_Combo_Hex_char;
+    }
+    public static char GetYellowComboTileChar()
+    {
+        return y_Combo_Hex_char;
+    }
+    
+
+    // Not in use, replaced with "Combo Made" Tiles of respective type
     public static char GetEmptyTileChar()
     {
         return default_Hex_char;
@@ -713,7 +735,10 @@ public class HexGrid : NetworkBehaviour
                 toDanger.Add(cell);
             }
             else if (
-                (cell.HasNeighborOf(slowSpawns) || (cell.GetKey() == GetEmptyTileChar() && cell.HasNeighborOf(allmisc) || cell.emptyNeighbors > 0))
+                (cell.HasNeighborOf(slowSpawns)
+                    || (cell.GetKey() == GetEmptyTileChar()
+                    && cell.HasNeighborOf(allmisc)
+                    || cell.emptyNeighbors > 0))
                      && !unchanging.Contains(cell.GetKey()))
             {
                 toSlow.Add(cell);
