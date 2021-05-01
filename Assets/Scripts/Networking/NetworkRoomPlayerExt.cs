@@ -155,9 +155,20 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Ready status
             card.readyStatus.SetActive(player.readyToBegin);
 
+            // Set colors of the color frames
             foreach (Image elem in card.colorFrames)
             {
                 elem.color = listColors[player.characterCode];
+            }
+
+            // If not ready, and character portrait is unavailable, grey out the portrait
+            if (!player.readyToBegin && !_characterSelectionInfo.characterAvailable[player.characterCode])
+            {
+                card.characterPortrait.color = new Color(0.4f, 0.4f, 0.4f);
+            }
+            else
+            {
+                card.characterPortrait.color = new Color(1f, 1f, 1f);
             }
         }
     }
