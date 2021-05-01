@@ -475,7 +475,9 @@ public class Player : NetworkBehaviour
 
                 char bombType = inv.GetSelectedBombType(); // get the currently selected bomb type
 
-                if (bombType == 'e') return; // if selected bomb type empty, return
+                // if (bombType == 'e') return; // removed for new combo tiles
+                if (bombType == 'e' || bombType == '1'|| bombType == '2'|| bombType == '3' || bombType == '4')
+                    return; // if selected bomb type empty, return
 
                 inv.RemoveInventoryBomb(bombType); // Subtract the bomb type from the player inventory by 1
 
