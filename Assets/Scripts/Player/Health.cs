@@ -132,6 +132,11 @@ public class Health : NetworkBehaviour
 			for (int j = 0; j < deadPlayerInventory.inventoryList[i]; j++)
 			{
 				char bombType = deadPlayerInventory.GetBombTypes()[i];
+
+				// TO-DO: this code gets repeated in PlayerInventory when extra bombs added to inv get dropped;
+				// make separate GroundItemFactory component or something? idk
+				
+				////
 				Vector3 randomTransform = this.gameObject.transform.position;
 				randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
 				randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
@@ -140,6 +145,7 @@ public class Health : NetworkBehaviour
 				GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
 				_groundItem.bombType = bombType;
 				NetworkServer.Spawn(groundItemObject);
+				////
 			}
 		}
 	}

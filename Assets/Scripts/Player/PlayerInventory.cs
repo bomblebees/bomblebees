@@ -11,6 +11,9 @@ public class PlayerInventory : NetworkBehaviour
     [Tooltip("Controls the max amount of bombs a player can carry for each bomb type")]
     [SerializeField] private int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
 
+	[Tooltip("Ground item prefab for spawning bombs on ground")]
+	[SerializeField] private GameObject groundItemPrefab;
+
     // A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
     public readonly SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
 
@@ -30,31 +33,84 @@ public class PlayerInventory : NetworkBehaviour
     }
 
     // Adds "amt" number of bombs of type "type" to the players inventory
-    [Server] public void AddInventoryBomb(char type, int amt)
+    [Server] public bool AddInventoryBomb(char type, int amt)
     {
         // Get the index corresponding to the bomb type
         int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
 
-        // If the amount we want to add is larger than max values, then set the bomb quantity to max
-        if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
-        {
-            inventoryList[idx] = INVEN_MAX_VALUES[idx];
+		// Store the extra bombs (bomb amount - spaces left) so we can drop extras on the ground 
+		int fullInvOverflowValue = (inventoryList[idx] + amt) - INVEN_MAX_VALUES[idx];
 
-            this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, INVEN_MAX_VALUES[idx]);
+        
+		// First check if inventory for this bomb type isn't completely full:
+		if (!(inventoryList[idx] == INVEN_MAX_VALUES[idx]))
+		{
+			// If the amount we want to add is larger than max values, then set the bomb quantity to max
+			if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
+			{
+				inventoryList[idx] = INVEN_MAX_VALUES[idx];
 
-        }
-        else
-        {
-            // Otherwise add the amount
-            inventoryList[idx] += amt;
+				if (inventoryList[idx] + amt != INVEN_MAX_VALUES[idx])
+				{
+					// Add conditional so that inventory add UI doesn't get displayed if inventory is already full
+					this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt - fullInvOverflowValue);
+				}
+				Debug.Log(fullInvOverflowValue);
 
-            this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
-        }
+				// Drop the amt of bombs on the ground
+				for (int i = 0; i < fullInvOverflowValue; i++)
+				{
+					////
+					Vector3 randomTransform = this.gameObject.transform.position;
+					randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
+					randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
+					GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
+								randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
+					GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
+					_groundItem.bombType = type;
+					NetworkServer.Spawn(groundItemObject);
+					////
+				}
+
+				return true;
+			}
+			else        // Otherwise simply add the amount to inv, don't drop anything
+			{
+				inventoryList[idx] += amt;
+
+				this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
+				return true;
+			}
+		}
+
+		// Otherwise, inventory is already full, drop all bombs on ground
+		for (int i = 0; i < fullInvOverflowValue; i++)
+		{
+			////
+			Vector3 randomTransform = this.gameObject.transform.position;
+			randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
+			randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
+			GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
+						randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
+			GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
+			_groundItem.bombType = type;
+			NetworkServer.Spawn(groundItemObject);
+			////
+		}
+
+		// if inventory is full, nothing gets added.
+		return false;
+
     }
 
 	public char[] GetBombTypes()
 	{
 		return INVEN_BOMB_TYPES;
+	}
+
+	public int[] GetMaxInvSizes()
+	{
+		return INVEN_MAX_VALUES;
 	}
 
     // Removes a bomb type from the inventory
