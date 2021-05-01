@@ -335,7 +335,9 @@ public class ComboObject : NetworkBehaviour
 
         if (other.gameObject.CompareTag("Spin"))
         {
-            bombRadialTimerImage.transform.localScale = new Vector3(0.3f,0.3f,0.3f);
+            // "Toggle on" radial timer
+            // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
+            // bombRadialTimerImage.transform.localScale *= 1.25f;
             bombRadialTimerImage.color = new Vector4(1,1,1,1);
 
             var playerPosition = other.transform.parent.gameObject.transform.position;
@@ -348,6 +350,7 @@ public class ComboObject : NetworkBehaviour
 
             pushedDirAngle = 30f;
             int edgeIndex;
+
             for (edgeIndex = 0; edgeIndex < HexMetrics.edgeAngles.Length; edgeIndex++)
             {
                 if (Mathf.Abs(dirFromPlayerToThis - HexMetrics.edgeAngles[edgeIndex]) <= 30)
