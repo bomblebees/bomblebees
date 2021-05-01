@@ -45,8 +45,23 @@ public class HexGrid : NetworkBehaviour
     private string hidden_Hex_Name = "HiddenHex";
     public GameObject terrain_Hex;
     private string terrain_Hex_Name = "TerrainHex";
+
     public GameObject default_Hex;
-    private string default_Hex_Name = "EmptyHex";
+    private string default_Hex_Name = "DefaultHex";
+    public GameObject r_Combo_Hex;
+    private string r_Combo_Hex_Name = "RedComboHex";
+    public GameObject g_Combo_Hex;
+    private string g_Combo_Hex_Name = "GreenComboHex";
+    public GameObject p_Combo_Hex;
+    private string p_Combo_Hex_Name = "PurpleComboHex";
+    public GameObject y_Combo_Hex;
+    private string y_Combo_Hex_Name = "YellowComboHex";
+    
+    static char r_Combo_Hex_char = '1';
+    static char g_Combo_Hex_char = '2';
+    static char p_Combo_Hex_char = '3';
+    static char y_Combo_Hex_char = '4';
+
     static char slow_Hex_char = '$';
     static char danger_Hex_char = '#';
     static char hidden_Hex_char = 'i';
@@ -319,6 +334,14 @@ public class HexGrid : NetworkBehaviour
                 return p_Hex;
             case 'w':
                 return w_Hex;
+            case '1':
+                return r_Combo_Hex;
+            case '2':
+                return g_Combo_Hex;
+            case '3':
+                return p_Combo_Hex;
+            case '4':
+                return y_Combo_Hex;
             case 't':
                 return terrain_Hex;
             case '-':
@@ -432,9 +455,31 @@ public class HexGrid : NetworkBehaviour
             yield break;
         }
 
-        cell.SetKey('e');
-        cell.CreateModel(ReturnModelByCellKey('e'));
-        colorGridList[cell.getListIndex()] = 'e';
+        // Instead of 'e', set to combo tile of respective type
+        if (cell.key == 'r')
+        {
+            cell.SetKey('1');
+            cell.CreateModel(ReturnModelByCellKey('1'));
+            colorGridList[cell.getListIndex()] = '1';
+        } else if (cell.key == 'g')
+        {
+            cell.SetKey('2');
+            cell.CreateModel(ReturnModelByCellKey('2'));
+            colorGridList[cell.getListIndex()] = '2';
+        } else if (cell.key == 'p')
+        {
+            cell.SetKey('3');
+            cell.CreateModel(ReturnModelByCellKey('3'));
+            colorGridList[cell.getListIndex()] = '3';
+        } else if (cell.key == 'y')
+        {
+            cell.SetKey('4');
+            cell.CreateModel(ReturnModelByCellKey('4'));
+            colorGridList[cell.getListIndex()] = '4';
+        }
+        // cell.SetKey('e');
+        // cell.CreateModel(ReturnModelByCellKey('e'));
+        // colorGridList[cell.getListIndex()] = 'e';
         yield return new WaitForSeconds(tileRegenDuration);
 
         char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
@@ -632,6 +677,7 @@ public class HexGrid : NetworkBehaviour
         return danger_Hex_char;
     }
 
+    // terence: seen
     public static char GetEmptyTileChar()
     {
         return default_Hex_char;
