@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class MessageFeed : MonoBehaviour
 {
@@ -11,9 +12,11 @@ public class MessageFeed : MonoBehaviour
     [SerializeField] private int maxMessages = 10;
     [SerializeField] private float fadeDelay = 4f;
 
+    [SerializeField] GameUIManager gameUIManager = null;
+
     private List<GameObject> feedUIs = new List<GameObject>();
 
-    public void CreateMessage(string messageText)
+    public void CreateMessage(string messageText, int charCode = -1)
     {
         // Do not create more messages than max messages
         if (feedUIs.Count >= maxMessages) return;
@@ -27,6 +30,12 @@ public class MessageFeed : MonoBehaviour
 
         // Set the text
         message.GetComponent<TMP_Text>().text = messageText;
+
+        // Set the character image, if applicable
+        if (charCode != -1)
+        {
+            message.GetComponentInChildren<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(charCode);
+        }
 
         // Get initial anchor position
         Vector2 pos = messsageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
@@ -74,22 +83,34 @@ public class MessageFeed : MonoBehaviour
 
     public void OnKillEvent(GameObject bomb, GameObject player)
     {
-        string killtext = GetPlayerText(player) + " died to " + GetBombText(bomb);
+        string killtext = " died to " + GetBombText(bomb);
 
-        CreateMessage(killtext);
+        CreateMessage(killtext, player.GetComponent<Player>().characterCode);
     }
 
-    public void OnSwapEvent(char comboKey, GameObject player)
+    public void OnSwapEvent(char comboKey, GameObject player, int numBombsAwarded)
     {
-        string killtext = GetPlayerText(player) + " made " + GetComboText(comboKey);
+        string killtext = GetComboText(comboKey) + GetComboMultiplier(numBombsAwarded);
 
-        CreateMessage(killtext);
+        CreateMessage(killtext, player.GetComponent<Player>().characterCode);
     }
 
     #endregion
 
 
     #region Helpers
+
+    private string GetComboMultiplier(int combos)
+    {
+        switch (combos)
+        {
+            case 1: return "<size=100%> x1";
+            case 2: return "<color=#ADFF00><size=125%> x2</color>";
+            case 3: return "<color=#E9FF00><size=150%> x3</color>";
+            case 4: return "<color=#FFB700><size=175%> x4</color>";
+            default: return "<color=#FF3100><size=200%> x" + combos.ToString() + "</color>";
+        }
+    }
 
     //private IEnumerator StartFade(int idx)
     //{
