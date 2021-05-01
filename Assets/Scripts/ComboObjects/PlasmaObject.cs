@@ -20,7 +20,7 @@ public class PlasmaObject : TriggerObject
 
     [SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
-    public float ignoreTriggererDuration = 1f;
+    public float ignoreTriggererDuration = 0f;
 
     protected override void StartDangerAnim()
     {
@@ -57,7 +57,7 @@ public class PlasmaObject : TriggerObject
         }
 
         Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
-        StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
+        // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
         this.hitBox.SetActive(true);
         this.plasmaSphereModel.SetActive(true);
