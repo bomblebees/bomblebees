@@ -83,7 +83,7 @@ public class MessageFeed : MonoBehaviour
 
     public void OnKillEvent(GameObject bomb, GameObject player)
     {
-        string killtext = " died to " + GetBombText(bomb);
+        string killtext = " died to " + GetBombText(bomb) + "!";
 
         CreateMessage(killtext, player.GetComponent<Player>().characterCode);
     }
@@ -141,15 +141,15 @@ public class MessageFeed : MonoBehaviour
     {
         if (bomb.GetComponent<BombObject>() != null)
         {
-            return "<color=#B2B2B2>Big Bomb</color>";
+            return "<color=#E21616>Bomble Bomb</color>";
         }
         else if (bomb.GetComponent<LaserObject>() != null)
         {
-            return "<color=#F9FF23>Laser Bomb</color>";
+            return "<color=#F9FF23>Laser Beem</color>";
         }
         else if (bomb.GetComponent<PlasmaObject>() != null)
         {
-            return "<color=#17E575>Plasma Bomb</color>";
+            return "<color=#17E575>Plasma Ball</color>";
         }
         else if (bomb.GetComponent<BlinkObject>() != null)
         {
@@ -174,7 +174,7 @@ public class MessageFeed : MonoBehaviour
             case 'g': return "<color=#17E575>Plasma Ball</color>";
             case 'y': return "<color=#F9FF23>Laser Beem</color>";
             case 'r': return "<color=#E21616>Bomble Bomb</color>";
-            case 'p': return "<color=#F153FF>Honey Bomb</color>";
+            case 'p': return "<color=#F153FF>Sludge Bomb</color>";
             case 'w': return "<color=#B2B2B2>Queen Bee Combo</color>";
             default: return "Error: Key " + key + " not found";
         }
