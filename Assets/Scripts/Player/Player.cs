@@ -162,6 +162,8 @@ public class Player : NetworkBehaviour
         // Set player color
         playerMesh = playerModel.transform.GetChild(0).gameObject;
         playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
+        // Disable tile highlight outline
+        if (isLocalPlayer) highlightModel.active = true;
     }
 
     public override void OnStartServer()
