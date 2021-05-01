@@ -8,7 +8,10 @@ public class GroundItem : NetworkBehaviour
 {
 	[SyncVar (hook = nameof(OnBombTypeChanged))] public char bombType = ' ';
 	[SyncVar] public Color color = Color.white;
-
+	public GameObject r_model;
+	public GameObject g_model;
+	public GameObject p_model;
+	public GameObject y_model;
 	[SerializeField] private float sinTimeOffsetRange = 0f;
 	[SerializeField] private float bobFrequency = 7f;
 	[SerializeField] private float amplitude = .2f;
@@ -96,16 +99,20 @@ public class GroundItem : NetworkBehaviour
 		switch (newValue)
 		{
 			case 'r':
-				GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.red);
+				r_model.active = true;
+				// GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.red);
 				break;
 			case 'p':
-				GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.magenta);
+				p_model.active = true;
+				// GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.magenta);
 				break;
 			case 'y':
-				this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.yellow);
+				y_model.active = true;
+				// this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.yellow);
 				break;
 			case 'g':
-				this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.green);
+				g_model.active = true;
+				// this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.green);
 				break;
 		}
 		
