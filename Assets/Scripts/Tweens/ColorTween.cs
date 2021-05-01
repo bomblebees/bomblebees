@@ -28,8 +28,14 @@ public class ColorTween : MonoBehaviour
         LeanTween.value(gameObject, updateColorCallback, targetColor, endColor, easeOutTime).setEase(easeOut);
     }
 
+    private bool loopStarted = false;
+
     public void LoopTween()
     {
+        if (loopStarted) return;
+
+        loopStarted = true;
+
         LeanTween.delayedCall(gameObject, timeBetweenLoop, () => {
 
             LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)

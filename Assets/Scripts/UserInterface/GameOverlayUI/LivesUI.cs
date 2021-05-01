@@ -102,7 +102,7 @@ public class LivesUI : MonoBehaviour
                 case 2: { livesUIs[i].hearts[2].SetActive(false); break; }
                 case 1: {
                         livesUIs[i].hearts[1].SetActive(false);
-                        if (players[i].transform.name == "LocalPlayer") livesUIs[i].background.GetComponent<ColorTween>().LoopTween(); 
+                        livesUIs[i].background.GetComponent<ColorTween>().LoopTween(); 
                         break;
                     }
                 case 0: { livesUIs[i].hearts[0].SetActive(false); break; }
