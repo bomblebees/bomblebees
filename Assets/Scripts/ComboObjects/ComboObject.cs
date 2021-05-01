@@ -338,7 +338,7 @@ public class ComboObject : NetworkBehaviour
             // "Toggle on" radial timer
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
-            bombRadialTimerImage.color = new Vector4(1,1,1,1);
+            // bombRadialTimerImage.color = new Vector4(1,1,1,1);
 
             var playerPosition = other.transform.parent.gameObject.transform.position;
             // note: Don't use Vector3.Angle
@@ -426,6 +426,10 @@ public class ComboObject : NetworkBehaviour
         else
             fillShaderRate = 1 / (startupDelay * fillShaderRatio);
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
+        // "Toggle on" radial timer
+            // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
+            // bombRadialTimerImage.transform.localScale *= 1.25f;
+        // bombRadialTimerImage.color = new Vector4(1,1,1,1);
     }
 
     protected virtual void StepFillShader()

@@ -37,6 +37,10 @@ public class TickObject : ComboObject
         tickStarted = true;
         base.EnableBeepSFX();
         base.ReadyFillShader();
+        // "Toggle on" radial timer
+            // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
+            // bombRadialTimerImage.transform.localScale *= 1.25f;
+        this.bombRadialTimerImage.color = new Vector4(1,1,1,1);
         if (!didEarlyEffects)
         {
             if (ownerIsQueen)
