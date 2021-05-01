@@ -92,7 +92,7 @@ public class LivesUI : MonoBehaviour
 
             livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
 
-            if (lifeCount <= 1) { livesUIs[i].heart2.SetActive(false); }
+            if (lifeCount <= 1) { livesUIs[i].heart2.SetActive(false); livesUIs[0].background.GetComponent<ColorTween>().LoopTween(); }
             if (lifeCount <= 0) { livesUIs[i].heart1.SetActive(false); }
         }
     }

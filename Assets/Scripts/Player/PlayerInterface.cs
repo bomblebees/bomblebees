@@ -92,7 +92,7 @@ public class PlayerInterface : NetworkBehaviour
 
     public void OnPlayerTakeDamage(int _, int __, GameObject ___)
     {
-        if (isLocalPlayer) damageIndicator.GetComponent<AlphaTween>().StartTween();
+        if (isLocalPlayer) damageIndicator.GetComponent<ColorTween>().StartTween();
     }
 
 

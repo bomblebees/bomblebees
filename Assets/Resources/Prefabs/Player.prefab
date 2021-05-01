@@ -4765,7 +4765,7 @@ GameObject:
   - component: {fileID: 1566261932739721934}
   - component: {fileID: 3111610297407448422}
   - component: {fileID: 3347959668700029982}
-  - component: {fileID: 1690806936436233082}
+  - component: {fileID: 8405971249846445455}
   m_Layer: 0
   m_Name: DamageIndicator
   m_TagString: Untagged
@@ -4829,7 +4829,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1690806936436233082
+--- !u!114 &8405971249846445455
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4838,11 +4838,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 664719721258544952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 899ae458f17fec54e9f7f25aff74617c, type: 3}
+  m_Script: {fileID: 11500000, guid: 297de32c565a57a4d95811db70a5c4da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetAlpha: 0.7
-  endAlpha: 0
+  targetColor: {r: 0.8862745, g: 0.095, b: 0, a: 0.69803923}
+  endColor: {r: 0.8862745, g: 0.095, b: 0, a: 0}
   easeInTime: 0.05
   easeOutTime: 0.4
   easeIn: 1
@@ -4940,6 +4940,7 @@ MonoBehaviour:
   steamId: 0
   playerId: 0
   steamName: '[Steam Name]'
+  characterCode: 0
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   debugMode: 0
   debugBombPress1: 8
