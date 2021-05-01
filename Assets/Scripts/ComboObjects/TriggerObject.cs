@@ -177,15 +177,22 @@ public class TriggerObject : ComboObject
 
     protected virtual void GetSpunDirection(int edgeIndex, GameObject triggeringPlayer, bool useBeam)
     {
+        /* Note from Terence:
+            I commented this out to fix the rotation bug. The rotation is handled
+            by 'targetAngle = HexMetrics.edgeAngles[edgeIndex] -90f' instead.
+            This seems to work more consistently and the extra angle math seems
+            redundant since we pass in edgeIndex anyway? But talk to me if this
+            breaks something bc I might b dumdum too
+        */
+
         // get angle from player
-        Vector3 dir = triggeringPlayer.transform.position - transform.position;
-        dir = triggeringPlayer.transform.InverseTransformDirection(dir);
+        // Vector3 dir = triggeringPlayer.transform.position - transform.position;
+        // dir = triggeringPlayer.transform.InverseTransformDirection(dir);
 
-        float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-        angle += 90f;
-        targetAngle = RoundAngleToHex(angle);
-
-        targetAngle = HexMetrics.edgeAngles[edgeIndex] -90f; // testing!
+        // float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        // angle += 90f;
+        // targetAngle = RoundAngleToHex(angle);
+        targetAngle = HexMetrics.edgeAngles[edgeIndex] -90f;
 
         startAngle = model.transform.eulerAngles.y;
         if (Math.Abs(startAngle - targetAngle) >= 180) // if angle diff is > 180, rotate in opp direction
