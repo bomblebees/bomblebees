@@ -21,7 +21,7 @@ public class ColorTween : MonoBehaviour
 
     private void OnEnable()
     {
-        StartTween();
+        if (startOnEnabled) StartTween();
     }
 
     public void StartTween()
