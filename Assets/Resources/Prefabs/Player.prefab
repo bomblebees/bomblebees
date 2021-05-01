@@ -4845,6 +4845,7 @@ MonoBehaviour:
   endColor: {r: 0.8862745, g: 0.095, b: 0, a: 0}
   easeInTime: 0.05
   easeOutTime: 0.4
+  timeBetweenLoop: 0
   easeIn: 1
   easeOut: 1
 --- !u!1 &728363404677404264
@@ -5030,8 +5031,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  maxLives: 2
-  currentLives: 2
+  maxLives: 3
+  currentLives: 3
   ghostDuration: 5
   invincibilityDuration: 1
   playerModel: {fileID: 5260639197599151655}
