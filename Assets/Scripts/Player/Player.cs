@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public ulong steamId = 0; // unique steam id
     [SyncVar] public ulong playerId = 0; // unique player id
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
+    [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
 
     // Assets

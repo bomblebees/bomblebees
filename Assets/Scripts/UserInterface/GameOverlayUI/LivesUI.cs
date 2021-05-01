@@ -20,6 +20,9 @@ public class LivesUI : MonoBehaviour
         public TMP_Text livesCounter;
     }
 
+    [SerializeField] public Sprite[] heartColors = new Sprite[4];
+    [SerializeField] public Texture2D[] characterPictures = new Texture2D[4];
+
     [SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
     [SerializeField] GameUIManager gameUIManager = null;
 
@@ -34,14 +37,16 @@ public class LivesUI : MonoBehaviour
             // enable ui for players
             elem.livesObject.SetActive(true);
 
-            // Set steam user avatar
-            if (p.steamId != 0)
-            {
-                CSteamID steamID = new CSteamID(p.steamId);
-                int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
-                if (imageId == -1) return;
-                elem.avatar.texture = GetSteamImageAsTexture(imageId);
-            }
+            //// Set steam user avatar
+            //if (p.steamId != 0)
+            //{
+            //    CSteamID steamID = new CSteamID(p.steamId);
+            //    int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
+            //    if (imageId == -1) return;
+            //    elem.avatar.texture = GetSteamImageAsTexture(imageId);
+            //}
+
+            elem.avatar.texture = characterPictures[p.characterCode];
 
             // initialize health and username
             elem.playerName.text = p.steamName;
@@ -51,8 +56,11 @@ public class LivesUI : MonoBehaviour
             // Set the lives
             elem.livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
 
-            elem.heart2.SetActive(true);
             elem.heart1.SetActive(true);
+            elem.heart1.GetComponent<Image>().overrideSprite = heartColors[p.characterCode];
+
+            elem.heart2.SetActive(true);
+            elem.heart2.GetComponent<Image>().overrideSprite = heartColors[p.characterCode];
             
         }
 

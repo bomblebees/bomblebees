@@ -52,6 +52,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         // transfer the color over
         gamePlayer.GetComponent<Player>().playerColor = listColors[roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode];
 
+        gamePlayer.GetComponent<Player>().characterCode = roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode;
+
         return true;
     }
 
