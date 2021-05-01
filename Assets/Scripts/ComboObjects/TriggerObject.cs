@@ -8,14 +8,22 @@ using UnityEngine;
 // - TickDown() to not 
 public class TriggerObject : ComboObject
 {
-	public float breakdownDuration = 3f;
-	protected bool wasHit = false;
+    public float breakdownDuration = 3f;
+    protected bool wasHit = false;
     protected bool canBeTriggered = true; // to make sure it's only hit once.
     protected float timeAlive = 0f; // Seconds since object was instantiated
     protected float timeTriggered = 0f;
     public float minimumLifeDuration = 4f; // Minimum time the object needs to use effect for
 
-	protected IEnumerator procCoroutine = null; // when Proc coroutine starts, store to this null var so that we can reference and stop it in Breakdown() even after Proc happens
+    public float rotateLerpRate = 0.15f;
+    protected float targetAngle = 0f;
+    protected float startAngle;
+    protected bool isRotating = false;
+
+
+    protected IEnumerator
+        procCoroutine =
+            null; // when Proc coroutine starts, store to this null var so that we can reference and stop it in Breakdown() even after Proc happens
 
     private bool canBeExtended = true;
     // note: lingerDuration is the time spent until object despawns without being hit
@@ -49,15 +57,15 @@ public class TriggerObject : ComboObject
 
     protected virtual void ListenForTrigger()
     {
-		// If the coroutine hasn't been started yet, start the Proc coroutine
+        // If the coroutine hasn't been started yet, start the Proc coroutine
         if (canBeTriggered && wasHit && procCoroutine == null)
         {
-			procCoroutine = Proc();
+            procCoroutine = Proc();
             StartCoroutine(procCoroutine);
         }
     }
-    
-    
+
+
     protected virtual void StartDangerAnim()
     {
         // TO OVERRIDE IN CHILDREN
@@ -65,16 +73,15 @@ public class TriggerObject : ComboObject
 
     protected virtual IEnumerator Proc()
     {
-
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay * fillShaderRatio);
-        
+
         StartDangerAnim();
-        
+
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
 
-        canBeTriggered = false;  // To stop it from being triggered twice
+        canBeTriggered = false; // To stop it from being triggered twice
         timeTriggered = timeAlive;
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
@@ -103,7 +110,8 @@ public class TriggerObject : ComboObject
             canBeExtended = false;
             if (wasHit)
             {
-                if (lingerDuration - timeTriggered < minimumLifeDuration + startupDelay) // If hit and going into "overtime" with trigger
+                if (lingerDuration - timeTriggered < minimumLifeDuration + startupDelay
+                ) // If hit and going into "overtime" with trigger
                 {
                     float extensionTime = minimumLifeDuration + startupDelay - (lingerDuration - timeTriggered);
                     StartCoroutine(DestroySelf(extensionTime));
@@ -118,7 +126,6 @@ public class TriggerObject : ComboObject
                 StartCoroutine(DestroySelf());
             }
         }
-
     }
 
     protected virtual void ElapseTimeAlive()
@@ -130,12 +137,12 @@ public class TriggerObject : ComboObject
     {
         var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
 
-		Debug.Log("enabling hitbox");
-		hitbox.SetActive(true);
+        Debug.Log("enabling hitbox");
+        hitbox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitbox.SetActive(false);
     }
-    
+
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         NotifyOccupiedTile(false); // prolly move this later
@@ -143,25 +150,54 @@ public class TriggerObject : ComboObject
         return true;
     }
 
-	public virtual IEnumerator Breakdown()
-	{
-		didEarlyEffects = true;
-		StartCoroutine(DisableObjectCollider());
-		StartCoroutine(DisableObjectModel());
-		
-		NotifyOccupiedTile(false);
+    public virtual IEnumerator Breakdown()
+    {
+        didEarlyEffects = true;
+        StartCoroutine(DisableObjectCollider());
+        StartCoroutine(DisableObjectModel());
 
-		// if the laser has already been procced when the breakdown happens, stop the proc prematurely before destroying
-		if (procCoroutine != null)
-		{
-			Debug.Log("Stopping Proc coroutine");
-			StopCoroutine(procCoroutine);
-		}
+        NotifyOccupiedTile(false);
 
-		// play breakdown anim here
-		yield return new WaitForSeconds(breakdownDuration);
+        // if the laser has already been procced when the breakdown happens, stop the proc prematurely before destroying
+        if (procCoroutine != null)
+        {
+            Debug.Log("Stopping Proc coroutine");
+            StopCoroutine(procCoroutine);
+        }
 
-		DestroySelf();
-	}
+        // play breakdown anim here
+        yield return new WaitForSeconds(breakdownDuration);
 
+        DestroySelf();
+    }
+
+    protected virtual void UpdateLaserDirection(int edgeIndex, GameObject triggeringPlayer, bool useBeam)
+    {
+        // get angle from player
+        Vector3 dir = triggeringPlayer.transform.position - transform.position;
+        dir = triggeringPlayer.transform.InverseTransformDirection(dir);
+
+        float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        angle += 90f;
+        targetAngle = RoundAngleToHex(angle);
+
+        startAngle = model.transform.eulerAngles.y;
+        if (Math.Abs(startAngle - targetAngle) > 180)
+        {
+            if (startAngle > targetAngle) targetAngle += 360f;
+            startAngle += 360f;
+        }
+
+        // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
+        // targetAngle = angle;
+        isRotating = true;
+        if (useBeam)
+        {
+            this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles =
+                new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
+        }
+
+        this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles =
+            new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex] + 270f);
+    }
 }
