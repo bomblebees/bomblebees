@@ -13,6 +13,9 @@ public class PlasmaObject : TriggerObject
     private Vector3 targetDir;
     public float projectileSpeed = 3f;
     public float startOffset = 3.5f;
+    public float hitboxIterationDuration = 0.5f;
+
+    private bool updatedHitboxThisIteration = true;
 
     protected IEnumerator
         spawnBallCoroutine =
@@ -37,8 +40,9 @@ public class PlasmaObject : TriggerObject
         var nextPos = FindCenterBelowOtherInclusive(plasmaSphereModel.transform.position + targetDir * startOffset);
         this.plasmaSphereModel.transform.position = nextPos;
         this.hitBox.transform.position = nextPos;
+        this.particleSystem.transform.position = nextPos;
         ////
-        UpdateLaserDirection(edgeIndex, triggeringPlayer, false);
+        GetSpunDirection(edgeIndex, triggeringPlayer, false);
         spawnBallCoroutine = SpawnBall(edgeIndex, triggeringPlayer);
         StartCoroutine(spawnBallCoroutine);
         return true;
@@ -59,8 +63,9 @@ public class PlasmaObject : TriggerObject
         Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
-        this.hitBox.SetActive(true);
-        this.plasmaSphereModel.SetActive(true);
+        // this.hitBox.SetActive(true);
+        // do we need to do the same for particles?
+        // this.plasmaSphereModel.enabled(true);
         base.Push(edgeIndex, triggeringPlayer); // This shoulda been at the top lol
     }
 
@@ -78,13 +83,24 @@ public class PlasmaObject : TriggerObject
             {
                 // Plasma has reached edge of stage, disable hitbox
                 this.hitBox.SetActive(false);
+                this.particleSystem.Stop();
+            }
+            else if (lastPosition == nextPos)  // has updated hitbox already
+            {
+                if (!updatedHitboxThisIteration)
+                {
+                    StartCoroutine(FlickerHitbox());
+                    updatedHitboxThisIteration = true;
+                }
             }
             else if (lastPosition != nextPos)
             {
                 particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
+                this.particleSystem.transform.position = nextPos;
+                // this.hitBox.SetActive(true);
+                updatedHitboxThisIteration = false;
                 lastPosition = nextPos;
-                this.hitBox.SetActive(true);
             }
         }
 
@@ -96,6 +112,14 @@ public class PlasmaObject : TriggerObject
             startAngle = newAngle;
         }
     }
+    
+    public IEnumerator FlickerHitbox()
+    {
+        this.hitBox.SetActive(true);
+        yield return new WaitForSeconds(hitboxIterationDuration);
+        this.hitBox.SetActive(false);
+    }
+    
 
     protected virtual void FindTriggerDirection(int edgeIndex)
     {

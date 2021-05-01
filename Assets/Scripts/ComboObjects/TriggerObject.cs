@@ -171,7 +171,7 @@ public class TriggerObject : ComboObject
         DestroySelf();
     }
 
-    protected virtual void UpdateLaserDirection(int edgeIndex, GameObject triggeringPlayer, bool useBeam)
+    protected virtual void GetSpunDirection(int edgeIndex, GameObject triggeringPlayer, bool useBeam)
     {
         // get angle from player
         Vector3 dir = triggeringPlayer.transform.position - transform.position;

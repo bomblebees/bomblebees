@@ -27,7 +27,7 @@ public class LaserObject : TriggerObject
 			chargeSFX.SetActive(true);
 		}
 
-        UpdateLaserDirection(edgeIndex, triggeringPlayer, true);
+        GetSpunDirection(edgeIndex, triggeringPlayer, true);
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
 
