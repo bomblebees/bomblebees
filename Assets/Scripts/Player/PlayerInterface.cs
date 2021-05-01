@@ -135,6 +135,7 @@ public class PlayerInterface : NetworkBehaviour
         }
     }
 
+	[ClientRpc]
     public void DisplayInventoryAdd(int slot, int amt)
     {
         invAddTexts[slot].text = "+" + amt.ToString();

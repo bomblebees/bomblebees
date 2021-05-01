@@ -15,6 +15,9 @@ public class GroundItem : NetworkBehaviour
 
 	private float thisOffset = 0f;
 
+	// when destroying, flag and destroy in next 
+	private bool flagToDestroy = false;
+
 	// Start is called before the first frame update
 	public override void OnStartClient()
     {
@@ -29,6 +32,15 @@ public class GroundItem : NetworkBehaviour
 		transform.position = transform.position + new Vector3(0.0f, Mathf.Sin(Time.time * bobFrequency + thisOffset) * amplitude, 0.0f);
     }
 
+	private void LateUpdate()
+	{
+		if (flagToDestroy)
+		{
+			DestroyItem();
+		}
+	}
+
+	[ServerCallback]
 	private void OnTriggerEnter(Collider other)
 	{
 		// to-do: if collision is detected while inventory is already full, it will still destroy the grounditem objects it comes into contact with, fix later
@@ -41,6 +53,7 @@ public class GroundItem : NetworkBehaviour
 			int indexOfBombType = Array.IndexOf(inventoryComponent.GetBombTypes(), bombType);
 			if (!(inventoryComponent.inventoryList[indexOfBombType] >= inventoryComponent.GetMaxInvSizes()[indexOfBombType]))
 			{
+				RpcPlayBombPickupSound(other.transform.parent.gameObject);
 				AddToInventory(other, inventoryComponent);
 			}
 		}
@@ -51,10 +64,9 @@ public class GroundItem : NetworkBehaviour
 	private void AddToInventory(Collider collider, PlayerInventory inventory)
 	{
 		// if the parent of the collider (the Player object) exists:
-		if (collider.transform.parent.GetComponent<Player>().isLocalPlayer)
-		{
-			FindObjectOfType<AudioManager>().PlaySound("inventorypop");
-		}
+		Debug.Log("GroundItem calls addtoinventory on server");
+		
+
 		// if inventory of player it collided with is already full, don't add
 		if (collider.transform.parent)
 		{
@@ -63,9 +75,18 @@ public class GroundItem : NetworkBehaviour
 
 			// and then add this grounditem's bomb type to the inventory, then destroy
 			inventory.AddInventoryBomb(bombType, 1);
+
+			flagToDestroy = true;
 			
-			NetworkServer.Destroy(this.gameObject);
-			
+		}
+	}
+	[ClientRpc]
+	private void RpcPlayBombPickupSound(GameObject player)
+	{
+		Debug.Log(player.name);
+		if (player.name == "LocalPlayer")
+		{
+			FindObjectOfType<AudioManager>().PlaySound("inventorypop");
 		}
 	}
 
@@ -88,5 +109,10 @@ public class GroundItem : NetworkBehaviour
 				break;
 		}
 		
+	}
+
+	private void DestroyItem()
+	{
+		NetworkServer.Destroy(gameObject);
 	}
 }
