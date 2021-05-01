@@ -76,7 +76,7 @@ public class LaserObject : TriggerObject
     {
         base.OnTriggerEnter(other);
         var gameObjHit = other.gameObject;
-        if (gameObjHit.CompareTag("ComboHitbox"))
+        if (gameObjHit.CompareTag("InterObjectHitbox"))
         {
             var _root = gameObjHit.transform.root.name;
             if (_root.Equals("Bomb Object(Clone)"))
