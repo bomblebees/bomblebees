@@ -153,6 +153,8 @@ public class PlayerInterface : NetworkBehaviour
         for (int i = 0; i < list.Count; i++)
         {
             invCounters[i].text = list[i].ToString();
+            if (invCounters[i].text == "5") invCounters[i].color = Color.yellow;
+            else                            invCounters[i].color = Color.white;
 
             if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
             else invSlots[i].color = new Color(1f, 1f, 1f);
