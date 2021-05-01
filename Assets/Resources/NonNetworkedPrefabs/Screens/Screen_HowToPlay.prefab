@@ -474,6 +474,7 @@ GameObject:
   - component: {fileID: 3348576033096828568}
   - component: {fileID: 3348576033096828570}
   - component: {fileID: 3348576033096828569}
+  - component: {fileID: 5411682650338294747}
   m_Layer: 5
   m_Name: Popup
   m_TagString: Untagged
@@ -544,6 +545,98 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5411682650338294747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3348576033096828575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07be4ae3972fed44b25c53028063ee7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAnimations:
+  - name: 
+    objToAnimate: {fileID: 3348576033096828575}
+    moveValue: {x: 0, y: -1032, z: 0}
+    moveType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    useLocalPosition: 1
+    dur: 0
+    startDelay: 0
+  - name: 
+    objToAnimate: {fileID: 3348576033096828575}
+    moveValue: {x: 0, y: -2.6, z: 0}
+    moveType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.07585854
+        value: 0.63530475
+        inSlope: 1.3566213
+        outSlope: 1.3566213
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    useLocalPosition: 1
+    dur: 0.35
+    startDelay: 0
+  loopMoveAnimations: 0
+  doMoveOnEnable: 1
+  scaleAnimations: []
+  loopScaleAnimations: 0
+  doScaleOnEnable: 0
+  rotateAnimations: []
+  loopRotateAnimations: 0
+  doRotateOnEnable: 0
 --- !u!1 &3348576033159574903
 GameObject:
   m_ObjectHideFlags: 0
@@ -1112,6 +1205,7 @@ GameObject:
   - component: {fileID: 3348576033492120583}
   - component: {fileID: 3348576033492120577}
   - component: {fileID: 3348576033492120576}
+  - component: {fileID: 3881948051716486332}
   m_Layer: 5
   m_Name: Dimed
   m_TagString: Untagged
@@ -1175,6 +1269,26 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3881948051716486332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3348576033492120582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 297de32c565a57a4d95811db70a5c4da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetColor: {r: 1, g: 1, b: 1, a: 0}
+  endColor: {r: 1, g: 1, b: 1, a: 1}
+  easeInTime: 0
+  easeOutTime: 0.35
+  timeBetweenLoop: 0
+  easeIn: 1
+  easeOut: 6
+  startOnEnabled: 1
 --- !u!1 &3348576033761028878
 GameObject:
   m_ObjectHideFlags: 0

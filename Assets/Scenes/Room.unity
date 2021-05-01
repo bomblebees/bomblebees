@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -402,6 +402,7 @@ GameObject:
   - component: {fileID: 179589565}
   - component: {fileID: 179589567}
   - component: {fileID: 179589566}
+  - component: {fileID: 179589568}
   m_Layer: 5
   m_Name: ReadyImg
   m_TagString: Untagged
@@ -466,6 +467,96 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 179589564}
   m_CullTransparentMesh: 0
+--- !u!114 &179589568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179589564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07be4ae3972fed44b25c53028063ee7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAnimations: []
+  loopMoveAnimations: 0
+  doMoveOnEnable: 0
+  scaleAnimations:
+  - name: 1
+    objToAnimate: {fileID: 179589564}
+    scaleValue: {x: 5, y: 10, z: 5}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0
+    startDelay: 0
+  - name: 2
+    objToAnimate: {fileID: 179589564}
+    scaleValue: {x: 1.4, y: 2.4, z: 1.4}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.06612383
+        value: 0.65060914
+        inSlope: 1.1427696
+        outSlope: 1.1427696
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0.3
+    startDelay: 0
+  loopScaleAnimations: 0
+  doScaleOnEnable: 1
+  rotateAnimations: []
+  loopRotateAnimations: 0
+  doRotateOnEnable: 0
 --- !u!1 &229411519
 GameObject:
   m_ObjectHideFlags: 0
@@ -2693,6 +2784,7 @@ GameObject:
   - component: {fileID: 526073199}
   - component: {fileID: 526073201}
   - component: {fileID: 526073200}
+  - component: {fileID: 526073202}
   m_Layer: 5
   m_Name: ReadyImg
   m_TagString: Untagged
@@ -2757,6 +2849,96 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 526073198}
   m_CullTransparentMesh: 0
+--- !u!114 &526073202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 526073198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07be4ae3972fed44b25c53028063ee7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAnimations: []
+  loopMoveAnimations: 0
+  doMoveOnEnable: 0
+  scaleAnimations:
+  - name: 1
+    objToAnimate: {fileID: 526073198}
+    scaleValue: {x: 5, y: 10, z: 5}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0
+    startDelay: 0
+  - name: 2
+    objToAnimate: {fileID: 526073198}
+    scaleValue: {x: 1.4, y: 2.4, z: 1.4}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.06612383
+        value: 0.65060914
+        inSlope: 1.1427696
+        outSlope: 1.1427696
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0.3
+    startDelay: 0
+  loopScaleAnimations: 0
+  doScaleOnEnable: 1
+  rotateAnimations: []
+  loopRotateAnimations: 0
+  doRotateOnEnable: 0
 --- !u!1 &536434075
 GameObject:
   m_ObjectHideFlags: 0
@@ -4284,6 +4466,7 @@ GameObject:
   - component: {fileID: 1004469253}
   - component: {fileID: 1004469255}
   - component: {fileID: 1004469254}
+  - component: {fileID: 1004469256}
   m_Layer: 5
   m_Name: ReadyImg
   m_TagString: Untagged
@@ -4348,6 +4531,96 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004469252}
   m_CullTransparentMesh: 0
+--- !u!114 &1004469256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004469252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07be4ae3972fed44b25c53028063ee7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAnimations: []
+  loopMoveAnimations: 0
+  doMoveOnEnable: 0
+  scaleAnimations:
+  - name: 1
+    objToAnimate: {fileID: 1004469252}
+    scaleValue: {x: 5, y: 10, z: 5}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0
+    startDelay: 0
+  - name: 2
+    objToAnimate: {fileID: 1004469252}
+    scaleValue: {x: 1.4, y: 2.4, z: 1.4}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.06612383
+        value: 0.65060914
+        inSlope: 1.1427696
+        outSlope: 1.1427696
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0.3
+    startDelay: 0
+  loopScaleAnimations: 0
+  doScaleOnEnable: 1
+  rotateAnimations: []
+  loopRotateAnimations: 0
+  doRotateOnEnable: 0
 --- !u!1 &1036673442
 GameObject:
   m_ObjectHideFlags: 0
@@ -4759,8 +5032,9 @@ MonoBehaviour:
   screenHowToPlay: {fileID: 711715748}
   screenControls: {fileID: 2137116034}
   deactivatedOpacity: 0.2
+  activatedOpacity: 1
   buttonStart: {fileID: 1845306631}
-  _buttonStartButton: {fileID: 0}
+  buttonStartButton: {fileID: 0}
   buttonReady: {fileID: 253897653}
   playerLobbyUi:
   - playerCard: {fileID: 46185327}
@@ -5709,6 +5983,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1579508662}
   - component: {fileID: 1579508664}
+  - component: {fileID: 1579508665}
   - component: {fileID: 1579508663}
   m_Layer: 5
   m_Name: ReadyImg
@@ -5774,6 +6049,96 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579508661}
   m_CullTransparentMesh: 0
+--- !u!114 &1579508665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579508661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07be4ae3972fed44b25c53028063ee7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveAnimations: []
+  loopMoveAnimations: 0
+  doMoveOnEnable: 0
+  scaleAnimations:
+  - name: 1
+    objToAnimate: {fileID: 1579508661}
+    scaleValue: {x: 5, y: 10, z: 5}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0
+    startDelay: 0
+  - name: 2
+    objToAnimate: {fileID: 1579508661}
+    scaleValue: {x: 1.4, y: 2.4, z: 1.4}
+    scaleType: 0
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.06612383
+        value: 0.65060914
+        inSlope: 1.1427696
+        outSlope: 1.1427696
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    dur: 0.3
+    startDelay: 0
+  loopScaleAnimations: 0
+  doScaleOnEnable: 1
+  rotateAnimations: []
+  loopRotateAnimations: 0
+  doRotateOnEnable: 0
 --- !u!1 &1586717167
 GameObject:
   m_ObjectHideFlags: 0

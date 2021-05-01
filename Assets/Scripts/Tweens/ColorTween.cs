@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,13 @@ public class ColorTween : MonoBehaviour
 
     public LeanTweenType easeIn = LeanTweenType.linear;
     public LeanTweenType easeOut = LeanTweenType.linear;
+
+    public bool startOnEnabled = false;
+
+    private void OnEnable()
+    {
+        StartTween();
+    }
 
     public void StartTween()
     {
@@ -50,5 +58,6 @@ public class ColorTween : MonoBehaviour
     {
         if (GetComponent<Image>()) GetComponent<Image>().color = val;
         if (GetComponent<RawImage>()) GetComponent<RawImage>().color = val;
+        if (GetComponent<TMP_Text>()) gameObject.GetComponent<TMP_Text>().color = val;
     }
 }
