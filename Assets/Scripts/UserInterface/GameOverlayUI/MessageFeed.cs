@@ -141,7 +141,7 @@ public class MessageFeed : MonoBehaviour
     {
         if (bomb.GetComponent<BombObject>() != null)
         {
-            return "<color=#B2B2B2>Default Bomb</color>";
+            return "<color=#B2B2B2>Big Bomb</color>";
         }
         else if (bomb.GetComponent<LaserObject>() != null)
         {
