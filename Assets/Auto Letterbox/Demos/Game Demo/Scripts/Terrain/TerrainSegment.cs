@@ -148,7 +148,7 @@ namespace LetterboxCamera {
             verticeXspacing = length / numberOfPoints;
 
             GameObject trimChild = null;
-            Transform trimChildTransform = this.transform.FindChild(trimName);
+            Transform trimChildTransform = this.transform.Find(trimName);
 
             if (trimChildTransform == null) {
                 trimChild = new GameObject(trimName);

@@ -14,15 +14,20 @@ public class LivesUI : MonoBehaviour
         public GameObject livesObject;
         public Image avatar;
         public RawImage background;
-        public GameObject heart1;
-        public GameObject heart2;
+        public GameObject[] hearts;
         public TMP_Text playerName;
         public TMP_Text livesCounter;
     }
 
-    [SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
+    //[SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
+
+    [SerializeField] private GameObject[] livesAnchors = new GameObject[4];
+
+    [SerializeField] private GameObject livesUIElementPrefab;
+
     [SerializeField] GameUIManager gameUIManager = null;
 
+    private List<LivesUIElement> livesUIs = new List<LivesUIElement>();
 
     public void EnableLivesUI(GameObject[] players)
     {
@@ -30,36 +35,36 @@ public class LivesUI : MonoBehaviour
         {
             Player p = players[i].GetComponent<Player>();
 
-            LivesElem elem = livesUIs[i];
+            // create the player card
+            GameObject obj = Instantiate(
+                livesUIElementPrefab,
+                new Vector3(0, 0, 0),
+                Quaternion.identity,
+                livesAnchors[i].transform);
+
+            // to make sure its positioned at 0 0 0 locally
+            obj.transform.localPosition = new Vector3(0, 0, 0);
+
+            LivesUIElement elem = obj.GetComponent<LivesUIElement>();
+
+            // add to a list
+            livesUIs.Add(elem);
 
             // enable ui for players
             elem.livesObject.SetActive(true);
 
-            //// Set steam user avatar
-            //if (p.steamId != 0)
-            //{
-            //    CSteamID steamID = new CSteamID(p.steamId);
-            //    int imageId = SteamFriends.GetLargeFriendAvatar(steamID);
-            //    if (imageId == -1) return;
-            //    elem.avatar.texture = GetSteamImageAsTexture(imageId);
-            //}
-
+            // set the avatar
             elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
-                
-            // initialize health and username
-            elem.playerName.text = p.steamName;
-            //livesUIs[i].playerName.color = p.playerColor; // sets the color to the color of the player
-            //elem.background.color = p.playerColor; // sets the color to the color of the player
+
+            // initialize username
+            //elem.playerName.text = p.steamName;
 
             // Set the lives
-            elem.livesCounter.text = "Lives: " + p.GetComponent<Health>().currentLives.ToString();
-
-            elem.heart1.SetActive(true);
-            elem.heart1.GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
-
-            elem.heart2.SetActive(true);
-            elem.heart2.GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
-            
+            for (int j = 0; j < elem.hearts.Length; j++)
+            {
+                elem.hearts[j].SetActive(true);
+                elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+            }
         }
 
     }
@@ -92,8 +97,16 @@ public class LivesUI : MonoBehaviour
 
             livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
 
-            if (lifeCount <= 1) { livesUIs[i].heart2.SetActive(false); }
-            if (lifeCount <= 0) { livesUIs[i].heart1.SetActive(false); }
+            switch (lifeCount)
+            {
+                case 2: { livesUIs[i].hearts[2].SetActive(false); break; }
+                case 1: {
+                        livesUIs[i].hearts[1].SetActive(false);
+                        livesUIs[i].background.GetComponent<ColorTween>().LoopTween(); 
+                        break;
+                    }
+                case 0: { livesUIs[i].hearts[0].SetActive(false); break; }
+            }
         }
     }
 

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mirror;
-using Steamworks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Room_UI : MonoBehaviour
@@ -20,10 +16,12 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private GameObject screenControls;
     [Header("Opacity Configuration")]
     [Range(0f, 1f)]
-    [SerializeField] private float deactivatedOpacity;
+    [SerializeField] private float deactivatedOpacity = 0.2f;
+    [Range(0f, 1f)]
+    [SerializeField] private float activatedOpacity = 1f;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
-    public Button _buttonStartButton;
+    public Button buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
     private CanvasRenderer[] _buttonStartCanvasRenderer;
     [Header("Ready Button")]
@@ -86,7 +84,7 @@ public class Room_UI : MonoBehaviour
         }
 
         // Cache start button components
-        _buttonStartButton = buttonStart.GetComponent<Button>();
+        buttonStartButton = buttonStart.GetComponent<Button>();
         _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
         _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
 
@@ -132,12 +130,12 @@ public class Room_UI : MonoBehaviour
     public void ActivateStartButton()
     {
         // Update functionality
-        _buttonStartButton.enabled = true;
+        buttonStartButton.interactable = true;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
         {
-            t.SetAlpha(1f);
+            t.SetAlpha(activatedOpacity);
         }
         buttonStart.transform.localScale.Set(1f,1f,1f);
         _buttonStartButtonHoverTween.enabled = true;
@@ -146,7 +144,7 @@ public class Room_UI : MonoBehaviour
     public void DeactivateStartButton()
     {
         // Update functionality
-        _buttonStartButton.enabled = false;
+        buttonStartButton.interactable = false;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
@@ -161,12 +159,12 @@ public class Room_UI : MonoBehaviour
     public void ActivateReadyButton()
     {
         // Update functionality
-        _buttonReadyButton.enabled = true;
+        _buttonReadyButton.interactable = true;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
         {
-            t.SetAlpha(1f);
+            t.SetAlpha(activatedOpacity);
         }
         buttonReady.transform.localScale.Set(1f,1f,1f);
         _buttonReadyButtonHoverTween.enabled = true;
@@ -175,7 +173,7 @@ public class Room_UI : MonoBehaviour
     public void DeactivateReadyButton()
     {
         // Update functionality
-        _buttonReadyButton.enabled = false;
+        _buttonReadyButton.interactable = false;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)

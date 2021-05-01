@@ -14,18 +14,20 @@ public class PlasmaObject : TriggerObject
     public float projectileSpeed = 3f;
     public float startOffset = 3.5f;
 
-	protected IEnumerator spawnBallCoroutine = null; // When starting the coroutine to spawn plasma, store to variable so in case of early destroy we can stop it
+    protected IEnumerator
+        spawnBallCoroutine =
+            null; // When starting the coroutine to spawn plasma, store to variable so in case of early destroy we can stop it
 
-	[SerializeField] public GameObject plasmaSphereModel;
+    [SerializeField] public GameObject plasmaSphereModel;
     [SerializeField] public ParticleSystem particleSystem;
     public float ignoreTriggererDuration = 1f;
-    
+
     protected override void StartDangerAnim()
     {
         this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
         this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
-    
+
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         if (wasHit) return true;
@@ -36,8 +38,9 @@ public class PlasmaObject : TriggerObject
         this.plasmaSphereModel.transform.position = nextPos;
         this.hitBox.transform.position = nextPos;
         ////
+        UpdateLaserDirection(edgeIndex, triggeringPlayer, false);
         spawnBallCoroutine = SpawnBall(edgeIndex, triggeringPlayer);
-		StartCoroutine(spawnBallCoroutine);
+        StartCoroutine(spawnBallCoroutine);
         return true;
     }
 
@@ -52,34 +55,45 @@ public class PlasmaObject : TriggerObject
         {
             yield return new WaitForSeconds(startupDelay);
         }
-		Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
+
+        Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         this.hitboxEnabled = true;
-        this.hitBox.SetActive(true); 
+        this.hitBox.SetActive(true);
         this.plasmaSphereModel.SetActive(true);
-        base.Push(edgeIndex, triggeringPlayer);  // This shoulda been at the top lol
+        base.Push(edgeIndex, triggeringPlayer); // This shoulda been at the top lol
     }
 
     public Vector3 lastPosition;
+
     private void LateUpdate()
     {
         if (this.hitboxEnabled == true)
         {
-			plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
+            plasmaSphereModel.transform.localPosition += targetDir * projectileSpeed * Time.deltaTime;
             var nextPos = FindCenterBelowOtherInclusive(this.plasmaSphereModel.transform.position);
-			// Debug.Log("nextPosition: " + nextPos);
-			if (nextPos == this.plasmaSphereModel.transform.position)  // Since FindCenter... returns own position on fail
+            // Debug.Log("nextPosition: " + nextPos);
+            if (nextPos == this.plasmaSphereModel.transform.position
+            ) // Since FindCenter... returns own position on fail
             {
-				// Plasma has reached edge of stage, disable hitbox
-                this.hitBox.SetActive(false); 
+                // Plasma has reached edge of stage, disable hitbox
+                this.hitBox.SetActive(false);
             }
             else if (lastPosition != nextPos)
             {
                 particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
                 lastPosition = nextPos;
-                this.hitBox.SetActive(true); 
+                this.hitBox.SetActive(true);
             }
+        }
+
+        if (isRotating)
+        {
+            float newAngle = Mathf.Lerp(startAngle, targetAngle, rotateLerpRate);
+            var r = model.transform.eulerAngles;
+            this.model.transform.eulerAngles = new Vector3(r.x, newAngle, r.z);
+            startAngle = newAngle;
         }
     }
 
@@ -90,8 +104,8 @@ public class PlasmaObject : TriggerObject
         // this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles =
         //     new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex] + 270f);
     }
-    
-    
+
+
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
@@ -103,24 +117,23 @@ public class PlasmaObject : TriggerObject
             {
                 StartCoroutine(Breakdown());
             }
-			if (_root.Equals("Laser Object(Clone)"))
-			{
-				StartCoroutine(Breakdown());
-			}
-		}
+
+            if (_root.Equals("Laser Object(Clone)"))
+            {
+                StartCoroutine(Breakdown());
+            }
+        }
     }
 
-	public override IEnumerator Breakdown()
-	{
-		// Same breakdown code as base class, plus the spawn ball coroutine stopping
+    public override IEnumerator Breakdown()
+    {
+        // Same breakdown code as base class, plus the spawn ball coroutine stopping
 
-		if (spawnBallCoroutine != null)
-		{
-			StopCoroutine(spawnBallCoroutine);
-		}
-		
-		yield return StartCoroutine(base.Breakdown());
-	}
-    
+        if (spawnBallCoroutine != null)
+        {
+            StopCoroutine(spawnBallCoroutine);
+        }
 
+        yield return StartCoroutine(base.Breakdown());
+    }
 }
