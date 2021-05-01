@@ -448,7 +448,8 @@ public class ComboObject : NetworkBehaviour
             {
                 angle += (60 - remainder);
             }
-    
+
+            if (angle < 0) angle = 300f;  // for edge case where it rounds to -60, which is out of bounds
             return angle;
         }
 }

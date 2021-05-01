@@ -93,7 +93,7 @@ public class PlasmaObject : TriggerObject
                     updatedHitboxThisIteration = true;
                 }
             }
-            else if (lastPosition != nextPos)
+            else if (lastPosition != nextPos) // new center found
             {
                 particleSystem.Play();
                 this.hitBox.transform.position = nextPos;
