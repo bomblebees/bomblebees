@@ -4940,6 +4940,7 @@ MonoBehaviour:
   steamId: 0
   playerId: 0
   steamName: '[Steam Name]'
+  characterCode: 0
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   debugMode: 0
   debugBombPress1: 8
@@ -5097,6 +5098,8 @@ MonoBehaviour:
   syncInterval: 0.1
   INVEN_BOMB_TYPES: 7200700079006700
   INVEN_MAX_VALUES: 05000000050000000500000005000000
+  groundItemPrefab: {fileID: 763655508682416159, guid: b046c0fefa7bf3343a3e25df1951a3c8,
+    type: 3}
   selectedSlot: 0
 --- !u!114 &7210949671591448289
 MonoBehaviour:

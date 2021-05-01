@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Mirror;
 
@@ -18,7 +19,7 @@ public class GroundItem : NetworkBehaviour
 	public override void OnStartClient()
     {
 		// offset by random float for better look
-		thisOffset = Random.Range(0f, sinTimeOffsetRange);
+		thisOffset = UnityEngine.Random.Range(0f, sinTimeOffsetRange);
 	}
 
     // Update is called once per frame
@@ -33,31 +34,38 @@ public class GroundItem : NetworkBehaviour
 		// to-do: if collision is detected while inventory is already full, it will still destroy the grounditem objects it comes into contact with, fix later
 		if (other.gameObject.layer == 18)
 		{
-			// play sound if local player
-			if (other.transform.parent.GetComponent<Player>().isLocalPlayer)
-			{
-				FindObjectOfType<AudioManager>().PlaySound("inventorypop");
-			}
+			// cache the collided player gameobject here, because we know player has a ground item pickup hitbox
+			PlayerInventory inventoryComponent = other.transform.parent.GetComponent<PlayerInventory>();
 
-			// then, add this ground item's type to the collided player's inventory:
-			AddToInventory(other);
+			// if inventory of player it collided with is already full, don't add
+			int indexOfBombType = Array.IndexOf(inventoryComponent.GetBombTypes(), bombType);
+			if (!(inventoryComponent.inventoryList[indexOfBombType] >= inventoryComponent.GetMaxInvSizes()[indexOfBombType]))
+			{
+				AddToInventory(other, inventoryComponent);
+			}
 		}
-		
+
 	}
 
 	[Server]
-	private void AddToInventory(Collider collider)
+	private void AddToInventory(Collider collider, PlayerInventory inventory)
 	{
 		// if the parent of the collider (the Player object) exists:
+		if (collider.transform.parent.GetComponent<Player>().isLocalPlayer)
+		{
+			FindObjectOfType<AudioManager>().PlaySound("inventorypop");
+		}
+		// if inventory of player it collided with is already full, don't add
 		if (collider.transform.parent)
 		{
 			// grab the inventory
-			PlayerInventory collidedInventory = collider.transform.parent.GetComponent<PlayerInventory>();
+			
 
 			// and then add this grounditem's bomb type to the inventory, then destroy
-			collidedInventory.AddInventoryBomb(bombType, 1);
-
+			inventory.AddInventoryBomb(bombType, 1);
+			
 			NetworkServer.Destroy(this.gameObject);
+			
 		}
 	}
 
