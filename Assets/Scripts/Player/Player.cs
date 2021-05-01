@@ -134,7 +134,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
     [NonSerialized] public Quaternion rotation;
-    [SerializeField] private GameObject highlightModel;
+    [SerializeField] public GameObject highlightModel;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate

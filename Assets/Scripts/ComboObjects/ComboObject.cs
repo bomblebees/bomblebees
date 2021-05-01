@@ -360,7 +360,10 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
+            // triggeringPlayer = other.transform.parent.gameObject;
             triggeringPlayer = other.transform.parent.gameObject;
+            Debug.Log(triggeringPlayer);
+            // triggeringPlayer = other.transform.parent.gameObject.selectedTile;
 
             // Adjust travel distance based on spin power
             int power = triggeringPlayer.GetComponent<Player>().spinPower;

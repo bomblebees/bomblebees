@@ -178,12 +178,19 @@ public class TriggerObject : ComboObject
     protected virtual void GetSpunDirection(int edgeIndex, GameObject triggeringPlayer, bool useBeam)
     {
         // get angle from player
-        Vector3 dir = triggeringPlayer.transform.position - transform.position;
-        dir = triggeringPlayer.transform.InverseTransformDirection(dir);
+        // changed to selected tile
+        Vector3 dir = triggeringPlayer.GetComponent<Player>().highlightModel.transform.position - transform.position;
+        dir = triggeringPlayer.GetComponent<Player>().highlightModel.transform.InverseTransformDirection(dir);
+        // Vector3 dir = triggeringPlayer.GetComponent<Player>().selectedTile.transform.position - transform.position;
+        // dir = triggeringPlayer.GetComponent<Player>().selectedTile.transform.InverseTransformDirection(dir);
+        // Debug.Log(dir);
 
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-        angle += 90f;
-        targetAngle = RoundAngleToHex(angle);
+        angle += 120f; // was 90
+        // targetAngle = RoundAngleToHex(angle);
+        targetAngle = angle;
+        // Debug.Log(targetAngle);
+        // targetAngle = angle;
 
         startAngle = model.transform.eulerAngles.y;
         if (Math.Abs(startAngle - targetAngle) >= 180) // if angle diff is > 180, rotate in opp direction
