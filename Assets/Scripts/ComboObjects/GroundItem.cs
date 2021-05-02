@@ -6,12 +6,9 @@ using Mirror;
 
 public class GroundItem : NetworkBehaviour
 {
-	[SyncVar (hook = nameof(OnBombTypeChanged))] public char bombType = ' ';
-	[SyncVar] public Color color = Color.white;
-	public GameObject r_model;
-	public GameObject g_model;
-	public GameObject p_model;
-	public GameObject y_model;
+	public char bombType = ' ';
+	public Color color = Color.white;
+	public GameObject model;
 	[SerializeField] private float sinTimeOffsetRange = 0f;
 	[SerializeField] private float bobFrequency = 7f;
 	[SerializeField] private float amplitude = .2f;
@@ -91,31 +88,6 @@ public class GroundItem : NetworkBehaviour
 		{
 			FindObjectOfType<AudioManager>().PlaySound("inventorypop");
 		}
-	}
-
-	private void OnBombTypeChanged(char oldValue, char newValue)
-	{
-		// to-do: how do i not hard code these bomb type values? help
-		switch (newValue)
-		{
-			case 'r':
-				r_model.active = true;
-				// GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.red);
-				break;
-			case 'p':
-				p_model.active = true;
-				// GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.magenta);
-				break;
-			case 'y':
-				y_model.active = true;
-				// this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.yellow);
-				break;
-			case 'g':
-				g_model.active = true;
-				// this.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", Color.green);
-				break;
-		}
-		
 	}
 
 	private void DestroyItem()

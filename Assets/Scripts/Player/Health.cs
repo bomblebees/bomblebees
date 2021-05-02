@@ -31,8 +31,14 @@ public class Health : NetworkBehaviour
     public GameObject ghostModel;
     public GameObject revivingModel;
     public GameObject playerInv;
-	public GameObject groundItemPrefab;
-    public Player playerScript;
+
+	[Tooltip("Ground item prefabs for spawning bombs on ground")]
+	[SerializeField] private GameObject groundItem_r;
+	[SerializeField] private GameObject groundItem_p;
+	[SerializeField] private GameObject groundItem_y;
+	[SerializeField] private GameObject groundItem_g;
+
+	public Player playerScript;
 
     // All the subscribed subscribed will receive this event
     public event LivesChangedDelegate EventLivesChanged;
@@ -135,16 +141,27 @@ public class Health : NetworkBehaviour
 
 				// TO-DO: this code gets repeated in PlayerInventory when extra bombs added to inv get dropped;
 				// make separate GroundItemFactory component or something? idk
-				
+
 				////
 				Vector3 randomTransform = this.gameObject.transform.position;
 				randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
 				randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
-				GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
-							randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
-				GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
-				_groundItem.bombType = bombType;
-				NetworkServer.Spawn(groundItemObject);
+
+				switch (bombType)
+				{
+					case 'r':
+						NetworkServer.Spawn((GameObject)Instantiate(groundItem_r, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+						break;
+					case 'p':
+						NetworkServer.Spawn((GameObject)Instantiate(groundItem_p, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+						break;
+					case 'y':
+						NetworkServer.Spawn((GameObject)Instantiate(groundItem_y, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+						break;
+					case 'g':
+						NetworkServer.Spawn((GameObject)Instantiate(groundItem_g, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+						break;
+				}
 				////
 			}
 		}

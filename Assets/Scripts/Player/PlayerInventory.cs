@@ -11,11 +11,14 @@ public class PlayerInventory : NetworkBehaviour
     [Tooltip("Controls the max amount of bombs a player can carry for each bomb type")]
     [SerializeField] private int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
 
-	[Tooltip("Ground item prefab for spawning bombs on ground")]
-	[SerializeField] private GameObject groundItemPrefab;
+	[Tooltip("Ground item prefabs for spawning bombs on ground")]
+	[SerializeField] private GameObject groundItem_r;
+	[SerializeField] private GameObject groundItem_p;
+	[SerializeField] private GameObject groundItem_y;
+	[SerializeField] private GameObject groundItem_g;
 
-    // A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
-    public readonly SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	// A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
+	public readonly SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
 
     // The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
     [SyncVar(hook=nameof(OnSelectedSlotChange))] public int selectedSlot = 0;
@@ -33,7 +36,7 @@ public class PlayerInventory : NetworkBehaviour
     }
 
     // Adds "amt" number of bombs of type "type" to the players inventory
-    [Server] public bool AddInventoryBomb(char type, int amt)
+    [Server] public void AddInventoryBomb(char type, int amt)
     {
         // Get the index corresponding to the bomb type
         int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
@@ -57,29 +60,12 @@ public class PlayerInventory : NetworkBehaviour
 				}
 				Debug.Log(fullInvOverflowValue);
 
-				// Drop the amt of bombs on the ground
-				for (int i = 0; i < fullInvOverflowValue; i++)
-				{
-					////
-					Vector3 randomTransform = this.gameObject.transform.position;
-					randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
-					randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
-					GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
-								randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
-					GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
-					_groundItem.bombType = type;
-					NetworkServer.Spawn(groundItemObject);
-					////
-				}
-
-				return true;
 			}
 			else        // Otherwise simply add the amount to inv, don't drop anything
 			{
 				inventoryList[idx] += amt;
 
 				this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
-				return true;
 			}
 		}
 
@@ -90,16 +76,28 @@ public class PlayerInventory : NetworkBehaviour
 			Vector3 randomTransform = this.gameObject.transform.position;
 			randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
 			randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
-			GameObject groundItemObject = (GameObject)Instantiate(groundItemPrefab,
-						randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity);
-			GroundItem _groundItem = groundItemObject.GetComponent<GroundItem>();
-			_groundItem.bombType = type;
-			NetworkServer.Spawn(groundItemObject);
+			
+			switch (type)
+			{
+				case 'r':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_r, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+				case 'p':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_p, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+				case 'y':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_y, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+				case 'g':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_g, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+			}
+
+			
 			////
 		}
 
 		// if inventory is full, nothing gets added.
-		return false;
 
     }
 
