@@ -322,7 +322,7 @@ public class Matchmaking : MonoBehaviour
             ButtonHoverTween button1ButtonHoverTween = rc.button1.GetComponent<ButtonHoverTween>();
             rc.button1.interactable = false;
             button1ButtonHoverTween.enabled = false;
-            rc.button1.transform.localScale = new Vector3(1f, 1f, 1f);
+            rc.button1.transform.localScale.Set(1f, 1f, 1f);
             foreach (CanvasRenderer t in button1CanvasRenderer)
             {
                 t.SetAlpha(deactivatedOpacity);
