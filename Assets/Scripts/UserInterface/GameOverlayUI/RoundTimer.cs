@@ -55,14 +55,26 @@ public class RoundTimer : MonoBehaviour
                 // Warn the player that the timer is ticking down
                 timerText.gameObject.GetComponent<ColorTween>().LoopTween();
                 remainingText.gameObject.SetActive(true);
+
+                // Play warning sound
+                FindObjectOfType<AudioManager>().PlaySound("timer_warning");
+
                 warnStarted = true;
             } else if (remainingTimeInSeconds <= countdownUnderSeconds + 1)
             {
                 // Start the countdown after set time
                 countdownText.gameObject.SetActive(true);
 
-                if (!countdownStarted) countdownText.text = secondsLeft.ToString();
+                if (!countdownStarted)
+                {
+                    // Set initial second
+                    countdownText.text = secondsLeft.ToString();
 
+                    // Play countdown sound
+                    FindObjectOfType<AudioManager>().PlaySound("timer_countdown");
+                }
+
+                // Set seconds for the rest every second
                 if (countdownText.text != secondsLeft.ToString())
                 {
                     countdownText.text = secondsLeft.ToString();
