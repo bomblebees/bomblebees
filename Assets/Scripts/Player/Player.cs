@@ -357,10 +357,12 @@ public class Player : NetworkBehaviour
     [Command] private void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [SerializeField] public float[] spinTimings = {0.5f, 1.0f, 1.5f, 2.0f};
+    // [SerializeField] public float[] spinTimings = {0.0f, 0.5f, 1.0f, 1.5f, 2.0f};
     [SerializeField] private int[] spinPowerDist = {1, 2, 3, 4};
     [SerializeField] private float spinScalar = 1f;
 
     // trash variables sry
+    private bool spinChargeLevel0Hit = false; // for initial hit
     private bool spinChargeLevel1Hit = false;
     private bool spinChargeLevel2Hit = false;
     private bool spinChargeLevel3Hit = false;
@@ -372,11 +374,13 @@ public class Player : NetworkBehaviour
 
         // When key is pressed down
         if (Input.GetKey(spinKey) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+
             if (!spinHeld)
             {
                 spinScalar = 0.5f;
                 startSpinTime = Time.time;
 
+                spinChargeLevel0Hit = false;
                 spinChargeLevel1Hit = false;
                 spinChargeLevel2Hit = false;
                 spinChargeLevel3Hit = false;
@@ -385,6 +389,17 @@ public class Player : NetworkBehaviour
             }
 
             spinChargeTime += Time.deltaTime;
+
+
+            // HERE
+
+            if (!spinChargeLevel0Hit)
+            {
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+                // CmdSetSpinChargeFlashEffect(10f, 0.2f);
+                spinChargeLevel0Hit = true;
+            }
+
 
             // Play anims and sounds
             if (!spinChargeLevel1Hit && spinChargeTime > spinTimings[0])

@@ -105,7 +105,13 @@ public class LivesUI : MonoBehaviour
                         livesUIs[i].background.GetComponent<ColorTween>().LoopTween(); 
                         break;
                     }
-                case 0: { livesUIs[i].hearts[0].SetActive(false); break; }
+                case 0: {
+                        livesUIs[i].hearts[0].SetActive(false);
+                        livesUIs[i].background.GetComponent<ColorTween>().EndLoopTween();
+                        livesUIs[i].background.color = new Vector4(.1f, .1f, .1f, 1f); // not working for some reason
+                        livesUIs[i].avatar.color = new Vector4(.5f, .5f, .5f, 5f);
+                        break;
+                }
             }
         }
     }
