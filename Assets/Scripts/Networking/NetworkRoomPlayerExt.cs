@@ -33,35 +33,52 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     NetworkRoomManagerExt room;
 
-    private void Update()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
 
         if (!_characterSelectionInfo)
         {
             _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-            if (!_characterSelectionInfo) return;
-            if (isLocalPlayer)
-            {
-                _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-            }
+            if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
         }
 
         if (!room)
         {
             room = NetworkManager.singleton as SteamNetworkManager;
             if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
+            if (!room) Debug.LogError("room not found");
         }
 
         if (!roomUI)
         {
             roomUI = Room_UI.singleton;
-            if (!roomUI) return;
-            if (isLocalPlayer)
-            {
-                roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-                roomUI.EventStartButtonClicked += OnStartButtonClick;
-            }
+            if (!roomUI) Debug.LogError("room not found");
+
         }
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+
+        // Subscribe to events
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+        roomUI.EventStartButtonClicked += OnStartButtonClick;
+
+        // Update the character availability
+        UpdateCharacterAvailability();
+
+        // Assign a free character to the player on enter
+        CmdChangeCharacterCode(GetNextAvailableCharacter());
+    }
+
+    private void Update()
+    {
+
+        // EXIT IF REQUIRED VARS NOT INITIALIZED
+        if (!_characterSelectionInfo || !room || !roomUI) return;
 
         // EXIT IF IS LOCAL PLAYER
         if (!isLocalPlayer) return;
@@ -89,8 +106,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public override void OnClientEnterRoom()
     {
-        //this.playerColor = listColors[index];
         base.OnClientEnterRoom();
+
+
     }
 
     public override void OnClientExitRoom()
@@ -173,88 +191,41 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-    // Updates the lobby information for the specific player
-    public void UpdateLobbyListPlayer()
+    // Updates the character availability array for this player
+    [Client] public void UpdateCharacterAvailability()
     {
-        return;
-
-        if (!roomUI)
+        // For all existing players
+        for (int i = 0; i < room.roomSlots.Count; i++)
         {
-            // enable room UI
-            roomUI = Room_UI.singleton;
+            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
-            // only subscribe to events if we are the local player
-            if (isLocalPlayer)
+            // If ready, set the character to be unavailable
+            if (player.readyToBegin && _characterSelectionInfo.characterAvailable[player.characterCode])
             {
-                roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-                roomUI.EventStartButtonClicked += OnStartButtonClick;
+                _characterSelectionInfo.characterAvailable[player.characterCode] = false;
             }
+        }
+    }
 
-            if (!roomUI)
+    // Returns the next available character in the character array
+    [Client] public int GetNextAvailableCharacter()
+    {
+        int nextCode = -1;
+
+        int len = _characterSelectionInfo.characterAvailable.Length;
+
+        // Check the next available character
+        for (int i = characterCode + 1; i < characterCode + len + 1; i++)
+        {
+            if (_characterSelectionInfo.characterAvailable[i % len])
             {
-                Debug.LogWarning("room UI not found!");
-                return;
+                nextCode = i % len;
+                break;
             }
         }
 
-        if (!_characterSelectionInfo)
-        {
-            _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-
-            // only subscribe to events if we are the local player
-            if (isLocalPlayer)
-            {
-                _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-            }
-
-            if (!_characterSelectionInfo)
-            {
-                Debug.LogWarning("_characterSelectionInfo not found!");
-                return;
-            }
-        }
-
-        Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[this.index];
-
-        // If it is the local player, allow them to change the portrait
-        if (isLocalPlayer)
-        {
-            if (this.readyToBegin)
-            {
-                card.changeCharacterButton.enabled = false;
-                card.changeCharacterButtonHoverTween.enabled = false;
-            } else
-            {
-                card.changeCharacterButton.enabled = true;
-                card.changeCharacterButtonHoverTween.enabled = true;
-            }
-        }
-
-        // Player list background
-        card.playerCard.SetActive(true);
-
-        // User name
-        card.username.text = this.steamUsername;
-
-
-
-        // Character selection
-        card.characterPortrait.enabled = true;
-        card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[this.characterCode];
-
-        // Ready status
-        card.readyStatus.SetActive(this.readyToBegin);
-
-        //string t = "";
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    t += _characterSelectionInfo.characterAvailable[i] + ", ";
-        //}
-        //Debug.Log(t);
-
-
-        //if (this.readyToBegin) roomUI.DeactivateReadyButton();
-        //else roomUI.ActivateReadyButton();
+        // return the character code
+        return nextCode;
     }
 
     // Called when the start button is clicked
@@ -284,16 +255,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-
     // Called by the local player when the character card is pressed
     [Client] public void OnCharacterChanged()
     {
-        CmdChangeCharacterCode();
+        CmdChangeCharacterCode(GetNextAvailableCharacter());
     }
 
-    [Command] private void CmdChangeCharacterCode()
+    [Command] private void CmdChangeCharacterCode(int code)
     {
-        characterCode = (characterCode + 1) % 4;
+        characterCode = code;
     }
 
     private Texture2D GetSteamImageAsTexture(int iImage)
