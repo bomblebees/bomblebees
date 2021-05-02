@@ -209,10 +209,35 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator ServerEndRound()
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
+        ServerEndSelection.SetActive(true);
+    }
+
+    [SerializeField] private GameObject ServerEndSelection;
+
+    [ClientRpc]
+    private void RpcShowLoadingScreen()
+    {
+        FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = true;
+    }
+
+    [Server]
+    public void ChooseReturnToLobby()
+    {
+        ServerEndSelection.SetActive(false);
         eventManager.OnReturnToLobby(); // invoke event
 
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         room.ServerChangeScene(room.RoomScene);
+    }
+
+    [Server]
+    public void ChooseRematch()
+    {
+        ServerEndSelection.SetActive(false);
+        RpcShowLoadingScreen();
+        NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        room.ServerChangeScene(room.RoomScene);
+        room.ServerChangeScene(room.GameplayScene);
     }
 
     [Server]
