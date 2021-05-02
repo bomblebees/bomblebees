@@ -33,6 +33,8 @@ public class RoundStartEnd : MonoBehaviour
         if (winner != null) titleText.text = winner.GetComponent<Player>().steamName + " won!";
         else titleText.text = "Tied!";
 
+        FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(titleText.text);
+
         yield return new WaitForSeconds(freezetime);
         titleText.text = "";
     }

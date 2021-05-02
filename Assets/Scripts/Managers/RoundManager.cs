@@ -209,11 +209,24 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator ServerEndRound()
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
-        serverEndSelection.SetActive(true);
+        RpcShowEndCard();
+        
+        Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+        foreach (Button button in buttonList)
+        {
+            button.interactable = true;
+            button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
+        }
     }
 
-    [SerializeField] private GameObject serverEndSelection;
+    [SerializeField] private Canvas serverEndSelectionCanvas;
 
+    [ClientRpc]
+    private void RpcShowEndCard()
+    {
+        serverEndSelectionCanvas.enabled = true;
+    }
+    
     [ClientRpc]
     private void RpcShowLoadingScreen()
     {
@@ -223,7 +236,7 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void ChooseReturnToLobby()
     {
-        serverEndSelection.SetActive(false);
+        serverEndSelectionCanvas.enabled = false;
         eventManager.OnReturnToLobby(); // invoke event
 
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
@@ -234,7 +247,7 @@ public class RoundManager : NetworkBehaviour
     public void ChooseRematch()
     {
         RpcShowLoadingScreen();
-        serverEndSelection.SetActive(false);
+        serverEndSelectionCanvas.enabled = true;
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         room.ServerChangeScene(room.RoomScene);
         room.ServerChangeScene(room.GameplayScene);

@@ -47,7 +47,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 53558122436424030}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -185,8 +185,9 @@ GameObject:
   - component: {fileID: 1955828162924801190}
   - component: {fileID: 3889213519122088472}
   - component: {fileID: 5660229994908076827}
+  - component: {fileID: 1595722558419732764}
   m_Layer: 5
-  m_Name: Text_Title
+  m_Name: Text_Server End Selection Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -310,6 +311,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1595722558419732764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889082775282576999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98dc278384443b64aace826c89547646, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1060849960005524185
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,7 +465,7 @@ MonoBehaviour:
   endGameFreezeDuration: 5
   useRoundTimer: 1
   roundDuration: 240
-  serverEndSelection: {fileID: 53558122436424030}
+  serverEndSelectionCanvas: {fileID: 1352525446624707517}
 --- !u!1 &5152639368858856142
 GameObject:
   m_ObjectHideFlags: 0
@@ -568,7 +581,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 7398151658737827314}
   m_OnClick:
     m_PersistentCalls:
@@ -591,7 +604,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5152639368858856142}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
   m_Name: 
@@ -631,10 +644,10 @@ RectTransform:
   m_Father: {fileID: 5768271671777198134}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 126}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 80.22618, y: -43.373863}
+  m_SizeDelta: {x: 122, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7219974891967902565
 CanvasRenderer:
@@ -913,10 +926,10 @@ RectTransform:
   m_Father: {fileID: 6946492899262108685}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 76.73653}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 204.54678, y: -43.26075}
+  m_SizeDelta: {x: 409.09357, y: 76.73653}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5436732214559550988
 CanvasRenderer:
@@ -1130,7 +1143,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 6338939230019923412}
   m_OnClick:
     m_PersistentCalls:
@@ -1153,7 +1166,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7465106021003392421}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
   m_Name: 
@@ -1256,10 +1269,10 @@ RectTransform:
   m_Father: {fileID: 5768271671777198134}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 86.74773}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 270.02618, y: -43.373863}
+  m_SizeDelta: {x: 217.6, y: 86.74773}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2028220337650764854
 CanvasRenderer:
