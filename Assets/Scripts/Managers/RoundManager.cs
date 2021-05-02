@@ -215,7 +215,7 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
-    public void OnLivesChanged(int currentHealth, int _, GameObject __)
+    public void OnLivesChanged(int currentHealth, int _, GameObject player)
     {
         if (currentHealth < 1)
         {
@@ -232,11 +232,11 @@ public class RoundManager : NetworkBehaviour
             // update alive count
             aliveCount = alivePlayers.Count;
 
-			Debug.Log(__.name);
+			Debug.Log(player.name);
 
 			// check if the round has ended
 			CheckRoundEnd();
-			EventPlayerEliminated?.Invoke(__);
+			EventPlayerEliminated?.Invoke(player);
 			
         }
     }

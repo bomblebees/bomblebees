@@ -63,9 +63,9 @@ public class PlasmaObject : TriggerObject
         Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
-        // this.hitBox.SetActive(true);
-        // do we need to do the same for particles?
-        // this.plasmaSphereModel.enabled(true);
+		// this.hitBox.SetActive(true);
+		// do we need to do the same for particles?
+		this.plasmaSphereModel.SetActive(true);
         base.Push(edgeIndex, triggeringPlayer); // This shoulda been at the top lol
     }
 
