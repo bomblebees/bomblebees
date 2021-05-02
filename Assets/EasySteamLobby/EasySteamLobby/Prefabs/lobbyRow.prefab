@@ -423,6 +423,7 @@ GameObject:
   - component: {fileID: 4446806063034494426}
   - component: {fileID: 8329138998300847532}
   - component: {fileID: 179331040483862153}
+  - component: {fileID: 5423810810217522744}
   m_Layer: 5
   m_Name: btnJoin
   m_TagString: Untagged
@@ -531,6 +532,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5423810810217522744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4735352142017644255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d81a40d7b4dc5ad419fc64e971ddf8a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleMultipler: 1.1
+  easeIn: 18
+  easeOut: 18
 --- !u!1 &5419104028651412029
 GameObject:
   m_ObjectHideFlags: 0
