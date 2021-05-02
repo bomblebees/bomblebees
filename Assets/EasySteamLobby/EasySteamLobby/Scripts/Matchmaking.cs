@@ -319,7 +319,10 @@ public class Matchmaking : MonoBehaviour
 
 
             CanvasRenderer[] button1CanvasRenderer = rc.button1.GetComponentsInChildren<CanvasRenderer>();
+            ButtonHoverTween button1ButtonHoverTween = rc.button1.GetComponent<ButtonHoverTween>();
             rc.button1.interactable = false;
+            button1ButtonHoverTween.enabled = false;
+            rc.button1.transform.localScale.Set(1f, 1f, 1f);
             foreach (CanvasRenderer t in button1CanvasRenderer)
             {
                 t.SetAlpha(deactivatedOpacity);
@@ -330,6 +333,7 @@ public class Matchmaking : MonoBehaviour
                 SteamMatchmaking.GetLobbyData(l, "LobbyVersion") == Application.version)
             {
                 rc.button1.interactable = true;
+                button1ButtonHoverTween.enabled = true;
                 foreach (CanvasRenderer t in button1CanvasRenderer)
                 {
                     t.SetAlpha(activatedOpacity);
