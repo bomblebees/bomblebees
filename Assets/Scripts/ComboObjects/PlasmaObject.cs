@@ -95,11 +95,12 @@ public class PlasmaObject : TriggerObject
             }
             else if (lastPosition != nextPos) // new center found
             {
-                particleSystem.Play();
+                
                 this.hitBox.transform.position = nextPos;
-                this.particleSystem.transform.position = nextPos;
-                // this.hitBox.SetActive(true);
-                updatedHitboxThisIteration = false;
+                this.particleSystem.transform.position = nextPos + new Vector3(0f, -7.6f, 0f);
+				particleSystem.Play();
+				// this.hitBox.SetActive(true);
+				updatedHitboxThisIteration = false;
                 lastPosition = nextPos;
             }
         }
