@@ -53,11 +53,11 @@ public static class KeyBindingManager  {
 //Add new keys to "bind" here
 public enum KeyAction
 {
-	none,
 	up,
 	down,
 	left,
 	right,
-	forward,
-	backward
+	swap,
+	place,
+	spin
 }
