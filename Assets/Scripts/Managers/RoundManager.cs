@@ -133,7 +133,8 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public IEnumerator StartRoundTimer()
     {
-        yield return new WaitForSeconds(roundDuration);
+        // wait for round to end, - 1 second for start time delay
+        yield return new WaitForSeconds(roundDuration - 1);
 
         if (!CheckRoundEnd())
         {
