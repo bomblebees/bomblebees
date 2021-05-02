@@ -886,7 +886,7 @@ public class Player : NetworkBehaviour
             
             selectedTile = tileHit.transform.gameObject;
             // selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);    // toggle on current
-            highlightModel.transform.position = new Vector3(selectedTile.transform.position.x, -6f, selectedTile.transform.position.z);
+            highlightModel.transform.position = new Vector3(selectedTile.transform.position.x, -5.8f, selectedTile.transform.position.z);
         }
         // else
         // {
