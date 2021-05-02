@@ -1,5 +1,6 @@
 ﻿using System;
 using Mirror;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,6 +25,4 @@ public class GlobalLoadingScreen : MonoBehaviour
             gameObject.GetComponent<Canvas>().enabled = false;
         }
     }
-    
-    
 }

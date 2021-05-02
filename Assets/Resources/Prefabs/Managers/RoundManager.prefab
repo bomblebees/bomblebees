@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3482464430598344863
 RectTransform:
   m_ObjectHideFlags: 0
@@ -452,7 +452,7 @@ MonoBehaviour:
   endGameFreezeDuration: 5
   useRoundTimer: 1
   roundDuration: 240
-  ServerEndSelection: {fileID: 53558122436424030}
+  serverEndSelection: {fileID: 53558122436424030}
 --- !u!1 &5152639368858856142
 GameObject:
   m_ObjectHideFlags: 0
@@ -631,10 +631,10 @@ RectTransform:
   m_Father: {fileID: 5768271671777198134}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80.22618, y: -43.373863}
-  m_SizeDelta: {x: 122, y: 126}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7219974891967902565
 CanvasRenderer:
@@ -737,7 +737,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: CHOOSE ACTION
+  m_text: REMATCH?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9a2157e1f9c4c4d38841fbb92558f587, type: 2}
   m_sharedMaterial: {fileID: -6360588970910393389, guid: 9a2157e1f9c4c4d38841fbb92558f587,
@@ -913,10 +913,10 @@ RectTransform:
   m_Father: {fileID: 6946492899262108685}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 204.54678, y: -43.26075}
-  m_SizeDelta: {x: 409.09357, y: 76.73653}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 76.73653}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5436732214559550988
 CanvasRenderer:
@@ -1256,10 +1256,10 @@ RectTransform:
   m_Father: {fileID: 5768271671777198134}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 270.02618, y: -43.373863}
-  m_SizeDelta: {x: 217.6, y: 86.74773}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 86.74773}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2028220337650764854
 CanvasRenderer:

@@ -209,10 +209,10 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator ServerEndRound()
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
-        ServerEndSelection.SetActive(true);
+        serverEndSelection.SetActive(true);
     }
 
-    [SerializeField] private GameObject ServerEndSelection;
+    [SerializeField] private GameObject serverEndSelection;
 
     [ClientRpc]
     private void RpcShowLoadingScreen()
@@ -223,7 +223,7 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void ChooseReturnToLobby()
     {
-        ServerEndSelection.SetActive(false);
+        serverEndSelection.SetActive(false);
         eventManager.OnReturnToLobby(); // invoke event
 
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
@@ -233,8 +233,8 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void ChooseRematch()
     {
-        ServerEndSelection.SetActive(false);
         RpcShowLoadingScreen();
+        serverEndSelection.SetActive(false);
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         room.ServerChangeScene(room.RoomScene);
         room.ServerChangeScene(room.GameplayScene);
