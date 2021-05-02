@@ -1,11 +1,12 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GlobalLoadingScreen : MonoBehaviour
 {
     [Scene] [SerializeField] private string gameScene;
-    
+
     void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -23,4 +24,6 @@ public class GlobalLoadingScreen : MonoBehaviour
             gameObject.GetComponent<Canvas>().enabled = false;
         }
     }
+    
+    
 }
