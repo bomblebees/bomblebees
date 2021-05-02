@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using NSubstitute.Core.SequenceChecking;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -30,6 +31,7 @@ public class ComboObject : NetworkBehaviour
     
     public Vector3 nearestCenter;
     public HexCell tileUnderneath;
+    public int edgeIndexCached = 0;
 
     public float vfxDuration = 4f;
     public float sfxDuration = 4f;
@@ -96,6 +98,7 @@ public class ComboObject : NetworkBehaviour
     {
         if (this.isMoving)
         {
+            
             this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
@@ -110,6 +113,28 @@ public class ComboObject : NetworkBehaviour
                     RpcStopMoving();
                 }
             }
+            else  // check if next tile is empty
+            {
+                var possiblePosition = gameObject.transform.position + HexMetrics.edgeDirections[edgeIndexCached] * HexMetrics.hexSize * 1; 
+                bool hasNewCenter = FindCenter();
+                if (hasNewCenter)  // defer check to whenever entering a new tile
+                {
+                    var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
+                    RaycastHit otherObjectHit;
+                    if (Physics.Raycast(checkForObjectRay, out otherObjectHit, 20f,
+                            1 << LayerMask.NameToLayer("ComboObjects"))) // found bomb, now stop
+                    {
+                        if (isServer)
+                        {
+                            GoToCenter();
+                            NotifyOccupiedTile(true);
+                            isMoving = false;
+                            RpcStopMoving();
+                        }
+                    }
+                }
+                
+            }
         }
     }
 
@@ -123,8 +148,9 @@ public class ComboObject : NetworkBehaviour
     }
 
     [Server]
-    protected virtual void FindCenter() 
+    protected virtual bool FindCenter()
     {
+        bool foundNew = false;
         var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
         RaycastHit tileUnderneathHit;
         if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
@@ -132,9 +158,11 @@ public class ComboObject : NetworkBehaviour
             tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
             var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
             // var result = GetComponent<Transform>().position;
+            if (nearestCenter != result) foundNew = true;
             nearestCenter = result;
             RpcFindCenter(result, this.gameObject.transform.position);
         }
+        return foundNew;
     }
     
     // Tell all clients the nearest center as calculated by the server
@@ -303,10 +331,11 @@ public class ComboObject : NetworkBehaviour
             {
                 var possiblePosition = gameObject.transform.position +
                                        HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; 
+;
+                
                 // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
                 var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
-                // Debug.DrawRay(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down * 20, Color.cyan, 2, true);
                 RaycastHit tileUnderneathHit;
                 RaycastHit otherObjectHit;
                 if (Physics.Raycast(checkForEmptyRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles"))  // if raycast hit basetile, break
