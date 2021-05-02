@@ -116,6 +116,7 @@ public class ComboObject : NetworkBehaviour
     [ClientRpc]
     void RpcStopMoving()
     {
+        Debug.Log("BOMB CENTERED");
         blockerHandler.SetActive(true);
         blockerHandler.GetComponent<HandleEntry>().Restart();
         isMoving = false;
