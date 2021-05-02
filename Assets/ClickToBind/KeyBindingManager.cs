@@ -53,17 +53,18 @@ public static class KeyBindingManager  {
 //Add new keys to "bind" here
 public enum KeyAction
 {
-	up,
-	down,
-	left,
-	right,
-	swap,
-	place,
-	spin,
-	rotateNext,
-	rotatePrevious,
-	bigBomb,
-	sludgeBomb,
-	laserBeem,
-	plasmaBall,
+	Up,
+	Down,
+	Left,
+	Right,
+	ToggleSettings,
+	Swap,
+	Place,
+	Spin,
+	RotateNext,
+	RotatePrevious,
+	BigBomb,
+	SludgeBomb,
+	LaserBeem,
+	PlasmaBall
 }

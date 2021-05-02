@@ -68,7 +68,7 @@ public class Hotbar : MonoBehaviour
     {
         if (localPlayer == null) return;
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.spin))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Spin))
         {
             if (spinHudTimer == 0) spinKey.GetComponent<ScaleTween>().StartTween();
             else
@@ -77,7 +77,7 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.swap))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Swap))
         {
             if (!swapDisabledEffect.activeSelf) swapKey.GetComponent<ScaleTween>().StartTween();
             else
@@ -89,7 +89,7 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.place))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Place))
         {
             if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<ScaleTween>().StartTween();
             else
@@ -100,7 +100,7 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.rotateNext))
+        if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext))
         {
             if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<ScaleTween>().StartTween();
             else

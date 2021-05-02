@@ -333,7 +333,7 @@ public class Player : NetworkBehaviour
     void ListenForBombUse()
     {
         // raycast down to check if tile is occupied
-        if (KeyBindingManager.GetKeyDown(KeyAction.place) && (this.canExitInvincibility || this.canPlaceBombs))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Place) && (this.canExitInvincibility || this.canPlaceBombs))
         {
             ExitInvincibility();
             CmdBombUse();
@@ -362,7 +362,7 @@ public class Player : NetworkBehaviour
         if (!canSpin) return;
 
         // When key is pressed down
-        if (KeyBindingManager.GetKey(KeyAction.spin) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+        if (KeyBindingManager.GetKey(KeyAction.Spin) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
             if (!spinHeld)
             {
                 spinScalar = 0.5f;
@@ -404,7 +404,7 @@ public class Player : NetworkBehaviour
         }
 
         // When key is let go
-        if (KeyBindingManager.GetKeyUp(KeyAction.spin))
+        if (KeyBindingManager.GetKeyUp(KeyAction.Spin))
         {
             for (int i = 0; i < spinTimings.Length; i++)
             {
@@ -813,7 +813,7 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForSwapping()
     {
-        if (KeyBindingManager.GetKeyDown(KeyAction.swap) && (this.canExitInvincibility || this.canSwap))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Swap) && (this.canExitInvincibility || this.canSwap))
         {
             ExitInvincibility();
             tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
@@ -889,27 +889,27 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForBombRotation()
     {
-		if (KeyBindingManager.GetKeyDown(KeyAction.rotateNext))
+		if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext))
         {
             CmdRotateItemStack();
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.bigBomb))
+		if (KeyBindingManager.GetKeyDown(KeyAction.BigBomb))
 		{
 			CmdSelectItemSlot(0);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.sludgeBomb))
+		if (KeyBindingManager.GetKeyDown(KeyAction.SludgeBomb))
 		{
 			CmdSelectItemSlot(1);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.laserBeem))
+		if (KeyBindingManager.GetKeyDown(KeyAction.LaserBeem))
 		{
 			CmdSelectItemSlot(2);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.plasmaBall))
+		if (KeyBindingManager.GetKeyDown(KeyAction.PlasmaBall))
 		{
 			CmdSelectItemSlot(3);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");

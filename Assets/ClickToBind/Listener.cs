@@ -17,22 +17,22 @@ public class Listener : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if(KeyBindingManager.GetKeyDown(KeyAction.up))
+		if(KeyBindingManager.GetKeyDown(KeyAction.Up))
 		{
 			box1.SetActive(!box1.activeSelf);
 		}
 
-		if(KeyBindingManager.GetKeyDown(KeyAction.down))
+		if(KeyBindingManager.GetKeyDown(KeyAction.Down))
 		{
 			box2.SetActive(!box2.activeSelf);
 		}
 
-		if(KeyBindingManager.GetKeyDown(KeyAction.left))
+		if(KeyBindingManager.GetKeyDown(KeyAction.Left))
 		{
 			box3.SetActive(!box3.activeSelf);
 		}
 				
-		if(KeyBindingManager.GetKeyDown(KeyAction.right))
+		if(KeyBindingManager.GetKeyDown(KeyAction.Right))
 		{
 			box4.SetActive(!box4.activeSelf);
 		}
