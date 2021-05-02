@@ -41,16 +41,7 @@ public class Player : NetworkBehaviour
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
-
-    [Header("Input")]
-    [SerializeField] public string swapKey = "space";
-    [SerializeField] public string spinKey = "o";
-    [SerializeField] public string bombKey = "j";
-    [SerializeField] public string rotateKey = "left shift";
-	[SerializeField] public string slot1 = "1";
-	[SerializeField] public string slot2 = "2";
-	[SerializeField] public string slot3 = "3";
-	[SerializeField] public string slot4 = "4";
+    
 
 	[SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
@@ -342,7 +333,7 @@ public class Player : NetworkBehaviour
     void ListenForBombUse()
     {
         // raycast down to check if tile is occupied
-        if (Input.GetKeyDown(bombKey) && (this.canExitInvincibility || this.canPlaceBombs))
+        if (KeyBindingManager.GetKeyDown(KeyAction.place) && (this.canExitInvincibility || this.canPlaceBombs))
         {
             ExitInvincibility();
             CmdBombUse();
@@ -371,7 +362,7 @@ public class Player : NetworkBehaviour
         if (!canSpin) return;
 
         // When key is pressed down
-        if (Input.GetKey(spinKey) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+        if (KeyBindingManager.GetKey(KeyAction.spin) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
             if (!spinHeld)
             {
                 spinScalar = 0.5f;
@@ -413,7 +404,7 @@ public class Player : NetworkBehaviour
         }
 
         // When key is let go
-        if (Input.GetKeyUp(spinKey))
+        if (KeyBindingManager.GetKeyUp(KeyAction.spin))
         {
             for (int i = 0; i < spinTimings.Length; i++)
             {
@@ -822,7 +813,7 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForSwapping()
     {
-        if (Input.GetKeyDown(swapKey) && (this.canExitInvincibility || this.canSwap))
+        if (KeyBindingManager.GetKeyDown(KeyAction.swap) && (this.canExitInvincibility || this.canSwap))
         {
             ExitInvincibility();
             tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
@@ -898,27 +889,27 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForBombRotation()
     {
-		if (Input.GetKeyDown(rotateKey))
+		if (KeyBindingManager.GetKeyDown(KeyAction.rotateNext))
         {
             CmdRotateItemStack();
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot1))
+		if (KeyBindingManager.GetKeyDown(KeyAction.bigBomb))
 		{
 			CmdSelectItemSlot(0);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot2))
+		if (KeyBindingManager.GetKeyDown(KeyAction.sludgeBomb))
 		{
 			CmdSelectItemSlot(1);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot3))
+		if (KeyBindingManager.GetKeyDown(KeyAction.laserBeem))
 		{
 			CmdSelectItemSlot(2);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot4))
+		if (KeyBindingManager.GetKeyDown(KeyAction.plasmaBall))
 		{
 			CmdSelectItemSlot(3);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");

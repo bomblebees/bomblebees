@@ -59,5 +59,11 @@ public enum KeyAction
 	right,
 	swap,
 	place,
-	spin
+	spin,
+	rotateNext,
+	rotatePrevious,
+	bigBomb,
+	sludgeBomb,
+	laserBeem,
+	plasmaBall,
 }
