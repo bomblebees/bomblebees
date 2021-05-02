@@ -17,6 +17,8 @@ public class PlasmaObject : TriggerObject
 
     private bool updatedHitboxThisIteration = true;
 
+	public GameObject FireSFX;
+
     protected IEnumerator
         spawnBallCoroutine =
             null; // When starting the coroutine to spawn plasma, store to variable so in case of early destroy we can stop it
@@ -36,22 +38,27 @@ public class PlasmaObject : TriggerObject
         if (wasHit) return true;
         wasHit = true;
         FindTriggerDirection(edgeIndex);
+		PlayChargeupSFX();
+
         ////
         var nextPos = FindCenterBelowOtherInclusive(plasmaSphereModel.transform.position + targetDir * startOffset);
         this.plasmaSphereModel.transform.position = nextPos;
         this.hitBox.transform.position = nextPos;
         this.particleSystem.transform.position = nextPos;
-        ////
+		////
+
         GetSpunDirection(edgeIndex, triggeringPlayer, false);
         spawnBallCoroutine = SpawnBall(edgeIndex, triggeringPlayer);
         StartCoroutine(spawnBallCoroutine);
         return true;
     }
 
-    // note: TriggerObject.Proc() runs in parallel
-    public IEnumerator SpawnBall(int edgeIndex, GameObject triggeringPlayer)
+	// note: TriggerObject.Proc() runs in parallel
+	public IEnumerator SpawnBall(int edgeIndex, GameObject triggeringPlayer)
     {
-        if (ownerIsQueen)
+		
+
+		if (ownerIsQueen)
         {
             yield return new WaitForSeconds(queenStartupDelay);
         }
@@ -60,7 +67,8 @@ public class PlasmaObject : TriggerObject
             yield return new WaitForSeconds(startupDelay);
         }
 
-        Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
+		PlayFireSFX();
+		Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
 		// this.hitBox.SetActive(true);
@@ -121,8 +129,24 @@ public class PlasmaObject : TriggerObject
         this.hitBox.SetActive(false);
     }
     
+	private void PlayFireSFX()
+	{
+		if (FireSFX)
+		{
+			FireSFX.SetActive(true);
+		}
+	}
 
-    protected virtual void FindTriggerDirection(int edgeIndex)
+	private void PlayChargeupSFX()
+	{
+		if (BeepSFX)
+		{
+			BeepSFX.SetActive(true);
+		}
+	}
+
+
+	protected virtual void FindTriggerDirection(int edgeIndex)
     {
         targetDir = HexMetrics.edgeDirections[edgeIndex];
         // this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = targetDir;
