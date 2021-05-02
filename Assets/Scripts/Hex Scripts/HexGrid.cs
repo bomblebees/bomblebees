@@ -258,6 +258,10 @@ public class HexGrid : NetworkBehaviour
 
             // Update the cell model 
             char newType = nonComboTileTypes[UnityEngine.Random.Range(0, nonComboTileTypes.Count)];
+
+            // Make sure terrain tiles are not generated
+            while (newType == 't') newType = nonComboTileTypes[UnityEngine.Random.Range(0, nonComboTileTypes.Count)];
+
             cell.SetKey(newType);
             cell.CreateModel(ReturnModelByCellKey(newType));
             if (isServer) colorGridList[idx] = newType;
