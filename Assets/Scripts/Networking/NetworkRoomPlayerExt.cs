@@ -35,27 +35,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     public override void OnStartClient()
     {
+        InitRequiredVars();
         base.OnStartClient();
-
-        if (!_characterSelectionInfo)
-        {
-            _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
-            if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
-        }
-
-        if (!room)
-        {
-            room = NetworkManager.singleton as SteamNetworkManager;
-            if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
-            if (!room) Debug.LogError("room not found");
-        }
-
-        if (!roomUI)
-        {
-            roomUI = Room_UI.singleton;
-            if (!roomUI) Debug.LogError("room not found");
-
-        }
     }
 
     public override void OnStartLocalPlayer()
@@ -74,8 +55,32 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         CmdChangeCharacterCode(GetNextAvailableCharacter());
     }
 
+    private void InitRequiredVars()
+    {
+
+        if (!_characterSelectionInfo)
+        {
+            _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
+            if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
+        }
+
+        if (!room)
+        {
+            room = NetworkManager.singleton as SteamNetworkManager;
+            if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
+            if (!room) Debug.LogError("room not found");
+        }
+
+        if (!roomUI)
+        {
+            roomUI = Room_UI.singleton;
+            if (!roomUI) Debug.LogError("room not found");
+        }
+    }
+
     private void Update()
     {
+        InitRequiredVars();
 
         // EXIT IF REQUIRED VARS NOT INITIALIZED
         if (!_characterSelectionInfo || !room || !roomUI) return;
