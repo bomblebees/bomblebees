@@ -200,7 +200,7 @@ public class Player : NetworkBehaviour
     private void Update()
     {
         // TODO: Delete later
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+        if (Input.GetKeyDown(KeyCode.Alpha9) && debugMode)
         {
             SpawnDefaultBomb();
         }
