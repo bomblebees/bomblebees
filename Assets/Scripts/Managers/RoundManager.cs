@@ -323,4 +323,13 @@ public class RoundManager : NetworkBehaviour
             return null;
         }
     }
+
+    private void Update()
+    {
+        // TODO: Delete later
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            ChooseRematch();
+        }
+    }
 }

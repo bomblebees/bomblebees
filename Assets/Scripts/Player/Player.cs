@@ -199,7 +199,12 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
-
+        // TODO: Delete later
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            SpawnDefaultBomb();
+        }
+        
         if (timeSinceSludged < 0 && sludgeEffectStarted)
         {
             sludgeEffectStarted = false;
