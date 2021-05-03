@@ -25,7 +25,8 @@ public class ComboObject : NetworkBehaviour
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)] public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
-    public float lerpRate = 0.9f;  // The speed at which the object is being pushed
+    public float lerpRate = 0.15f;  // The speed at which the object is being pushed
+    public float lerpRateSecondary = 0.50f;
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
     public float snapToCenterThreshold = 0.5f;
     
@@ -115,22 +116,16 @@ public class ComboObject : NetworkBehaviour
             }
             else  // check if next tile is empty
             {
-                var possiblePosition = gameObject.transform.position + HexMetrics.edgeDirections[edgeIndexCached] * HexMetrics.hexSize * 1; 
-                bool hasNewCenter = FindCenter();
-                if (hasNewCenter)  // defer check to whenever entering a new tile
+                if (FindCenter())  // defer check to whenever entering a new tile
                 {
-                    var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
+                    var possiblePosition = nearestCenter + HexMetrics.edgeDirections[edgeIndexCached] * HexMetrics.hexSize * 1;
+                    var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 40f, 0f), Vector3.down);
                     RaycastHit otherObjectHit;
-                    if (Physics.Raycast(checkForObjectRay, out otherObjectHit, 20f,
+                    if (Physics.Raycast(checkForObjectRay, out otherObjectHit, 100f,
                             1 << LayerMask.NameToLayer("ComboObjects"))) // found bomb, now stop
                     {
-                        if (isServer)
-                        {
-                            GoToCenter();
-                            NotifyOccupiedTile(true);
-                            isMoving = false;
-                            RpcStopMoving();
-                        }
+                        lerpRate = lerpRateSecondary;
+                        targetPosition = nearestCenter;
                     }
                 }
                 
@@ -141,7 +136,6 @@ public class ComboObject : NetworkBehaviour
     [ClientRpc]
     void RpcStopMoving()
     {
-        Debug.Log("BOMB CENTERED");
         blockerHandler.SetActive(true);
         blockerHandler.GetComponent<HandleEntry>().Restart();
         isMoving = false;
@@ -327,6 +321,7 @@ public class ComboObject : NetworkBehaviour
         {
             targetPosition = this.gameObject.transform.position;  // Safety, in the event that no possible tiles are found.
             // float lerpScaleRate = 1/travelDistanceInHexes;
+            edgeIndexCached = edgeIndex;
             for (var tileOffset = 1; tileOffset < travelDistanceInHexes; tileOffset++)
             {
                 var possiblePosition = gameObject.transform.position +
