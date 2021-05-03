@@ -34,12 +34,6 @@ public class PlayerSpin : NetworkBehaviour
     [SerializeField] private int[] spinPowerDist = { 1, 2, 3, 4 };
 
     /// <summary>
-    /// The current movement multiplier applied by the spin charge effect.
-    /// Used in PlayerMovement script.
-    /// </summary>
-    [SerializeField] public float spinScalar = 1f;
-
-    /// <summary>
     /// The current spin charge level when spin charge is held.
     /// A value of negative 1 means that the charge is not being held
     /// </summary>
@@ -108,7 +102,7 @@ public class PlayerSpin : NetworkBehaviour
     {
         if (!spinHeld)
         {
-            spinScalar = 0.5f;
+            this.GetComponent<PlayerMovement>().spinChargedScalar = 0.5f;
 
             currentChargeLevel = 0;
 
@@ -170,7 +164,7 @@ public class PlayerSpin : NetworkBehaviour
     {
         //CmdSetSpinChargeFlashEffect(0f, 0f);
         // Set movement speed back to normal
-        spinScalar = 1f;
+        this.GetComponent<PlayerMovement>().spinChargedScalar = 1f;
 
         // Reset the charge time and spinHeld vars
         spinChargeTime = 0f;
@@ -301,19 +295,17 @@ public class PlayerSpin : NetworkBehaviour
         spinAnim.gameObject.SetActive(true);
 
         // trigger character spin animation
-        this.GetComponent<Player>().animator.SetTrigger("anim_SpinTrigger");
-        //this.GetComponent<Player>().networkAnimator.SetTrigger("anim_SpinTrigger");
+        this.GetComponent<Player>().networkAnimator.SetTrigger("anim_SpinTrigger");
 
         yield return new WaitForSeconds(spinAnimDuration);
         spinAnim.gameObject.SetActive(false);
 
-
         // reset character spin animation
-        this.GetComponent<Player>().animator.ResetTrigger("anim_SpinTrigger");
-        //this.GetComponent<Player>().networkAnimator.ResetTrigger("anim_SpinTrigger");
+        this.GetComponent<Player>().networkAnimator.ResetTrigger("anim_SpinTrigger");
 
-        this.GetComponent<Player>().isRunAnim = true;
-        this.GetComponent<Player>().isIdleAnim = true;
+        // reset run and idle anims to make sure we dont get stuck in spin anim
+        this.GetComponent<PlayerMovement>().playingRunAnim = false;
+        this.GetComponent<PlayerMovement>().playingIdleAnim = false;
     }
 
     #endregion

@@ -198,7 +198,7 @@ public class RoundManager : NetworkBehaviour
             p.SetCanPlaceBombs(true);
             //p.SetCanSpin(true);
             p.SetCanSwap(true); 
-            p.SetCanMove(true);
+            //p.SetCanMove(true);
         }
         aliveCount = alivePlayers.Count;
         UpdateGridsAliveCount(0, aliveCount);

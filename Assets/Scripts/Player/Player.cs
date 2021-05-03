@@ -52,16 +52,6 @@ public class Player : NetworkBehaviour
     public bool isQueen = false;
     public float queenDuration = 10f;
 
-    private float horizontalAxis;
-    private float prevHorizontalAxis;
-    private float verticalAxis;
-    private float prevVerticalAxis;
-    private float fixedY = 7; // The Y position the player will be stuck to.
-
-    [Header("Movement")] [SerializeField] private CharacterController controller;
-    [SerializeField] private float movementSpeed = 50;
-    [SerializeField] private float turnSpeed = 17f;
-
     [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
 
@@ -69,7 +59,6 @@ public class Player : NetworkBehaviour
     public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     [SerializeField] public bool tileHighlights = true;
 
-    [SyncVar] public bool canMove = false;
     [SyncVar] public bool canPlaceBombs = false;
     [SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
@@ -83,9 +72,9 @@ public class Player : NetworkBehaviour
     public GameObject blink;
     public GameObject gravityObject;
 	public GameObject groundItemPickupHitbox;
-	private float slowScalar = 1f;
+	//private float slowScalar = 1f;
     public float timeSinceSlowed = 0f;
-    private float sludgedScalar = 1f;
+    //private float sludgedScalar = 1f;
     private float timeSinceSludged = 0f;
     private float sludgedDuration = 0f;  // set by the sludge object
     private float sludgeEndAnim = -40f;
@@ -114,8 +103,6 @@ public class Player : NetworkBehaviour
 
     private GameObject playerMesh;
     [SerializeField] private GameObject playerModel;
-    [SerializeField] private GameObject ghostModel;
-    [NonSerialized] public Quaternion rotation;
     [SerializeField] private GameObject highlightModel;
 
     public bool isDead = false; // when player has lost ALL lives
@@ -141,7 +128,7 @@ public class Player : NetworkBehaviour
         playerMesh = playerModel.transform.GetChild(0).gameObject;
         playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
         // Disable tile highlight outline
-        if (isLocalPlayer) highlightModel.active = true;
+        if (isLocalPlayer) highlightModel.SetActive(true);
     }
 
     public override void OnStartServer()
@@ -192,7 +179,7 @@ public class Player : NetworkBehaviour
             // timeSinceSludgedEnd = -4f;
             // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -40f);
 
-            sludgedScalar = 1.0f;
+            //sludgedScalar = 1.0f;
             if (sludgeVFX.activeSelf)
             {
                 sludgeVFX.SetActive(false);
@@ -213,32 +200,19 @@ public class Player : NetworkBehaviour
 
         if (isDead) return; // if dead, disable all player updates
 
-        this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
-        
-
-        ApplyMovement();
         ApplyTileHighlight();
         ListenForSwapping();
         ListenForBombUse();
         ListenForBombRotation();
         if (debugMode) DebugMode();
-        stunnedDuration -= 0.5f * Time.deltaTime;
-        if (stunnedDuration > 0)
-        {
-            canMove = false;
-        }
-        else
-        {
-            canMove = true;
-        }
 
         //Debug.Log("tme sine cludge" + timeSinceSludged);
 
 
-        if (this.timeSinceSlowed > slowTimeCheckInterval)
-        {
-            slowScalar = 1.0f;
-        }
+        //if (this.timeSinceSlowed > slowTimeCheckInterval)
+        //{
+        //    slowScalar = 1.0f;
+        //}
     }
 
     [Command] public void CmdSetSludgeEffectEnded(bool cond)
@@ -524,69 +498,6 @@ public class Player : NetworkBehaviour
         //this.heldHexModel.gameObject.transform.localScale = heldHexScale;
     }
 
-    // Apply movement to the player, using WASD or Arrow keys
-    [Client]
-    void ApplyMovement()
-    {
-        horizontalAxis = Input.GetAxisRaw("Horizontal");
-        verticalAxis = Input.GetAxisRaw("Vertical");
-        if (horizontalAxis != 0 || verticalAxis != 0)
-        {
-            isIdleAnim = true;
-            if (isRunAnim)
-            {
-                // client animator
-                animator.ResetTrigger("anim_IdleTrigger");
-                animator.SetTrigger("anim_RunTrigger");
-                // network animator
-                networkAnimator.ResetTrigger("anim_IdleTrigger");
-                networkAnimator.SetTrigger("anim_RunTrigger");
-                isRunAnim = false;
-            }
-        }
-        else
-        {
-            isRunAnim = true;
-            if (isIdleAnim)
-            {
-                // client animator
-                animator.ResetTrigger("anim_RunTrigger");
-                animator.SetTrigger("anim_IdleTrigger");
-                // network animator
-                networkAnimator.ResetTrigger("anim_RunTrigger");
-                networkAnimator.SetTrigger("anim_IdleTrigger");
-                isIdleAnim = false;
-            }
-        }
-
-
-        this.timeSinceSlowed += Time.deltaTime;
-        timeSinceSludged -= Time.deltaTime;
-        Vector3 direction = new Vector3(this.horizontalAxis, 0f, this.verticalAxis).normalized;
-        if (direction != Vector3.zero)
-        { 
-            rotation = Quaternion.Slerp(
-                playerModel.transform.rotation,
-                Quaternion.LookRotation(direction),
-                turnSpeed * Time.deltaTime);
-            if (playerModel.activeSelf)
-            {
-                playerModel.transform.rotation = rotation;
-            } else if (ghostModel.activeSelf)
-            {
-                ghostModel.transform.rotation = rotation;
-            }
-
-            // add spin scalar
-            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
-        }
-    }
-
-    public void SetCanMove(bool val)
-    {
-        this.canMove = val;
-    }
-
     // Listens for key press and swaps the tile beneath the player
     [Client]
     void ListenForSwapping()
@@ -765,7 +676,7 @@ public class Player : NetworkBehaviour
 
     public void ApplySpeedScalar(float val)
     {
-        this.slowScalar *= val;
+        //this.slowScalar *= val;
     }
     
     public void ApplySludgeSlow(float slowRate, float slowDur)
@@ -798,7 +709,7 @@ public class Player : NetworkBehaviour
 		}
 
 		var slowFactor = 1 - slowRate;
-        this.sludgedScalar = slowFactor;
+        //this.sludgedScalar = slowFactor;
         this.sludgedDuration = slowDur;
         this.timeSinceSludged = slowDur;
         this.sludgeEffectStarted = true;
@@ -812,7 +723,7 @@ public class Player : NetworkBehaviour
 
     public void SetSpeedScalar(float val)
     {
-        this.slowScalar = val;
+        //this.slowScalar = val;
     }
 
     
