@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GlobalLoadingScreen : MonoBehaviour
 {
-    [Scene] [SerializeField] private string gameScene;
+    [Scene] [SerializeField] private string roomScene;
 
     void OnEnable()
     {
@@ -20,9 +20,7 @@ public class GlobalLoadingScreen : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.path == gameScene)
-        {
-            gameObject.GetComponent<Canvas>().enabled = false;
-        }
+        if (scene.path == roomScene) return;
+        gameObject.GetComponent<Canvas>().enabled = false;
     }
 }
