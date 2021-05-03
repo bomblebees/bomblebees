@@ -97,8 +97,8 @@ public class PlayerMovement : NetworkBehaviour
         if (!playingRunAnim)
         {
             // Stop idle anim, and start run anim
-            this.GetComponent<Player>().networkAnimator.ResetTrigger("anim_IdleTrigger");
-            this.GetComponent<Player>().networkAnimator.SetTrigger("anim_RunTrigger");
+            this.GetComponent<NetworkAnimator>().ResetTrigger("anim_IdleTrigger");
+            this.GetComponent<NetworkAnimator>().SetTrigger("anim_RunTrigger");
 
             // Now playing run anim
             playingRunAnim = true;
@@ -114,8 +114,8 @@ public class PlayerMovement : NetworkBehaviour
         if (!playingIdleAnim)
         {
             // Stop run anim, and start idle anim
-            this.GetComponent<Player>().networkAnimator.ResetTrigger("anim_RunTrigger");
-            this.GetComponent<Player>().networkAnimator.SetTrigger("anim_IdleTrigger");
+            this.GetComponent<NetworkAnimator>().ResetTrigger("anim_RunTrigger");
+            this.GetComponent<NetworkAnimator>().SetTrigger("anim_IdleTrigger");
 
             // Now playing idle anim
             playingIdleAnim = true;

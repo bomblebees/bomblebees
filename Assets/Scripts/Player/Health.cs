@@ -216,12 +216,6 @@ public class Health : NetworkBehaviour
     [ClientCallback]
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.root.transform.root.transform.root != this.gameObject.transform.root 
-            && other.gameObject.transform.name == "SpinPVP")
-        {
-            playerScript.stunnedDuration = 1;
-            return;
-        }
         if (
             !hasAuthority
             || (!(playerScript.canBeHit && 
@@ -254,11 +248,6 @@ public class Health : NetworkBehaviour
 
             var sludge = obj.root.GetComponent<SludgeObject>();
             playerScript.ApplySludgeSlow(sludge.slowRate, sludge.slowDuration);
-        }
-        else if (obj.name == "SlowHitbox")
-        {
-            this.playerScript.SetSpeedScalar(0.5f);
-            playerScript.timeSinceSlowed = 0f;
         }
         else // Bombs
         {

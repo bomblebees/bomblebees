@@ -27,30 +27,18 @@ public class Player : NetworkBehaviour
 
     // Assets
     [Header("Debug")]
-    public bool debugMode = false;
-    public string debugBombPress1 = "8";
-    public string debugBombPress2 = "9";
-    public string debugBombPress3 = "e";
-	public string debugBombPress4 = ";";
-	public string debugGroundItemSpawn = "g";
+ //   public bool debugMode = false;
+ //   public string debugBombPress1 = "8";
+ //   public string debugBombPress2 = "9";
+ //   public string debugBombPress3 = "e";
+	//public string debugBombPress4 = ";";
+	//public string debugGroundItemSpawn = "g";
     private HexGrid hexGrid;
-    public bool isStunned = false;
-    public float stunnedDuration = 0;
 
     [Header("Respawn")]
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
-    
-
-	[SerializeField] public float defaultBombCooldown = 3f;
-    private float defaultBombUseTimer = 0f;
-    [SerializeField] private GameObject onDefaultBombReadyAnim;
-    private bool playedOnDefaultBombReadyAnim = true;
-    public int queenPoints = 0;
-    public int queenPointThreshhold = 2;
-    public bool isQueen = false;
-    public float queenDuration = 10f;
 
     [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
     public char heldKey = 'g';
@@ -65,13 +53,8 @@ public class Player : NetworkBehaviour
     [SyncVar] public bool canBeHit = true;
 
     // Game Objects
-    [Header("Required", order = 2)] public GameObject bomb;
-    public GameObject laser;
-    public GameObject plasma;
-    public GameObject bigBomb;
-    public GameObject blink;
-    public GameObject gravityObject;
-	public GameObject groundItemPickupHitbox;
+    [Header("Required", order = 2)]
+    public GameObject groundItemPickupHitbox;
 	//private float slowScalar = 1f;
     public float timeSinceSlowed = 0f;
     //private float sludgedScalar = 1f;
@@ -86,13 +69,6 @@ public class Player : NetworkBehaviour
     public float slowTimeCheckInterval = 0.05f;
     public GameObject sludgeVFX;
 
-    // reference to Animator, Network Animator components
-    public Animator animator;
-    public NetworkAnimator networkAnimator;
-    public bool isRunAnim = false;
-    public bool isIdleAnim = false;
-
-
     // private Caches
     private Ray tileRay;
     private RaycastHit tileHit;
@@ -106,7 +82,6 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject highlightModel;
 
     public bool isDead = false; // when player has lost ALL lives
-    //public bool isFrozen = true; // cannot move, but can rotate
 
     // Event manager singleton
     private EventManager eventManager;
@@ -158,11 +133,6 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
-        // TODO: Delete later
-        if (Input.GetKeyDown(KeyCode.Alpha9) && debugMode)
-        {
-            //SpawnDefaultBomb();
-        }
         
         if (timeSinceSludged < 0 && sludgeEffectStarted)
         {
@@ -219,28 +189,6 @@ public class Player : NetworkBehaviour
     [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
     {
         sludgeEffectEnded = cond;
-    }
-
-    // Update version for server
-    [ServerCallback]
-    private void LateUpdate()
-    {
-        if (!isServer) return;
-
-        // Handle default-placing bomb anim
-        //if (!playedOnDefaultBombReadyAnim && defaultBombUseTimer > defaultBombCooldown)
-        //{
-        //    Debug.Log("inside");
-        //    RpcEnableBombPlaceAnimation();
-        //    playedOnDefaultBombReadyAnim = true;
-        //}
-        //defaultBombUseTimer += Time.deltaTime;
-    }
-
-    [ClientRpc]
-    void RpcEnableBombPlaceAnimation()
-    {
-        onDefaultBombReadyAnim.SetActive(true);
     }
 
     void LinkAssets()
@@ -446,9 +394,6 @@ public class Player : NetworkBehaviour
             //healthScript.SignalExit();
             this.canExitInvincibility = false;
 			FindObjectOfType<AudioManager>().PlaySound("playerRespawn");
-
-            isRunAnim = true;
-            isIdleAnim = true;
         }
     }
 
@@ -502,41 +447,5 @@ public class Player : NetworkBehaviour
         if (timeSinceSludged > 0)
         {
         }
-    }
-
-    public void SetSpeedScalar(float val)
-    {
-        //this.slowScalar = val;
-    }
-
-    
-    public void ApplyQueenPoints(int val)
-    {
-        this.queenPoints += val;
-        print("queen points is now "+this.queenPoints);
-        if (queenPoints > queenPointThreshhold)
-        {
-            print("queen");
-            RpcBecomeQueen();
-        }
-    }
-
-    public void BecomeQueen()
-    {
-        print("A Player has become queen!");
-        this.isQueen = true;
-        StartCoroutine(ToggleQueen(queenDuration, false));
-    }
-
-    public IEnumerator ToggleQueen(float delay, bool val)
-    {
-        yield return new WaitForSeconds(delay);
-        this.isQueen = val;
-    }
-
-    [ClientRpc]
-    public void RpcBecomeQueen()
-    {
-         BecomeQueen();       
     }
 }

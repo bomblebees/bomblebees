@@ -327,7 +327,7 @@ public class RoundManager : NetworkBehaviour
     private void Update()
     {
         // TODO: Delete later
-        if (Input.GetKeyDown(KeyCode.Alpha0) && FindObjectOfType<Player>().debugMode)
+        if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             ChooseRematch();
         }

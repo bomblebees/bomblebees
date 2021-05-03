@@ -122,7 +122,7 @@ public class PlayerBombPlace : NetworkBehaviour
     /// Spawns the given bomb on the server
     /// </summary>
     /// <param name="prefab">The prefab of the bomb to spawn</param>
-    [Server] void SpawnBomb(GameObject prefab)
+    [Server] private void SpawnBomb(GameObject prefab)
     {
         // Instantiate the bomb
         GameObject _bomb = Instantiate(prefab, this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);

@@ -324,13 +324,13 @@ public class PlayerSpin : NetworkBehaviour
         spinAnim.gameObject.SetActive(true);
 
         // trigger character spin animation
-        this.GetComponent<Player>().networkAnimator.SetTrigger("anim_SpinTrigger");
+        this.GetComponent<NetworkAnimator>().SetTrigger("anim_SpinTrigger");
 
         yield return new WaitForSeconds(spinAnimDuration);
         spinAnim.gameObject.SetActive(false);
 
         // reset character spin animation
-        this.GetComponent<Player>().networkAnimator.ResetTrigger("anim_SpinTrigger");
+        this.GetComponent<NetworkAnimator>().ResetTrigger("anim_SpinTrigger");
 
         // reset run and idle anims to make sure we dont get stuck in spin anim
         this.GetComponent<PlayerMovement>().playingRunAnim = false;
