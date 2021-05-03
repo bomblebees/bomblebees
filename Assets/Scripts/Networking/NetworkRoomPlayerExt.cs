@@ -80,7 +80,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void Update()
     {
-        InitRequiredVars();
+        // InitRequiredVars();
 
         // EXIT IF REQUIRED VARS NOT INITIALIZED
         if (!_characterSelectionInfo || !room || !roomUI) return;
