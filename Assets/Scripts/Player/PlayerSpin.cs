@@ -5,6 +5,8 @@ using Mirror;
 
 public class PlayerSpin : NetworkBehaviour
 {
+    [Header("Required")]
+    [SerializeField] private GameObject playerMesh;
 
     /// <summary>
     /// Whether the player can spin.
@@ -38,6 +40,15 @@ public class PlayerSpin : NetworkBehaviour
     /// A value of negative 1 means that the charge is not being held
     /// </summary>
     private int currentChargeLevel = 0;
+
+    [Header("Spin Charge Flash Effects")]
+    [SerializeField] private float[] flashSpeeds = { 0f, 10f, 15f, 20f };
+    [SerializeField] private float[] glowAmnts = { 0f, 0.4f, 0.8f, 1.2f };
+
+    /// <summary>
+    /// The current charge effect level, determines the flash effect level in flashSpeeds and glowAmnts
+    /// </summary>
+    [SyncVar(hook = nameof(OnChangeChargeEffectLevel))] private int chargeEffectLevel = 0;
 
     [Header("Hitbox")]
     [SerializeField] private GameObject spinHitbox;
@@ -152,6 +163,9 @@ public class PlayerSpin : NetworkBehaviour
             // Increase it to the next level
             currentChargeLevel += 1;
 
+            // Set new charge effect
+            SetChargeEffectLevel(currentChargeLevel);
+
             // Play the charge level sound
             FindObjectOfType<AudioManager>().PlaySound("spinCharge" + currentChargeLevel);
 
@@ -160,9 +174,25 @@ public class PlayerSpin : NetworkBehaviour
         }
     }
 
+
+    [Command] public void SetChargeEffectLevel(int newLevel)
+    {
+        chargeEffectLevel = newLevel;
+    }
+
+    /// <summary>
+    /// SyncVar hook for variable chargeEffectLevel
+    /// </summary>
+    [ClientCallback] public void OnChangeChargeEffectLevel(int oldLevel, int newLevel)
+    {
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeeds[newLevel]);
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmnts[newLevel]);
+    }
+
     [Client] public void ResetSpinCharge()
     {
-        //CmdSetSpinChargeFlashEffect(0f, 0f);
+        SetChargeEffectLevel(0);
+
         // Set movement speed back to normal
         this.GetComponent<PlayerMovement>().spinChargedScalar = 1f;
 

@@ -4965,14 +4965,10 @@ MonoBehaviour:
   queenPointThreshhold: 5
   isQueen: 0
   queenDuration: 10
-  controller: {fileID: 493922037362194888}
-  movementSpeed: 50
-  turnSpeed: 17
   heldKey: 103
   heldHexScale: {x: 90, y: 90, z: 90}
   heldHexOffset: {x: 8, y: 17, z: 0}
   tileHighlights: 1
-  canMove: 0
   canPlaceBombs: 0
   canSwap: 0
   canExitInvincibility: 0
@@ -4996,7 +4992,6 @@ MonoBehaviour:
   selectedTile: {fileID: 0}
   maxStackSize: 3
   playerModel: {fileID: 5260639197599151655}
-  ghostModel: {fileID: 7560027545034526390}
   highlightModel: {fileID: 1232416090054458822}
   isDead: 0
 --- !u!114 &5463513637451450348
@@ -5016,10 +5011,12 @@ MonoBehaviour:
   ghostModel: {fileID: 8062245979255692024}
   playerModel: {fileID: 5260639197599151655}
   controller: {fileID: 493922037362194888}
-  isRunAnim: 0
-  isIdleAnim: 0
+  sludgedScalar: 1
+  spinChargedScalar: 1
   movementSpeed: 50
   turnSpeed: 17
+  playingRunAnim: 0
+  playingIdleAnim: 0
 --- !u!114 &-6034901384483308242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5034,6 +5031,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  playerMesh: {fileID: 4109969135870488925}
   canSpin: 1
   spinHeld: 0
   spinPower: 1
@@ -5043,7 +5041,6 @@ MonoBehaviour:
   - 1.5
   - 2
   spinPowerDist: 01000000020000000300000004000000
-  spinScalar: 1
   spinHitbox: {fileID: 1163376774926246814}
   spinHitboxDuration: 0.02
   spinAnim: {fileID: 2126876005053527932}
@@ -42419,6 +42416,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37f3e26f15b559e439724ae350bd8a9a, type: 3}
+--- !u!1 &4109969135870488925 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -231537852577957333, guid: 37f3e26f15b559e439724ae350bd8a9a,
+    type: 3}
+  m_PrefabInstance: {fileID: 5026266410568485750}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4776731333535001757 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 37f3e26f15b559e439724ae350bd8a9a,
@@ -42503,12 +42506,6 @@ PrefabInstance:
 --- !u!4 &7560027545034526395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2336704052561413615, guid: d46145a26442c5b449a21b5c35d6e0e9,
-    type: 3}
-  m_PrefabInstance: {fileID: 5226215212550458196}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &7560027545034526390 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2336704052561413602, guid: d46145a26442c5b449a21b5c35d6e0e9,
     type: 3}
   m_PrefabInstance: {fileID: 5226215212550458196}
   m_PrefabAsset: {fileID: 0}
@@ -42883,15 +42880,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 343c3f866915a1e4cabc0c6a4d21dfd2, type: 3}
---- !u!1 &2126876005053527932 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7274719735903540578, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
-    type: 3}
-  m_PrefabInstance: {fileID: 8750724405304861214}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2156110565965072082 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7249909577646941388, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
+    type: 3}
+  m_PrefabInstance: {fileID: 8750724405304861214}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2126876005053527932 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7274719735903540578, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
     type: 3}
   m_PrefabInstance: {fileID: 8750724405304861214}
   m_PrefabAsset: {fileID: 0}
