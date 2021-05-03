@@ -57,6 +57,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void InitRequiredVars()
     {
+        // Only init if we are in the room scene
+        if (SceneManager.GetActiveScene().name != "Room") return;
 
         if (!_characterSelectionInfo)
         {
@@ -80,7 +82,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void Update()
     {
-        // InitRequiredVars();
+        InitRequiredVars();
 
         // EXIT IF REQUIRED VARS NOT INITIALIZED
         if (!_characterSelectionInfo || !room || !roomUI) return;
