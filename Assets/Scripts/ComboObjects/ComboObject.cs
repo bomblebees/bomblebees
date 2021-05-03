@@ -388,7 +388,7 @@ public class ComboObject : NetworkBehaviour
             triggeringPlayer = other.transform.parent.gameObject;
 
             // Adjust travel distance based on spin power
-            int power = triggeringPlayer.GetComponent<Player>().spinPower;
+            int power = triggeringPlayer.GetComponent<PlayerSpin>().spinPower;
             Debug.Log("power: " + power);
 
             int newTravelDistanceInHexes = power + 1;
@@ -398,7 +398,7 @@ public class ComboObject : NetworkBehaviour
             RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
 
             // Set spin hit on player, for event logger
-            triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
+            //triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
         }
     }
 

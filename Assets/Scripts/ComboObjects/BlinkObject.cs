@@ -69,7 +69,7 @@ public class BlinkObject : TickObject
         StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration));
         this.collider.enabled = false;
         base.Push(edgeIndex, triggeringPlayer); // Doesn't use lerpRate at all. Do this to get targetPosition
-        this.triggeringPlayer.GetComponent<Player>().SetSpinHitboxActive(false); // Turns off Player's spin hitbox so it doesn't linger after the teleport.
+        //this.triggeringPlayer.GetComponent<Player>().SetSpinHitboxActive(false); // Turns off Player's spin hitbox so it doesn't linger after the teleport.
         isMoving = false;
         
         // NotifyServerPosition(triggeringPlayer);

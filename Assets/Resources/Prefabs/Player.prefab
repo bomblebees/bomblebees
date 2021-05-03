@@ -4860,6 +4860,7 @@ GameObject:
   - component: {fileID: 94709753153883346}
   - component: {fileID: 493922037362194888}
   - component: {fileID: 493922037362194891}
+  - component: {fileID: -6034901384483308242}
   - component: {fileID: -8900185448856423588}
   - component: {fileID: 5921287484511493969}
   - component: {fileID: 643420728015153871}
@@ -4867,7 +4868,6 @@ GameObject:
   - component: {fileID: -4029230019786924673}
   - component: {fileID: 5311549566228183417}
   - component: {fileID: 265390215517963061}
-  - component: {fileID: 732740295544866867}
   - component: {fileID: -2281093725366134900}
   - component: {fileID: 2620434565718017240}
   m_Layer: 12
@@ -5014,6 +5014,35 @@ MonoBehaviour:
   - 2
   spinPowerDist: 01000000020000000300000004000000
   spinScalar: 1
+--- !u!114 &-6034901384483308242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 728363404677404264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530351e1cfad1f14599d351f1fc5d0d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  canSpin: 1
+  spinHeld: 0
+  spinPower: 1
+  spinTimings:
+  - 0.5
+  - 1
+  - 1.5
+  - 2
+  spinPowerDist: 01000000020000000300000004000000
+  spinScalar: 1
+  spinHitbox: {fileID: 1163376774926246814}
+  spinHitboxDuration: 0.02
+  spinAnim: {fileID: 2126876005053527932}
+  spinAnimDuration: 0.3
+  spinTotalCooldown: 0.4
 --- !u!114 &-8900185448856423588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5183,20 +5212,6 @@ MonoBehaviour:
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
   target: {fileID: 7560027545034526395}
---- !u!136 &732740295544866867
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 728363404677404264}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  m_Radius: 1
-  m_Height: 20
-  m_Direction: 1
-  m_Center: {x: 0, y: 10, z: 0}
 --- !u!114 &-2281093725366134900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42236,12 +42251,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5070fe9e3588d324493aeca7a91f65b9, type: 3}
---- !u!224 &8569514173636617671 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 8800530296141692236, guid: 5070fe9e3588d324493aeca7a91f65b9,
-    type: 3}
-  m_PrefabInstance: {fileID: 922327603176511627}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2990736555978134024 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2688085051857799811, guid: 5070fe9e3588d324493aeca7a91f65b9,
@@ -42254,6 +42263,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &8569514173636617671 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8800530296141692236, guid: 5070fe9e3588d324493aeca7a91f65b9,
+    type: 3}
+  m_PrefabInstance: {fileID: 922327603176511627}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5026266410568485750
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42865,6 +42880,12 @@ PrefabInstance:
 --- !u!4 &2156110565965072082 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7249909577646941388, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
+    type: 3}
+  m_PrefabInstance: {fileID: 8750724405304861214}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2126876005053527932 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7274719735903540578, guid: 343c3f866915a1e4cabc0c6a4d21dfd2,
     type: 3}
   m_PrefabInstance: {fileID: 8750724405304861214}
   m_PrefabAsset: {fileID: 0}

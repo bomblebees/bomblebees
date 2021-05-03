@@ -69,18 +69,11 @@ public class Player : NetworkBehaviour
     public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     [SerializeField] public bool tileHighlights = true;
 
-    public float spinHitboxDuration = 0.6f;
-    public float spinAnimDuration = 0.8f;
-    public float spinTotalCooldown = 0.8f;
-
     [SyncVar] public bool canMove = false;
     [SyncVar] public bool canPlaceBombs = false;
-    [SyncVar] public bool canSpin = true;
     [SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
-    public GameObject spinHit = null; // the bomb that was hit with spin
-    public GameObject spinPVP = null;
 
     // Game Objects
     [Header("Required", order = 2)] public GameObject bomb;
@@ -112,8 +105,6 @@ public class Player : NetworkBehaviour
 
 
     // private Caches
-    private GameObject spinHitbox;
-    private GameObject spinAnim;
     private Ray tileRay;
     private RaycastHit tileHit;
     public GameObject selectedTile;
@@ -143,11 +134,7 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        this.Assert();
         LinkAssets();
-        spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
-        spinPVP = gameObject.transform.Find("SpinPVP").gameObject;
-        spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
         UpdateHeldHex(heldKey); // Initialize model
 
         // Set player color
@@ -161,22 +148,17 @@ public class Player : NetworkBehaviour
     {
         base.OnStartServer();
 
-        this.Assert();
         LinkAssets();
-        spinHitbox = gameObject.transform.Find("SpinHitbox").gameObject;
-        spinAnim = this.gameObject.transform.Find("SpinVFX").gameObject;
 
         //fixedY = this.transform.position.y;  // To prevent bugs from collisions
 
         // events
         healthScript.EventLivesLowered += SetCanPlaceBombs;
-        healthScript.EventLivesLowered += SetCanSpin;
         healthScript.EventLivesLowered += SetCanSwap;
         healthScript.EventLivesLowered += SetCanBeHit;
         healthScript.EventLivesLowered += ClearItemStack;
 
         healthScript.EventGhostExit += SetCanPlaceBombs;
-        healthScript.EventGhostExit += SetCanSpin;
         healthScript.EventGhostExit += SetCanSwap;
         healthScript.EventGhostExit += SetCanExitInvincibility;
 
@@ -185,14 +167,6 @@ public class Player : NetworkBehaviour
         // Event manager singleton
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
-    }
-
-    void Assert()
-    {
-        if (spinTotalCooldown <= spinHitboxDuration && spinTotalCooldown <= spinAnimDuration)
-        {
-            Debug.LogError("Player.cs: spinCooldown is lower than spinDuration.");
-        }
     }
 
     // Update is called once per frame
@@ -222,7 +196,7 @@ public class Player : NetworkBehaviour
             if (sludgeVFX.activeSelf)
             {
                 sludgeVFX.SetActive(false);
-                this.canSpin = true;
+                //this.canSpin = true;
             }
 
             if (sludgeEndAnim > -40f)
@@ -246,7 +220,6 @@ public class Player : NetworkBehaviour
         ApplyTileHighlight();
         ListenForSwapping();
         ListenForBombUse();
-        ListenForSpinning();
         ListenForBombRotation();
         if (debugMode) DebugMode();
         stunnedDuration -= 0.5f * Time.deltaTime;
@@ -343,129 +316,6 @@ public class Player : NetworkBehaviour
             ExitInvincibility();
             CmdBombUse();
         }
-    }
-
-    public int spinPower = 1;
-    private float startSpinTime = 0f;
-    public float spinChargeTime = 0f;
-
-    [SyncVar] public bool spinHeld = false;
-    [Command] private void CmdSetSpinHeld(bool held) { spinHeld = held; }
-
-    [SerializeField] public float[] spinTimings = {0.5f, 1.0f, 1.5f, 2.0f};
-    // [SerializeField] public float[] spinTimings = {0.0f, 0.5f, 1.0f, 1.5f, 2.0f};
-    [SerializeField] private int[] spinPowerDist = {1, 2, 3, 4};
-    [SerializeField] private float spinScalar = 1f;
-
-    // trash variables sry
-    private bool spinChargeLevel0Hit = false; // for initial hit
-    private bool spinChargeLevel1Hit = false;
-    private bool spinChargeLevel2Hit = false;
-    private bool spinChargeLevel3Hit = false;
-
-    [Client]
-    public void ListenForSpinning()
-    {
-        if (!canSpin) return;
-
-        // When key is pressed down
-        if (KeyBindingManager.GetKey(KeyAction.Spin) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
-            if (!spinHeld)
-            {
-                spinScalar = 0.5f;
-                startSpinTime = Time.time;
-
-                spinChargeLevel0Hit = false;
-                spinChargeLevel1Hit = false;
-                spinChargeLevel2Hit = false;
-                spinChargeLevel3Hit = false;
-
-                CmdSetSpinHeld(true);
-            }
-
-            spinChargeTime += Time.deltaTime;
-
-
-            // HERE
-
-            if (!spinChargeLevel0Hit)
-            {
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
-                // CmdSetSpinChargeFlashEffect(10f, 0.2f);
-                spinChargeLevel0Hit = true;
-            }
-
-
-            // Play anims and sounds
-            if (!spinChargeLevel1Hit && spinChargeTime > spinTimings[0])
-            {
-                FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
-                CmdSetSpinChargeFlashEffect(10f, 0.4f);
-                spinChargeLevel1Hit = true;
-            }
-
-            if (!spinChargeLevel2Hit && spinChargeTime > spinTimings[1])
-            {
-                FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
-                CmdSetSpinChargeFlashEffect(15f, 0.8f);
-                spinChargeLevel2Hit = true;
-            }
-
-            if (!spinChargeLevel3Hit && spinChargeTime >= spinTimings[2])
-            {
-                FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
-                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
-                CmdSetSpinChargeFlashEffect(20f, 1.2f);
-                spinChargeLevel3Hit = true;
-            }
-        }
-
-        // When key is let go
-        if (KeyBindingManager.GetKeyUp(KeyAction.Spin))
-        {
-            for (int i = 0; i < spinTimings.Length; i++)
-            {
-                // If maximum power, dont need to check timing
-                if (i == spinTimings.Length - 1)
-                {
-                    spinPower = spinPowerDist[i];
-                    break;
-                }
-
-                // Set power in ascending order
-                if (spinChargeTime < spinTimings[i])
-                {
-                    spinPower = spinPowerDist[i];
-                    break;
-                }
-            }
-            ExitInvincibility();
-            CmdSpin(spinPower);
-
-            ResetSpinCharge();
-        }
-
-    }
-
-    [Command] public void CmdSetSpinChargeFlashEffect(float flashSpeed, float glowAmt)
-    {
-        RpcSetSpinChargeFlashEffect(flashSpeed, glowAmt);
-    }
-
-    [ClientRpc] public void RpcSetSpinChargeFlashEffect(float flashSpeed, float glowAmt)
-    {
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeed);
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmt);
-    }
-
-    public void ResetSpinCharge()
-    {
-        CmdSetSpinChargeFlashEffect(0f, 0f);
-        spinScalar = 1f;
-        spinChargeTime = 0f;
-        CmdSetSpinHeld(false);
     }
 
     [Command]
@@ -643,98 +493,6 @@ public class Player : NetworkBehaviour
         this.canPlaceBombs = val;
     }
 
-    public void SetCanSpin(bool val)
-    {
-        this.canSpin = val;
-    }
-
-    public IEnumerator Spin(int spinPower)
-    {
-        if (canSpin)
-        {
-            if (!spinHitbox)
-            {
-                Debug.LogError("Player.cs: no spinHitbox assigned");
-            }
-            else
-            {
-                this.spinPower = spinPower;
-                StartCoroutine(HandleSpinHitbox());
-                StartCoroutine(HandleSpinAnim());
-                FindObjectOfType<AudioManager>().PlaySound("playerSpin");
-                canSpin = false;
-                yield return new WaitForSeconds(spinTotalCooldown);
-                if (sludgeEffectEnded) canSpin = true;
-            }
-        }
-    }
-
-    [Command(ignoreAuthority=true)]
-    void CmdSpin(int spinPower, NetworkConnectionToClient sender = null)
-    {
-        // Spin for server
-        if (canSpin) StartCoroutine(WaitSpinHit(sender.identity.gameObject));
-        StartCoroutine(Spin(spinPower));
-        RpcSpin(spinPower);
-    }
-
-    [ClientRpc]
-    void RpcSpin(int spinPower)
-    {
-        // Client will spin for all observers
-        StartCoroutine(Spin(spinPower));
-    }
-
-    // Wait to check if spin hit a bomb
-    private IEnumerator WaitSpinHit(GameObject player)
-    {
-        Player p = player.GetComponent<Player>();
-
-        yield return new WaitForSeconds(p.spinHitboxDuration);
-        
-        if (p.spinHit == null) // If did not hit, make a "spin miss" event
-        {
-            eventManager.OnPlayerSpin(player);
-        }
-        else // If did hit, make a "spin hit" event
-        {
-            eventManager.OnPlayerSpin(player, p.spinHit);
-            p.spinHit = null;
-        }
-    }
-
-    private IEnumerator HandleSpinHitbox()
-    {
-        spinHitbox.gameObject.SetActive(true);
-        yield return new WaitForSeconds(spinHitboxDuration);
-        spinHitbox.gameObject.SetActive(false);
-
-        spinPVP.gameObject.SetActive(true);
-        yield return new WaitForSeconds(spinHitboxDuration);
-        spinPVP.gameObject.SetActive(false);
-    }
-
-    private IEnumerator HandleSpinAnim()
-    {
-
-        spinAnim.gameObject.SetActive(true);
-
-        // trigger character spin animation
-        animator.SetTrigger("anim_SpinTrigger");
-        networkAnimator.SetTrigger("anim_SpinTrigger");
-
-        yield return new WaitForSeconds(spinAnimDuration);
-        spinAnim.gameObject.SetActive(false);
-        
-
-        // reset character spin animation
-        animator.ResetTrigger("anim_SpinTrigger");
-        networkAnimator.ResetTrigger("anim_SpinTrigger");
-
-        isRunAnim = true;
-        isIdleAnim = true;
-    }
-
     void OnChangeHeldKey(char _, char newHeldKey)
     {
         // commented out for now
@@ -819,7 +577,8 @@ public class Player : NetworkBehaviour
                 ghostModel.transform.rotation = rotation;
             }
 
-            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * spinScalar * Time.deltaTime);
+            // add spin scalar
+            controller.Move(direction * movementSpeed * slowScalar * sludgedScalar * Time.deltaTime);
         }
     }
 
@@ -986,7 +745,7 @@ public class Player : NetworkBehaviour
     {
         if (canExitInvincibility)
         {
-            this.canSpin = true;
+            //this.canSpin = true;
             this.canBeHit = true;
             this.canSwap = true;
             this.canPlaceBombs = true;
@@ -1004,11 +763,6 @@ public class Player : NetworkBehaviour
         this.canExitInvincibility = val;
     }
 
-    public void SetSpinHitboxActive(bool val)
-    {
-        spinHitbox.SetActive(val);
-    }
-
     public void ApplySpeedScalar(float val)
     {
         this.slowScalar *= val;
@@ -1019,8 +773,8 @@ public class Player : NetworkBehaviour
         if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
         else CmdApplySludgeSlow(slowRate, slowDur);
 
-        ResetSpinCharge();
-        this.canSpin = false;
+        //ResetSpinCharge();
+        //this.canSpin = false;
     }
 
     [Command] public void CmdApplySludgeSlow(float slowRate, float slowDur) { RpcApplySludgeSlow(slowRate, slowDur); }

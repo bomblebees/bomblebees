@@ -114,7 +114,7 @@ public class Hotbar : MonoBehaviour
     {
         if (spinHudTimer != 0)
         {
-            float totalDuration = localPlayer.spinTotalCooldown;
+            float totalDuration = localPlayer.GetComponent<PlayerSpin>().spinTotalCooldown;
             spinCooldownFilter.fillAmount = spinHudTimer / totalDuration;
             spinHudTimer -= Time.deltaTime;
 
@@ -143,7 +143,7 @@ public class Hotbar : MonoBehaviour
     {
         if (localPlayer != null)
         {
-            spinHudTimer = localPlayer.spinTotalCooldown;
+            spinHudTimer = localPlayer.GetComponent<PlayerSpin>().spinTotalCooldown;
         }
     }
 
