@@ -12,11 +12,6 @@ public class TickObject : ComboObject
         // All the client needs to do is render the sfx/vfx
         // The server should do all calculations
     }
-
-    public virtual void _Start(GameObject player)
-    {
-        base._Start(player);
-    }
     
     public override void OnStartServer()
     {

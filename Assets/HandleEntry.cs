@@ -24,7 +24,7 @@ public class HandleEntry : MonoBehaviour
             var gameObjHit = other.gameObject;
             if (gameObjHit.CompareTag("Player"))
             {
-                print("hi1");
+                //print("hi1");
                 // SetPlayerEntry(other, true); // This needs to run before the invisibleBlocker scans for collision
             }
             invisibleBlocker.gameObject.SetActive(false);
@@ -39,7 +39,7 @@ public class HandleEntry : MonoBehaviour
         // Debug.Log(gameObjHit.name);
         if (gameObjHit.CompareTag("Player"))
         {
-            print("hi2");
+            //print("hi2");
             invisibleBlocker.gameObject.SetActive(true);
             // SetPlayerEntry(other, false);
             // Physics.IgnoreCollision(gameObjHit.GetComponent<CapsuleCollider>(), this.GetComponent<SphereCollider>(),
@@ -49,7 +49,7 @@ public class HandleEntry : MonoBehaviour
 
     protected virtual void SetPlayerEntry(Collider playerCollider, bool val)
     {
-        print("hi3");
+        //print("hi3");
         if (!playerCollider) Debug.LogError("HandleEntry.cs: Need to update collider type of plaer");
         // Physics.IgnoreCollision(playerCollider, invisibleBlocker, val);
         // invisibleBlocker.gameObject.SetActive(true);

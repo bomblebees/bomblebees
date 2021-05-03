@@ -195,7 +195,7 @@ public class RoundManager : NetworkBehaviour
         {
             alivePlayers.Add(playerList[i]);
             Player p = playerList[i].player;
-            p.SetCanPlaceBombs(true);
+            //p.SetCanPlaceBombs(true);
             //p.SetCanSpin(true);
             p.SetCanSwap(true); 
             //p.SetCanMove(true);

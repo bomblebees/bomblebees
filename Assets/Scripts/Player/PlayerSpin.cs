@@ -90,7 +90,6 @@ public class PlayerSpin : NetworkBehaviour
     {
         if (!canSpin) return;
 
-
         // When spin key is pressed down
         if (KeyBindingManager.GetKey(KeyAction.Spin) && spinChargeTime < spinTimings[spinTimings.Length - 1])
         {

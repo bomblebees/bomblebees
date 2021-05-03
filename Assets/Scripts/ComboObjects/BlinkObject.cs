@@ -18,12 +18,6 @@ public class BlinkObject : TickObject
     public bool triggered = false;
     
     
-    public override void _Start(GameObject player)
-    {
-        base._Start(player);
-        EnableObject();
-    }
-
     // protected virtual IEnumerator DelayedSpawn()
     // {
     //     yield return new WaitForSeconds(startupDelay);

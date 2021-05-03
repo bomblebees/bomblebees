@@ -59,7 +59,7 @@ public class Player : NetworkBehaviour
     public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     [SerializeField] public bool tileHighlights = true;
 
-    [SyncVar] public bool canPlaceBombs = false;
+    //[SyncVar] public bool canPlaceBombs = false;
     [SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
@@ -140,12 +140,10 @@ public class Player : NetworkBehaviour
         //fixedY = this.transform.position.y;  // To prevent bugs from collisions
 
         // events
-        healthScript.EventLivesLowered += SetCanPlaceBombs;
         healthScript.EventLivesLowered += SetCanSwap;
         healthScript.EventLivesLowered += SetCanBeHit;
         healthScript.EventLivesLowered += ClearItemStack;
 
-        healthScript.EventGhostExit += SetCanPlaceBombs;
         healthScript.EventGhostExit += SetCanSwap;
         healthScript.EventGhostExit += SetCanExitInvincibility;
 
@@ -163,7 +161,7 @@ public class Player : NetworkBehaviour
         // TODO: Delete later
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            SpawnDefaultBomb();
+            //SpawnDefaultBomb();
         }
         
         if (timeSinceSludged < 0 && sludgeEffectStarted)
@@ -202,9 +200,7 @@ public class Player : NetworkBehaviour
 
         ApplyTileHighlight();
         ListenForSwapping();
-        ListenForBombUse();
         ListenForBombRotation();
-        if (debugMode) DebugMode();
 
         //Debug.Log("tme sine cludge" + timeSinceSludged);
 
@@ -223,33 +219,6 @@ public class Player : NetworkBehaviour
     [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
     {
         sludgeEffectEnded = cond;
-    }
-
-    private void DebugMode()
-    {
-        if (Input.GetKeyDown(debugBombPress1))
-        {
-            hexGrid.GrowRing();
-        }
-        if (Input.GetKeyDown(debugBombPress2))
-        {
-            SpawnLaserObject();
-        }
-        if (Input.GetKeyDown(debugBombPress3))
-        {
-            SpawnPlasmaObject();
-        }
-        if (Input.GetKeyDown(debugBombPress4))
-        {
-            SpawnBlinkObject();
-        }
-		if (Input.GetKeyDown(debugGroundItemSpawn))
-		{
-			Debug.Log("G pressed in Debug mode");
-			healthScript.CmdDropItems();
-			
-
-		}
     }
 
     // Update version for server
@@ -279,192 +248,6 @@ public class Player : NetworkBehaviour
         hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
             .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
         if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
-    }
-
-    [Client]
-    void ListenForBombUse()
-    {
-        // raycast down to check if tile is occupied
-        if (KeyBindingManager.GetKeyDown(KeyAction.Place) && (this.canExitInvincibility || this.canPlaceBombs))
-        {
-            ExitInvincibility();
-            CmdBombUse();
-        }
-    }
-
-    [Command]
-    void CmdBombUse(NetworkConnectionToClient sender = null)
-    {
-        BombUse(sender);
-    }
-
-    void BombUse(NetworkConnectionToClient sender)
-    {
-        Ray tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
-
-        if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-        {
-            var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
-            if (!hexCell.IsOccupiedByComboObject())
-            {
-                // Get the players inventory who called this function
-                PlayerInventory inv = sender.identity.GetComponent<PlayerInventory>();
-
-                char bombType = inv.GetSelectedBombType(); // get the currently selected bomb type
-
-                // if (bombType == 'e') return; // removed for new combo tiles
-                if (bombType == 'e' || bombType == '1'|| bombType == '2'|| bombType == '3' || bombType == '4')
-                    return; // if selected bomb type empty, return
-
-                inv.RemoveInventoryBomb(bombType); // Subtract the bomb type from the player inventory by 1
-
-                switch (bombType)
-                {
-                    case 'b':
-                        // Debug.Log("Blue Bomb Type");
-                        SpawnBlinkObject(sender.identity.gameObject);
-                        break;
-                    case 'g':
-                        // Debug.Log("Green Bomb Type");
-                        SpawnPlasmaObject(sender.identity.gameObject);
-                        break;
-                    case 'y':
-                        // Debug.Log("Yellow Bomb Type");
-                        SpawnLaserObject(sender.identity.gameObject);
-                        break;
-                    case 'r':
-                        // Debug.Log("Red Bomb Type");
-                        SpawnDefaultBomb(sender.identity.gameObject);
-                        break;
-                    case 'p':
-                        // Debug.Log("Purple Bomb Type");
-                        SpawnSludgeObject(sender.identity.gameObject);
-                        break;
-                    case 'w':
-                        // Debug.Log("White Bomb Type");
-                        SpawnDefaultBomb(sender.identity.gameObject);
-                        break;
-                    default:
-                        // code should not reach here
-                        Debug.Log("Bomb type not found");
-                        break;
-                }
-            }
-        }
-    }
-
-    [Server]
-    void SpawnDefaultBomb(GameObject placer = null)
-    {
-        GameObject _bomb = (GameObject)Instantiate(bomb,
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(_bomb);
-        // _bomb.GetComponent<BombObject>()._Start(placer);
-        RpcSpawnDefaultBomb(_bomb, placer);
-
-        eventManager.OnBombPlaced(_bomb, placer); // call event
-    }
-
-    [ClientRpc]
-    void RpcSpawnDefaultBomb(GameObject bomb, GameObject placer)
-    {
-        bomb.GetComponent<BombObject>()._Start(placer);
-    }
-
-    [Server]
-    void SpawnLaserObject(GameObject placer = null)
-    {
-        GameObject _laser = (GameObject) Instantiate(laser,
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(_laser);
-        // _laser.GetComponent<LaserObject>()._Start(placer);
-        RpcSpawnLaserObject(_laser, placer);
-
-        eventManager.OnBombPlaced(_laser, placer); // call event
-    }
-
-    [ClientRpc]
-    void RpcSpawnLaserObject(GameObject laser, GameObject placer)
-    {
-        laser.GetComponent<LaserObject>()._Start(placer);
-    }
-
-    [Server]
-    void SpawnPlasmaObject(GameObject placer = null)
-    {
-        GameObject _plasma = (GameObject) Instantiate(plasma,
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(_plasma);
-        // _plasma.GetComponent<PlasmaObject>()._Start(placer);
-        RpcSpawnPlasmaObject(_plasma, placer);
-        
-        eventManager.OnBombPlaced(_plasma, placer); // call event
-    }
-
-    [ClientRpc]
-    void RpcSpawnPlasmaObject(GameObject plasma, GameObject placer)
-    {
-        plasma.GetComponent<PlasmaObject>()._Start(placer);
-    }
-
-    [Server]
-    void SpawnBlinkObject(GameObject placer = null)
-    {
-        GameObject _blink = (GameObject) Instantiate(blink,
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(_blink);
-        _blink.GetComponent<BlinkObject>()._Start(placer);
-        // RpcSpawnBlinkObject(_blink, placer);
-
-        eventManager.OnBombPlaced(_blink, placer); // call event
-    }
-
-    [ClientRpc]
-    void RpcSpawnBlinkObject(GameObject blink, GameObject placer)
-    {
-        blink.GetComponent<BlinkObject>()._Start(placer);
-    }
-
-    [Server]
-    void SpawnSludgeObject(GameObject placer = null)
-    {
-        GameObject _sludge = (GameObject) Instantiate(gravityObject,
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        NetworkServer.Spawn(_sludge);
-        // _sludge.GetComponent<SludgeObject>()._Start(placer);
-        RpcSpawnSludgeBomb(_sludge, placer);
-        
-        eventManager.OnBombPlaced(_sludge, placer); // call event
-    }
-
-    [ClientRpc]
-    void RpcSpawnSludgeBomb(GameObject sludge, GameObject placer)
-    {
-        sludge.GetComponent<SludgeObject>()._Start(placer);
-    }
-
-    [Server]
-    void SpawnPulseObject(GameObject placer = null)
-    {
-        GameObject _pulse = (GameObject) Instantiate(bigBomb,
-            this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
-        // _pulse.GetComponent<PulseObject>()._Start(placer); // TODO change this type
-        NetworkServer.Spawn(_pulse);
-
-        RpcSpawnPulseObject(_pulse, placer);
-
-        eventManager.OnBombPlaced(_pulse, placer); // call event    }
-    }
-
-    [ClientRpc]
-    void RpcSpawnPulseObject(GameObject pulse, GameObject placer)
-    {
-        pulse.GetComponent<PulseObject>()._Start(placer);
-    }
-
-    public void SetCanPlaceBombs(bool val)
-    {
-        this.canPlaceBombs = val;
     }
 
     void OnChangeHeldKey(char _, char newHeldKey)
@@ -659,7 +442,7 @@ public class Player : NetworkBehaviour
             //this.canSpin = true;
             this.canBeHit = true;
             this.canSwap = true;
-            this.canPlaceBombs = true;
+            //this.canPlaceBombs = true;
             //healthScript.SignalExit();
             this.canExitInvincibility = false;
 			FindObjectOfType<AudioManager>().PlaySound("playerRespawn");
