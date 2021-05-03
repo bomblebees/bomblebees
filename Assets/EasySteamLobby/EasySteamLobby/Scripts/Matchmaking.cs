@@ -28,11 +28,18 @@ using Mirror;
 
 public class Matchmaking : MonoBehaviour
 {
+    [Header("Button Opacity Configuration")]
+    [Range(0f, 1f)]
+    [SerializeField] private float deactivatedOpacity = 0.2f;
+    [Range(0f, 1f)]
+    [SerializeField] private float activatedOpacity = 1f;
+
     private string LOBBY_MATCHING_KEY = "[key:bomblebees-lobby]";
     private string LOBBY_MATCHING_VALUE = "[true]";
     private const string HostAddressKey = "HostAddress";
 
     // The network manager for game scene networking
+    [Header("Matchmaking")]
     [SerializeField] private SteamNetworkManager networkManager;
 
     //this function will be called when the host player pressed the start button.
@@ -311,14 +318,28 @@ public class Matchmaking : MonoBehaviour
 
 
 
-            rc.button1.interactable = true;
-
-            if (SteamMatchmaking.GetNumLobbyMembers(l) == SteamMatchmaking.GetLobbyMemberLimit(l) - 1
-                || SteamMatchmaking.GetLobbyData(l, "gameStatus") == "In Game"
-                || SteamMatchmaking.GetLobbyData(l, "LobbyVersion") != Application.version)
+            CanvasRenderer[] button1CanvasRenderer = rc.button1.GetComponentsInChildren<CanvasRenderer>();
+            ButtonHoverTween button1ButtonHoverTween = rc.button1.GetComponent<ButtonHoverTween>();
+            rc.button1.interactable = false;
+            button1ButtonHoverTween.enabled = false;
+            rc.button1.transform.localScale.Set(1f, 1f, 1f);
+            foreach (CanvasRenderer t in button1CanvasRenderer)
             {
-                rc.button1.interactable = false;
+                t.SetAlpha(deactivatedOpacity);
             }
+
+            if (SteamMatchmaking.GetNumLobbyMembers(l) != SteamMatchmaking.GetLobbyMemberLimit(l) - 1 &&
+                SteamMatchmaking.GetLobbyData(l, "gameStatus") != "In Game" &&
+                SteamMatchmaking.GetLobbyData(l, "LobbyVersion") == Application.version)
+            {
+                rc.button1.interactable = true;
+                button1ButtonHoverTween.enabled = true;
+                foreach (CanvasRenderer t in button1CanvasRenderer)
+                {
+                    t.SetAlpha(activatedOpacity);
+                }
+            }
+            
             rc.button1.onClick.AddListener(delegate { uiJoinLobby(l.m_SteamID); });
 
             i++;

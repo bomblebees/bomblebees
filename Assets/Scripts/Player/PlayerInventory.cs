@@ -11,8 +11,14 @@ public class PlayerInventory : NetworkBehaviour
     [Tooltip("Controls the max amount of bombs a player can carry for each bomb type")]
     [SerializeField] private int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
 
-    // A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
-    public readonly SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	[Tooltip("Ground item prefabs for spawning bombs on ground")]
+	[SerializeField] private GameObject groundItem_r;
+	[SerializeField] private GameObject groundItem_p;
+	[SerializeField] private GameObject groundItem_y;
+	[SerializeField] private GameObject groundItem_g;
+
+	// A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
+	public readonly SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
 
     // The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
     [SyncVar(hook=nameof(OnSelectedSlotChange))] public int selectedSlot = 0;
@@ -35,20 +41,74 @@ public class PlayerInventory : NetworkBehaviour
         // Get the index corresponding to the bomb type
         int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
 
-        // If the amount we want to add is larger than max values, then set the bomb quantity to max
-        if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
-        {
-            inventoryList[idx] = INVEN_MAX_VALUES[idx];
-        } else
-        {
-            // Otherwise add the amount
-            inventoryList[idx] += amt;
-        }
+		// Store the extra bombs (bomb amount - spaces left) so we can drop extras on the ground 
+		int fullInvOverflowValue = (inventoryList[idx] + amt) - INVEN_MAX_VALUES[idx];
+
+        
+		// First check if inventory for this bomb type isn't completely full:
+		if (!(inventoryList[idx] == INVEN_MAX_VALUES[idx]))
+		{
+			// If the amount we want to add is larger than max values, then set the bomb quantity to max
+			if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
+			{
+				inventoryList[idx] = INVEN_MAX_VALUES[idx];
+
+				if (inventoryList[idx] + amt != INVEN_MAX_VALUES[idx])
+				{
+					// Add conditional so that inventory add UI doesn't get displayed if inventory is already full
+					this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt - fullInvOverflowValue);
+				}
+				Debug.Log(fullInvOverflowValue);
+
+			}
+			else        // Otherwise simply add the amount to inv, don't drop anything
+			{
+				inventoryList[idx] += amt;
+
+				this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
+			}
+		}
+
+		// Otherwise, inventory is already full, drop all bombs on ground
+		for (int i = 0; i < fullInvOverflowValue; i++)
+		{
+			////
+			Vector3 randomTransform = this.gameObject.transform.position;
+			randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
+			randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
+			
+			switch (type)
+			{
+				case 'r':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_r, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+				case 'p':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_p, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+				case 'y':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_y, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+				case 'g':
+					NetworkServer.Spawn((GameObject)Instantiate(groundItem_g, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+					break;
+			}
+
+			
+			////
+		}
+
+		// if inventory is full, nothing gets added.
+
     }
 
 	public char[] GetBombTypes()
 	{
 		return INVEN_BOMB_TYPES;
+	}
+
+	public int[] GetMaxInvSizes()
+	{
+		return INVEN_MAX_VALUES;
 	}
 
     // Removes a bomb type from the inventory
@@ -78,12 +138,29 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
-    // Changes the selected slot to the next slot
+    // Changes the selected slot to the next available slot
+    // If no slots are available, does not move slot
     [Server] public void RotateSelectedSlot()
     {
+        // Start at current slot
+        int nextSlot = selectedSlot;
+
+        // Set it to the next available slot
+        for (int i = 1; i <= inventoryList.Count; i++)
+        {
+            // Set to next slot
+            nextSlot = selectedSlot + i;
+
+            // If past the last slot rotate back to the beginning
+            if (nextSlot >= inventoryList.Count) nextSlot = nextSlot - inventoryList.Count;
+
+            // If this slot has bombs, leave loop
+            if (inventoryList[nextSlot] > 0) break;
+        }
+
         // Increment selected slot, if at the last slot rotate back to the beginning
-        if (selectedSlot + 1 >= INVEN_BOMB_TYPES.Length) SwitchToSlot(0);
-        else SwitchToSlot(selectedSlot + 1);
+        if (nextSlot >= INVEN_BOMB_TYPES.Length) SwitchToSlot(0);
+        else SwitchToSlot(nextSlot);
     }
 
 	// Changes the selected swap to the hotkey button pressed
@@ -102,16 +179,6 @@ public class PlayerInventory : NetworkBehaviour
 
     [Client] private void OnInventoryChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
     {
-        //Debug.Log("inventory idx:" + idx + " changed from " + oldAmt + " to " + newAmt);
-
-        //string d = "Inventory: ";
-        //foreach (int q in inventoryList)
-        //{
-        //    d += q.ToString() + " ";
-        //}
-
-        //Debug.Log(d);
-
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
 

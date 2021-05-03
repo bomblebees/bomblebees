@@ -18,7 +18,7 @@ public class SludgeObject : TickObject
     {
         base.OnTriggerEnter(other);
         var gameObjHit = other.gameObject;
-        if (gameObjHit.CompareTag("ComboHitbox"))
+        if (gameObjHit.CompareTag("InterObjectHitbox"))
         {
             var _root = gameObjHit.transform.root.name;
             if (_root.Equals("Bomb Object(Clone)"))
@@ -33,10 +33,10 @@ public class SludgeObject : TickObject
             // {
             //     this.EarlyProc();
             // }
-            // else if (_root.Equals("Plasma Object(Clone)"))
-            // {
-            //     this.EarlyProc();
-            // }
+            else if (_root.Equals("Plasma Object(Clone)"))
+            {
+                 this.EarlyProc();
+            }
         }
     }
 }

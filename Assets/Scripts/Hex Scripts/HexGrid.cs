@@ -45,8 +45,23 @@ public class HexGrid : NetworkBehaviour
     private string hidden_Hex_Name = "HiddenHex";
     public GameObject terrain_Hex;
     private string terrain_Hex_Name = "TerrainHex";
+
     public GameObject default_Hex;
-    private string default_Hex_Name = "EmptyHex";
+    private string default_Hex_Name = "DefaultHex";
+    public GameObject r_Combo_Hex;
+    private string r_Combo_Hex_Name = "RedComboHex";
+    public GameObject g_Combo_Hex;
+    private string g_Combo_Hex_Name = "GreenComboHex";
+    public GameObject p_Combo_Hex;
+    private string p_Combo_Hex_Name = "PurpleComboHex";
+    public GameObject y_Combo_Hex;
+    private string y_Combo_Hex_Name = "YellowComboHex";
+    
+    static char r_Combo_Hex_char = '1';
+    static char g_Combo_Hex_char = '2';
+    static char p_Combo_Hex_char = '3';
+    static char y_Combo_Hex_char = '4';
+
     static char slow_Hex_char = '$';
     static char danger_Hex_char = '#';
     static char hidden_Hex_char = 'i';
@@ -243,6 +258,10 @@ public class HexGrid : NetworkBehaviour
 
             // Update the cell model 
             char newType = nonComboTileTypes[UnityEngine.Random.Range(0, nonComboTileTypes.Count)];
+
+            // Make sure terrain tiles are not generated
+            while (newType == 't') newType = nonComboTileTypes[UnityEngine.Random.Range(0, nonComboTileTypes.Count)];
+
             cell.SetKey(newType);
             cell.CreateModel(ReturnModelByCellKey(newType));
             if (isServer) colorGridList[idx] = newType;
@@ -319,6 +338,14 @@ public class HexGrid : NetworkBehaviour
                 return p_Hex;
             case 'w':
                 return w_Hex;
+            case '1':
+                return r_Combo_Hex;
+            case '2':
+                return g_Combo_Hex;
+            case '3':
+                return p_Combo_Hex;
+            case '4':
+                return y_Combo_Hex;
             case 't':
                 return terrain_Hex;
             case '-':
@@ -408,6 +435,10 @@ public class HexGrid : NetworkBehaviour
         var c = level.getArray()[z, x];
         if (ignoreRandomGenOnE && (level.getArray()[z, x] == GetDangerTileChar() ||
                                    level.getArray()[z, x] == GetEmptyTileChar() ||
+                                   level.getArray()[z, x] == GetRedComboTileChar() ||
+                                   level.getArray()[z, x] == GetGreenComboTileChar() ||
+                                   level.getArray()[z, x] == GetPurpleComboTileChar() ||
+                                   level.getArray()[z, x] == GetYellowComboTileChar() ||
                                    level.getArray()[z, x] == GetSlowTileChar() ||
                                    level.getArray()[z, x] == GetHiddenHexChar()))
         {
@@ -432,9 +463,31 @@ public class HexGrid : NetworkBehaviour
             yield break;
         }
 
-        cell.SetKey('e');
-        cell.CreateModel(ReturnModelByCellKey('e'));
-        colorGridList[cell.getListIndex()] = 'e';
+        // Instead of 'e', set to combo tile of respective type
+        if (cell.key == 'r')
+        {
+            cell.SetKey('1');
+            cell.CreateModel(ReturnModelByCellKey('1'));
+            colorGridList[cell.getListIndex()] = '1';
+        } else if (cell.key == 'g')
+        {
+            cell.SetKey('2');
+            cell.CreateModel(ReturnModelByCellKey('2'));
+            colorGridList[cell.getListIndex()] = '2';
+        } else if (cell.key == 'p')
+        {
+            cell.SetKey('3');
+            cell.CreateModel(ReturnModelByCellKey('3'));
+            colorGridList[cell.getListIndex()] = '3';
+        } else if (cell.key == 'y')
+        {
+            cell.SetKey('4');
+            cell.CreateModel(ReturnModelByCellKey('4'));
+            colorGridList[cell.getListIndex()] = '4';
+        }
+        // cell.SetKey('e');
+        // cell.CreateModel(ReturnModelByCellKey('e'));
+        // colorGridList[cell.getListIndex()] = 'e';
         yield return new WaitForSeconds(tileRegenDuration);
 
         char newKey = tileTypes[UnityEngine.Random.Range(0, tileTypes.Length)];
@@ -546,14 +599,14 @@ public class HexGrid : NetworkBehaviour
 
         if (comboCells.Count > 0)
         {
-            eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject);
+            eventManager.OnPlayerSwap(heldKey, oldKey, true, player.gameObject, comboCells.Count - 2);
             // player.GetComponent<PlayerInventory>().AddInventoryBomb(heldKey, comboCells.Count);
             // trying 1f instead of Count
-            player.GetComponent<PlayerInventory>().AddInventoryBomb(heldKey, 1);
+            player.GetComponent<PlayerInventory>().AddInventoryBomb(heldKey, comboCells.Count - 2);
         }
         else
         {
-            eventManager.OnPlayerSwap(heldKey, oldKey, false, player.gameObject);
+            eventManager.OnPlayerSwap(heldKey, oldKey, false, player.gameObject, 0);
         }
 
         ComboCallback(comboCells);
@@ -632,6 +685,25 @@ public class HexGrid : NetworkBehaviour
         return danger_Hex_char;
     }
 
+    public static char GetRedComboTileChar()
+    {
+        return r_Combo_Hex_char;
+    }
+    public static char GetGreenComboTileChar()
+    {
+        return g_Combo_Hex_char;
+    }
+    public static char GetPurpleComboTileChar()
+    {
+        return p_Combo_Hex_char;
+    }
+    public static char GetYellowComboTileChar()
+    {
+        return y_Combo_Hex_char;
+    }
+    
+
+    // Not in use, replaced with "Combo Made" Tiles of respective type
     public static char GetEmptyTileChar()
     {
         return default_Hex_char;
@@ -667,7 +739,10 @@ public class HexGrid : NetworkBehaviour
                 toDanger.Add(cell);
             }
             else if (
-                (cell.HasNeighborOf(slowSpawns) || (cell.GetKey() == GetEmptyTileChar() && cell.HasNeighborOf(allmisc) || cell.emptyNeighbors > 0))
+                (cell.HasNeighborOf(slowSpawns)
+                    || (cell.GetKey() == GetEmptyTileChar()
+                    && cell.HasNeighborOf(allmisc)
+                    || cell.emptyNeighbors > 0))
                      && !unchanging.Contains(cell.GetKey()))
             {
                 toSlow.Add(cell);

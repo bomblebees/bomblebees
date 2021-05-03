@@ -14,14 +14,10 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Player HUD")]
     [SerializeField] private TMP_Text playerName;
 
-    [SerializeField] private Image selectedHighlight;
-    [SerializeField] private Image[] invSlots = new Image[4];
-    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
-
     [SerializeField] private Image hexUI;
-    [SerializeField] private Image bombCooldownFilter;
     [SerializeField] public Image spinChargeBar;
-    private float bombHudTimer = 0;
+    [SerializeField] public GameObject spinUI;
+    [SerializeField] public GameObject inventoryUI;
 
     [Header("User Interface")]
     [SerializeField] private GameObject deathUI;
@@ -31,64 +27,72 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
 
+    [Header("Inventory")]
+    [SerializeField] private Image selectedHighlight;
+    [SerializeField] private Image[] invSlots = new Image[4];
+    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+    [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
+
     private Player player;
     private GameUIManager gameUIManager;
-    private BombHelper bombHelper;
 
     public override void OnStartClient()
     {
         base.OnStartClient();
 
+        // Turn off held hex and inventory UI for other players
+        if (!isLocalPlayer)
+        {
+            hexUI.gameObject.SetActive(false);
+            inventoryUI.gameObject.SetActive(false);
+
+            playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
+
+            //spinUI.SetActive(false);
+        }
+
         CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
 
+        UpdateInventoryQuantity();
 
         gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
 
-        bombHelper = gameUIManager.GetComponent<BombHelper>();
-
         player = this.GetComponent<Player>();
-
-        UpdateInventoryQuantity();
     }
+
+    bool spinChargeStarted = false;
+    float spinChargeTime = 0;
+    
 
     private void Update()
     {
-        if (!isLocalPlayer) return;
+        //if (!isLocalPlayer) return;
 
         // If player null, return
         if (!player) return;
 
-        UpdateSpinChargeBar();
+        if (player.spinHeld) { spinChargeStarted = true; }
+        else if (spinChargeStarted) { spinChargeTime = 0; spinChargeStarted = false; UpdateSpinChargeBar(); }
+
+        if (spinChargeStarted)
+        {
+            UpdateSpinChargeBar();
+        }
     }
 
     public void UpdateSpinChargeBar()
     {
         float[] spinTimes = player.spinTimings;
-        spinChargeBar.fillAmount = player.spinChargeTime / spinTimes[spinTimes.Length - 2];
+        spinChargeTime += Time.deltaTime;
+        spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 2];
     }
 
     public void OnPlayerTakeDamage(int _, int __, GameObject ___)
     {
-        if (isLocalPlayer) damageIndicator.GetComponent<FlashTween>().StartFlash();
-    }
-
-    public IEnumerator EnableDeathUI()
-    {
-        // WARN: lazy way to disable player after death, may still be able to place bombs
-        //playerModelsAndVfx.SetActive(false); 
-
-        //deathUI.SetActive(true);
-        yield return new WaitForSeconds(0);
-        //deathUI.SetActive(false);
-    }
-
-    public void EnableGameOverUI()
-    {
-        //deathUI.SetActive(false);
-        //gameOverUI.SetActive(true);
+        if (isLocalPlayer) damageIndicator.GetComponent<ColorTween>().StartTween();
     }
 
 
@@ -107,34 +111,12 @@ public class PlayerInterface : NetworkBehaviour
         playerName.color = player.GetComponent<Player>().playerColor;
     }
 
-    [Client]
-    public void UpdateInventoryQuantity()
-    {
-        SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
-
-        for (int i = 0; i < list.Count; i++)
-        {
-            invCounters[i].text = list[i].ToString();
-
-            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
-            else invSlots[i].color = new Color(1f, 1f, 1f);
-        }
-    }
-
-    [Client]
-    public void UpdateInventorySelected()
-    {
-        int selected = this.GetComponent<PlayerInventory>().selectedSlot;
-
-        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
-    }
-
     public void UpdateHexHud(char key)
     {
         hexUI.color = GetKeyColor(key);
 
         // Run bounce anim
-        hexUI.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
+        hexUI.gameObject.GetComponent<ScaleTween>().StartTween();
     }
 
     // get color associated with key
@@ -153,16 +135,39 @@ public class PlayerInterface : NetworkBehaviour
         }
     }
 
-    [Server]
-    public void StartBombHudCooldown(float duration)
+	[ClientRpc]
+    public void DisplayInventoryAdd(int slot, int amt)
     {
-        RpcStartBombHudCooldown(duration);
+        invAddTexts[slot].text = "+" + amt.ToString();
+        //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
+
+
+
+        invAddTexts[slot].GetComponent<AlphaTextTween>().StartTween();
+        invAddTexts[slot].GetComponent<MoveTween>().StartTween();
     }
 
-    [ClientRpc]
-    public void RpcStartBombHudCooldown(float duration)
+    public void UpdateInventoryQuantity()
     {
-        bombHudTimer = duration;
+        SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            invCounters[i].text = list[i].ToString();
+            // update color if stack is full
+            if (invCounters[i].text == "5") invCounters[i].color = Color.yellow;
+            else                            invCounters[i].color = Color.white;
+
+            if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
+            else invSlots[i].color = new Color(1f, 1f, 1f);
+        }
+    }
+
+    public void UpdateInventorySelected()
+    {
+        int selected = this.GetComponent<PlayerInventory>().selectedSlot;
+
+        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
     }
 
     #endregion

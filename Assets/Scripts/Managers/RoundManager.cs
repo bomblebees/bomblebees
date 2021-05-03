@@ -41,9 +41,11 @@ public class RoundManager : NetworkBehaviour
     public delegate void PlayerConnectedDelegate(PlayerInfo p);
     public delegate void RoundStartDelegate();
     public delegate void RoundEndDelegate(GameObject winner);
+	public delegate void PlayerEliminatedDelegate(GameObject eliminatedPlayer);
     public event PlayerConnectedDelegate EventPlayerConnected;
     public event RoundStartDelegate EventRoundStart;
     public event RoundEndDelegate EventRoundEnd;
+	public event PlayerEliminatedDelegate EventPlayerEliminated;
 
     // singletons
     public static RoundManager _instance;
@@ -131,7 +133,8 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public IEnumerator StartRoundTimer()
     {
-        yield return new WaitForSeconds(roundDuration);
+        // wait for round to end, - 1 second for start time delay
+        yield return new WaitForSeconds(roundDuration - 1);
 
         if (!CheckRoundEnd())
         {
@@ -177,6 +180,13 @@ public class RoundManager : NetworkBehaviour
         EventRoundEnd?.Invoke(winner);
     }
 
+	// Call this event when player gets eliminated, but for now not if player is last kill/in 1v1 duel (otherwise whistle plays)
+	[ClientRpc]
+	public void RpcPlayerEliminated(GameObject eliminatedPlayer)
+	{
+		EventPlayerEliminated?.Invoke(eliminatedPlayer);
+	}
+
     [Server]
     public IEnumerator ServerStartRound()
     {
@@ -199,6 +209,34 @@ public class RoundManager : NetworkBehaviour
     public IEnumerator ServerEndRound()
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
+        RpcShowEndCard();
+        
+        Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+        foreach (Button button in buttonList)
+        {
+            button.interactable = true;
+            button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
+        }
+    }
+
+    [SerializeField] private Canvas serverEndSelectionCanvas;
+
+    [ClientRpc]
+    private void RpcShowEndCard()
+    {
+        serverEndSelectionCanvas.enabled = true;
+    }
+    
+    [ClientRpc]
+    private void RpcShowLoadingScreen()
+    {
+        FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = true;
+    }
+
+    [Server]
+    public void ChooseReturnToLobby()
+    {
+        serverEndSelectionCanvas.enabled = false;
         eventManager.OnReturnToLobby(); // invoke event
 
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
@@ -206,7 +244,17 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
-    public void OnLivesChanged(int currentHealth, int _, GameObject __)
+    public void ChooseRematch()
+    {
+        RpcShowLoadingScreen();
+        serverEndSelectionCanvas.enabled = true;
+        NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        room.ServerChangeScene(room.RoomScene);
+        room.ServerChangeScene(room.GameplayScene);
+    }
+
+    [Server]
+    public void OnLivesChanged(int currentHealth, int _, GameObject player)
     {
         if (currentHealth < 1)
         {
@@ -223,8 +271,12 @@ public class RoundManager : NetworkBehaviour
             // update alive count
             aliveCount = alivePlayers.Count;
 
-            // check if the round has ended
-            CheckRoundEnd();
+			Debug.Log(player.name);
+
+			// check if the round has ended
+			CheckRoundEnd();
+			EventPlayerEliminated?.Invoke(player);
+			
         }
     }
 
@@ -269,6 +321,15 @@ public class RoundManager : NetworkBehaviour
         {
             // There was a tie (we can check further win conditions here, ex. player with most combos)
             return null;
+        }
+    }
+
+    private void Update()
+    {
+        // TODO: Delete later
+        if (Input.GetKeyDown(KeyCode.Alpha0) && FindObjectOfType<Player>().debugMode)
+        {
+            ChooseRematch();
         }
     }
 }

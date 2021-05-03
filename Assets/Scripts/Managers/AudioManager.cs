@@ -7,6 +7,7 @@ using System.Collections.Generic;
 public class AudioManager : NetworkBehaviour
 {
     private EventManager eventManager;
+	private RoundManager roundManager;
 
     [ServerCallback]
     public override void OnStartServer()
@@ -14,13 +15,25 @@ public class AudioManager : NetworkBehaviour
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
+		roundManager = RoundManager.Singleton;
+		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
         eventManager.EventPlayerSwap += ServerPlayComboSound;
         eventManager.EventBombPlaced += RpcPlayPlaceSound;
         eventManager.EventEndRound += ServerPlayerWhistleSound;
         eventManager.EventPlayerSpin += RpcPlayHitSound;
+
+		Debug.Log("eventManager: " + eventManager);
+		Debug.Log("roundManager: " + roundManager);
+		// wanted to try subscribing to an event in RoundManager instead of EventManager for player eliminated sound
+		// The other way would be to put the event in EventManager instead of RoundManager and invoke in RoundManager?
+
+		roundManager.EventPlayerEliminated += RpcPlayPlayerEliminatedSound;
     }
 
-    [System.Serializable]
+
+
+	[System.Serializable]
     public class Sound
     {
         public string name;
@@ -76,29 +89,81 @@ public class AudioManager : NetworkBehaviour
     }
 
     [Server]
-    public void ServerPlayComboSound(char oldKey, char newKey, bool combo, GameObject player)
+    public void ServerPlayComboSound(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
     {
-        if (combo) RpcPlayComboSound(oldKey);
+        if (combo) RpcPlayComboSound(oldKey, numBombsAwarded, player);
 
         // For specific combo noises, add switch statement here.
         // Use variable oldKey to determine what color combo was made
     }
 
     [ClientRpc]
-    public void RpcPlayComboSound(char comboKey)
+    public void RpcPlayComboSound(char comboKey, int numBombs, GameObject player)
     {
-        PlaySound("comboCreation");
+		// if the client player game object is local player (name gets changed on client start in Player)
+		if (player.name == "LocalPlayer")
+		{
+			// play different bomb sounds for different size combo
+			switch (numBombs)
+			{
+				case 1:
+					PlaySound("comboCreation1");
+					break;
+				case 2:
+					PlaySound("comboCreation2");
+					break;
+				case 3:
+					PlaySound("comboCreation3");
+					break;
+				default:
+					PlaySound("comboCreation3");
+					break;
+			}
+			// PlaySound("comboCreation");
+		}
     }
 
     [ClientRpc]
     public void RpcPlayPlaceSound(GameObject bomb, GameObject player)
     {
-        PlaySound("bombPlace");
+		// Play different bomb sound for different component (bomb) type
+
+		if (bomb.TryGetComponent(out BombObject bombComponent)) {
+			// "Kickable" bomb placed, play respective play sound type
+			PlaySound("bombPlace");
+		}
+		else if (bomb.TryGetComponent(out SludgeObject sludgeComponent))
+		{
+			// Deployable placed, play deployable sound fx
+			PlaySound("bombPlace");
+		}
+		else if (bomb.TryGetComponent(out LaserObject laserComponent))
+		{
+			// Deployable placed, play deployable sound fx
+			PlaySound("deployablePlace");
+		}
+		else if (bomb.TryGetComponent(out PlasmaObject plasmaComponent))
+		{
+			// Deployable placed, play deployable sound fx
+			PlaySound("deployablePlace");
+		}
+		else
+		{
+			// Play default sound if type is none of these
+			PlaySound("bombPlace");
+		}
     }
 
-    [Server] public void ServerPlayerWhistleSound(List<Player> players) { RpcPlayWhistleSound(); }
+	[Server] public void ServerPlayerWhistleSound(List<Player> players) { RpcPlayWhistleSound(); }
 
-    [ClientRpc]
+	[ClientRpc]
+	public void RpcPlayPlayerEliminatedSound(GameObject eliminatedPlayer)
+	{
+		Debug.Log("Play player eliminated sound");
+		PlaySound("playerEliminated");
+	}
+
+	[ClientRpc]
     public void RpcPlayWhistleSound()
     {
         PlaySound("endWhistle");

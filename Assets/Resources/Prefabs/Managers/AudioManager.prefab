@@ -71,8 +71,20 @@ MonoBehaviour:
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
-  - name: comboCreation
-    clip: {fileID: 8300000, guid: ea81a75b060b34b48b0996dc23deb882, type: 3}
+  - name: comboCreation1
+    clip: {fileID: 8300000, guid: b7b41b710997be346a881dc73f71457d, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: comboCreation2
+    clip: {fileID: 8300000, guid: d1bb416708d61db47b86423d567c94d8, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: comboCreation3
+    clip: {fileID: 8300000, guid: ef8d643b285cb864999f1fd0c7afa4d9, type: 3}
     volume: 0.5
     pitch: 1
     spatialBlend: 0
@@ -83,9 +95,21 @@ MonoBehaviour:
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
+  - name: deployablePlace
+    clip: {fileID: 8300000, guid: f90cba37747177c44afdda1a6e0a2297, type: 3}
+    volume: 0.55
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
   - name: endWhistle
     clip: {fileID: 8300000, guid: 5892a90067e096542b86af45e840da77, type: 3}
     volume: 0.75
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerEliminated
+    clip: {fileID: 8300000, guid: b2c3a5388b8b47442a3583106b4ddc47, type: 3}
+    volume: 0.6
     pitch: 1
     spatialBlend: 0
     source: {fileID: 0}
@@ -169,6 +193,18 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: inventorypop
     clip: {fileID: 8300000, guid: ab577ff59dc9d944f998e1b1b3bae396, type: 3}
+    volume: 0.35
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: timer_warning
+    clip: {fileID: 8300000, guid: d4d6486cc1bd022438729b9ac996b501, type: 3}
+    volume: 0.35
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: timer_countdown
+    clip: {fileID: 8300000, guid: fae7dce3bca242c428de6ea559de40a9, type: 3}
     volume: 0.35
     pitch: 1
     spatialBlend: 0

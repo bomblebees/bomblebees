@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class TickObject : ComboObject
 {
+
+    private bool tickStarted = false;
     
     public override void OnStartClient()
     {
@@ -14,8 +16,6 @@ public class TickObject : ComboObject
     public virtual void _Start(GameObject player)
     {
         base._Start(player);
-        base.ReadyFillShader();
-        StartCoroutine(TickDown());
     }
     
     public override void OnStartServer()
@@ -34,6 +34,13 @@ public class TickObject : ComboObject
     
     protected virtual IEnumerator TickDown()
     {
+        tickStarted = true;
+        base.EnableBeepSFX();
+        base.ReadyFillShader();
+        // "Toggle on" radial timer
+            // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
+            // bombRadialTimerImage.transform.localScale *= 1.25f;
+        this.bombRadialTimerImage.color = new Vector4(1,1,1,1);
         if (!didEarlyEffects)
         {
             if (ownerIsQueen)
@@ -65,7 +72,7 @@ public class TickObject : ComboObject
     {
         FindCenter();
         GoToCenter();
-        StartCoroutine((ProcEffects()));
+        ProcEffects();
         if (!didEarlyEffects)
         {
             yield return new WaitForSeconds(lingerDuration);
@@ -78,10 +85,10 @@ public class TickObject : ComboObject
         // TO DEFINE IN EACH BOMB TYPE
     }
 
-    public virtual IEnumerator ProcEffects()
+    public void ProcEffects()
     {
         print("Proccing");
-        yield return new WaitForSeconds(0);
+        // yield return new WaitForSeconds(0.01f);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
@@ -95,15 +102,20 @@ public class TickObject : ComboObject
     public virtual void EarlyProc()
     {
         if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep"); // TODO do something like "StopPlaying(objectSound)"
+		if (didEarlyEffects)
+		{
+			return;
+		}
         didEarlyEffects = true;
         FindCenter();
         GoToCenter();
-        StartCoroutine(ProcEffects());
+        ProcEffects();
     }
 
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
+        if (!tickStarted) StartCoroutine(TickDown());
         bool result = base.Push(edgeIndex, triggeringPlayer);
         if (result)
         {

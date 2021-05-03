@@ -18,17 +18,20 @@ public class ComboObject : NetworkBehaviour
     public GameObject hitBox;
     public Collider collider;
     [SerializeField] public GameObject SFX;
+    [SerializeField] public GameObject BeepSFX;
     public Image bombRadialTimerImage;
     
     protected bool isMoving = false;  // isMoving: Whether or not the object is moving after being pushed
     [Header("Properties", order = 2)] public float travelDistanceInHexes = 4;
     protected float pushedDirAngle = 30;
-    public float lerpRate = 0.9f;  // The speed at which the object is being pushed
+    public float lerpRate = 0.15f;  // The speed at which the object is being pushed
+    public float lerpRateSecondary = 0.50f;
     public Vector3 targetPosition;  // The position that the tile wants to move to after being pushed
     public float snapToCenterThreshold = 0.5f;
     
     public Vector3 nearestCenter;
     public HexCell tileUnderneath;
+    public int edgeIndexCached = 0;
 
     public float vfxDuration = 4f;
     public float sfxDuration = 4f;
@@ -95,6 +98,7 @@ public class ComboObject : NetworkBehaviour
     {
         if (this.isMoving)
         {
+            
             this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
@@ -109,6 +113,22 @@ public class ComboObject : NetworkBehaviour
                     RpcStopMoving();
                 }
             }
+            else  // check if next tile is empty
+            {
+                if (FindCenter())  // defer check to whenever entering a new tile
+                {
+                    var possiblePosition = nearestCenter + HexMetrics.edgeDirections[edgeIndexCached] * HexMetrics.hexSize * 1;
+                    var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 40f, 0f), Vector3.down);
+                    RaycastHit otherObjectHit;
+                    if (Physics.Raycast(checkForObjectRay, out otherObjectHit, 100f,
+                            1 << LayerMask.NameToLayer("ComboObjects"))) // found bomb, now stop
+                    {
+                        lerpRate = lerpRateSecondary;
+                        targetPosition = nearestCenter;
+                    }
+                }
+                
+            }
         }
     }
 
@@ -121,8 +141,9 @@ public class ComboObject : NetworkBehaviour
     }
 
     [Server]
-    protected virtual void FindCenter() 
+    protected virtual bool FindCenter()
     {
+        bool foundNew = false;
         var objectRay = new Ray(this.gameObject.transform.position, Vector3.down);
         RaycastHit tileUnderneathHit;
         if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
@@ -130,9 +151,11 @@ public class ComboObject : NetworkBehaviour
             tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
             var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
             // var result = GetComponent<Transform>().position;
+            if (nearestCenter != result) foundNew = true;
             nearestCenter = result;
             RpcFindCenter(result, this.gameObject.transform.position);
         }
+        return foundNew;
     }
     
     // Tell all clients the nearest center as calculated by the server
@@ -168,9 +191,13 @@ public class ComboObject : NetworkBehaviour
             var objectRay = new Ray(origin, Vector3.down);
             RaycastHit tileUnderneathHit;
             var status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles"));
+			
             if (!status)
             {
-                status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("SlowHex"));
+				// status = Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("SlowHex"));
+				
+				// Status false means collider hit wasn't a base tile
+				// return origin;
             }
             // if (!status)
             // {
@@ -178,7 +205,7 @@ public class ComboObject : NetworkBehaviour
             // }
             if (status) {
                 // var tileBelowOrigin = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
-                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position ;
+                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
                 return result;
             }
             else return origin;
@@ -239,6 +266,14 @@ public class ComboObject : NetworkBehaviour
         }
     }
 
+    protected virtual void EnableBeepSFX()
+    {
+        if (BeepSFX)
+        {
+            BeepSFX.SetActive(true);
+        }
+    }
+
     protected virtual IEnumerator EnableHitbox()
     {
         hitBox.SetActive(true);
@@ -285,14 +320,16 @@ public class ComboObject : NetworkBehaviour
         {
             targetPosition = this.gameObject.transform.position;  // Safety, in the event that no possible tiles are found.
             // float lerpScaleRate = 1/travelDistanceInHexes;
+            edgeIndexCached = edgeIndex;
             for (var tileOffset = 1; tileOffset < travelDistanceInHexes; tileOffset++)
             {
                 var possiblePosition = gameObject.transform.position +
                                        HexMetrics.edgeDirections[edgeIndex] * HexMetrics.hexSize * tileOffset; 
+;
+                
                 // if works then change targetPosition
                 var checkForEmptyRay = new Ray(possiblePosition, Vector3.down);
                 var checkForObjectRay = new Ray(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down);
-                // Debug.DrawRay(possiblePosition + new Vector3(0f, 20f, 0f), Vector3.down * 20, Color.cyan, 2, true);
                 RaycastHit tileUnderneathHit;
                 RaycastHit otherObjectHit;
                 if (Physics.Raycast(checkForEmptyRay, out tileUnderneathHit, 10f, 1 << LayerMask.NameToLayer("BaseTiles"))  // if raycast hit basetile, break
@@ -322,6 +359,11 @@ public class ComboObject : NetworkBehaviour
 
         if (other.gameObject.CompareTag("Spin"))
         {
+            // "Toggle on" radial timer
+            // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
+            // bombRadialTimerImage.transform.localScale *= 1.25f;
+            // bombRadialTimerImage.color = new Vector4(1,1,1,1);
+
             var playerPosition = other.transform.parent.gameObject.transform.position;
             // note: Don't use Vector3.Angle
             var angleInRad = Mathf.Atan2(playerPosition.x - transform.position.x,
@@ -332,6 +374,7 @@ public class ComboObject : NetworkBehaviour
 
             pushedDirAngle = 30f;
             int edgeIndex;
+
             for (edgeIndex = 0; edgeIndex < HexMetrics.edgeAngles.Length; edgeIndex++)
             {
                 if (Mathf.Abs(dirFromPlayerToThis - HexMetrics.edgeAngles[edgeIndex]) <= 30)
@@ -407,6 +450,10 @@ public class ComboObject : NetworkBehaviour
         else
             fillShaderRate = 1 / (startupDelay * fillShaderRatio);
         this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
+        // "Toggle on" radial timer
+            // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
+            // bombRadialTimerImage.transform.localScale *= 1.25f;
+        // bombRadialTimerImage.color = new Vector4(1,1,1,1);
     }
 
     protected virtual void StepFillShader()
@@ -429,7 +476,8 @@ public class ComboObject : NetworkBehaviour
             {
                 angle += (60 - remainder);
             }
-    
+
+            if (angle < 0) angle = 300f;  // for edge case where it rounds to -60, which is out of bounds
             return angle;
         }
 }

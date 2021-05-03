@@ -3,8 +3,13 @@ using UnityEngine;
 
 public class GlobalSettings : MonoBehaviour
 {
+    [Header("Canvas")]
+    [SerializeField] private Canvas mainCanvas;
+    [SerializeField] private Canvas keyBindingsCanvas;
+    
+    [Header("Others")]
     [SerializeField] private TMP_Text textFullscreen;
-
+    
     private void Start()
     {
         UpdateFullscreenText();
@@ -53,6 +58,12 @@ public class GlobalSettings : MonoBehaviour
                 textFullscreen.text = "Fullscreen: Error";
                 break;
         }
+    }
+
+    public void ToggleKeyBindingsCanvas()
+    {
+        mainCanvas.gameObject.SetActive(!mainCanvas.gameObject.activeSelf);
+        keyBindingsCanvas.enabled = !keyBindingsCanvas.enabled;
     }
 
     public void OnClickQuitGameButton()

@@ -8,12 +8,7 @@ using UnityEngine;
 // - TickDown() to not 
 public class LaserObject : TriggerObject
 {
-    public float breakdownDuration = 3f;
-    private bool isRotating = false;
 	private bool isActivated = false;
-    private float targetAngle = 0f;
-    private float startAngle;
-    public float rotateLerpRate = 0.15f;
 
     public GameObject arrowUI;
 	public GameObject chargeSFX;
@@ -32,36 +27,33 @@ public class LaserObject : TriggerObject
 			chargeSFX.SetActive(true);
 		}
 
-        UpdateLaserDirection(edgeIndex, triggeringPlayer);
+        GetSpunDirection(edgeIndex, triggeringPlayer, true);
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
 
-    protected virtual void UpdateLaserDirection(int edgeIndex, GameObject triggeringPlayer)
-    {
-        // get angle from player
-        Vector3 dir = triggeringPlayer.transform.position - transform.position;
-        dir = triggeringPlayer.transform.InverseTransformDirection(dir);
-        float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-        // angle = Mathf.Rad2Deg(angle);
-        angle += 90f;
-        float[] roundTo = new float[]{-60f, 0f, 60f, 120f, 180f, 240f, 300f};
-        targetAngle = RoundAngleToHex(angle);
-
-
-        startAngle = model.transform.eulerAngles.y;
-        if (Math.Abs(startAngle - targetAngle) > 180)
-        {
-            if (startAngle > targetAngle) targetAngle += 360f;
-            startAngle += 360f;
-        }
-        print(startAngle+" GOING TO "+targetAngle);
-
-        // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
-        // targetAngle = angle;
-        isRotating = true;
-        this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
-        this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles = new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex]+270f);
-    }
+    // protected virtual void UpdateLaserDirection(int edgeIndex, GameObject triggeringPlayer)
+    // {
+    //     // get angle from player
+    //     Vector3 dir = triggeringPlayer.transform.position - transform.position;
+    //     dir = triggeringPlayer.transform.InverseTransformDirection(dir);
+    //     
+    //     float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+    //     angle += 90f;
+    //     targetAngle = RoundAngleToHex(angle);
+    //
+    //     startAngle = model.transform.eulerAngles.y;
+    //     if (Math.Abs(startAngle - targetAngle) > 180)
+    //     {
+    //         if (startAngle > targetAngle) targetAngle += 360f;
+    //         startAngle += 360f;
+    //     }
+    //
+    //     // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
+    //     // targetAngle = angle;
+    //     isRotating = true;
+    //     this.gameObject.GetComponent<Transform>().transform.Find("Hitbox").transform.eulerAngles = new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
+    //     this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles = new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex]+270f);
+    // }
 
     protected virtual float RoundAngleToHex(float angle)
     {
@@ -84,14 +76,18 @@ public class LaserObject : TriggerObject
     {
         base.OnTriggerEnter(other);
         var gameObjHit = other.gameObject;
-        if (gameObjHit.CompareTag("ComboHitbox"))
+        if (gameObjHit.CompareTag("InterObjectHitbox"))
         {
             var _root = gameObjHit.transform.root.name;
             if (_root.Equals("Bomb Object(Clone)"))
             {
                 StartCoroutine(Breakdown());
             }
-        }
+			if (_root.Equals("Laser Object(Clone)"))
+			{
+				StartCoroutine(Breakdown());
+			}
+		}
     }
     
     protected virtual void Update()
@@ -119,14 +115,5 @@ public class LaserObject : TriggerObject
         }
     }
     
-    public IEnumerator Breakdown()
-    {
-        didEarlyEffects = true;
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
-        // play breakdown anim here
-        NotifyOccupiedTile(false);
-        yield return new WaitForSeconds(breakdownDuration);
-        DestroySelf();
-    }
+
 }

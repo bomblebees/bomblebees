@@ -45,6 +45,7 @@ public class PulseObject : TickObject
         }
     }
     
+	/*
     public override IEnumerator ProcEffects()
     {
         yield return new WaitForSeconds(0);
@@ -58,6 +59,7 @@ public class PulseObject : TickObject
         StartCoroutine(DisableObjectModel());
         NotifyOccupiedTile(false);
     }
+	*/
 
     public IEnumerator PulseCell(HexCell cell, float hitboxDuration)
     {

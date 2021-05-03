@@ -7,6 +7,9 @@ using Steamworks;
 
 public class SteamNetworkManager : NetworkRoomManagerExt
 {
+    // Temp list of player colors
+    private Color[] listColors = { Color.red, Color.blue, Color.yellow, Color.green };
+
     /// <summary>
     /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
     /// This is the ideal point to pass any data like player name, credentials, tokens, colors, etc.
@@ -20,7 +23,8 @@ public class SteamNetworkManager : NetworkRoomManagerExt
         // transfer steam id to player
         gamePlayer.GetComponent<Player>().steamId = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId;
         gamePlayer.GetComponent<Player>().steamName = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamUsername;
-        gamePlayer.GetComponent<Player>().playerColor = roomPlayer.GetComponent<NetworkRoomPlayerExt>().playerColor;
+        gamePlayer.GetComponent<Player>().playerColor = listColors[roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode];
+        gamePlayer.GetComponent<Player>().characterCode = roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode;
 
         return true;
     }
@@ -36,10 +40,6 @@ public class SteamNetworkManager : NetworkRoomManagerExt
         {
             AssignRoomPlayerSteamInfo(newRoomGameObject, UInt64.Parse(conn.address));
         }
-
-
-        //return newRoomGameObject;
-        //Debug.Log("SERVER ADD PLAYER " + conn.address);
 
         return newRoomGameObject;
     }
@@ -82,20 +82,20 @@ public class SteamNetworkManager : NetworkRoomManagerExt
 
     public override void OnRoomServerPlayersReady()
     {
-        foreach(NetworkRoomPlayerExt p in roomSlots)
-        {
-            showStartButton = true;
-            p.UpdateLobbyList();
-        }
+        showStartButton = true;
+        //foreach (NetworkRoomPlayerExt p in roomSlots)
+        //{
+        //    //p.UpdateLobbyList();
+        //}
     }
 
     public override void OnRoomServerPlayersNotReady()
     {
-        foreach (NetworkRoomPlayerExt p in roomSlots)
-        {
-            showStartButton = false;
-            p.UpdateLobbyList();
-        }
+        showStartButton = false;
+        //foreach (NetworkRoomPlayerExt p in roomSlots)
+        //{
+        //    //p.UpdateLobbyList();
+        //}
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)

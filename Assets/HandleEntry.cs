@@ -25,11 +25,11 @@ public class HandleEntry : MonoBehaviour
             if (gameObjHit.CompareTag("Player"))
             {
                 print("hi1");
-                SetPlayerEntry(other, true); // This needs to run before the invisibleBlocker scans for collision
+                // SetPlayerEntry(other, true); // This needs to run before the invisibleBlocker scans for collision
             }
-
-            invisibleBlocker.gameObject.SetActive(true); // only enable after collision has been disabled for anyone who needs it
-            allowingEntry = false;
+            invisibleBlocker.gameObject.SetActive(false);
+            // invisibleBlocker.gameObject.SetActive(true); // only enable after collision has been disabled for anyone who needs it
+            // allowingEntry = false;
         }
     }
 
@@ -40,7 +40,8 @@ public class HandleEntry : MonoBehaviour
         if (gameObjHit.CompareTag("Player"))
         {
             print("hi2");
-            SetPlayerEntry(other, false);
+            invisibleBlocker.gameObject.SetActive(true);
+            // SetPlayerEntry(other, false);
             // Physics.IgnoreCollision(gameObjHit.GetComponent<CapsuleCollider>(), this.GetComponent<SphereCollider>(),
             //     true);
         }
@@ -50,12 +51,13 @@ public class HandleEntry : MonoBehaviour
     {
         print("hi3");
         if (!playerCollider) Debug.LogError("HandleEntry.cs: Need to update collider type of plaer");
-        Physics.IgnoreCollision(playerCollider, invisibleBlocker, val);
-        canGetIn = val;
+        // Physics.IgnoreCollision(playerCollider, invisibleBlocker, val);
+        // invisibleBlocker.gameObject.SetActive(true);
+        // canGetIn = val;
     }
 
     public virtual void Restart()
     {
-        allowingEntry = true;
+        // allowingEntry = true;
     }
 }

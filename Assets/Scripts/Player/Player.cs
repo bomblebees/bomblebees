@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public ulong steamId = 0; // unique steam id
     [SyncVar] public ulong playerId = 0; // unique player id
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
+    [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
 
     // Assets
@@ -40,16 +41,7 @@ public class Player : NetworkBehaviour
     public float invincibilityDuration = 2.0f;
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
-
-    [Header("Input")]
-    [SerializeField] public string swapKey = "space";
-    [SerializeField] public string spinKey = "o";
-    [SerializeField] public string bombKey = "j";
-    [SerializeField] public string rotateKey = "left shift";
-	[SerializeField] public string slot1 = "1";
-	[SerializeField] public string slot2 = "2";
-	[SerializeField] public string slot3 = "3";
-	[SerializeField] public string slot4 = "4";
+    
 
 	[SerializeField] public float defaultBombCooldown = 3f;
     private float defaultBombUseTimer = 0f;
@@ -133,6 +125,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject playerModel;
     [SerializeField] private GameObject ghostModel;
     [NonSerialized] public Quaternion rotation;
+    [SerializeField] private GameObject highlightModel;
 
     public bool isDead = false; // when player has lost ALL lives
     //public bool isFrozen = true; // cannot move, but can rotate
@@ -143,8 +136,8 @@ public class Player : NetworkBehaviour
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
     {
-        base.OnStartLocalPlayer();
         gameObject.name = "LocalPlayer";
+        base.OnStartLocalPlayer();
     }
 
     public override void OnStartClient()
@@ -160,6 +153,8 @@ public class Player : NetworkBehaviour
         // Set player color
         playerMesh = playerModel.transform.GetChild(0).gameObject;
         playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
+        // Disable tile highlight outline
+        if (isLocalPlayer) highlightModel.active = true;
     }
 
     public override void OnStartServer()
@@ -204,7 +199,12 @@ public class Player : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
-
+        // TODO: Delete later
+        if (Input.GetKeyDown(KeyCode.Alpha9) && debugMode)
+        {
+            SpawnDefaultBomb();
+        }
+        
         if (timeSinceSludged < 0 && sludgeEffectStarted)
         {
             sludgeEffectStarted = false;
@@ -338,7 +338,7 @@ public class Player : NetworkBehaviour
     void ListenForBombUse()
     {
         // raycast down to check if tile is occupied
-        if (Input.GetKeyDown(bombKey) && (this.canExitInvincibility || this.canPlaceBombs))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Place) && (this.canExitInvincibility || this.canPlaceBombs))
         {
             ExitInvincibility();
             CmdBombUse();
@@ -348,13 +348,17 @@ public class Player : NetworkBehaviour
     public int spinPower = 1;
     private float startSpinTime = 0f;
     public float spinChargeTime = 0f;
-    private bool spinHeld = false;
+
+    [SyncVar] public bool spinHeld = false;
+    [Command] private void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [SerializeField] public float[] spinTimings = {0.5f, 1.0f, 1.5f, 2.0f};
+    // [SerializeField] public float[] spinTimings = {0.0f, 0.5f, 1.0f, 1.5f, 2.0f};
     [SerializeField] private int[] spinPowerDist = {1, 2, 3, 4};
     [SerializeField] private float spinScalar = 1f;
 
     // trash variables sry
+    private bool spinChargeLevel0Hit = false; // for initial hit
     private bool spinChargeLevel1Hit = false;
     private bool spinChargeLevel2Hit = false;
     private bool spinChargeLevel3Hit = false;
@@ -364,51 +368,62 @@ public class Player : NetworkBehaviour
     {
         if (!canSpin) return;
 
-        if (Input.GetKey(spinKey) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
+        // When key is pressed down
+        if (KeyBindingManager.GetKey(KeyAction.Spin) && spinChargeTime < spinTimings[spinTimings.Length - 1]) {
             if (!spinHeld)
             {
                 spinScalar = 0.5f;
                 startSpinTime = Time.time;
 
+                spinChargeLevel0Hit = false;
                 spinChargeLevel1Hit = false;
                 spinChargeLevel2Hit = false;
                 spinChargeLevel3Hit = false;
 
-                spinHeld = true;
+                CmdSetSpinHeld(true);
             }
 
             spinChargeTime += Time.deltaTime;
+
+
+            // HERE
+
+            if (!spinChargeLevel0Hit)
+            {
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+                // CmdSetSpinChargeFlashEffect(10f, 0.2f);
+                spinChargeLevel0Hit = true;
+            }
+
 
             // Play anims and sounds
             if (!spinChargeLevel1Hit && spinChargeTime > spinTimings[0])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge2");
-                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.4f);
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+                CmdSetSpinChargeFlashEffect(10f, 0.4f);
                 spinChargeLevel1Hit = true;
             }
 
             if (!spinChargeLevel2Hit && spinChargeTime > spinTimings[1])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge3");
-                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 15f);
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.8f);
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+                CmdSetSpinChargeFlashEffect(15f, 0.8f);
                 spinChargeLevel2Hit = true;
             }
 
             if (!spinChargeLevel3Hit && spinChargeTime >= spinTimings[2])
             {
                 FindObjectOfType<AudioManager>().PlaySound("spinCharge4");
-                this.GetComponent<PlayerInterface>().spinChargeBar.gameObject.GetComponent<IconBounceTween>().OnTweenStart();
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 20f);
-                playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 1.2f);
+                this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+                CmdSetSpinChargeFlashEffect(20f, 1.2f);
                 spinChargeLevel3Hit = true;
             }
         }
 
-        if (Input.GetKeyUp(spinKey) && spinHeld)
+        // When key is let go
+        if (KeyBindingManager.GetKeyUp(KeyAction.Spin))
         {
             for (int i = 0; i < spinTimings.Length; i++)
             {
@@ -434,18 +449,32 @@ public class Player : NetworkBehaviour
 
     }
 
-    public void ResetSpinCharge()
+    [Command] public void CmdSetSpinChargeFlashEffect(float flashSpeed, float glowAmt)
     {
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
-        spinScalar = 1f;
-        spinChargeTime = 0f;
-        spinHeld = false;
+        RpcSetSpinChargeFlashEffect(flashSpeed, glowAmt);
     }
 
+    [ClientRpc] public void RpcSetSpinChargeFlashEffect(float flashSpeed, float glowAmt)
+    {
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeed);
+        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmt);
+    }
+
+    public void ResetSpinCharge()
+    {
+        CmdSetSpinChargeFlashEffect(0f, 0f);
+        spinScalar = 1f;
+        spinChargeTime = 0f;
+        CmdSetSpinHeld(false);
+    }
 
     [Command]
     void CmdBombUse(NetworkConnectionToClient sender = null)
+    {
+        BombUse(sender);
+    }
+
+    void BombUse(NetworkConnectionToClient sender)
     {
         Ray tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
@@ -459,7 +488,9 @@ public class Player : NetworkBehaviour
 
                 char bombType = inv.GetSelectedBombType(); // get the currently selected bomb type
 
-                if (bombType == 'e') return; // if selected bomb type empty, return
+                // if (bombType == 'e') return; // removed for new combo tiles
+                if (bombType == 'e' || bombType == '1'|| bombType == '2'|| bombType == '3' || bombType == '4')
+                    return; // if selected bomb type empty, return
 
                 inv.RemoveInventoryBomb(bombType); // Subtract the bomb type from the player inventory by 1
 
@@ -801,7 +832,7 @@ public class Player : NetworkBehaviour
     [Client]
     void ListenForSwapping()
     {
-        if (Input.GetKeyDown(swapKey) && (this.canExitInvincibility || this.canSwap))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Swap) && (this.canExitInvincibility || this.canSwap))
         {
             ExitInvincibility();
             tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
@@ -860,42 +891,44 @@ public class Player : NetworkBehaviour
             // Debug.Log("hit");
 
             // Apply indicator to hex tile to show the tile selected
-            if (selectedTile)
-                selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+            // if (selectedTile)
+            //     selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f); // toggles off prev selected
+            
             selectedTile = tileHit.transform.gameObject;
-            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 1f);
+            // selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);    // toggle on current
+            highlightModel.transform.position = new Vector3(selectedTile.transform.position.x, -5.8f, selectedTile.transform.position.z);
         }
-        else
-        {
-            selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
-        }
+        // else
+        // {
+        //     selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+        // }
     }
 
     // Listens for key press and rotates the item stack
     [Client]
     void ListenForBombRotation()
     {
-		if (Input.GetKeyDown(rotateKey))
+		if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext))
         {
             CmdRotateItemStack();
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot1))
+		if (KeyBindingManager.GetKeyDown(KeyAction.BigBomb))
 		{
 			CmdSelectItemSlot(0);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot2))
+		if (KeyBindingManager.GetKeyDown(KeyAction.SludgeBomb))
 		{
 			CmdSelectItemSlot(1);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot3))
+		if (KeyBindingManager.GetKeyDown(KeyAction.LaserBeem))
 		{
 			CmdSelectItemSlot(2);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 		}
-		if (Input.GetKeyDown(slot4))
+		if (KeyBindingManager.GetKeyDown(KeyAction.PlasmaBall))
 		{
 			CmdSelectItemSlot(3);
 			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
@@ -909,10 +942,11 @@ public class Player : NetworkBehaviour
     }
 
 	[Command]
-	public void CmdSelectItemSlot(int index)
+	public void CmdSelectItemSlot(int index, NetworkConnectionToClient sender = null)
 	{
 		this.GetComponent<PlayerInventory>().SwitchToSlot(index);
-	}
+        //BombUse(sender);
+    }
 
     [Server]
     public void ClearItemStack(bool val = true)

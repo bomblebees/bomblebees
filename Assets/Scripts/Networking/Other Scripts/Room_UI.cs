@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mirror;
-using Steamworks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Room_UI : MonoBehaviour
@@ -17,14 +13,22 @@ public class Room_UI : MonoBehaviour
 
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
-    [SerializeField] private GameObject screenBombList;
+    [SerializeField] private GameObject screenControls;
+    [Header("Opacity Configuration")]
+    [Range(0f, 1f)]
+    [SerializeField] private float deactivatedOpacity = 0.2f;
+    [Range(0f, 1f)]
+    [SerializeField] private float activatedOpacity = 1f;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
-    private Button _buttonStartButton;
+    public Button buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
     private CanvasRenderer[] _buttonStartCanvasRenderer;
-    [Range(0f, 1f)]
-    [SerializeField] private float deactivatedOpacity;
+    [Header("Ready Button")]
+    [SerializeField] public GameObject buttonReady;
+    private Button _buttonReadyButton;
+    private ButtonHoverTween _buttonReadyButtonHoverTween;
+    private CanvasRenderer[] _buttonReadyCanvasRenderer;
 
     [Serializable]
     public class PlayerLobbyCard
@@ -36,6 +40,7 @@ public class Room_UI : MonoBehaviour
         public RawImage characterPortrait;
         public Button changeCharacterButton;
         public ButtonHoverTween changeCharacterButtonHoverTween;
+        public Image[] colorFrames;
     }
 
     [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
@@ -62,7 +67,7 @@ public class Room_UI : MonoBehaviour
         if (mainMenuUI.screenLoading.activeSelf)
         {
             mainMenuUI.screenLoading.SetActive(false);
-            
+
         }
 
         if (!mainMenuUI.screenNavigation.activeSelf)
@@ -79,9 +84,18 @@ public class Room_UI : MonoBehaviour
         }
 
         // Cache start button components
-        _buttonStartButton = buttonStart.GetComponent<Button>();
+        buttonStartButton = buttonStart.GetComponent<Button>();
         _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
         _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
+
+        // Cache ready button components
+        _buttonReadyButton = buttonReady.GetComponent<Button>();
+        _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
+        _buttonReadyCanvasRenderer = buttonReady.GetComponentsInChildren<CanvasRenderer>();
+
+        // Initialize button states
+        DeactivateStartButton();
+        ActivateReadyButton();
     }
 
     public void Back()
@@ -116,12 +130,12 @@ public class Room_UI : MonoBehaviour
     public void ActivateStartButton()
     {
         // Update functionality
-        _buttonStartButton.enabled = true;
+        buttonStartButton.interactable = true;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
         {
-            t.SetAlpha(1f);
+            t.SetAlpha(activatedOpacity);
         }
         buttonStart.transform.localScale.Set(1f,1f,1f);
         _buttonStartButtonHoverTween.enabled = true;
@@ -130,7 +144,7 @@ public class Room_UI : MonoBehaviour
     public void DeactivateStartButton()
     {
         // Update functionality
-        _buttonStartButton.enabled = false;
+        buttonStartButton.interactable = false;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
@@ -140,6 +154,34 @@ public class Room_UI : MonoBehaviour
         
         _buttonStartButtonHoverTween.enabled = false;
         buttonStart.transform.localScale.Set(1f,1f,1f);
+    }
+    
+    public void ActivateReadyButton()
+    {
+        // Update functionality
+        _buttonReadyButton.interactable = true;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
+        {
+            t.SetAlpha(activatedOpacity);
+        }
+        buttonReady.transform.localScale.Set(1f,1f,1f);
+        _buttonReadyButtonHoverTween.enabled = true;
+    }
+
+    public void DeactivateReadyButton()
+    {
+        // Update functionality
+        _buttonReadyButton.interactable = false;
+        
+        // Update appearance
+        foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
+        {
+            t.SetAlpha(deactivatedOpacity);
+        }
+        _buttonReadyButtonHoverTween.enabled = false;
+        buttonReady.transform.localScale.Set(1f,1f,1f);
     }
     
     #region Screen: HOW TO PLAY
@@ -153,9 +195,9 @@ public class Room_UI : MonoBehaviour
 
     #region Screen: BOMB LIST
 
-    public void ToggleScreenBombList()
+    public void ToggleScreenControls()
     {
-        screenBombList.SetActive(!screenBombList.activeSelf);
+        screenControls.SetActive(!screenControls.activeSelf);
     }
     
     #endregion

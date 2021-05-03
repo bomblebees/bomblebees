@@ -57,9 +57,9 @@ public class Hotbar : MonoBehaviour
         {
             UpdateHexUI();
             KeyPressListener();
+            UpdateSpinDelayTimer();
         }
 
-        UpdateSpinDelayTimer();
     }
 
     // Plays a button press tween anim when hot keys can be pressed
@@ -68,18 +68,18 @@ public class Hotbar : MonoBehaviour
     {
         if (localPlayer == null) return;
 
-        if (Input.GetKeyDown(localPlayer.spinKey))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Spin))
         {
-            if (spinHudTimer == 0) spinKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (spinHudTimer == 0) spinKey.GetComponent<ScaleTween>().StartTween();
             else
             {
                 FindObjectOfType<AudioManager>().PlaySound("error1");
             }
         }
 
-        if (Input.GetKeyDown(localPlayer.swapKey))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Swap))
         {
-            if (!swapDisabledEffect.activeSelf) swapKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (!swapDisabledEffect.activeSelf) swapKey.GetComponent<ScaleTween>().StartTween();
             else
             {
                 FindObjectOfType<AudioManager>().PlaySound("error1");
@@ -89,9 +89,9 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(localPlayer.bombKey))
+        if (KeyBindingManager.GetKeyDown(KeyAction.Place))
         {
-            if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<ScaleTween>().StartTween();
             else
             {
                 FindObjectOfType<AudioManager>().PlaySound("error1");
@@ -100,9 +100,9 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(localPlayer.rotateKey))
+        if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext))
         {
-            if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<IconBounceTween>().OnTweenStart();
+            if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<ScaleTween>().StartTween();
             else
             {
                 // FindObjectOfType<AudioManager>().PlaySound("error1");

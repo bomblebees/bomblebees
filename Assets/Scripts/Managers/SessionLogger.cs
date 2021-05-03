@@ -38,7 +38,7 @@ public class SessionLogger : MonoBehaviour
 
     // Permissions
     [HideInInspector] public bool sendPermissions = false; // whether the user chose to send us data or not
-    private bool permissionsShown = false; // whether we already shown the popup to the user already this session
+    private bool permissionsShown = true; // whether we already shown the popup to the user already this session
     [SerializeField] private GameObject permissionsPopup; // the permissions popup that requets user to send data
 
     // Debug
