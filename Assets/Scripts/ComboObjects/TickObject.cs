@@ -88,7 +88,7 @@ public class TickObject : ComboObject
     public virtual IEnumerator ProcEffects()
     {
         print("Proccing");
-        yield return new WaitForSeconds(0);
+        yield return new WaitForSeconds(0.01f);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
