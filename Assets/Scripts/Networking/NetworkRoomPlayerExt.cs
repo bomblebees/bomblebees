@@ -47,12 +47,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
-
-        // Update the character availability
-        UpdateCharacterAvailability();
-
-        // Assign a free character to the player on enter
-        CmdChangeCharacterCode(GetNextAvailableCharacter());
     }
 
     private void InitRequiredVars()
@@ -195,18 +189,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             {
                 card.characterPortrait.color = new Color(1f, 1f, 1f);
             }
-        }
-    }
 
-    // Updates the character availability array for this player
-    [Client] public void UpdateCharacterAvailability()
-    {
-        // For all existing players
-        for (int i = 0; i < room.roomSlots.Count; i++)
-        {
-            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
-
-            // If ready, set the character to be unavailable
+            // if player is ready, update the character availability
             if (player.readyToBegin && _characterSelectionInfo.characterAvailable[player.characterCode])
             {
                 _characterSelectionInfo.characterAvailable[player.characterCode] = false;
