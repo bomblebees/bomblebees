@@ -67,7 +67,7 @@ public class TickObject : ComboObject
     {
         FindCenter();
         GoToCenter();
-        StartCoroutine((ProcEffects()));
+        ProcEffects();
         if (!didEarlyEffects)
         {
             yield return new WaitForSeconds(lingerDuration);
@@ -80,10 +80,10 @@ public class TickObject : ComboObject
         // TO DEFINE IN EACH BOMB TYPE
     }
 
-    public virtual IEnumerator ProcEffects()
+    public void ProcEffects()
     {
         print("Proccing");
-        yield return new WaitForSeconds(0.01f);
+        // yield return new WaitForSeconds(0.01f);
         StopVelocity();
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
@@ -97,10 +97,14 @@ public class TickObject : ComboObject
     public virtual void EarlyProc()
     {
         if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep"); // TODO do something like "StopPlaying(objectSound)"
+		if (didEarlyEffects)
+		{
+			return;
+		}
         didEarlyEffects = true;
         FindCenter();
         GoToCenter();
-        StartCoroutine(ProcEffects());
+        ProcEffects();
     }
 
 

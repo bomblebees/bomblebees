@@ -106,9 +106,11 @@ public class BlinkObject : TickObject
             }
         }
     }
-    
-    // Overridden in order to move the startupDelay away from this func and into the actual bomb placement
-    public override IEnumerator ProcEffects()
+
+	// Overridden in order to move the startupDelay away from this func and into the actual bomb placement
+
+		/*
+	public override IEnumerator ProcEffects()
     {
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay);
         else yield return new WaitForSeconds(startupDelay);
@@ -120,6 +122,7 @@ public class BlinkObject : TickObject
         StartCoroutine(DisableObjectModel());
         NotifyOccupiedTile(false);
     }
+	*/
     
     public IEnumerator Breakdown()
     {
