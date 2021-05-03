@@ -1,29 +1,41 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ScenelessObjectManager : MonoBehaviour
 {
-    [Header("Configure")] 
-    [SerializeField] private float settingButtonOpacity = 1f;
-    [Header("Others")]
     [SerializeField] private GlobalSettings globalSettings;
     [SerializeField] private GameObject settingButton;
     private CanvasRenderer[] _canvasRenderers;
+    [Scene] [SerializeField] private string roomScene, gameScene;
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    void OnEnable()
     {
-        _canvasRenderers = settingButton.GetComponentsInChildren<CanvasRenderer>();
-
-        foreach (var canvasRenderer in _canvasRenderers)
-        {
-            canvasRenderer.SetAlpha(settingButtonOpacity);
-        }
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.path == roomScene || scene.path == gameScene)
+        {
+            settingButton.SetActive(false);
+        }
+        else
+        {
+            settingButton.SetActive(true);
+        }
+    }
+    
     private void Update()
     {
         if (KeyBindingManager.GetKeyUp(KeyAction.ToggleSettings))
