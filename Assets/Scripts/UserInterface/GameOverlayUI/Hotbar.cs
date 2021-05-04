@@ -131,9 +131,9 @@ public class Hotbar : MonoBehaviour
 
     public void UpdateHexUI()
     {
-        if (localPlayer.selectedTile == null) return;
+        if (localPlayer.GetComponent<PlayerSwap>().selectedTile == null) return;
 
-        char selectedKey = localPlayer.selectedTile.GetComponentInParent<HexCell>().GetKey();
+        char selectedKey = localPlayer.GetComponent<PlayerSwap>().GetComponentInParent<HexCell>().GetKey();
 
         backHex.color = bombHelper.GetKeyColor(selectedKey);
         frontHex.color = bombHelper.GetKeyColor(localPlayer.GetComponent<PlayerSwap>().heldKey);

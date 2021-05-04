@@ -48,6 +48,9 @@ public class PlayerSwap : NetworkBehaviour
         // Subscribe to damage events
         this.GetComponent<Health>().EventLivesLowered += OnGhostEnter;
         this.GetComponent<Health>().EventGhostExit += OnGhostExit;
+
+        // Enable tile highlight outline for the local player
+        if (isLocalPlayer) highlightModel.SetActive(true);
     }
 
     // Cannot swap in ghost mode
@@ -149,7 +152,7 @@ public class PlayerSwap : NetworkBehaviour
     /// <summary>
     /// The hex object the player is currently selecting
     /// </summary>
-    private GameObject selectedTile;
+    [HideInInspector] public GameObject selectedTile;
 
     [SerializeField] private GameObject highlightModel;
 

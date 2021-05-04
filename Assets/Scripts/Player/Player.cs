@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-//using Castle.Core.Smtp;
-using UnityEditor;
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Mirror;
-//using NSubstitute.Exceptions;
-using Debug = UnityEngine.Debug;
 
 public class Player : NetworkBehaviour
 {
@@ -25,54 +12,24 @@ public class Player : NetworkBehaviour
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
 
-    // Assets
-    [Header("Debug")]
- //   public bool debugMode = false;
- //   public string debugBombPress1 = "8";
- //   public string debugBombPress2 = "9";
- //   public string debugBombPress3 = "e";
-	//public string debugBombPress4 = ";";
-	//public string debugGroundItemSpawn = "g";
+    //[Header("Debug")]
+    //public bool debugMode = false;
+    //public string debugBombPress1 = "8";
+    //public string debugBombPress2 = "9";
+    //public string debugBombPress3 = "e";
+    //public string debugBombPress4 = ";";
+    //public string debugGroundItemSpawn = "g";
 
-    [SerializeField] public Health healthScript = null;
-
-    [SerializeField] public bool tileHighlights = true;
-
-    //[SyncVar] public bool canPlaceBombs = false;
-    //[SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
 
     // Game Objects
     [Header("Required", order = 2)]
+    [SerializeField] private GameObject playerMesh;
     public GameObject groundItemPickupHitbox;
-	//private float slowScalar = 1f;
-    public float timeSinceSlowed = 0f;
-    //private float sludgedScalar = 1f;
-    private float timeSinceSludged = 0f;
-    private float sludgedDuration = 0f;  // set by the sludge object
-    private float sludgeEndAnim = -40f;
-    // private float timeSinceSludgedEnd = -40f;
-    public float timeSinceSludgedEndDur = 0f;
-    private bool sludgeEffectEnded = true;
-    private bool sludgeEffectStarted = false;
-
-    public float slowTimeCheckInterval = 0.05f;
-    public GameObject sludgeVFX;
-
-    // private Caches
-    private Ray tileRay;
-    private RaycastHit tileHit;
-    public GameObject selectedTile;
-
-    private GameObject playerMesh;
-    [SerializeField] private GameObject playerModel;
-    [SerializeField] private GameObject highlightModel;
+    public GameObject sludgeVFX; //unused
 
     public bool isDead = false; // when player has lost ALL lives
-
-    // Event manager singleton
-    private EventManager eventManager;
 
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
@@ -86,10 +43,7 @@ public class Player : NetworkBehaviour
         base.OnStartClient();
 
         // Set player color
-        playerMesh = playerModel.transform.GetChild(0).gameObject;
         playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
-        // Disable tile highlight outline
-        if (isLocalPlayer) highlightModel.SetActive(true);
     }
 
     public override void OnStartServer()
@@ -98,74 +52,21 @@ public class Player : NetworkBehaviour
 
         //fixedY = this.transform.position.y;  // To prevent bugs from collisions
 
-        // events
-        healthScript.EventLivesLowered += SetCanBeHit;
-
-        healthScript.EventGhostExit += SetCanExitInvincibility;
-
-        //Debug.Log("server started");
-
-        // Event manager singleton
-        eventManager = EventManager.Singleton;
-        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+        // Subscribe to damage events
+        this.GetComponent<Health>().EventLivesLowered += SetCanBeHit;
+        this.GetComponent<Health>().EventGhostExit += SetCanExitInvincibility;
     }
 
     // Update is called once per frame
     [ClientCallback]
     private void Update()
     {
-        
-        if (timeSinceSludged < 0 && sludgeEffectStarted)
-        {
-            sludgeEffectStarted = false;
-            CmdSetSludgeEffectEnded(true);
-        }
-
-        if (sludgeEffectEnded)
-        {
-            /* SLUDGE EFFECT ENDS HERE */
-            // start coroutine
-            // timeSinceSludgedEnd = -4f;
-            // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -40f);
-
-            //sludgedScalar = 1.0f;
-            if (sludgeVFX.activeSelf)
-            {
-                sludgeVFX.SetActive(false);
-                //this.canSpin = true;
-            }
-
-            if (sludgeEndAnim > -40f)
-            {
-                sludgeEndAnim -= Time.deltaTime * 20f; // temp
-                playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
-            }
-        }
-
-
+        // Code after this point is run only on the local player
         if (!isLocalPlayer) return;
-
-        if (gameObject.name != "LocalPlayer") gameObject.name = "LocalPlayer";
 
         if (isDead) return; // if dead, disable all player updates
 
-        //Debug.Log("tme sine cludge" + timeSinceSludged);
-
-
-        //if (this.timeSinceSlowed > slowTimeCheckInterval)
-        //{
-        //    slowScalar = 1.0f;
-        //}
-    }
-
-    [Command] public void CmdSetSludgeEffectEnded(bool cond)
-    {
-        RpcSetSludgeEffectEnded(cond);
-    }
-
-    [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
-    {
-        sludgeEffectEnded = cond;
+        // Any update code for the player can go here
     }
 
     public void SetCanBeHit(bool val)
@@ -177,11 +78,7 @@ public class Player : NetworkBehaviour
     {
         if (canExitInvincibility)
         {
-            //this.canSpin = true;
             this.canBeHit = true;
-            //this.canSwap = true;
-            //this.canPlaceBombs = true;
-            //healthScript.SignalExit();
             this.canExitInvincibility = false;
 			FindObjectOfType<AudioManager>().PlaySound("playerRespawn");
         }
@@ -192,50 +89,91 @@ public class Player : NetworkBehaviour
         this.canExitInvincibility = val;
     }
 
-    public void ApplySpeedScalar(float val)
+
+    #region Sludge Effect
+
+    /// <summary>
+    /// Whether the player is currenly sludged
+    /// </summary>
+    [SyncVar(hook =nameof(OnChangeSludged))] public bool isSludged = false;
+    [Command] private void SetIsSludged(bool cond) { isSludged = cond; }
+
+    /// <summary>
+    /// Cached sludge routine, used in ApplySludgeSlow()
+    /// </summary>
+    private IEnumerator sludgeRoutine;
+
+    /// <summary>
+    /// Called when the player enters collision with the sludge hitbox
+    /// </summary>
+    /// <param name="slowRate"> The speed multiplier of the sludge effect </param>
+    /// <param name="slowDur"> The duration of the sludge effect </param>
+    [Client] public void ApplySludgeSlow(float slowRate, float slowDur)
     {
-        //this.slowScalar *= val;
+        // If the sludge effect coroutine is already running, stop it
+        // This allows the sludge effect to be applied again
+        if (sludgeRoutine != null) StopCoroutine(sludgeRoutine);
+
+        // Start the sludge effect
+        sludgeRoutine = SludgeEffectRoutine(slowRate, slowDur);
+        StartCoroutine(sludgeRoutine);
     }
-    
-    public void ApplySludgeSlow(float slowRate, float slowDur)
-    {
-        if (isServer) RpcApplySludgeSlow(slowRate, slowDur);
-        else CmdApplySludgeSlow(slowRate, slowDur);
 
-        //ResetSpinCharge();
-        //this.canSpin = false;
+    /// <summary>
+    /// The coroutine that manages the sludge effect on this player
+    /// </summary>
+    /// <param name="scalar"> The speed multiplier of the sludge effect </param>
+    /// <param name="duration"> The duration of the sludge effect </param>
+    /// <returns></returns>
+    [Client] private IEnumerator SludgeEffectRoutine(float scalar, float duration)
+    {
+        // Let server know that the player is sludged
+        SetIsSludged(true);
+
+        // Slow the player down by scalar times
+        this.GetComponent<PlayerMovement>().sludgedScalar = scalar;
+
+        // Reset spin charge and disallow player to spin while sludged
+        this.GetComponent<PlayerSpin>().canSpin = false;
+        this.GetComponent<PlayerSpin>().ResetSpinCharge();
+
+        // Wait for the sludge effect to end
+        yield return new WaitForSeconds(duration);
+
+        // Reset all sludge effects that was applied earlier
+        this.GetComponent<PlayerMovement>().sludgedScalar = 1;
+        SetIsSludged(false);
+        this.GetComponent<PlayerSpin>().canSpin = true;
     }
 
-    [Command] public void CmdApplySludgeSlow(float slowRate, float slowDur) { RpcApplySludgeSlow(slowRate, slowDur); }
-    [ClientRpc] public void RpcApplySludgeSlow(float slowRate, float slowDur)
+    /// <summary>
+    /// SyncVar hook for variable isSludged
+    /// </summary>
+    [ClientCallback] private void OnChangeSludged(bool prevEffect, bool newEffect)
     {
-        /* SLUDGE STATUS EFFECT STARTS HERE*/
-        sludgeEndAnim = -3f;
-        playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", sludgeEndAnim);
-
-		switch (UnityEngine.Random.Range(1, 4))
-		{
-			case 1:
-				FindObjectOfType<AudioManager>().PlaySound("playerEw1");
-				break;
-			case 2:
-				FindObjectOfType<AudioManager>().PlaySound("playerEw2");
-				break;
-			case 3:
-				FindObjectOfType<AudioManager>().PlaySound("playerEw3");
-				break;
-		}
-
-		var slowFactor = 1 - slowRate;
-        //this.sludgedScalar = slowFactor;
-        this.sludgedDuration = slowDur;
-        this.timeSinceSludged = slowDur;
-        this.sludgeEffectStarted = true;
-        this.sludgeEffectEnded = false;
-        sludgeVFX.SetActive(true);
-        /* APPLY EFFECTS THAT HAPPEN ONCE PER SLUDGE-EFFECT HERE */
-        if (timeSinceSludged > 0)
+        
+        if (newEffect) // If the player is now sludged
         {
+            // Turn on the sludge VFX
+            playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -3);
+
+            // Play random sludge sound effect
+            FindObjectOfType<AudioManager>().PlaySound("playerEw" + UnityEngine.Random.Range(1, 4));
+        } else // If the player is not sludged anymore
+        {
+            // Slowly tween the VFX down until it is gone
+            LeanTween.value(gameObject, UpdateSludgeVFXCallback, -3f, -40f, 1f);
         }
     }
+
+    /// <summary>
+    /// Callback function for updating the VFX, used in OnChangeSludged()
+    /// </summary>
+    /// <param name="val"> The value to update the VFX to </param>
+    [ClientCallback] private void UpdateSludgeVFXCallback(float val)
+    {
+        playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", val);
+    }
+
+    #endregion
 }

@@ -18,7 +18,7 @@ public class PlayerSpin : NetworkBehaviour
     /// Also used to sync charge bars
     /// </summary>
     [HideInInspector] [SyncVar] public bool spinHeld = false;
-    [Command] private void CmdSetSpinHeld(bool held) { spinHeld = held; }
+    [Command] public void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [Header("Spin Charge")]
     public int spinPower = 1;
