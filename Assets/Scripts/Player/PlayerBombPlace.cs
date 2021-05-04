@@ -63,11 +63,22 @@ public class PlayerBombPlace : NetworkBehaviour
         // When place key is pressed down
         if (KeyBindingManager.GetKeyDown(KeyAction.Place))
         {
-            PlaceBomb();
+            // Get the currently selected bomb type
+            char bombType = this.GetComponent<PlayerInventory>().GetSelectedBombType();
+
+            // If no bombs then return
+            if (bombType == 'e' || bombType == '1' || bombType == '2' || bombType == '3' || bombType == '4')
+            {
+                return;
+            } else
+            {
+                // Place bomb on the server
+                CmdPlaceBomb();
+            }
         }
     }
 
-    [Client] private void PlaceBomb()
+    [Command] private void CmdPlaceBomb()
     {
         // Get the tile underneath the player
         tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
@@ -82,15 +93,8 @@ public class PlayerBombPlace : NetworkBehaviour
                 // Get the currently selected bomb type
                 char bombType = this.GetComponent<PlayerInventory>().GetSelectedBombType();
 
-                // If selected bomb type is not wanted, return
-                if (bombType == 'e' || bombType == '1' || bombType == '2' || bombType == '3' || bombType == '4')
-                {
-                    Debug.LogWarning("bombType '" + bombType + "' is not placeable.");
-                    return; 
-                }
-
-                // Spawn the bomb on the server
-                CmdSpawnBombType(bombType);
+                // Spawn the bomb
+                SpawnBombType(bombType);
             }
         }
     }
@@ -99,7 +103,7 @@ public class PlayerBombPlace : NetworkBehaviour
     /// Spawns the bomb associated with the given bomb type
     /// </summary>
     /// <param name="bombType">The character corresponding to the bomb type</param>
-    [Command] private void CmdSpawnBombType(char bombType)
+    [Server] private void SpawnBombType(char bombType)
     {
         // Remove the bomb type from the player inventory by 1
         this.GetComponent<PlayerInventory>().RemoveInventoryBomb(bombType); 
