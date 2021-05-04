@@ -40,15 +40,10 @@ public class Player : NetworkBehaviour
     public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
 
-    [Header("HexTiles")] [SyncVar(hook = nameof(OnChangeHeldKey))]
-    public char heldKey = 'g';
-
-    public Vector3 heldHexScale = new Vector3(800, 800, 800);
-    public Vector3 heldHexOffset = new Vector3(0, 25, 10);
     [SerializeField] public bool tileHighlights = true;
 
     //[SyncVar] public bool canPlaceBombs = false;
-    [SyncVar] public bool canSwap = false;
+    //[SyncVar] public bool canSwap = false;
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
 
@@ -96,8 +91,6 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        LinkAssets();
-        UpdateHeldHex(heldKey); // Initialize model
 
         // Set player color
         playerMesh = playerModel.transform.GetChild(0).gameObject;
@@ -110,16 +103,12 @@ public class Player : NetworkBehaviour
     {
         base.OnStartServer();
 
-        LinkAssets();
-
         //fixedY = this.transform.position.y;  // To prevent bugs from collisions
 
         // events
-        healthScript.EventLivesLowered += SetCanSwap;
         healthScript.EventLivesLowered += SetCanBeHit;
         healthScript.EventLivesLowered += ClearItemStack;
 
-        healthScript.EventGhostExit += SetCanSwap;
         healthScript.EventGhostExit += SetCanExitInvincibility;
 
         //Debug.Log("server started");
@@ -169,7 +158,6 @@ public class Player : NetworkBehaviour
         if (isDead) return; // if dead, disable all player updates
 
         ApplyTileHighlight();
-        ListenForSwapping();
         ListenForBombRotation();
 
         //Debug.Log("tme sine cludge" + timeSinceSludged);
@@ -189,89 +177,6 @@ public class Player : NetworkBehaviour
     [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
     {
         sludgeEffectEnded = cond;
-    }
-
-    void LinkAssets()
-    {
-        hexGrid = GameObject.FindGameObjectWithTag("HexGrid")
-            .GetComponent<HexGrid>(); // Make sure hexGrid is created before the player
-        if (!hexGrid) Debug.LogError("Player.cs: No cellPrefab found.");
-    }
-
-    void OnChangeHeldKey(char _, char newHeldKey)
-    {
-        // commented out for now
-        UpdateHeldHex(newHeldKey);
-    }
-
-    void UpdateHeldHex(char newHeldKey)
-    {
-        this.GetComponent<PlayerInterface>().UpdateHexHud(newHeldKey);
-
-
-        // commented out, below is for hex model
-      
-        //if (this.heldHexModel)
-        //{
-        //    Destroy(this.heldHexModel, 0f);
-        //    Debug.Log("Destroyed held hex");
-        //}
-
-        //// Create the hex model in the player's hand
-        //this.heldHexModel = Instantiate(
-        //    hexGrid.ReturnModelByCellKey(newHeldKey),
-        //    playerModel.transform.position + playerModel.transform.up * heldHexOffset.y +
-        //    playerModel.transform.forward * heldHexOffset.x,
-        //    playerModel.transform.rotation,
-        //    playerModel.transform
-        //);
-
-        //this.heldHexModel.gameObject.transform.localScale = heldHexScale;
-    }
-
-    // Listens for key press and swaps the tile beneath the player
-    [Client]
-    void ListenForSwapping()
-    {
-        if (KeyBindingManager.GetKeyDown(KeyAction.Swap) && (this.canExitInvincibility || this.canSwap))
-        {
-            ExitInvincibility();
-            tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
-
-            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-            {
-                GameObject modelHit = tileHit.transform.gameObject;
-                //HexCell hexCell = modelHit.GetComponentInParent<HexCell>();
-                char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
-                if (HexCell.ignoreKeys.Contains(newKey)) return;
-
-                int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
-
-                CmdSwap(cellIdx, GetHeldKey());
-                //hexGrid.netIdentity.AssignClientAuthority(connectionToClient);
-                //hexGrid.CmdSwapHexAndKey(cellIdx, getHeldKey());
-                //hexGrid.netIdentity.RemoveClientAuthority();
-
-                FindObjectOfType<AudioManager>().PlaySound("playerSwap");
-
-                // Only update models and grids if it is a new key
-                if (!this.heldKey.Equals(newKey))
-                {
-                    CmdSetHeldKey(newKey);
-                }
-            }
-        }
-    }
-
-    public void SetCanSwap(bool val)
-    {
-        this.canSwap = val;
-    }
-
-    [Command]
-    void CmdSwap(int cellIdx, char heldKey, NetworkConnectionToClient sender = null)
-    {
-        hexGrid.SwapHexAndKey(cellIdx, heldKey, sender.identity);
     }
 
     // Applies the highlight shader to the tile the player is "looking" at
@@ -355,29 +260,6 @@ public class Player : NetworkBehaviour
         this.GetComponent<PlayerInventory>().ResetInventory();
     }
 
-    [Command]
-    void CmdSetHeldKey(char newKey)
-    {
-        RpcSetHeldKey(newKey);
-    }
-
-    [ClientRpc]
-    void RpcSetHeldKey(char newKey)
-    {
-        SetHeldKey(newKey); // Sync held key
-        UpdateHeldHex(newKey); // Update model for all observers
-    }
-
-    public void SetHeldKey(char key)
-    {
-        this.heldKey = key;
-    }
-
-    public char GetHeldKey()
-    {
-        return this.heldKey;
-    }
-
     public void SetCanBeHit(bool val)
     {
         this.canBeHit = val;
@@ -389,7 +271,7 @@ public class Player : NetworkBehaviour
         {
             //this.canSpin = true;
             this.canBeHit = true;
-            this.canSwap = true;
+            //this.canSwap = true;
             //this.canPlaceBombs = true;
             //healthScript.SignalExit();
             this.canExitInvincibility = false;

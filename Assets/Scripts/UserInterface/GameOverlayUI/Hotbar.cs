@@ -136,7 +136,7 @@ public class Hotbar : MonoBehaviour
         char selectedKey = localPlayer.selectedTile.GetComponentInParent<HexCell>().GetKey();
 
         backHex.color = bombHelper.GetKeyColor(selectedKey);
-        frontHex.color = bombHelper.GetKeyColor(localPlayer.GetHeldKey());
+        frontHex.color = bombHelper.GetKeyColor(localPlayer.GetComponent<PlayerSwap>().heldKey);
     }
 
     public void StartSpinCooldown()

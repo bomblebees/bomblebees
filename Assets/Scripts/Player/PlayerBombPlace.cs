@@ -56,8 +56,7 @@ public class PlayerBombPlace : NetworkBehaviour
     /// <summary>
     /// Checks for spin key presses, called in Update()
     /// </summary>
-    [Client]
-    public void ListenForPlaceInput()
+    [Client] private void ListenForPlaceInput()
     {
         if (!canPlaceBombs) return;
 
@@ -68,16 +67,16 @@ public class PlayerBombPlace : NetworkBehaviour
         }
     }
 
-    [Client] void PlaceBomb()
+    [Client] private void PlaceBomb()
     {
-        // Get the tile underneath us
+        // Get the tile underneath the player
         tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
 
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
         {
             var hexCell = tileHit.transform.gameObject.GetComponentInParent<HexCell>();
 
-            // If the hex tile is not occupied, we can place a bomb
+            // If the hex tile is not occupied, player can place a bomb
             if (!hexCell.IsOccupiedByComboObject())
             {
                 // Get the currently selected bomb type

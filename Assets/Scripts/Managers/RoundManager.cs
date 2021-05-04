@@ -197,7 +197,7 @@ public class RoundManager : NetworkBehaviour
             Player p = playerList[i].player;
             //p.SetCanPlaceBombs(true);
             //p.SetCanSpin(true);
-            p.SetCanSwap(true); 
+            //p.SetCanSwap(true); 
             //p.SetCanMove(true);
         }
         aliveCount = alivePlayers.Count;
