@@ -73,12 +73,12 @@ public class PlayerBombPlace : NetworkBehaviour
             } else
             {
                 // Place bomb on the server
-                CmdPlaceBomb();
+                CmdSpawnBomb(bombType);
             }
         }
     }
 
-    [Command] private void CmdPlaceBomb()
+    [Command] public void CmdSpawnBomb(char bombType)
     {
         // Get the tile underneath the player
         tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
@@ -90,8 +90,8 @@ public class PlayerBombPlace : NetworkBehaviour
             // If the hex tile is not occupied, player can place a bomb
             if (!hexCell.IsOccupiedByComboObject())
             {
-                // Get the currently selected bomb type
-                char bombType = this.GetComponent<PlayerInventory>().GetSelectedBombType();
+                //// Get the currently selected bomb type
+                //char bombType = this.GetComponent<PlayerInventory>().GetSelectedBombType();
 
                 // Spawn the bomb
                 SpawnBombType(bombType);

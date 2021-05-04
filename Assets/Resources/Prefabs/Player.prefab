@@ -4950,20 +4950,18 @@ MonoBehaviour:
   steamName: '[Steam Name]'
   characterCode: 0
   playerColor: {r: 0, g: 0, b: 0, a: 0}
-  healthScript: {fileID: -8900185448856423588}
-  tileHighlights: 1
   canExitInvincibility: 0
   canBeHit: 1
-  groundItemPickupHitbox: {fileID: 3947501954672016332}
-  timeSinceSlowed: 0
-  timeSinceSludgedEndDur: 0
-  slowTimeCheckInterval: 0.05
-  sludgeVFX: {fileID: 2841311880343033178}
-  selectedTile: {fileID: 0}
   playerMesh: {fileID: 4109969135870488925}
-  playerModel: {fileID: 5260639197599151655}
-  highlightModel: {fileID: 1232416090054458822}
+  groundItemPickupHitbox: {fileID: 3947501954672016332}
+  sludgeVFX: {fileID: 2841311880343033178}
   isDead: 0
+  debugMode: 0
+  debugSpawnBomble: 6
+  debugSpawnSludge: 7
+  debugSpawnLaser: 8
+  debugSpawnPlasma: 9
+  debugSpawnGroundItem: g
   isSludged: 0
 --- !u!114 &5463513637451450348
 MonoBehaviour:
@@ -5004,6 +5002,7 @@ MonoBehaviour:
   syncInterval: 0.1
   canSwap: 1
   heldKey: 103
+  selectedTile: {fileID: 0}
   highlightModel: {fileID: 1232416090054458822}
   tileHighlights: 1
 --- !u!114 &5903701323762087715
