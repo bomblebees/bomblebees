@@ -134,8 +134,7 @@ public class Player : NetworkBehaviour
         this.GetComponent<PlayerMovement>().sludgedScalar = scalar;
 
         // Reset spin charge and disallow player to spin while sludged
-        this.GetComponent<PlayerSpin>().canSpin = false;
-        this.GetComponent<PlayerSpin>().ResetSpinCharge();
+        this.GetComponent<PlayerSpin>().StopSpin();
 
         // Wait for the sludge effect to end
         yield return new WaitForSeconds(duration);

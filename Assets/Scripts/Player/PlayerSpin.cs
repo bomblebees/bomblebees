@@ -71,16 +71,18 @@ public class PlayerSpin : NetworkBehaviour
     }
 
     // Cannot spin in ghost mode
-    private void OnGhostEnter(bool _) {
-        // When we enter ghost mode coroutines may still be running. Stop them here
+    private void OnGhostEnter(bool _) { StopSpin();  }
+    private void OnGhostExit(bool _) { canSpin = true; }
+
+    [Client] public void StopSpin()
+    {
+        // When we stop spinning coroutines may still be running. Stop them here
         StopAllCoroutines();
 
         canSpin = false;
         ResetSpinCharge();
         spinHitbox.gameObject.SetActive(false);
     }
-
-    private void OnGhostExit(bool _) { canSpin = true; }
 
     void Update()
     {
