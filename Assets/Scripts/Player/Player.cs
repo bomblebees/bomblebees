@@ -102,6 +102,19 @@ public class Player : NetworkBehaviour
         this.canBeHit = val;
     }
 
+    public void SetInvincibilityVFX(bool enabled)
+    {
+        if (enabled)
+        {
+            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
+            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.5f);
+        } else
+        {
+            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
+            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
+        }
+    }
+
     public void ExitInvincibility()
     {
         if (canExitInvincibility)
@@ -109,6 +122,7 @@ public class Player : NetworkBehaviour
             this.canBeHit = true;
             this.canExitInvincibility = false;
 			FindObjectOfType<AudioManager>().PlaySound("playerRespawn");
+            SetInvincibilityVFX(false);
         }
     }
 

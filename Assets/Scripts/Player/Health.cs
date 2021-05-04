@@ -177,7 +177,6 @@ public class Health : NetworkBehaviour
 
         // Anims
         ghostModel.SetActive(true);
-        revivingModel.SetActive(false);
         // playerModel.SetActive(false);
 
 		EventLivesLowered?.Invoke(false); // keep
@@ -193,9 +192,10 @@ public class Health : NetworkBehaviour
         
         // TODO helper
         ghostModel.SetActive(false);
-        revivingModel.SetActive(true);
-        playerModel.SetActive(false);
-        
+        playerModel.SetActive(true);
+
+        playerScript.SetInvincibilityVFX(true);
+
         // Debug.Log("Ghost Mode Exited");
         yield return new WaitForSeconds(invincibilityDuration);
         playerScript.ExitInvincibility();
