@@ -159,7 +159,7 @@ public class Player : NetworkBehaviour
         SetIsSludged(true);
 
         // Slow the player down by scalar times
-        this.GetComponent<PlayerMovement>().sludgedScalar = scalar;
+        this.GetComponent<PlayerMovement>().sludgedScalar = 1 - scalar;
 
         // Reset spin charge and disallow player to spin while sludged
         this.GetComponent<PlayerSpin>().StopSpin();
