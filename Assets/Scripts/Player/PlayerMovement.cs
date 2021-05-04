@@ -14,9 +14,6 @@ public class PlayerMovement : NetworkBehaviour
     private float horizontalAxis;
     private float verticalAxis;
 
-    private float prevHorizontalAxis;
-    private float prevVerticalAxis;
-
     private Quaternion rotation;
 
     [HideInInspector] public float sludgedScalar = 1f;
@@ -31,6 +28,17 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Speeds")] 
     [SerializeField] private float movementSpeed = 50f;
     [SerializeField] private float turnSpeed = 17f;
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        // Subscribe to damage events
+        this.GetComponent<Health>().EventGhostExit += OnGhostExit;
+    }
+
+    // Reset anims when we exit ghost to prevent T posing
+    private void OnGhostExit(bool _) { playingRunAnim = false; playingIdleAnim = false; }
 
     // Update is called once per frame
     void Update()
@@ -53,13 +61,13 @@ public class PlayerMovement : NetworkBehaviour
 
         if (horizontalAxis != 0 || verticalAxis != 0)
         {
-            // If moving play move animation
-            PlayMovementAnimation();
+            // Play move animation if player model is active
+            if (playerModel.activeSelf) PlayMovementAnimation();
         }
         else
         {
-            // If idle play idle animation
-            PlayIdleAnimation();
+            // Play idle animation if player model is active
+            if (playerModel.activeSelf) PlayIdleAnimation();
         }
 
 
