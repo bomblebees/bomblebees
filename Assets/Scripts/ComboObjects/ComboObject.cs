@@ -54,16 +54,14 @@ public class ComboObject : NetworkBehaviour
     protected float fillShaderRate = 0;
 
     // player who placed the bomb (set in Player.cs, SERVER only variable)
-    protected GameObject ownerPlayer;
-    public void SetOwnerPlayer(GameObject p) { 
-        ownerPlayer = p;
-        ownerIsQueen = p.GetComponent<Player>().isQueen; 
-    }
+    [SyncVar] public GameObject ownerPlayer;
+
     public GameObject GetOwnerPlayer() { return ownerPlayer; }
 
-    public virtual void _Start(GameObject player)
+    public override void OnStartClient()
     {
-        SetOwnerPlayer(player);
+        base.OnStartClient();
+
         IgnoreDamageHitbox();
         if (!model)
         {
@@ -387,8 +385,8 @@ public class ComboObject : NetworkBehaviour
             triggeringPlayer = other.transform.parent.gameObject;
 
             // Adjust travel distance based on spin power
-            int power = triggeringPlayer.GetComponent<Player>().spinPower;
-            Debug.Log("power: " + power);
+            int power = triggeringPlayer.GetComponent<PlayerSpin>().spinPower;
+            //Debug.Log("power: " + power);
 
             int newTravelDistanceInHexes = power + 1;
 
@@ -397,7 +395,7 @@ public class ComboObject : NetworkBehaviour
             RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
 
             // Set spin hit on player, for event logger
-            triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
+            //triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
         }
     }
 

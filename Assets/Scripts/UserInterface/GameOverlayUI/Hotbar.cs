@@ -114,7 +114,7 @@ public class Hotbar : MonoBehaviour
     {
         if (spinHudTimer != 0)
         {
-            float totalDuration = localPlayer.spinTotalCooldown;
+            float totalDuration = localPlayer.GetComponent<PlayerSpin>().spinTotalCooldown;
             spinCooldownFilter.fillAmount = spinHudTimer / totalDuration;
             spinHudTimer -= Time.deltaTime;
 
@@ -131,19 +131,19 @@ public class Hotbar : MonoBehaviour
 
     public void UpdateHexUI()
     {
-        if (localPlayer.selectedTile == null) return;
+        if (localPlayer.GetComponent<PlayerSwap>().selectedTile == null) return;
 
-        char selectedKey = localPlayer.selectedTile.GetComponentInParent<HexCell>().GetKey();
+        char selectedKey = localPlayer.GetComponent<PlayerSwap>().selectedTile.GetComponentInParent<HexCell>().GetKey();
 
         backHex.color = bombHelper.GetKeyColor(selectedKey);
-        frontHex.color = bombHelper.GetKeyColor(localPlayer.GetHeldKey());
+        frontHex.color = bombHelper.GetKeyColor(localPlayer.GetComponent<PlayerSwap>().heldKey);
     }
 
     public void StartSpinCooldown()
     {
         if (localPlayer != null)
         {
-            spinHudTimer = localPlayer.spinTotalCooldown;
+            spinHudTimer = localPlayer.GetComponent<PlayerSpin>().spinTotalCooldown;
         }
     }
 

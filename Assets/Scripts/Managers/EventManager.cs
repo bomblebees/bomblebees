@@ -162,7 +162,7 @@ public class EventManager : NetworkBehaviour
             sessionLogger.CreateEventSPN(
                 player,
                 bomb,
-                Time.time - roundStartTime - player.GetComponent<Player>().spinHitboxDuration); // subtract the time waited for event time
+                Time.time - roundStartTime - player.GetComponent<PlayerSpin>().spinHitboxDuration); // subtract the time waited for event time
         } else // if the spin hit a bomb
         {
             sessionLogger.CreateEventSPN(player, bomb, Time.time - roundStartTime);

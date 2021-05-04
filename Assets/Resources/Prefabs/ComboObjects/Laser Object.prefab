@@ -5245,10 +5245,12 @@ MonoBehaviour:
   bombRadialTimerImage: {fileID: 3036916688498786007}
   travelDistanceInHexes: 4
   lerpRate: 0.15
+  lerpRateSecondary: 0.5
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
   nearestCenter: {x: 0, y: 0, z: 0}
   tileUnderneath: {fileID: 0}
+  edgeIndexCached: 0
   vfxDuration: 4
   sfxDuration: 5
   hitboxDuration: 4
@@ -5259,6 +5261,7 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 4570919758972788173}
   fillShaderRatio: 0.9
+  ownerPlayer: {fileID: 0}
   breakdownDuration: 0
   minimumLifeDuration: 4
   rotateLerpRate: 0.15
@@ -6085,7 +6088,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.15
+  m_Radius: 0.5
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}

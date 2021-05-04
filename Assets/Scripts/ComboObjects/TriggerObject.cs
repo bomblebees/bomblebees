@@ -30,10 +30,11 @@ public class TriggerObject : ComboObject
 
     public bool stayPermanent = true; // Whether the deployable stays permanently until hit
 
-    public virtual void _Start(GameObject player)
+    public override void OnStartClient()
     {
-        base._Start(player);
+        base.OnStartClient();
         base.ReadyFillShader();
+
         //base.OnStartServer();
         FindCenter();
         GoToCenter();

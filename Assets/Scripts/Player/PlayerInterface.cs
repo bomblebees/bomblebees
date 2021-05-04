@@ -74,7 +74,7 @@ public class PlayerInterface : NetworkBehaviour
         // If player null, return
         if (!player) return;
 
-        if (player.spinHeld) { spinChargeStarted = true; }
+        if (player.GetComponent<PlayerSpin>().spinHeld) { spinChargeStarted = true; }
         else if (spinChargeStarted) { spinChargeTime = 0; spinChargeStarted = false; UpdateSpinChargeBar(); }
 
         if (spinChargeStarted)
@@ -85,7 +85,7 @@ public class PlayerInterface : NetworkBehaviour
 
     public void UpdateSpinChargeBar()
     {
-        float[] spinTimes = player.spinTimings;
+        float[] spinTimes = player.GetComponent<PlayerSpin>().spinTimings;
         spinChargeTime += Time.deltaTime;
         spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 2];
     }

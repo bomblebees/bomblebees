@@ -6,10 +6,10 @@ using Mirror;
 public class PlayerInventory : NetworkBehaviour
 {
     [Tooltip("Controls the order of bombs as shown in the player HUD")]
-    [SerializeField] private char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
+    [SerializeField] private static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
 
     [Tooltip("Controls the max amount of bombs a player can carry for each bomb type")]
-    [SerializeField] private int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
+    [SerializeField] private static int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
 
 	[Tooltip("Ground item prefabs for spawning bombs on ground")]
 	[SerializeField] private GameObject groundItem_r;
@@ -26,6 +26,17 @@ public class PlayerInventory : NetworkBehaviour
     // Singleton
     private GameUIManager gameUIManager;
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        // Subscribe to the damage event on the server
+        this.GetComponent<Health>().EventLivesLowered += OnGhostEnter;
+    }
+
+    // When player enters ghost mode, reset the inventroy
+    [Server] private void OnGhostEnter(bool _) { ResetInventory(); }
+
     public override void OnStartClient()
     {
         gameUIManager = GameUIManager.Singleton;
@@ -35,112 +46,49 @@ public class PlayerInventory : NetworkBehaviour
         inventoryList.Callback += OnInventoryChange;
     }
 
-    // Adds "amt" number of bombs of type "type" to the players inventory
-    [Server] public void AddInventoryBomb(char type, int amt)
+    private void Update()
     {
-        // Get the index corresponding to the bomb type
-        int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
+        // Code after this point is run only on the local player
+        if (!isLocalPlayer) return;
 
-		// Store the extra bombs (bomb amount - spaces left) so we can drop extras on the ground 
-		int fullInvOverflowValue = (inventoryList[idx] + amt) - INVEN_MAX_VALUES[idx];
-
-        
-		// First check if inventory for this bomb type isn't completely full:
-		if (!(inventoryList[idx] == INVEN_MAX_VALUES[idx]))
-		{
-			// If the amount we want to add is larger than max values, then set the bomb quantity to max
-			if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
-			{
-				inventoryList[idx] = INVEN_MAX_VALUES[idx];
-
-				if (inventoryList[idx] + amt != INVEN_MAX_VALUES[idx])
-				{
-					// Add conditional so that inventory add UI doesn't get displayed if inventory is already full
-					this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt - fullInvOverflowValue);
-				}
-				Debug.Log(fullInvOverflowValue);
-
-			}
-			else        // Otherwise simply add the amount to inv, don't drop anything
-			{
-				inventoryList[idx] += amt;
-
-				this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
-			}
-		}
-
-		// Otherwise, inventory is already full, drop all bombs on ground
-		for (int i = 0; i < fullInvOverflowValue; i++)
-		{
-			////
-			Vector3 randomTransform = this.gameObject.transform.position;
-			randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
-			randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
-			
-			switch (type)
-			{
-				case 'r':
-					NetworkServer.Spawn((GameObject)Instantiate(groundItem_r, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
-					break;
-				case 'p':
-					NetworkServer.Spawn((GameObject)Instantiate(groundItem_p, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
-					break;
-				case 'y':
-					NetworkServer.Spawn((GameObject)Instantiate(groundItem_y, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
-					break;
-				case 'g':
-					NetworkServer.Spawn((GameObject)Instantiate(groundItem_g, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
-					break;
-			}
-
-			
-			////
-		}
-
-		// if inventory is full, nothing gets added.
-
+        // Check for key press every frame
+        ListenForSelectInput();
     }
 
-	public char[] GetBombTypes()
-	{
-		return INVEN_BOMB_TYPES;
-	}
-
-	public int[] GetMaxInvSizes()
-	{
-		return INVEN_MAX_VALUES;
-	}
-
-    // Removes a bomb type from the inventory
-    [Server] public void RemoveInventoryBomb(char type)
+    /// <summary>
+    /// Listens for key press and rotates/selects the item stack
+    /// </summary>
+    [Client] void ListenForSelectInput()
     {
-        // Get the index corresponding to the bomb type
-        int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
+        // If the "next bomb" key is pressed
+        if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext)) SelectItemStack();
 
-        // Check if it can be removed
-        if (inventoryList[idx] > 0)
-        {
-            // Decrement the bomb quantity by one
-            inventoryList[idx]--;
-        } else
-        {
-            // This function should not be called if bomb type has zero quantity
-            Debug.LogError("Error: RemoveInventoryBomb called when bomb type has 0 quantity");
-        }
+        // If the individual bombs are pressed
+        if (KeyBindingManager.GetKeyDown(KeyAction.BigBomb)) SelectItemStack(0);
+        if (KeyBindingManager.GetKeyDown(KeyAction.SludgeBomb)) SelectItemStack(1);
+        if (KeyBindingManager.GetKeyDown(KeyAction.LaserBeem)) SelectItemStack(2);
+        if (KeyBindingManager.GetKeyDown(KeyAction.PlasmaBall)) SelectItemStack(3);
     }
 
-    // Resets all bomb quantity back to zero
-    [Server] public void ResetInventory()
+    /// <summary>
+    /// Selects the slot at the given index.
+    /// </summary>
+    /// <param name="idx"> The index of the slot to switch to. -1 means to rotate the selection instead </param>
+    [Client] private void SelectItemStack(int idx = -1)
     {
-        for (int i = 0; i < inventoryList.Count; i++)
-        {
-            inventoryList[i] = 0;
-        }
+        // Play the bomb selection sound
+        FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+
+        // If -1, then get the next index
+        if (idx == -1) CmdSetSelectedSlot(GetNextAvailableBomb());
+        else CmdSetSelectedSlot(idx);
     }
 
-    // Changes the selected slot to the next available slot
-    // If no slots are available, does not move slot
-    [Server] public void RotateSelectedSlot()
+    /// <summary>
+    /// Gets the next available slot. If no slots are available, the currently selected slot is returned
+    /// </summary>
+    /// <returns> The index of the slot </returns>
+    [Client] private int GetNextAvailableBomb()
     {
         // Start at current slot
         int nextSlot = selectedSlot;
@@ -159,17 +107,136 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         // Increment selected slot, if at the last slot rotate back to the beginning
-        if (nextSlot >= INVEN_BOMB_TYPES.Length) SwitchToSlot(0);
-        else SwitchToSlot(nextSlot);
+        if (nextSlot >= INVEN_BOMB_TYPES.Length) return 0;
+        else return nextSlot;
     }
 
-	// Changes the selected swap to the hotkey button pressed
-	[Server] public void SwitchToSlot(int index)
+    /// <summary>
+    /// Adds bombs to the players inventroy
+    /// </summary>
+    /// <param name="type"> The type of bomb to add </param>
+    /// <param name="amt"> The number of bombs of this type to add </param>
+    [Server] public void AddInventoryBomb(char type, int amt)
+    {
+        // Get the index corresponding to the bomb type
+        int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
+
+        // Store the extra bombs (bomb amount - spaces left) so we can drop extras on the ground 
+        int fullInvOverflowValue = (inventoryList[idx] + amt) - INVEN_MAX_VALUES[idx];
+
+
+        // First check if inventory for this bomb type isn't completely full:
+        if (!(inventoryList[idx] == INVEN_MAX_VALUES[idx]))
+        {
+            // If the amount we want to add is larger than max values, then set the bomb quantity to max
+            if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
+            {
+                inventoryList[idx] = INVEN_MAX_VALUES[idx];
+
+                if (inventoryList[idx] + amt != INVEN_MAX_VALUES[idx])
+                {
+                    // Add conditional so that inventory add UI doesn't get displayed if inventory is already full
+                    this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt - fullInvOverflowValue);
+                }
+                Debug.Log(fullInvOverflowValue);
+
+            }
+            else        // Otherwise simply add the amount to inv, don't drop anything
+            {
+                inventoryList[idx] += amt;
+
+                this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt);
+            }
+        }
+
+        // Otherwise, inventory is already full, drop all bombs on ground
+        for (int i = 0; i < fullInvOverflowValue; i++)
+        {
+            ////
+            Vector3 randomTransform = this.gameObject.transform.position;
+            randomTransform.x = randomTransform.x + UnityEngine.Random.Range(-8f, 8f);
+            randomTransform.z = randomTransform.z + UnityEngine.Random.Range(-8f, 8f);
+
+            switch (type)
+            {
+                case 'r':
+                    NetworkServer.Spawn((GameObject)Instantiate(groundItem_r, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+                    break;
+                case 'p':
+                    NetworkServer.Spawn((GameObject)Instantiate(groundItem_p, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+                    break;
+                case 'y':
+                    NetworkServer.Spawn((GameObject)Instantiate(groundItem_y, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+                    break;
+                case 'g':
+                    NetworkServer.Spawn((GameObject)Instantiate(groundItem_g, randomTransform + new Vector3(0f, 3f, 0f), Quaternion.identity));
+                    break;
+            }
+
+
+            ////
+        }
+
+        // if inventory is full, nothing gets added.
+
+    }
+
+    public char[] GetBombTypes()
+    {
+        return INVEN_BOMB_TYPES;
+    }
+
+    public int[] GetMaxInvSizes()
+    {
+        return INVEN_MAX_VALUES;
+    }
+
+
+    /// <summary>
+    /// Removes a bomb from the players inventory
+    /// </summary>
+    /// <param name="type"> The type of bomb to remove </param>
+    [Server] public void RemoveInventoryBomb(char type)
+    {
+        // Get the index corresponding to the bomb type
+        int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
+
+        // Check if it can be removed
+        if (inventoryList[idx] > 0)
+        {
+            // Decrement the bomb quantity by one
+            inventoryList[idx]--;
+        } else
+        {
+            // This function should not be called if bomb type has zero quantity
+            Debug.LogError("Error: RemoveInventoryBomb called when bomb type has 0 quantity");
+        }
+    }
+
+    /// <summary>
+    /// Resets all bomb quantity back to zero
+    /// </summary>
+    [Server] public void ResetInventory()
+    {
+        for (int i = 0; i < inventoryList.Count; i++)
+        {
+            inventoryList[i] = 0;
+        }
+    }
+
+    /// <summary>
+    /// Changes the currently selected slot
+    /// </summary>
+    /// <param name="index"> The index of the slot to change to</param>
+    [Command] public void CmdSetSelectedSlot(int index)
 	{
 		selectedSlot = index;
 	}
 
-    [Client] private void OnSelectedSlotChange(int oldSlot, int newSlot)
+    /// <summary>
+    /// SyncVar hook for the variable selectedSlot
+    /// </summary>
+    [ClientCallback] private void OnSelectedSlotChange(int oldSlot, int newSlot)
     {
         // Update the player interface when selected slot changes
         this.GetComponent<PlayerInterface>().UpdateInventorySelected();
@@ -177,7 +244,11 @@ public class PlayerInventory : NetworkBehaviour
         if (isLocalPlayer) gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
     }
 
-    [Client] private void OnInventoryChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
+
+    /// <summary>
+    /// SyncList hook for variable inventoryList
+    /// </summary>
+    [ClientCallback] private void OnInventoryChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
     {
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
@@ -188,8 +259,10 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
-    // Returns the bomb type corresponding to the currently selected bomb
-    // returns 'e' if the bomb slot is empty
+    /// <summary>
+    /// Returns the bomb type corresponding to the currently selected bomb
+    /// </summary>
+    /// <returns> The character of the bomb type. Returns 'e' if the bomb slot is empty</returns>
     public char GetSelectedBombType()
     {
         if (inventoryList[selectedSlot] <= 0) return 'e';

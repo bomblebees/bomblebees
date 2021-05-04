@@ -195,10 +195,10 @@ public class RoundManager : NetworkBehaviour
         {
             alivePlayers.Add(playerList[i]);
             Player p = playerList[i].player;
-            p.SetCanPlaceBombs(true);
-            p.SetCanSpin(true);
-            p.SetCanSwap(true); 
-            p.SetCanMove(true);
+            //p.SetCanPlaceBombs(true);
+            //p.SetCanSpin(true);
+            //p.SetCanSwap(true); 
+            //p.SetCanMove(true);
         }
         aliveCount = alivePlayers.Count;
         UpdateGridsAliveCount(0, aliveCount);
@@ -327,7 +327,7 @@ public class RoundManager : NetworkBehaviour
     private void Update()
     {
         // TODO: Delete later
-        if (Input.GetKeyDown(KeyCode.Alpha0) && FindObjectOfType<Player>().debugMode)
+        if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             ChooseRematch();
         }
