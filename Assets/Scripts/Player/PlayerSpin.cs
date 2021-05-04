@@ -71,7 +71,15 @@ public class PlayerSpin : NetworkBehaviour
     }
 
     // Cannot spin in ghost mode
-    private void OnGhostEnter(bool _) { canSpin = false; }
+    private void OnGhostEnter(bool _) {
+        // When we enter ghost mode coroutines may still be running. Stop them here
+        StopAllCoroutines();
+
+        canSpin = false;
+        ResetSpinCharge();
+        spinHitbox.gameObject.SetActive(false);
+    }
+
     private void OnGhostExit(bool _) { canSpin = true; }
 
     void Update()
@@ -271,16 +279,9 @@ public class PlayerSpin : NetworkBehaviour
     /// </summary>
     [Client] private IEnumerator HandleSpinHitbox()
     {
-        if (!spinHitbox)
-        {
-            Debug.LogError("PlayerSpin.cs: no spinHitbox assigned");
-        }
-        else
-        {
-            spinHitbox.gameObject.SetActive(true);
-            yield return new WaitForSeconds(spinHitboxDuration);
-            spinHitbox.gameObject.SetActive(false);
-        }
+        spinHitbox.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinHitboxDuration);
+        spinHitbox.gameObject.SetActive(false);
     }
 
     #endregion

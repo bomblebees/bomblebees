@@ -70,17 +70,27 @@ public class PlayerMovement : NetworkBehaviour
 
         if (direction != Vector3.zero)
         {
-            // Calculate rotation
-            rotation = Quaternion.Slerp(
-                playerModel.transform.rotation,
-                Quaternion.LookRotation(direction),
-                turnSpeed * Time.deltaTime);
-            
-            // Rotate player or ghost model
-            if (playerModel.activeSelf)
+
+            // Rotate player or ghost model, which ever is active
+            if (playerModel.activeSelf) 
+            {
+                // Calculate rotation for the player
+                rotation = Quaternion.Slerp(
+                    playerModel.transform.rotation,
+                    Quaternion.LookRotation(direction),
+                    turnSpeed * Time.deltaTime);
+
                 playerModel.transform.rotation = rotation;
-            else if (ghostModel.activeSelf)
+            } else if (ghostModel.activeSelf)
+            {
+                // Calculate rotation for the ghost
+                rotation = Quaternion.Slerp(
+                    ghostModel.transform.rotation,
+                    Quaternion.LookRotation(direction),
+                    turnSpeed * Time.deltaTime);
+
                 ghostModel.transform.rotation = rotation;
+            }
 
             // Move the player
             controller.Move(direction * movementSpeed * sludgedScalar * spinChargedScalar * Time.deltaTime);
