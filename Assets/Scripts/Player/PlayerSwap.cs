@@ -182,10 +182,10 @@ public class PlayerSwap : NetworkBehaviour
             if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
             {
                 // If the tile is already the currently selected tile, do nothing
-                if (tileHit.transform.gameObject == selectedTile)
-                {
-                    return;
-                }
+                //if (tileHit.transform.gameObject == selectedTile)
+                //{
+                //    return;
+                //}
 
                 // This is the new selected tile
                 selectedTile = tileHit.transform.gameObject;
