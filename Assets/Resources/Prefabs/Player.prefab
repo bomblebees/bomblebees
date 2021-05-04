@@ -4950,8 +4950,6 @@ MonoBehaviour:
   steamName: '[Steam Name]'
   characterCode: 0
   playerColor: {r: 0, g: 0, b: 0, a: 0}
-  invincibilityDuration: 2
-  ghostDuration: 5
   healthScript: {fileID: -8900185448856423588}
   tileHighlights: 1
   canExitInvincibility: 0
@@ -4962,7 +4960,6 @@ MonoBehaviour:
   slowTimeCheckInterval: 0.05
   sludgeVFX: {fileID: 2841311880343033178}
   selectedTile: {fileID: 0}
-  maxStackSize: 3
   playerModel: {fileID: 5260639197599151655}
   highlightModel: {fileID: 1232416090054458822}
   isDead: 0
@@ -5005,6 +5002,8 @@ MonoBehaviour:
   syncInterval: 0.1
   canSwap: 1
   heldKey: 103
+  highlightModel: {fileID: 1232416090054458822}
+  tileHighlights: 1
 --- !u!114 &5903701323762087715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5153,8 +5152,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  INVEN_BOMB_TYPES: 7200700079006700
-  INVEN_MAX_VALUES: 05000000050000000500000005000000
   groundItem_r: {fileID: 3756264357427646106, guid: 77981a58e6ee4be409664cc21206a3fe,
     type: 3}
   groundItem_p: {fileID: 7772138325108953873, guid: 5b054532a5e2e3149b169f40742ced39,
@@ -41423,7 +41420,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1286395321591997060
 Transform:
   m_ObjectHideFlags: 0

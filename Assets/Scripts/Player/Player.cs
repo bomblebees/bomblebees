@@ -33,11 +33,7 @@ public class Player : NetworkBehaviour
  //   public string debugBombPress3 = "e";
 	//public string debugBombPress4 = ";";
 	//public string debugGroundItemSpawn = "g";
-    private HexGrid hexGrid;
 
-    [Header("Respawn")]
-    public float invincibilityDuration = 2.0f;
-    public float ghostDuration = 5.0f;
     [SerializeField] public Health healthScript = null;
 
     [SerializeField] public bool tileHighlights = true;
@@ -68,9 +64,6 @@ public class Player : NetworkBehaviour
     private Ray tileRay;
     private RaycastHit tileHit;
     public GameObject selectedTile;
-    private GameObject heldHexModel;
-
-    [SerializeField] private int maxStackSize = 3;
 
     private GameObject playerMesh;
     [SerializeField] private GameObject playerModel;
@@ -107,7 +100,6 @@ public class Player : NetworkBehaviour
 
         // events
         healthScript.EventLivesLowered += SetCanBeHit;
-        healthScript.EventLivesLowered += ClearItemStack;
 
         healthScript.EventGhostExit += SetCanExitInvincibility;
 
@@ -157,9 +149,6 @@ public class Player : NetworkBehaviour
 
         if (isDead) return; // if dead, disable all player updates
 
-        ApplyTileHighlight();
-        ListenForBombRotation();
-
         //Debug.Log("tme sine cludge" + timeSinceSludged);
 
 
@@ -177,87 +166,6 @@ public class Player : NetworkBehaviour
     [ClientRpc] public void RpcSetSludgeEffectEnded(bool cond)
     {
         sludgeEffectEnded = cond;
-    }
-
-    // Applies the highlight shader to the tile the player is "looking" at
-    // This is the tile that will be swapped, and one where the bomb will be placed on
-    [Client]
-    void ApplyTileHighlight()
-    {
-        if (!tileHighlights || isDead)
-        {
-            if (selectedTile) selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
-            return;
-        }
-
-        tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
-
-        if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-        {
-            // Debug.Log("hit");
-
-            // Apply indicator to hex tile to show the tile selected
-            // if (selectedTile)
-            //     selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f); // toggles off prev selected
-            
-            selectedTile = tileHit.transform.gameObject;
-            // selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);    // toggle on current
-            highlightModel.transform.position = new Vector3(selectedTile.transform.position.x, -5.8f, selectedTile.transform.position.z);
-        }
-        // else
-        // {
-        //     selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
-        // }
-    }
-
-    // Listens for key press and rotates the item stack
-    [Client]
-    void ListenForBombRotation()
-    {
-		if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext))
-        {
-            CmdRotateItemStack();
-			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
-		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.BigBomb))
-		{
-			CmdSelectItemSlot(0);
-			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
-		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.SludgeBomb))
-		{
-			CmdSelectItemSlot(1);
-			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
-		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.LaserBeem))
-		{
-			CmdSelectItemSlot(2);
-			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
-		}
-		if (KeyBindingManager.GetKeyDown(KeyAction.PlasmaBall))
-		{
-			CmdSelectItemSlot(3);
-			FindObjectOfType<AudioManager>().PlaySound("bombrotation");
-		}
-	}
-
-    [Command]
-    public void CmdRotateItemStack()
-    {
-        this.GetComponent<PlayerInventory>().RotateSelectedSlot();
-    }
-
-	[Command]
-	public void CmdSelectItemSlot(int index, NetworkConnectionToClient sender = null)
-	{
-		this.GetComponent<PlayerInventory>().SwitchToSlot(index);
-        //BombUse(sender);
-    }
-
-    [Server]
-    public void ClearItemStack(bool val = true)
-    {
-        this.GetComponent<PlayerInventory>().ResetInventory();
     }
 
     public void SetCanBeHit(bool val)

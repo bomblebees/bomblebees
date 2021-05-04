@@ -61,7 +61,12 @@ public class PlayerSwap : NetworkBehaviour
 
         // Check for key press every frame
         ListenForSwapInput();
+
+        // Applies the tile selection highlight
+        ApplyTileHighlight();
     }
+
+    #region Swap
 
     /// <summary>
     /// Checks for swap key presses, called in Update()
@@ -134,5 +139,67 @@ public class PlayerSwap : NetworkBehaviour
         // Update hex tile on the HUD for this player for every observer
         this.GetComponent<PlayerInterface>().UpdateHexHud(newHeldKey);
     }
+
+    #endregion
+
+    #region Tile Highlight
+
+    [Header("Tile Highlight/Selection")]
+
+    /// <summary>
+    /// The hex object the player is currently selecting
+    /// </summary>
+    private GameObject selectedTile;
+
+    [SerializeField] private GameObject highlightModel;
+
+
+    /// <summary>
+    /// Whether tile highlights are enabled or not
+    /// </summary>
+    [SerializeField] public bool tileHighlights = true;
+
+    /// <summary>
+    /// Applies the highlight shader to the tile the player is "looking" at
+    /// <para> This is the tile that will be swapped, and one where the bomb will be placed on </para>
+    /// </summary>
+    [Client]
+    void ApplyTileHighlight()
+    {
+        // If tile highlights are disabled or player is dead, disable the highlight model 
+        if (!tileHighlights || this.GetComponent<Player>().isDead)
+        {
+            highlightModel.SetActive(false);
+            //if (selectedTile) selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);
+        } else
+        {
+            // Get the tile underneath the player
+            tileRay = new Ray(transform.position + transform.up * 5, Vector3.down * 10);
+
+            if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+            {
+                // If the tile is already the currently selected tile, do nothing
+                if (tileHit.transform.gameObject == selectedTile)
+                {
+                    return;
+                }
+
+                // This is the new selected tile
+                selectedTile = tileHit.transform.gameObject;
+
+                // Enable the highlight model
+                highlightModel.SetActive(true);
+
+                // Set the highlight model's position to the tiles position
+                highlightModel.transform.position = new Vector3(selectedTile.transform.position.x, -5.8f, selectedTile.transform.position.z);
+                
+    
+            }
+        }
+
+
+    }
+
+    #endregion
 
 }
