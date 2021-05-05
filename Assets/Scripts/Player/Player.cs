@@ -178,6 +178,7 @@ public class Player : NetworkBehaviour
         // Reset spin charge and disallow player to spin while sludged
         this.GetComponent<PlayerSpin>().StopSpin();
 
+		this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(true);
         // Wait for the sludge effect to end
         yield return new WaitForSeconds(duration);
 
@@ -185,7 +186,8 @@ public class Player : NetworkBehaviour
         this.GetComponent<PlayerMovement>().sludgedScalar = 1;
         SetIsSludged(false);
         this.GetComponent<PlayerSpin>().canSpin = true;
-    }
+		this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(false);
+	}
 
     /// <summary>
     /// SyncVar hook for variable isSludged

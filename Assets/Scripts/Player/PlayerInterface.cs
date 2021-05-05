@@ -18,6 +18,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] public Image spinChargeBar;
     [SerializeField] public GameObject spinUI;
     [SerializeField] public GameObject inventoryUI;
+	[SerializeField] public GameObject sludgedSpinBarUI;
 
     [Header("User Interface")]
     [SerializeField] private GameObject deathUI;
