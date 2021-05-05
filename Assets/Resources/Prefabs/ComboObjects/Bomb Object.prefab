@@ -347,6 +347,7 @@ MonoBehaviour:
   bombRadialTimerImage: {fileID: 2574470246567174100}
   travelDistanceInHexes: 3
   lerpRate: 0.15
+  lerpRateSecondary: 0.5
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
   nearestCenter: {x: 0, y: 0, z: 0}
@@ -362,6 +363,7 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 6699408313976199026}
   fillShaderRatio: 0.9
+  ownerPlayer: {fileID: 0}
 --- !u!114 &5054101179393573515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -552,7 +554,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 24300002, guid: 18ca679d8b5f0e54aa062b5e40b9afde,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: 86f83ee8767c79c479587a747e75be49, type: 3}
+  m_audioClip: {fileID: 8300000, guid: dc17dfb9dbe1ca345832851571eed168, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.7
   m_Pitch: 1
