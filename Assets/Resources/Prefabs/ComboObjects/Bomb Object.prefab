@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.2}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -347,6 +347,7 @@ MonoBehaviour:
   bombRadialTimerImage: {fileID: 2574470246567174100}
   travelDistanceInHexes: 3
   lerpRate: 0.15
+  lerpRateSecondary: 0.5
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
   nearestCenter: {x: 0, y: 0, z: 0}
@@ -362,6 +363,7 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 6699408313976199026}
   fillShaderRatio: 0.9
+  ownerPlayer: {fileID: 0}
 --- !u!114 &5054101179393573515
 MonoBehaviour:
   m_ObjectHideFlags: 0
