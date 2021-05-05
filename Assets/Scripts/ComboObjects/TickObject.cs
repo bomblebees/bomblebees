@@ -82,7 +82,6 @@ public class TickObject : ComboObject
 
     public void ProcEffects()
     {
-        print("Proccing");
         // yield return new WaitForSeconds(0.01f);
         StopVelocity();
         StartCoroutine(EnableSFX());

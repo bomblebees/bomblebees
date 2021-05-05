@@ -142,7 +142,6 @@ public class TriggerObject : ComboObject
     {
         var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
 
-        Debug.Log("enabling hitbox");
         hitbox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitbox.SetActive(false);

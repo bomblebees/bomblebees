@@ -100,7 +100,10 @@ public class Player : NetworkBehaviour
     public void SetCanBeHit(bool val)
     {
         this.canBeHit = val;
-    }
+
+		Debug.Log("val in SetCanBeHit in player: " + val);
+		isSludged = val;
+	}
 
     public void SetInvincibilityVFX(bool enabled)
     {
@@ -173,12 +176,13 @@ public class Player : NetworkBehaviour
         SetIsSludged(true);
 
         // Slow the player down by scalar times
+		// (change this here in SludgeEffectRoutine or should this be changed in OnChangeSludged? - yooka)
         this.GetComponent<PlayerMovement>().sludgedScalar = 1 - scalar;
 
         // Reset spin charge and disallow player to spin while sludged
         this.GetComponent<PlayerSpin>().StopSpin();
 
-		this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(true);
+		
         // Wait for the sludge effect to end
         yield return new WaitForSeconds(duration);
 
@@ -186,7 +190,6 @@ public class Player : NetworkBehaviour
         this.GetComponent<PlayerMovement>().sludgedScalar = 1;
         SetIsSludged(false);
         this.GetComponent<PlayerSpin>().canSpin = true;
-		this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(false);
 	}
 
     /// <summary>
@@ -194,19 +197,28 @@ public class Player : NetworkBehaviour
     /// </summary>
     [ClientCallback] private void OnChangeSludged(bool prevEffect, bool newEffect)
     {
-        
+		Debug.Log("isSludge changed");
         if (newEffect) // If the player is now sludged
         {
             // Turn on the sludge VFX
-            playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -3);
 
-            // Play random sludge sound effect
-            FindObjectOfType<AudioManager>().PlaySound("playerEw" + UnityEngine.Random.Range(1, 4));
+			// (playerMesh sort of broken in new model, disable for now (playerMesh is now just the hair object out of entire player model))
+            // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -3);
+
+			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(true);
+
+			// Play random sludge sound effect
+			FindObjectOfType<AudioManager>().PlaySound("playerEw" + UnityEngine.Random.Range(1, 4));
         } else // If the player is not sludged anymore
         {
-            // Slowly tween the VFX down until it is gone
-            LeanTween.value(gameObject, UpdateSludgeVFXCallback, -3f, -40f, 1f);
-        }
+			Debug.Log("Sludge ending/stopped");
+			// Reset speed to normal
+			this.GetComponent<PlayerMovement>().sludgedScalar = 1;
+
+			// Slowly tween the VFX down until it is gone
+			LeanTween.value(gameObject, UpdateSludgeVFXCallback, -3f, -40f, 1f);
+			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(false);
+		}
     }
 
     /// <summary>
@@ -215,7 +227,8 @@ public class Player : NetworkBehaviour
     /// <param name="val"> The value to update the VFX to </param>
     [ClientCallback] private void UpdateSludgeVFXCallback(float val)
     {
-        playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", val);
+		// re-enable when we get the right format for manipulating the new player mesh/model
+        // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", val);
     }
 
     #endregion
