@@ -9,6 +9,7 @@ public class ScenelessObjectManager : MonoBehaviour
     [Header("Misc.")]
     [SerializeField] private GlobalSettings globalSettings;
     [SerializeField] private GameObject settingButton;
+    [SerializeField] private PingDisplay pingDisplay;
 
     private void Awake()
     {
@@ -30,10 +31,12 @@ public class ScenelessObjectManager : MonoBehaviour
         if (scene.path == roomScene || scene.path == gameScene)
         {
             settingButton.SetActive(false);
+            pingDisplay.gameObject.SetActive(true);
         }
         else
         {
             settingButton.SetActive(true);
+            pingDisplay.gameObject.SetActive(false);
         }
     }
     
