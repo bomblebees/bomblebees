@@ -10,59 +10,50 @@ public class GlobalSettings : MonoBehaviour
     [Header("Others")]
     [SerializeField] private TMP_Text textFullscreen;
     
+    private int _fullScreenModeIndex;
+    private readonly FullScreenMode[] _fullScreenModes = {
+        FullScreenMode.Windowed, 
+        FullScreenMode.MaximizedWindow, 
+        FullScreenMode.ExclusiveFullScreen, 
+        FullScreenMode.FullScreenWindow};
+    
     private void Start()
     {
+        // Start with windowed mode
+        _fullScreenModeIndex = 0;
+        Screen.fullScreenMode = _fullScreenModes[_fullScreenModeIndex];
         UpdateFullscreenText();
     }
 
     public void ToggleFullScreenMode()
     {
-        switch (Screen.fullScreenMode)
-        {
-            case FullScreenMode.Windowed:
-                Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
-                break;
-            case FullScreenMode.MaximizedWindow:
-                Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
-                break;
-            case FullScreenMode.ExclusiveFullScreen:
-                Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
-                break;
-            case FullScreenMode.FullScreenWindow:
-                Screen.fullScreenMode = FullScreenMode.Windowed;
-                break;
-            default:
-                Screen.fullScreenMode = FullScreenMode.Windowed;
-                break;
-        }
+        _fullScreenModeIndex = (_fullScreenModeIndex + 1) % 4;
+        Screen.fullScreenMode = _fullScreenModes[_fullScreenModeIndex];
         UpdateFullscreenText();
     }
 
     private void UpdateFullscreenText()
     {
-        switch (Screen.fullScreenMode)
+        switch (_fullScreenModeIndex)
         {
-            case FullScreenMode.Windowed:
+            case 0:
                 textFullscreen.text = "Fullscreen: Windowed";
                 break;
-            case FullScreenMode.MaximizedWindow:
+            case 1:
                 textFullscreen.text = "Fullscreen: Maximized Window";
                 break;
-            case FullScreenMode.ExclusiveFullScreen:
+            case 2:
                 textFullscreen.text = "Fullscreen: Exclusive Fullscreen";
                 break;
-            case FullScreenMode.FullScreenWindow:
+            case 3:
                 textFullscreen.text = "Fullscreen: Fullscreen Window";
-                break;
-            default:
-                textFullscreen.text = "Fullscreen: Error";
                 break;
         }
     }
 
     public void ToggleKeyBindingsCanvas()
     {
-        mainCanvas.gameObject.SetActive(!mainCanvas.gameObject.activeSelf);
+        mainCanvas.enabled = !mainCanvas.enabled;
         keyBindingsCanvas.enabled = !keyBindingsCanvas.enabled;
     }
 

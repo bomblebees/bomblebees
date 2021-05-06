@@ -453,10 +453,12 @@ MonoBehaviour:
   bombRadialTimerImage: {fileID: 873223445666439039}
   travelDistanceInHexes: 4
   lerpRate: 0.15
+  lerpRateSecondary: 0.5
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
   nearestCenter: {x: 0, y: 0, z: 0}
   tileUnderneath: {fileID: 0}
+  edgeIndexCached: 0
   vfxDuration: 4
   sfxDuration: 10
   hitboxDuration: 7
@@ -467,6 +469,7 @@ MonoBehaviour:
   hasStarted: 0
   model: {fileID: 4027959080017919692}
   fillShaderRatio: 0.9
+  ownerPlayer: {fileID: 0}
   breakdownDuration: 3
   minimumLifeDuration: 4
   rotateLerpRate: 0.15
@@ -6647,7 +6650,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.2}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:

@@ -38,7 +38,7 @@ public class ScenelessObjectManager : MonoBehaviour
     
     private void Update()
     {
-        if (KeyBindingManager.GetKeyUp(KeyAction.ToggleSettings))
+        if (Input.GetKeyUp(KeyCode.Escape))
         {
             ToggleSettingsScreen();
         }

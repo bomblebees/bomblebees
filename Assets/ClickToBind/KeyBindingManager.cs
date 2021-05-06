@@ -57,7 +57,6 @@ public enum KeyAction
 	Down,
 	Left,
 	Right,
-	ToggleSettings,
 	Swap,
 	Place,
 	Spin,
