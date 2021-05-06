@@ -4,27 +4,28 @@ using UnityEngine.SceneManagement;
 
 public class ScenelessObjectManager : MonoBehaviour
 {
+    [Header("Scene")]
+    [Scene] [SerializeField] private string roomScene, gameScene;
+    [Header("Misc.")]
     [SerializeField] private GlobalSettings globalSettings;
     [SerializeField] private GameObject settingButton;
-    private CanvasRenderer[] _canvasRenderers;
-    [Scene] [SerializeField] private string roomScene, gameScene;
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-    
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.path == roomScene || scene.path == gameScene)
         {
