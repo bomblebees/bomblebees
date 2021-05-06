@@ -62,7 +62,7 @@ public class GlobalSettings : MonoBehaviour
 
     public void ToggleKeyBindingsCanvas()
     {
-        mainCanvas.gameObject.SetActive(!mainCanvas.gameObject.activeSelf);
+        mainCanvas.enabled = !mainCanvas.enabled;
         keyBindingsCanvas.enabled = !keyBindingsCanvas.enabled;
     }
 
