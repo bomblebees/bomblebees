@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -28,6 +29,13 @@ public class ButtonHoverTween : MonoBehaviour, IPointerEnterHandler, IPointerExi
     }
 
     public void OnPointerExit(PointerEventData eventData)
+    {
+        LeanTween.scale(this.gameObject, originalScale, 0.2f)
+            .setEase(easeOut)
+            .setOnComplete(OnTweenExitComplete);
+    }
+
+    public void OnDisable()
     {
         LeanTween.scale(this.gameObject, originalScale, 0.2f)
             .setEase(easeOut)
