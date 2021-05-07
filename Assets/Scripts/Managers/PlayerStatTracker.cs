@@ -83,7 +83,7 @@ public class PlayerStatTracker : NetworkBehaviour
 			// is this a reliable method of checking if the player inputted is the same as player stored in playerStatsList??
 			if (GameObject.ReferenceEquals(player, playerStatsList[i].player))
 			{
-				toPrint = "Kills: " + playerStatsList[i].kills + ", Deaths: " + playerStatsList[i].deaths + ", Assists: " + playerStatsList[i].assists;
+				toPrint = player.GetComponent<Player>().steamName + " - Kills: " + playerStatsList[i].kills + ", Deaths: " + playerStatsList[i].deaths + ", Assists: " + playerStatsList[i].assists;
 			}
 		}
 		// toPrint = "Kills: " + playerStatsList[index].kills + ", Deaths: " + playerStatsList[index].deaths + ", Assists: " + playerStatsList[index].assists;
