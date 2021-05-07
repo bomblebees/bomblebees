@@ -147,7 +147,7 @@ public class PlayerSpin : NetworkBehaviour
     public void SpinRelease()
     {
         // Get the spin power
-        spinPower = CalculateSpinPower();
+        spinPower = spinPowerDist[CalculateSpinLevel(spinChargeTime)];
 
         //@@ ExitInvincibility();
 
@@ -216,8 +216,9 @@ public class PlayerSpin : NetworkBehaviour
     /// <summary>
     /// Calculates the spin power based on the current spin charge time
     /// </summary>
-    /// <returns>The spin power</returns>
-    [Client] public int CalculateSpinPower()
+    /// <param name="spinTime"> The current time elapsed of the spin charge </param>
+    /// <returns>The index of the spin charge level</returns>
+    [Client] public int CalculateSpinLevel(float spinTime)
     {
         // For each spin level in ascending order
         for (int i = 0; i < spinTimings.Length; i++)
@@ -225,13 +226,13 @@ public class PlayerSpin : NetworkBehaviour
             // If maximum power, dont need to check timing
             if (i == spinTimings.Length - 1)
             {
-                return spinPowerDist[i];
+                return i;
             }
 
             // If chrage time is below this spin level, then that is the spin power
-            if (spinChargeTime < spinTimings[i])
+            if (spinTime < spinTimings[i])
             {
-                return spinPowerDist[i];
+                return i;
             }
         }
 

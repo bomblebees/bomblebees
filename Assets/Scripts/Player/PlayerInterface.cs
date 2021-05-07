@@ -27,6 +27,7 @@ public class PlayerInterface : NetworkBehaviour
 
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
+    [SerializeField] private float spinExitDelay = 0.5f;
 
     [Header("Inventory")]
     [SerializeField] private Image selectedHighlight;
@@ -70,20 +71,51 @@ public class PlayerInterface : NetworkBehaviour
 
     private void Update()
     {
-        //if (!isLocalPlayer) return;
+        if (!isLocalPlayer) return;
 
         // If player null, return
         if (!player) return;
 
-        if (player.GetComponent<PlayerSpin>().spinHeld) { spinChargeStarted = true; 
-                                                            spinUI.GetComponent<CanvasGroup>().alpha = 1; }
-        else if (spinChargeStarted) { spinChargeTime = 0; spinChargeStarted = false;UpdateSpinChargeBar();
-                                                            spinUI.GetComponent<CanvasGroup>().alpha = 0.5f; }
+        PlayerSpin ps = player.GetComponent<PlayerSpin>();
+
+        if (ps.spinHeld)
+        {
+            spinChargeStarted = true; 
+            spinUI.GetComponent<CanvasGroup>().alpha = 1;
+        } else if (spinChargeStarted)
+        {
+            // Reset the spin charge to the level that it acheived
+            int level = ps.CalculateSpinLevel(spinChargeTime);
+            if (level == 0) spinChargeTime = 0;
+            else spinChargeTime = ps.spinTimings[level - 1];
+            
+            // Spin charge has finished 
+            spinChargeStarted = false;
+
+            // Reupdate the UI
+            UpdateSpinChargeBar();
+
+            // Set to back to zero after a short time
+            StartCoroutine(DelaySpinChargeExit());
+        }
 
         if (spinChargeStarted)
         {
             UpdateSpinChargeBar();
         }
+    }
+
+
+
+    /// <summary>
+    /// Called after spin charge is released, sets it back to zero after some time
+    /// </summary>
+    [Client] private IEnumerator DelaySpinChargeExit()
+    {
+        yield return new WaitForSeconds(spinExitDelay);
+        spinChargeTime = 0;
+        spinUI.GetComponent<CanvasGroup>().alpha = 0.5f;
+        UpdateSpinChargeBar();
     }
 
     public void UpdateSpinChargeBar()

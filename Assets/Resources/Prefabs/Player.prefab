@@ -5025,12 +5025,13 @@ MonoBehaviour:
   steamName: '[Steam Name]'
   characterCode: 0
   playerColor: {r: 0, g: 0, b: 0, a: 0}
+  playerListIndex: 0
   canExitInvincibility: 0
   canBeHit: 1
   playerMesh: {fileID: 2399962388445293346}
   groundItemPickupHitbox: {fileID: 3947501954672016332}
   sludgeVFX: {fileID: 2841311880343033178}
-  isDead: 0
+  isEliminated: 0
   debugMode: 1
   debugSpawnBomble: 6
   debugSpawnSludge: 7
@@ -5199,6 +5200,7 @@ MonoBehaviour:
   gameOverUI: {fileID: 4213303826634790758}
   damageIndicator: {fileID: 664719721258544952}
   deathUItime: 3
+  spinExitDelay: 0.35
   selectedHighlight: {fileID: 2446140551976249669}
   invSlots:
   - {fileID: 2401688614270687233}
