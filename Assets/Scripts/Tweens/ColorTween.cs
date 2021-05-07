@@ -18,6 +18,7 @@ public class ColorTween : MonoBehaviour
     public LeanTweenType easeOut = LeanTweenType.linear;
 
     public bool startOnEnabled = false;
+    public bool endAfterFinish = true;
 
     private void OnEnable()
     {
@@ -26,9 +27,16 @@ public class ColorTween : MonoBehaviour
 
     public void StartTween()
     {
-        LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
-            .setEase(easeIn)
-            .setOnComplete(EndTween);
+        if (endAfterFinish)
+        {
+            LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
+                .setEase(easeIn)
+                .setOnComplete(EndTween);
+        } else
+        {
+            LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
+                .setEase(easeIn);
+        }
     }
 
     public void EndTween()

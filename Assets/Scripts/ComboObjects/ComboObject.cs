@@ -281,12 +281,12 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DisableObjectModel()
     {
-        GameObject _model = this.gameObject.transform.Find("Model").gameObject;
-        if (!_model)
+        //GameObject _model = this.gameObject.transform.Find("Model").gameObject;
+        if (!model)
         {
             print("ERROR: Model not found for a Bomb! Make sure the Model's name is 'Model'");
         }
-        _model.SetActive(false);
+        model.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
 
