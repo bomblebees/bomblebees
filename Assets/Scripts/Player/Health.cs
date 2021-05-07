@@ -225,11 +225,16 @@ public class Health : NetworkBehaviour
                 return;
         }
 
-        if (cachedCollider == other.gameObject.transform.parent.gameObject) return;
+		// the Health component has client authority, is hittable, and the collider is also a combo object hitbox
+
+		// grab the triggeringPlayer from the comboObject here
+
+		if (cachedCollider == other.gameObject.transform.parent.gameObject) return;
         else cachedCollider = other.gameObject.transform.parent.gameObject;
 
         var obj = other.gameObject.transform;
         var objRootName = obj.root.name;
+		/*
         if (
             (
                 objRootName == "Plasma Object(Clone)"
@@ -242,7 +247,9 @@ public class Health : NetworkBehaviour
         {
             cachedCollider = null;
         }
-		else if (objRootName == "Sludge Object(Clone)")
+		else
+		*/
+		if (objRootName == "Sludge Object(Clone)")
         {
             Debug.Log("triggered");
 
@@ -253,7 +260,7 @@ public class Health : NetworkBehaviour
         {
 			// if hit/life is taken, drop the player's stuff
 			CmdDropItems();
-
+			Debug.Log("hit by damaging ability");
             playerScript.canBeHit = false; // might remove later. this is for extra security
             this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
         }

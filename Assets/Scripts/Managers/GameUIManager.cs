@@ -47,7 +47,7 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundStart += ServerStartRound;
 
         eventManager.EventPlayerTookDamage += RpcOnKillEvent;
-        eventManager.EventPlayerSwap += ServerOnSwapEvent;
+        // eventManager.EventPlayerSwap += ServerOnSwapEvent;
         eventManager.EventPlayerSpin += ServerOnSpinEvent;
     }
 
