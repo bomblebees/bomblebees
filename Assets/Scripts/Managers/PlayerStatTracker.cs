@@ -59,14 +59,46 @@ public class PlayerStatTracker : NetworkBehaviour
 	public void PlayerDeathUpdate(int _, GameObject bomb, GameObject playerThatDied)
 	{
 		ComboObject bombComponent = bomb.GetComponent<ComboObject>();
-		Player playerComponent = playerThatDied.GetComponent<Player>();
 
-		if (bombComponent.triggeringPlayer != playerThatDied)
+		int killerIndex = -1;
+		int deadPlayerIndex = -1;
+
+		// Iterate through player stats list and find both the player that got kill and player that got hit
+		for (int i = 0; i < playerStatsList.Count; i++)
 		{
-			playerStatsList[bombComponent.triggeringPlayer.GetComponent<Player>().playerListIndex].kills++;
+			if (ReferenceEquals(bombComponent.triggeringPlayer, playerStatsList[i].player))
+			{
+				killerIndex = i;
+			}
+			
+			if (ReferenceEquals(playerThatDied, playerStatsList[i].player))
+			{
+				deadPlayerIndex = i;
+			}
 		}
 
-		playerStatsList[playerComponent.playerListIndex].deaths++;
+		// If not self-destruct, give kill credit to the bomb's latest triggerer/pusher
+		if (bombComponent.triggeringPlayer != playerThatDied)
+		{
+			if (killerIndex != -1)
+			{
+				playerStatsList[killerIndex].kills++;
+			}
+			else
+			{
+				Debug.Log("Killer player not found in stats list");
+			}
+		}
+
+		// Add a death to the player that got hit
+		if (deadPlayerIndex != -1)
+		{
+			playerStatsList[deadPlayerIndex].deaths++;
+		}
+		else
+		{
+			Debug.Log("Player that died not found in stats list");
+		}
 	}
 
 	public string PrintStats(GameObject player)
