@@ -4924,6 +4924,7 @@ MonoBehaviour:
   easeIn: 1
   easeOut: 1
   startOnEnabled: 0
+  endAfterFinish: 1
 --- !u!1 &728363404677404264
 GameObject:
   m_ObjectHideFlags: 0
@@ -5032,7 +5033,7 @@ MonoBehaviour:
   groundItemPickupHitbox: {fileID: 3947501954672016332}
   sludgeVFX: {fileID: 2841311880343033178}
   multikillMaxTimeThreshold: 2
-  isDead: 0
+  isEliminated: 0
   debugMode: 1
   debugSpawnBomble: 6
   debugSpawnSludge: 7
@@ -5201,6 +5202,7 @@ MonoBehaviour:
   gameOverUI: {fileID: 4213303826634790758}
   damageIndicator: {fileID: 664719721258544952}
   deathUItime: 3
+  spinExitDelay: 0.4
   selectedHighlight: {fileID: 2446140551976249669}
   invSlots:
   - {fileID: 2401688614270687233}
