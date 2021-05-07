@@ -44,7 +44,7 @@ public class ComboObject : NetworkBehaviour
     protected bool didEarlyEffects = false;
 
     // player who triggered the bomb
-    protected GameObject triggeringPlayer;
+    public GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
     
     [FormerlySerializedAs("objectMat")] public GameObject model;

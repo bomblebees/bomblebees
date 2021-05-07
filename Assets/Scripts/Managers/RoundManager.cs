@@ -23,7 +23,10 @@ public class RoundManager : NetworkBehaviour
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
     public int aliveCount = -1;
 
-    [Header("Round Settings")]
+	[Header("Stat Tracker")]
+	[SerializeField] public PlayerStatTracker statTracker;
+
+	[Header("Round Settings")]
     [SerializeField] public int startGameFreezeDuration = 5;
     [SerializeField] public int endGameFreezeDuration = 5;
 
@@ -65,7 +68,6 @@ public class RoundManager : NetworkBehaviour
     {
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         totalRoomPlayers = room.roomSlots.Count;
-
         // Event manager singleton
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
@@ -106,6 +108,9 @@ public class RoundManager : NetworkBehaviour
         playerInfo.steamId = steamId;
 
         playerList.Add(playerInfo);
+
+		// add player to stat tracker list and store reference to the player gameobject
+		statTracker.CreatePlayerStatObject(sender.identity.gameObject);
 
         // invoke event after added to list
         EventPlayerConnected?.Invoke(playerInfo);
@@ -160,9 +165,16 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void EndRound(GameObject winner = null)
     {
+		Debug.Log("huh");
         // Append all player objects to player list for event manager
         List<Player> players = new List<Player>();
-        playerList.ForEach(pi => players.Add(pi.player));
+        playerList.ForEach(pi => 
+		{
+			players.Add(pi.player);
+			Debug.Log(statTracker.PrintStats(pi.player.gameObject));
+			Debug.Log("foreach in end round");
+		}
+		);
 
         eventManager.OnEndRound(players);
         RpcEndRound(winner);
@@ -195,6 +207,7 @@ public class RoundManager : NetworkBehaviour
         {
             alivePlayers.Add(playerList[i]);
             Player p = playerList[i].player;
+			p.playerListIndex = i;
             //p.SetCanPlaceBombs(true);
             //p.SetCanSpin(true);
             //p.SetCanSwap(true); 

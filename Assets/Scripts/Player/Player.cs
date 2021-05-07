@@ -12,6 +12,8 @@ public class Player : NetworkBehaviour
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
 
+	public int playerListIndex;
+
     //[Header("Debug")]
     //public bool debugMode = false;
     //public string debugBombPress1 = "8";
