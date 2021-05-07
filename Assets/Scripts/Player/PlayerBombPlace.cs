@@ -130,8 +130,13 @@ public class PlayerBombPlace : NetworkBehaviour
         // Instantiate the bomb
         GameObject _bomb = Instantiate(prefab, this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
 
-        // Set the owner player as this player
-        _bomb.GetComponent<ComboObject>().ownerPlayer = this.gameObject;
+		ComboObject bombComponent = _bomb.GetComponent<ComboObject>();
+
+		// Set the owner player as this player
+		bombComponent.ownerPlayer = this.gameObject;
+
+		// Set the initial triggered player as this player
+		bombComponent.triggeringPlayer = this.gameObject;
 
         // Spawn the object on the server
         NetworkServer.Spawn(_bomb);
