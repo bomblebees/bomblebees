@@ -14,6 +14,26 @@ public class PlayerStatTracker : NetworkBehaviour
 		public int deaths = 0;
 		public int assists = 0;
 
+		public int doubleKills = 0;
+		public int tripleKills = 0;
+		// temp - what happens when u get a multikill greater than 3? (theoretically impossible)
+		public int superKill = 0;
+
+		// number of bombs used
+		public int comboObjectsDropped = 0;
+
+		// number of self destructs
+		public int selfDestructs = 0;
+
+		// number of combos made
+		public int totalCombosMade = 0;
+
+		// individual combo objects made from combos
+		public int bombsMade = 0;
+		public int sludgesMade = 0;
+		public int lasersMade = 0;
+		public int plasmasMade = 0;
+
 		public PlayerStats(GameObject playerObject)
 		{
 			player = playerObject;
@@ -41,6 +61,7 @@ public class PlayerStatTracker : NetworkBehaviour
 		Debug.Log("Starting PlayerStatTracker on server");
 		eventManager.EventStartRound += InitializePlayerStatsList;
 		eventManager.EventPlayerTookDamage += PlayerDeathUpdate;
+		eventManager.EventPlayerSwap += PlayerSwapUpdate;
 	}
 
 
@@ -101,6 +122,64 @@ public class PlayerStatTracker : NetworkBehaviour
 		}
 	}
 
+	[Server]
+	public void PlayerSwapUpdate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
+	{
+		int playerIndex = getPlayerIndexInList(player);
+
+		// if a combo was made, add to total combo counter
+		if (combo)
+		{
+			playerStatsList[playerIndex].totalCombosMade++;
+		}
+
+		// if 1 or more bombs awarded, add to respective counter
+		if (numBombsAwarded > 0)
+		{
+			// this shit will be a problem when we rework colors unless we can go through the codebase and change all the hardcoded color values
+			switch (oldKey)
+			{
+				// award the number of bombs made for respective combo:
+				case 'r':
+					playerStatsList[playerIndex].bombsMade += numBombsAwarded;
+					break;
+				case 'p':
+					playerStatsList[playerIndex].sludgesMade += numBombsAwarded;
+					break;
+				case 'y':
+					playerStatsList[playerIndex].lasersMade += numBombsAwarded;
+					break;
+				case 'g':
+					playerStatsList[playerIndex].plasmasMade += numBombsAwarded;
+					break;
+				default:
+					Debug.Log("Cannot award bomb type to total bomb stat counter, bomb type not found");
+					break;
+			}
+		}
+	}
+
+	#region Helpers
+
+	private int getPlayerIndexInList(GameObject player)
+	{
+		int playerIndex = -1;
+		for (int i = 0; i < playerStatsList.Count; i++)
+		{
+			if (ReferenceEquals(player, playerStatsList[i].player))
+			{
+				playerIndex = i;
+			}
+		}
+		if (playerIndex == -1)
+		{
+			Debug.Log("Player not found in stat tracker list.");
+			return playerIndex;
+		}
+
+		return playerIndex;
+	}
+
 	public string PrintStats(GameObject player)
 	{
 		string toPrint = "";
@@ -110,16 +189,23 @@ public class PlayerStatTracker : NetworkBehaviour
 			return "Player component not found, cannot print stats";
 		}
 
-		for (int i = 0; i < playerStatsList.Count; i++)
-		{
-			// is this a reliable method of checking if the player inputted is the same as player stored in playerStatsList??
-			if (GameObject.ReferenceEquals(player, playerStatsList[i].player))
-			{
-				toPrint = player.GetComponent<Player>().steamName + " - Kills: " + playerStatsList[i].kills + ", Deaths: " + playerStatsList[i].deaths + ", Assists: " + playerStatsList[i].assists;
-			}
-		}
+		int playerToPrint = getPlayerIndexInList(player);
+
+		toPrint = player.GetComponent<Player>().steamName +"\n" +
+			"Kills: " + playerStatsList[playerToPrint].kills + "\n" +
+			"Deaths: " + playerStatsList[playerToPrint].deaths + "\n" +
+			"Assists: " + playerStatsList[playerToPrint].assists + "\n" +
+			"Total Combos Made: " + playerStatsList[playerToPrint].totalCombosMade + "\n" +
+			"Total Bombs Created: " + playerStatsList[playerToPrint].bombsMade + "\n" +
+			"Total Sludges Created: " + playerStatsList[playerToPrint].sludgesMade + "\n" +
+			"Total Lasers Created: " + playerStatsList[playerToPrint].lasersMade + "\n" +
+			"Total Plasmas Created: " + playerStatsList[playerToPrint].plasmasMade;
+
+
 		// toPrint = "Kills: " + playerStatsList[index].kills + ", Deaths: " + playerStatsList[index].deaths + ", Assists: " + playerStatsList[index].assists;
 
 		return toPrint;
 	}
+
+	#endregion
 }

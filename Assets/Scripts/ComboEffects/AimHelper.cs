@@ -46,7 +46,7 @@ public class AimHelper : MonoBehaviour
 
             Quaternion ang = Quaternion.Euler(0, 0, angles[edgeIndex]);
 
-            LeanTween.rotateLocal(radialArrow, ang.eulerAngles, 0.3f)
+            LeanTween.rotateLocal(radialArrow, ang.eulerAngles, 0.15f)
                 .setEase(LeanTweenType.easeOutExpo);
                 
                 //LeanRotateZ(newPushedDirAngle, 0.1f);
