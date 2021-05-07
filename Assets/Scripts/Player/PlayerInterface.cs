@@ -78,6 +78,10 @@ public class PlayerInterface : NetworkBehaviour
 
         PlayerSpin ps = player.GetComponent<PlayerSpin>();
 
+        // Show full opacity charge bar if sludged
+        if (player.GetComponent<Player>().isSludged == true) spinUI.GetComponent<CanvasGroup>().alpha = 1;
+        else                                                 spinUI.GetComponent<CanvasGroup>().alpha = .5f;
+
         if (ps.spinHeld)
         {
             spinChargeStarted = true; 
