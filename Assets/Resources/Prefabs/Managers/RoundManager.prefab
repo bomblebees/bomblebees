@@ -47,7 +47,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 53558122436424030}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -408,6 +408,7 @@ GameObject:
   - component: {fileID: 8664837616217751523}
   - component: {fileID: 7258488814944656641}
   - component: {fileID: 4286371612849763445}
+  - component: {fileID: 4197033293965648748}
   m_Layer: 0
   m_Name: RoundManager
   m_TagString: Untagged
@@ -461,11 +462,26 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   aliveCount: -1
+  statTracker: {fileID: 4197033293965648748}
   startGameFreezeDuration: 3
   endGameFreezeDuration: 5
   useRoundTimer: 1
   roundDuration: 240
   serverEndSelectionCanvas: {fileID: 1352525446624707517}
+--- !u!114 &4197033293965648748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2406211372602509701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b5c522ac606aec4c894e5aeeeff5f9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!1 &5152639368858856142
 GameObject:
   m_ObjectHideFlags: 0
