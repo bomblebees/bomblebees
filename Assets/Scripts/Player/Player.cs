@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
@@ -31,10 +32,17 @@ public class Player : NetworkBehaviour
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
+	[Header("Multikill Settings")]
+	public double multikillMaxTimeThreshold = 2;
+	private double lastKillTime = -1;
+	private int multiKillCount = 1;
+
     public bool isEliminated = false; // when player has lost ALL lives
 
-    // Added for easy referencing of local player from anywhere
-    public override void OnStartLocalPlayer()
+	private EventManager eventManager;
+
+	// Added for easy referencing of local player from anywhere
+	public override void OnStartLocalPlayer()
     {
         gameObject.name = "LocalPlayer";
         base.OnStartLocalPlayer();
@@ -52,10 +60,12 @@ public class Player : NetworkBehaviour
     {
         base.OnStartServer();
 
-        //fixedY = this.transform.position.y;  // To prevent bugs from collisions
+		//fixedY = this.transform.position.y;  // To prevent bugs from collisions
+		eventManager = EventManager.Singleton;
+		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
-        // Subscribe to damage events
-        this.GetComponent<Health>().EventLivesLowered += SetCanBeHit;
+		// Subscribe to damage events
+		this.GetComponent<Health>().EventLivesLowered += SetCanBeHit;
         this.GetComponent<Health>().EventGhostExit += SetCanExitInvincibility;
     }
 
@@ -103,7 +113,6 @@ public class Player : NetworkBehaviour
     {
         this.canBeHit = val;
 
-		Debug.Log("val in SetCanBeHit in player: " + val);
 		isSludged = val;
 	}
 
@@ -233,5 +242,36 @@ public class Player : NetworkBehaviour
         // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", val);
     }
 
-    #endregion
+	#endregion
+
+	#region Multikill Tracking
+	[Server]
+	public void TrackMultiKill(double timeOfThisKill)
+	{
+		Debug.Log("Tracking multikill; time of this kill: " + timeOfThisKill);
+		Debug.Log("Time of last kill: " + lastKillTime);
+		if (lastKillTime == -1)
+		{
+			// player's first kill, set the lastKillTime and return
+			lastKillTime = NetworkTime.time;
+			return;
+		}
+		// if the multikill threshold time has already passed, reset counter to 1
+		if (timeOfThisKill - lastKillTime > multikillMaxTimeThreshold)
+		{
+			multiKillCount = 1;
+		}
+		else
+		{
+			// time elapsed is less than the threshold, add to multikill
+			multiKillCount++;
+			// time from last kill is under threshold, count the multikill and send the event with the player attached
+			Debug.Log("Multikill number " + multiKillCount + " achieved, time from last kill: " + (NetworkTime.time - lastKillTime));
+
+			eventManager.OnPlayerMultikill(gameObject, multiKillCount);
+		}
+
+		lastKillTime = NetworkTime.time;
+	}
+	#endregion
 }

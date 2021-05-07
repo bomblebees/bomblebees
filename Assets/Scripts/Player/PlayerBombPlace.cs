@@ -138,8 +138,8 @@ public class PlayerBombPlace : NetworkBehaviour
 		// Set the initial triggered player as this player
 		bombComponent.triggeringPlayer = this.gameObject;
 
-        // Spawn the object on the server
-        NetworkServer.Spawn(_bomb);
+		// Spawn the object on the server
+		NetworkServer.Spawn(_bomb);
 
         // Call the bomb placed event
         eventManager.OnBombPlaced(_bomb, this.gameObject);

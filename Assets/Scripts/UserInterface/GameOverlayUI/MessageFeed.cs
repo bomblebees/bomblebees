@@ -95,6 +95,36 @@ public class MessageFeed : MonoBehaviour
         CreateMessage(killtext, -1);
     }
 
+	public void OnMultikillEvent(GameObject player, int multikillNumber)
+	{
+		// We will probably display multikills in large letters through some announcer feed later;
+		// just make a multikill message type for now
+		string playerName = GetPlayerTextUppercase(player);
+
+		string killAmountText = "";
+
+		switch (multikillNumber)
+		{
+			case 1:
+				// multikill should never be called with just one kill, but just in case haha lol xd
+				killAmountText = "SINGLE KILL! CODE IS BROKEN! LOL";
+				break;
+			case 2:
+				killAmountText = "DOUBLE KILL!";
+				break;
+			case 3:
+				killAmountText = "TRIPLE KILL!";
+				break;
+			default:
+				killAmountText = "SUPER KILL!";
+				break;
+		}
+
+		string multikillText = playerName + " " + killAmountText;
+
+		CreateMessage(multikillText, -1);
+	}
+
     public void OnSwapEvent(char comboKey, GameObject player, int numBombsAwarded)
     {
         string killtext = GetComboText(comboKey) + GetComboMultiplier(numBombsAwarded);
@@ -144,7 +174,14 @@ public class MessageFeed : MonoBehaviour
         return "<b><color=#" + ColorUtility.ToHtmlStringRGB(p.playerColor) + ">" + p.steamName + "</color></b>";
     }
 
-    private string GetBombText(GameObject bomb)
+	private string GetPlayerTextUppercase(GameObject player)
+	{
+		Player p = player.GetComponent<Player>();
+		string playerUppercaseName = p.steamName.ToUpper();
+		return "<b><color=#" + ColorUtility.ToHtmlStringRGB(p.playerColor) + ">" + playerUppercaseName + "</color></b>";
+	}
+
+	private string GetBombText(GameObject bomb)
     {
         if (bomb.GetComponent<BombObject>() != null)
         {

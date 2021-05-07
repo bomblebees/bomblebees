@@ -4924,7 +4924,6 @@ MonoBehaviour:
   easeIn: 1
   easeOut: 1
   startOnEnabled: 0
-  endAfterFinish: 1
 --- !u!1 &728363404677404264
 GameObject:
   m_ObjectHideFlags: 0
@@ -5032,7 +5031,8 @@ MonoBehaviour:
   playerMesh: {fileID: 2399962388445293346}
   groundItemPickupHitbox: {fileID: 3947501954672016332}
   sludgeVFX: {fileID: 2841311880343033178}
-  isEliminated: 0
+  multikillMaxTimeThreshold: 2
+  isDead: 0
   debugMode: 1
   debugSpawnBomble: 6
   debugSpawnSludge: 7
@@ -5201,7 +5201,6 @@ MonoBehaviour:
   gameOverUI: {fileID: 4213303826634790758}
   damageIndicator: {fileID: 664719721258544952}
   deathUItime: 3
-  spinExitDelay: 0.35
   selectedHighlight: {fileID: 2446140551976249669}
   invSlots:
   - {fileID: 2401688614270687233}
@@ -10790,8 +10789,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8028620940725904821}
   - component: {fileID: 3459756383608607166}
-  - component: {fileID: 6410950151623461525}
-  - component: {fileID: 7123583715433258109}
   m_Layer: 5
   m_Name: Spin
   m_TagString: Untagged
@@ -10841,39 +10838,6 @@ MonoBehaviour:
   easeOutTime: 0.15
   easeIn: 6
   easeOut: 18
---- !u!225 &6410950151623461525
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3574706720935437555}
-  m_Enabled: 1
-  m_Alpha: 0.52
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
-  m_IgnoreParentGroups: 0
---- !u!114 &7123583715433258109
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3574706720935437555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 297de32c565a57a4d95811db70a5c4da, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetColor: {r: 1, g: 1, b: 1, a: 1}
-  endColor: {r: 1, g: 0, b: 0, a: 0.5019608}
-  easeInTime: 1
-  easeOutTime: 1
-  timeBetweenLoop: 0
-  easeIn: 1
-  easeOut: 1
-  startOnEnabled: 0
-  endAfterFinish: 1
 --- !u!1 &3742883595269632051
 GameObject:
   m_ObjectHideFlags: 0
@@ -26233,7 +26197,7 @@ GameObject:
   - component: {fileID: 1676341455795591886}
   - component: {fileID: 56470278163432649}
   m_Layer: 5
-  m_Name: SpinIcon
+  m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41698,12 +41662,12 @@ GameObject:
   - component: {fileID: 353102404511580083}
   - component: {fileID: 5602590261321930266}
   m_Layer: 5
-  m_Name: SpinIconOutline
+  m_Name: Image (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2168947945503371370
 RectTransform:
   m_ObjectHideFlags: 0
@@ -42284,12 +42248,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5070fe9e3588d324493aeca7a91f65b9, type: 3}
---- !u!224 &8136433064829220325 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 8800530296141692236, guid: 5070fe9e3588d324493aeca7a91f65b9,
-    type: 3}
-  m_PrefabInstance: {fileID: 777901654312077481}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3424519614513562154 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2688085051857799811, guid: 5070fe9e3588d324493aeca7a91f65b9,
@@ -42302,6 +42260,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &8136433064829220325 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8800530296141692236, guid: 5070fe9e3588d324493aeca7a91f65b9,
+    type: 3}
+  m_PrefabInstance: {fileID: 777901654312077481}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &922327603176511627
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42875,15 +42839,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d46145a26442c5b449a21b5c35d6e0e9, type: 3}
---- !u!4 &7560027545034526395 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2336704052561413615, guid: d46145a26442c5b449a21b5c35d6e0e9,
-    type: 3}
-  m_PrefabInstance: {fileID: 5226215212550458196}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7560027545034526390 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2336704052561413602, guid: d46145a26442c5b449a21b5c35d6e0e9,
+    type: 3}
+  m_PrefabInstance: {fileID: 5226215212550458196}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7560027545034526395 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2336704052561413615, guid: d46145a26442c5b449a21b5c35d6e0e9,
     type: 3}
   m_PrefabInstance: {fileID: 5226215212550458196}
   m_PrefabAsset: {fileID: 0}
