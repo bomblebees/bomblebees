@@ -68,7 +68,6 @@ public class PlasmaObject : TriggerObject
         }
 
 		PlayFireSFX();
-		Debug.Log("activate plasma spawn ball in SpawnBall coroutine");
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
 		// this.hitBox.SetActive(true);

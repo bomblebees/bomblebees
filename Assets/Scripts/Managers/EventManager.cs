@@ -25,6 +25,7 @@ public class EventManager : NetworkBehaviour
     public delegate void PlayerTookDamageDelegate(int newLives, GameObject bomb, GameObject player);
     public delegate void PlayerSwapDelegate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded);
     public delegate void PlayerSpinDelegate(GameObject player, GameObject bomb);
+	public delegate void PlayerMultikillDelegate(GameObject player, int killNumber);
 
     public event StartRoundDelegate EventStartRound;
     public event EndRoundDelegate EventEndRound;
@@ -33,6 +34,7 @@ public class EventManager : NetworkBehaviour
     public event PlayerTookDamageDelegate EventPlayerTookDamage;
     public event PlayerSwapDelegate EventPlayerSwap;
     public event PlayerSpinDelegate EventPlayerSpin;
+	public event PlayerMultikillDelegate EventMultikill;
 
     // singletons
     public static EventManager _instance;
@@ -126,6 +128,21 @@ public class EventManager : NetworkBehaviour
             EventPlayerTookDamage?.Invoke(newLives, bomb, player);
         }
 
+		// Take the NetworkTime.time and pass it into a method on Player for detecting multi kills
+		// this is server code!
+
+		// The killer is stored in the bomb object, so get the player component there and call the method on that player
+		// if not self destruct, count towards multikill: 
+		if (!ReferenceEquals(bomb.GetComponent<ComboObject>().triggeringPlayer, player))
+		{
+			bomb.GetComponent<ComboObject>().triggeringPlayer.GetComponent<Player>().TrackMultiKill(NetworkTime.time);
+		}
+		else
+		{
+			Debug.Log("Player took damage from own bomb");
+		}
+		
+
         //Debug.Log("player who took damage: " + player.name);
         //Debug.Log("player lives: " + newLives.ToString());
         //Debug.Log("bomb that hit the player: " + bomb);
@@ -170,5 +187,16 @@ public class EventManager : NetworkBehaviour
         EventPlayerSpin?.Invoke(player, bomb);
     }
 
+	/// <summary>
+	/// Called when a player gets a multikill
+	/// </summary>
+	/// <param name="player">The player that achieved the multikill</param>
+	/// <param name="killNumber">The current multikill number</param>
+	[Server]
+	public void OnPlayerMultikill(GameObject player, int killNumber)
+	{
+		Debug.Log("Multikill recorded! By " + player.GetComponent<Player>().steamName + ", multikill size of " + killNumber);
+		EventMultikill?.Invoke(player, killNumber);
+	}
     #endregion
 }

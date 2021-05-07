@@ -47,6 +47,7 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundStart += ServerStartRound;
 
         eventManager.EventPlayerTookDamage += RpcOnKillEvent;
+		eventManager.EventMultikill += RpcOnMultikillEvent;
         // eventManager.EventPlayerSwap += ServerOnSwapEvent;
         eventManager.EventPlayerSpin += ServerOnSpinEvent;
     }
@@ -166,7 +167,13 @@ public class GameUIManager : NetworkBehaviour
         messageFeed.OnKillEvent(bomb, player);
     }
 
-    [Server]
+	[ClientRpc]
+	public void RpcOnMultikillEvent(GameObject player, int multiKillAmount)
+	{
+		messageFeed.OnMultikillEvent(player, multiKillAmount);
+	}
+
+	[Server]
     public void ServerOnSwapEvent(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
     {
         if (combo)

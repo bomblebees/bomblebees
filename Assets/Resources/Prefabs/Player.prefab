@@ -5025,11 +5025,13 @@ MonoBehaviour:
   steamName: '[Steam Name]'
   characterCode: 0
   playerColor: {r: 0, g: 0, b: 0, a: 0}
+  playerListIndex: 0
   canExitInvincibility: 0
   canBeHit: 1
   playerMesh: {fileID: 2399962388445293346}
   groundItemPickupHitbox: {fileID: 3947501954672016332}
   sludgeVFX: {fileID: 2841311880343033178}
+  multikillMaxTimeThreshold: 2
   isDead: 0
   debugMode: 1
   debugSpawnBomble: 6
