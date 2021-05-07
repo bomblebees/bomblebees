@@ -44,7 +44,7 @@ public class PlayerMovement : NetworkBehaviour
     void Update()
     {
         // Code after this point is run only on the local player
-        if (!isLocalPlayer) return;
+        if (!isLocalPlayer || this.GetComponent<Player>().isEliminated) return;
 
         this.transform.position = new Vector3(this.transform.position.x, fixedY, this.transform.position.z);
 

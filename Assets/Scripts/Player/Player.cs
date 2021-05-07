@@ -31,7 +31,7 @@ public class Player : NetworkBehaviour
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
-    public bool isDead = false; // when player has lost ALL lives
+    public bool isEliminated = false; // when player has lost ALL lives
 
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
@@ -66,7 +66,7 @@ public class Player : NetworkBehaviour
         // Code after this point is run only on the local player
         if (!isLocalPlayer) return;
 
-        if (isDead) return; // if dead, disable all player updates
+        if (isEliminated) return; // if dead, disable all player updates
 
         // -- Any update code for the player can go here --
 

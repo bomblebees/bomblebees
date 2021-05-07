@@ -271,7 +271,7 @@ public class Health : NetworkBehaviour
         playerInv.SetActive(false);
         playerModel.SetActive(false);
         playerScript.canBeHit = false;
-        playerScript.isDead = true;
+        playerScript.isEliminated = true;
     }
 
     #endregion
