@@ -28,6 +28,7 @@ public class PlayerSpin : NetworkBehaviour
     /// The timings in seconds required to reach a specific spin charge level.
     /// </summary>
     [SerializeField] public float[] spinTimings = { 0.5f, 1.0f, 1.5f, 2.0f };
+    
 
     /// <summary>
     /// The spin power of each spin level. The number represents the distance in hexes
@@ -127,7 +128,9 @@ public class PlayerSpin : NetworkBehaviour
             currentChargeLevel = 0;
 
             // Bounce the charge bar right away
-            this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+            // here
+            // this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
+            // this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
 
             CmdSetSpinHeld(true);
         }

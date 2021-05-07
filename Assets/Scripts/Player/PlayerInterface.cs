@@ -75,8 +75,10 @@ public class PlayerInterface : NetworkBehaviour
         // If player null, return
         if (!player) return;
 
-        if (player.GetComponent<PlayerSpin>().spinHeld) { spinChargeStarted = true; }
-        else if (spinChargeStarted) { spinChargeTime = 0; spinChargeStarted = false; UpdateSpinChargeBar(); }
+        if (player.GetComponent<PlayerSpin>().spinHeld) { spinChargeStarted = true; 
+                                                            spinUI.GetComponent<CanvasGroup>().alpha = 1; }
+        else if (spinChargeStarted) { spinChargeTime = 0; spinChargeStarted = false;UpdateSpinChargeBar();
+                                                            spinUI.GetComponent<CanvasGroup>().alpha = 0.5f; }
 
         if (spinChargeStarted)
         {
