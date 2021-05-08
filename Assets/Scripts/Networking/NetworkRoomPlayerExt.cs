@@ -36,13 +36,20 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     Room_UI roomUI;
 
     NetworkRoomManagerExt room;
+    
+    // TODO: Test only
+    public int times;
 
     public override void OnStartClient()
     {
+        // TODO: Test only
+        times += 1;
+        
         InitRequiredVars();
         base.OnStartClient();
 
         _pingDisplay = FindObjectOfType<PingDisplay>();
+        
         InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
     }
 
