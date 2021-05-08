@@ -31,9 +31,12 @@ public class AimHelper : MonoBehaviour
         if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf)
         {
             radialArrow.SetActive(false);
-            target.SetActive(false);
-            targetQuad.SetActive(false);
 
+            if (target != null)
+            {
+                target.SetActive(false);
+                targetQuad.SetActive(false);
+            }
         }
 
 
