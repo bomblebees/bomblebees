@@ -407,9 +407,14 @@ public class RoundManager : NetworkBehaviour
     private void Update()
     {
         // TODO: Delete later
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetKeyDown(KeyCode.Alpha5) && Input.GetKey(KeyCode.C))
         {
             ChooseRematch();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha6) && Input.GetKey(KeyCode.C))
+        {
+            ChooseReturnToLobby();
         }
     }
 }

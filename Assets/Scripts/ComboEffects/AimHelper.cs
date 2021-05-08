@@ -31,9 +31,14 @@ public class AimHelper : MonoBehaviour
         if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf)
         {
             radialArrow.SetActive(false);
-            target.SetActive(false);
-            targetQuad.SetActive(false);
 
+            if (target != null)
+            {
+                target.SetActive(false);
+                targetQuad.SetActive(false);
+            }
+
+            return;
         }
 
 
@@ -84,8 +89,9 @@ public class AimHelper : MonoBehaviour
     protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name != "LocalPlayer") return;
+        if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf) return;
 
-        radialArrow.gameObject.GetComponentInChildren<ColorTween>().StartTween();
+        radialArrow.GetComponentInChildren<ColorTween>().StartTween();
 
         if (target != null)
         {
@@ -97,8 +103,9 @@ public class AimHelper : MonoBehaviour
     protected virtual void OnTriggerExit(Collider other)
     {
         if (other.gameObject.name != "LocalPlayer") return;
+        if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf) return;
 
-        radialArrow.gameObject.GetComponentInChildren<ColorTween>().EndTween();
+        radialArrow.GetComponentInChildren<ColorTween>().EndTween();
 
         if (target != null)
         {
