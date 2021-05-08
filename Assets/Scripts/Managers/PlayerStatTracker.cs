@@ -270,7 +270,8 @@ public class PlayerStatTracker : NetworkBehaviour
 				"Total Bombs Created: " + playerStatsOrderedByElimination[i].bombsMade + "\n" +
 				"Total Sludges Created: " + playerStatsOrderedByElimination[i].sludgesMade + "\n" +
 				"Total Lasers Created: " + playerStatsOrderedByElimination[i].lasersMade + "\n" +
-				"Total Plasmas Created: " + playerStatsOrderedByElimination[i].plasmasMade;
+				"Total Plasmas Created: " + playerStatsOrderedByElimination[i].plasmasMade + "\n" +
+				"Size of playerStatsOrderedByElimination: " + playerStatsOrderedByElimination.Count;
 			Debug.Log(toPrint);
 		}
 		/*
