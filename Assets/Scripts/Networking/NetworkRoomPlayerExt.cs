@@ -39,16 +39,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         base.OnStartClient();
     }
 
-    public override void OnStartLocalPlayer()
-    {
-        base.OnStartLocalPlayer();
-
-        // Subscribe to events
-        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-        roomUI.EventStartButtonClicked += OnStartButtonClick;
-    }
-
     private void InitRequiredVars()
     {
         // Only init if we are in the room scene
@@ -109,7 +99,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         base.OnClientEnterRoom();
 
-
+        // Subscribe to events
+        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+        roomUI.EventStartButtonClicked += OnStartButtonClick;
     }
 
     public override void OnClientExitRoom()
