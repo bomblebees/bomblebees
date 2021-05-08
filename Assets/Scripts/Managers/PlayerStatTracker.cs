@@ -142,8 +142,8 @@ public class PlayerStatTracker : NetworkBehaviour
 			
 			if (!(lobbyNumPlayers <= 1))
 			{
-				playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
 				playerStatsList[deadPlayerIndex].placement = lobbyNumPlayers - playerStatsOrderedByElimination.Count;
+				playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
 			}
 
 			/*

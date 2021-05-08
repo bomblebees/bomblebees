@@ -230,6 +230,9 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public IEnumerator ServerEndRound(GameObject winner = null)
     {
+
+		yield return new WaitForSeconds(endGameFreezeDuration);
+
 		if (winner != null)
 		{
 			PlayerStatTracker.PlayerStats winningPlayerStat = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
@@ -286,8 +289,7 @@ public class RoundManager : NetworkBehaviour
 				}
 			}
 		}
-		yield return new WaitForSeconds(endGameFreezeDuration);
-        RpcShowEndCard();
+		RpcShowEndCard();
 
 		// printing game results in console
 
