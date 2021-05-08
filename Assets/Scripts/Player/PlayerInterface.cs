@@ -25,6 +25,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private GameObject deathUI;
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject damageIndicator;
+    [SerializeField] private GameObject damageFlash;
 
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
@@ -144,9 +145,19 @@ public class PlayerInterface : NetworkBehaviour
         spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 2];
     }
 
-    public void OnPlayerTakeDamage(int _, int __, GameObject ___)
+    public void OnPlayerTakeDamage(int currentHealth, int _, GameObject __)
     {
-        if (isLocalPlayer) damageIndicator.GetComponent<ColorTween>().StartTween();
+        if (!isLocalPlayer) return;
+
+        damageIndicator.GetComponent<ColorTween>().StartTween();
+
+        if (currentHealth == 1)
+        {
+            damageFlash.GetComponent<ColorTween>().LoopTween();
+        } else if (currentHealth == 0)
+        {
+            damageFlash.GetComponent<ColorTween>().EndLoopTween();
+        }
 	}
 
 
