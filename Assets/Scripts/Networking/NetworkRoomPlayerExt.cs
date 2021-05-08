@@ -40,19 +40,24 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         InitRequiredVars();
         base.OnStartClient();
         
-        InvokeRepeating(nameof(CmdSetPing), 0, 1);
+        InvokeRepeating(nameof(SetPing), 0, 1);
+    }
+
+    private void SetPing()
+    {
+        CmdSetPing(string.Format("{0}ms", (int)(NetworkTime.rtt * 1000)));
+        UpdatePingDisplay();
     }
 
     [Command]
-    private void CmdSetPing()
+    private void CmdSetPing(string newPing)
     {
-        ping = string.Format("{0}ms", (int)(NetworkTime.rtt * 1000));
-        UpdatePingDisplay();
+        ping = newPing;
     }
     
     public void UpdatePingDisplay()
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < room.roomSlots.Count; i++)
         {
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
