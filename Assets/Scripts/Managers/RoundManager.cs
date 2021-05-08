@@ -235,9 +235,11 @@ public class RoundManager : NetworkBehaviour
 
 		if (winner != null)
 		{
+			/*
 			PlayerStatTracker.PlayerStats winningPlayerStat = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
 			winningPlayerStat.placement = 1;
 			statTracker.playerStatsOrderedByElimination.Insert(0, winningPlayerStat);
+			*/
 
 			// if we have a winner, but we also have other survivors
 			if (alivePlayers.Count > 1)
