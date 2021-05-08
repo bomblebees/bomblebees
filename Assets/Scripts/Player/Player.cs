@@ -13,7 +13,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
 
-	public int playerListIndex;
+    [SyncVar] public int playerListIndex;
 
     //[Header("Debug")]
     //public bool debugMode = false;
