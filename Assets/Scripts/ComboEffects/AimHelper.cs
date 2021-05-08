@@ -61,6 +61,10 @@ public class AimHelper : MonoBehaviour
                 LeanTween.moveLocalX(target, distances[newDist], 0.2f)
                     .setEase(LeanTweenType.easeOutExpo);
 
+                // Apply bounce animation to the target (ignores first move)
+                if (other.gameObject.GetComponent<PlayerSpin>().currentChargeLevel > 0)
+                    target.GetComponent<ScaleTween>().StartTween();
+
                 // Move the quad to the center of the target and bomb
                 LeanTween.moveLocalX(targetQuad, distances[newDist] / 2, 0.2f)
                     .setEase(LeanTweenType.easeOutExpo);
