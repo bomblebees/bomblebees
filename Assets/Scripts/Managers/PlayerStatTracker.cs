@@ -204,7 +204,7 @@ public class PlayerStatTracker : NetworkBehaviour
 	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
 
 	// populate stat block with the necessary stats
-	public void CreateStatsUIElement(PlayerStats playerStat)
+	public void CreateStatsUIElement()
 	{
 		for (int i = 0; i < playerStatsOrderedByElimination.Count; i++)
 		{
@@ -214,7 +214,10 @@ public class PlayerStatTracker : NetworkBehaviour
 				PlayerStatsUIElementPrefab,
 				new Vector3(0, 0, 0),
 				Quaternion.identity,
-				roundManager.statsElementUIAnchorObject.transform);
+				roundManager.statsElementUIAnchorObject.transform
+			);
+
+			obj.transform.localPosition = new Vector3(0, 0, 0);
 
 			obj.transform.position += new Vector3(0, i * StatUIBlockSpacing, 0);
 
@@ -223,9 +226,9 @@ public class PlayerStatTracker : NetworkBehaviour
 			uiElement.avatar.sprite = uiElement.GetComponent<CharacterHelper>().GetCharImage(playerObject.characterCode);
 			uiElement.playerName.text = playerObject.steamName;
 
-			uiElement.killsText.text = playerStat.kills.ToString();
-			uiElement.deathsText.text = playerStat.deaths.ToString();
-			uiElement.combosMadeText.text = playerStat.totalCombosMade.ToString();
+			uiElement.killsText.text = playerStatsOrderedByElimination[i].kills.ToString();
+			uiElement.deathsText.text = playerStatsOrderedByElimination[i].deaths.ToString();
+			uiElement.combosMadeText.text = playerStatsOrderedByElimination[i].totalCombosMade.ToString();
 		}
 	}
 

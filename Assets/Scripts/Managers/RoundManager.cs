@@ -298,7 +298,7 @@ public class RoundManager : NetworkBehaviour
 		// printing game results in console
 
 		statTracker.PrintStats();
-		
+		statTracker.CreateStatsUIElement();
 		
 
 		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
