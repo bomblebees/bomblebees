@@ -139,10 +139,10 @@ public class PlayerStatTracker : NetworkBehaviour
 			Debug.Log("num players in lobby: " + roundManager.playerList.Count);
 			Debug.Log("dead player in stat tracker: " + playerThatDied);
 			int lobbyNumPlayers = roundManager.playerList.Count;
-			playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
-
+			
 			if (!(lobbyNumPlayers <= 1))
 			{
+				playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
 				playerStatsList[deadPlayerIndex].placement = lobbyNumPlayers - playerStatsOrderedByElimination.Count;
 			}
 

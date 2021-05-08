@@ -172,62 +172,7 @@ public class RoundManager : NetworkBehaviour
     {
 
 
-		if (winner != null)
-		{
-			PlayerStatTracker.PlayerStats winningPlayerStat = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
-			winningPlayerStat.placement = 1;
-			statTracker.playerStatsOrderedByElimination.Insert(0, winningPlayerStat);
-			
-			// if we have a winner, but we also have other survivors
-			if (alivePlayers.Count > 1)
-			{
-				// add to ordered stats list in order of less lives to max
-				for (int i = 1; i <= playerMaxLives; i++)
-				{
-					for (int j = 0; j < alivePlayers.Count; j++)
-					{
-						if (alivePlayers[j].player.GetComponent<Health>().currentLives == i)
-						{
-							PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[j].player.gameObject)];
-							currentPlayer.placement = playerList.Count - statTracker.playerStatsOrderedByElimination.Count;
-							statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
-						}
-					}
-				}
-			}
-			else // we have just one winner
-			{
-				// player is in index 0, last one standing
-				/*
-				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
-				currentPlayer.placement = 1;
-				statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
-				*/
-			}
-		}
-		else
-		{
-			Debug.Log("no winners, winner is null");
-			// tie
-			if (alivePlayers.Count == 0)
-			{
-				// round ended before time but last one standing was also person to die; single player game
-				Debug.Log("single player game");
-				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(playerList[0].player.gameObject)];
-				currentPlayer.placement = 1;
-				statTracker.playerStatsOrderedByElimination.Insert(0, statTracker.playerStatsList[statTracker.getPlayerIndexInList(playerList[0].player.gameObject)]);
-				
-			}
-			else // no winner, round ended by time 
-			{
-				for (int i = 0; i < alivePlayers.Count; i++)
-				{
-					// go through the set of player stats and add to the ordered list in order of kills, then combos made
-					PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[i].player.gameObject)];
-					statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
-				}
-			}
-		}
+		
 
 		
 
@@ -242,7 +187,7 @@ public class RoundManager : NetworkBehaviour
 
         eventManager.OnEndRound(players);
         RpcEndRound(winner);
-        StartCoroutine(ServerEndRound());
+        StartCoroutine(ServerEndRound(winner));
     }
 
     [ClientRpc]
@@ -283,9 +228,65 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
-    public IEnumerator ServerEndRound()
+    public IEnumerator ServerEndRound(GameObject winner = null)
     {
-        yield return new WaitForSeconds(endGameFreezeDuration);
+		if (winner != null)
+		{
+			PlayerStatTracker.PlayerStats winningPlayerStat = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
+			winningPlayerStat.placement = 1;
+			statTracker.playerStatsOrderedByElimination.Insert(0, winningPlayerStat);
+
+			// if we have a winner, but we also have other survivors
+			if (alivePlayers.Count > 1)
+			{
+				// add to ordered stats list in order of less lives to max
+				for (int i = 1; i <= playerMaxLives; i++)
+				{
+					for (int j = 0; j < alivePlayers.Count; j++)
+					{
+						if (alivePlayers[j].player.GetComponent<Health>().currentLives == i)
+						{
+							PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[j].player.gameObject)];
+							currentPlayer.placement = playerList.Count - statTracker.playerStatsOrderedByElimination.Count;
+							statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
+						}
+					}
+				}
+			}
+			else // we have just one winner
+			{
+				// player is in index 0, last one standing
+				/*
+				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
+				currentPlayer.placement = 1;
+				statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
+				*/
+			}
+		}
+		else
+		{
+			Debug.Log("no winners, winner is null");
+			// tie
+			if (alivePlayers.Count == 0)
+			{
+				// round ended before time but last one standing was also person to die; single player game
+				Debug.Log("single player game");
+				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(playerList[0].player.gameObject)];
+				currentPlayer.placement = 1;
+				statTracker.playerStatsOrderedByElimination.Insert(0, statTracker.playerStatsList[statTracker.getPlayerIndexInList(playerList[0].player.gameObject)]);
+
+			}
+			else // no winner, round ended by time 
+			{
+				for (int i = 0; i < alivePlayers.Count; i++)
+				{
+					// go through the set of player stats and add to the ordered list in order of kills, then combos made
+					PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[i].player.gameObject)];
+					statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
+				}
+			}
+		}
+		yield return new WaitForSeconds(endGameFreezeDuration);
         RpcShowEndCard();
 
 		// printing game results in console
