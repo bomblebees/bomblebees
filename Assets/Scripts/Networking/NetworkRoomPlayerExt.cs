@@ -24,7 +24,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SerializeField] private string defaultUsername;
 
     private PingDisplay _pingDisplay;
-    private SteamNetworkManager _steamNetworkManager;
+    private NetworkManager _networkManager;
     
     // Temp list of player colors
     private List<Color> listColors = new List<Color> {
@@ -37,35 +37,41 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     Room_UI roomUI;
 
     NetworkRoomManagerExt room;
-    
+
+    private void Awake()
+    {
+        _pingDisplay = FindObjectOfType<PingDisplay>();
+        _networkManager = FindObjectOfType<NetworkManager>();
+    }
+
 
     public override void OnStartClient()
     {
         InitRequiredVars();
         base.OnStartClient();
 
-        _pingDisplay = FindObjectOfType<PingDisplay>();
-        _steamNetworkManager = FindObjectOfType<SteamNetworkManager>();
-
-        if (_steamNetworkManager.networkAddress.Equals("localhost"))
+        if (_networkManager.networkAddress.Equals("localhost"))
         {
+            // If host
             InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
         }
         else
         {
-            InvokeRepeating(nameof(FirstSetPing), 0f, 0.1f);
+            // If not host
+            InvokeRepeating(nameof(SetInitialPing), 0f, 0.1f);
         }
         
     }
 
-    private void FirstSetPing()
+    private void SetInitialPing()
     {
         SetPing();
         
-        if (!_pingDisplay.myPing.Equals("connecting...") || _steamNetworkManager.networkAddress.Equals("localhost"))
+        if (!_pingDisplay.myPing.Equals("connecting...") || _networkManager.networkAddress.Equals("localhost"))
         {
-            CancelInvoke(nameof(FirstSetPing));
+            CancelInvoke(nameof(SetInitialPing));
             InvokeRepeating(nameof(SetPing), _pingDisplay.updateInterval, _pingDisplay.updateInterval);
+            RpcUpdatePingDisplay();
         }
     }
     
@@ -80,15 +86,20 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         ping = newPing;
     }
-    
-    public void UpdatePingDisplay()
+
+    [ClientRpc]
+    private void RpcUpdatePingDisplay()
     {
-        for (int i = 0; i < room.roomSlots.Count; i++)
+        UpdatePingDisplay();
+    }
+
+    private void UpdatePingDisplay()
+    {
+        for (var i = 0; i < room.roomSlots.Count; i++)
         {
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
-
-            // TODO: Temporary ping display
+            
             card.username.text = player.steamUsername + " " + player.ping;
         }
     }
@@ -223,7 +234,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.playerCard.SetActive(true);
 
             // User name
-            // TODO: Temporary ping display
             card.username.text = player.steamUsername + " " + player.ping; 
 
             // If steam is active, set steam avatars
