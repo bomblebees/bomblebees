@@ -16,6 +16,7 @@ public class RoundManager : NetworkBehaviour
         public Player player;
         public ulong steamId;
     }
+	private bool roundOver = false;
 
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
@@ -372,10 +373,11 @@ public class RoundManager : NetworkBehaviour
     public bool CheckRoundEnd()
     {
         // End the round if only one player alive
-        if (aliveCount <= 1)
+        if (aliveCount <= 1 && !roundOver)
         {
             if (aliveCount == 0) EndRound();
             else EndRound(alivePlayers[0].player.gameObject);
+			roundOver = true;
             return true;
         }
 
