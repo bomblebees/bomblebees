@@ -122,8 +122,7 @@ public class GameUIManager : NetworkBehaviour
         {
             playerObjects[i] = playerList[i].player.gameObject;
 
-            // Subscribe to lives change event for specific player
-            playerList[i].health.EventLivesChanged += ServerUpdateLives;
+            
         }
 
         RpcEnableLivesUI(playerObjects);
@@ -131,30 +130,18 @@ public class GameUIManager : NetworkBehaviour
 
     [ClientRpc] public void RpcEnableLivesUI(GameObject[] players)
     {
+        foreach (GameObject p in players)
+        {
+            // Subscribe to lives change event for specific player
+            p.GetComponent<Health>().EventLivesChanged += ClientUpdateLives;
+        }
+
         livesUI.EnableLivesUI(players);
     }
 
-    // technical debt: having reference to individual player whose live changed is better
-    [Server]
-    public void ServerUpdateLives(int currentHealth, int _, GameObject player)
+    [Client] public void ClientUpdateLives(int currentHealth, int _, GameObject player)
     {
-        // Convert playerinfo struct to network transportable gameObjects
-        List<RoundManager.PlayerInfo> playerList = roundManager.playerList;
-
-        GameObject[] playerObjects = new GameObject[playerList.Count];
-
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            playerObjects[i] = playerList[i].player.gameObject;
-        }
-
-        RpcClientUpdateLives(playerObjects);
-    }
-
-    [ClientRpc]
-    public void RpcClientUpdateLives(GameObject[] players)
-    {
-        livesUI.UpdateLives(players);
+        livesUI.UpdateLives();
     }
 
     #endregion

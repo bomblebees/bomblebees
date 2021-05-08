@@ -69,14 +69,16 @@ public class LivesUI : MonoBehaviour
 
     }
 
-    public void UpdateLives(GameObject[] players)
+    public void UpdateLives()
     {
+        Player[] players = FindObjectsOfType<Player>();
+
         for (int i = 0; i < players.Length; i++)
         {
             // If player name has not been updated, initialize it
             if (livesUIs[i].playerName.text.Length <= 0)
             {
-                ulong steamId = players[i].GetComponent<Player>().steamId;
+                ulong steamId = players[i].steamId;
 
                 string userName = "[Player Name]";
 
