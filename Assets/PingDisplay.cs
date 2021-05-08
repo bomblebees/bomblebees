@@ -1,4 +1,5 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 using TMPro;
 using UnityEngine;
 
@@ -8,11 +9,19 @@ public class PingDisplay : MonoBehaviour
     private TMP_Text _text;
     public string myPing;
 
-    private void Start()
+    private void Awake()
     {
         _text = GetComponent<TMP_Text>();
-        
+    }
+
+    private void OnEnable()
+    {
         InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
+    }
+
+    private void OnDisable()
+    {
+        CancelInvoke(nameof(UpdatePingDisplay));
     }
 
     private void UpdatePingDisplay()

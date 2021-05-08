@@ -43,11 +43,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         base.OnStartClient();
 
         _pingDisplay = FindObjectOfType<PingDisplay>();
-        InvokeRepeating(nameof(SetPing), 0.1f, _pingDisplay.updateInterval);
+        InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
     }
 
     private void SetPing()
     {
+        Debug.Log("SetPing() is called");
         CmdSetPing(_pingDisplay.myPing);
         UpdatePingDisplay();
     }
