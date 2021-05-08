@@ -297,7 +297,7 @@ public class RoundManager : NetworkBehaviour
 
 		// printing game results in console
 
-		RpcPrintResults(statTracker.gameObject);
+		RpcPrintResults();
 		
 		
 
@@ -323,10 +323,10 @@ public class RoundManager : NetworkBehaviour
     }
 
 	[ClientRpc]
-	private void RpcPrintResults(GameObject statTracker)
+	private void RpcPrintResults()
 	{
 		// statTracker.PrintStats();
-		statTracker.GetComponent<PlayerStatTracker>().CreateStatsUIElement();
+		statTracker.CreateStatsUIElement();
 	}
 
     [Server]

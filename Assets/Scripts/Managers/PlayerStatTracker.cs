@@ -47,7 +47,7 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SerializeField] public int StatUIBlockSpacing = 112; // not too robust, maybe use array of preset anchors like in LivesUI later?
 
 	public List<PlayerStats> playerStatsList = new List<PlayerStats>();
-	public List<PlayerStats> playerStatsOrderedByElimination = new List<PlayerStats>();
+	public SyncList<PlayerStats> playerStatsOrderedByElimination = new SyncList<PlayerStats>();
 
 	private RoundManager roundManager;
 	private EventManager eventManager;
@@ -71,7 +71,10 @@ public class PlayerStatTracker : NetworkBehaviour
 		eventManager.EventPlayerSwap += PlayerSwapUpdate;
 	}
 
-
+	public override void OnStartClient()
+	{
+		// playerStatsOrderedByElimination.Callback += 
+	}
 
 	public void CreatePlayerStatObject(GameObject player)
 	{
