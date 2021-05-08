@@ -9,7 +9,7 @@ public class PingDisplay : MonoBehaviour
     private TMP_Text _text;
     public string myPing;
 
-    private void Awake()
+    private void Start()
     {
         _text = GetComponent<TMP_Text>();
     }
@@ -22,6 +22,8 @@ public class PingDisplay : MonoBehaviour
     private void OnDisable()
     {
         CancelInvoke(nameof(UpdatePingDisplay));
+        _text.text = "Oms";
+        myPing = _text.text;
     }
 
     private void UpdatePingDisplay()

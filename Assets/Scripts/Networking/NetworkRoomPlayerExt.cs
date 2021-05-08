@@ -37,14 +37,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     NetworkRoomManagerExt room;
     
-    // TODO: Test only
-    public int times;
 
     public override void OnStartClient()
     {
-        // TODO: Test only
-        times += 1;
-        
         InitRequiredVars();
         base.OnStartClient();
 
@@ -55,7 +50,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void SetPing()
     {
-        Debug.Log("SetPing() is called");
         CmdSetPing(_pingDisplay.myPing);
         UpdatePingDisplay();
     }
