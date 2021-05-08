@@ -198,9 +198,11 @@ public class RoundManager : NetworkBehaviour
 			else // we have just one winner
 			{
 				// player is in index 0, last one standing
+				/*
 				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
 				currentPlayer.placement = 1;
 				statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
+				*/
 			}
 		}
 		else
