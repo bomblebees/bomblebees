@@ -192,7 +192,7 @@ public class RoundManager : NetworkBehaviour
         EventRoundEnd?.Invoke(winner);
     }
 
-	// Call this event when player gets eliminated, but for now not if player is last kill/in 1v1 duel (otherwise whistle plays)
+	// Call this event when player gets eliminated
 	[ClientRpc]
 	public void RpcPlayerEliminated(GameObject eliminatedPlayer)
 	{

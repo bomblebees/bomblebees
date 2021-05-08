@@ -14,6 +14,9 @@ public class PlayerStatTracker : NetworkBehaviour
 		public int deaths = 0;
 		public int assists = 0;
 
+		// placement from 1st to 4th at end game so stats screen can display in order
+		public int placement = -1;
+
 		public int doubleKills = 0;
 		public int tripleKills = 0;
 		// temp - what happens when u get a multikill greater than 3? (theoretically impossible)
@@ -41,6 +44,7 @@ public class PlayerStatTracker : NetworkBehaviour
 	}
 
 	public List<PlayerStats> playerStatsList = new List<PlayerStats>();
+	public List<PlayerStats> playerStatsOrderedByElimination = new List<PlayerStats>();
 
 	private RoundManager roundManager;
 	private EventManager eventManager;
@@ -120,6 +124,17 @@ public class PlayerStatTracker : NetworkBehaviour
 		{
 			Debug.Log("Player that died not found in stats list");
 		}
+
+		// if the KO'd player has less than 1 life, they are eliminated; add to ordered player list at index 0.
+
+		// Number of lives gets set before the event is called, so we should already be set to do the check here
+		if (playerThatDied.GetComponent<Health>().currentLives < 1)
+		{
+			// Get total number of players in the lobby
+			int lobbyNumPlayers = roundManager.playerList.Count;
+			playerStatsList[deadPlayerIndex].placement = lobbyNumPlayers - playerStatsOrderedByElimination.Count;
+			playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
+		}
 	}
 
 	[Server]
@@ -192,6 +207,7 @@ public class PlayerStatTracker : NetworkBehaviour
 		int playerToPrint = getPlayerIndexInList(player);
 
 		toPrint = player.GetComponent<Player>().steamName +"\n" +
+			"Placement: " + playerStatsList[playerToPrint].placement + "\n" +
 			"Kills: " + playerStatsList[playerToPrint].kills + "\n" +
 			"Deaths: " + playerStatsList[playerToPrint].deaths + "\n" +
 			"Assists: " + playerStatsList[playerToPrint].assists + "\n" +

@@ -55,12 +55,6 @@ public class Health : NetworkBehaviour
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
-    [ClientRpc]
-    private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
-    {
-        EventLivesChanged?.Invoke(currentHealth, maxHealth, this.gameObject);
-    }
-
 	[Client]
 	private void DisableItemPickup()
 	{
@@ -80,6 +74,7 @@ public class Health : NetworkBehaviour
 
 		playerModel.SetActive(false);
 
+		EventLivesChanged?.Invoke(newLives, maxLives, this.gameObject);
 
 		switch (UnityEngine.Random.Range(1,4))
 		{
@@ -107,7 +102,6 @@ public class Health : NetworkBehaviour
     private void SetHealth(int value)
     {
         currentLives = value;
-        RpcLivesChangedDelegate(currentLives, maxLives); // Run event for all
     }
 
     // Starts when Player starts existing on server
