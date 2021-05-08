@@ -173,8 +173,7 @@ public class RoundManager : NetworkBehaviour
 			players.Add(pi.player);
 			Debug.Log(statTracker.PrintStats(pi.player.gameObject));
 			Debug.Log("foreach in end round");
-		}
-		);
+		});
 
         eventManager.OnEndRound(players);
         RpcEndRound(winner);
@@ -223,8 +222,15 @@ public class RoundManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(endGameFreezeDuration);
         RpcShowEndCard();
-        
-        Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+
+		// printing game results in console
+		playerList.ForEach(pi =>
+		{
+			Debug.Log(statTracker.PrintStats(pi.player.gameObject));
+			Debug.Log("foreach in end round");
+		});
+
+		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
         {
             button.interactable = true;

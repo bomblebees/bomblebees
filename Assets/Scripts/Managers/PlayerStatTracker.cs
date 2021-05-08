@@ -128,9 +128,13 @@ public class PlayerStatTracker : NetworkBehaviour
 		// if the KO'd player has less than 1 life, they are eliminated; add to ordered player list at index 0.
 
 		// Number of lives gets set before the event is called, so we should already be set to do the check here
+		
 		if (playerThatDied.GetComponent<Health>().currentLives < 1)
 		{
 			// Get total number of players in the lobby
+			Debug.Log(playerStatsOrderedByElimination.Count);
+			Debug.Log("num players in lobby: " + roundManager.playerList.Count);
+			Debug.Log("dead player in stat tracker: " + playerThatDied);
 			int lobbyNumPlayers = roundManager.playerList.Count;
 			playerStatsList[deadPlayerIndex].placement = lobbyNumPlayers - playerStatsOrderedByElimination.Count;
 			playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
