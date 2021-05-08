@@ -3,6 +3,7 @@ using UnityEngine;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public string steamUsername = "Username";
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
+    [SyncVar] public string ping;
     
     [Header("Character Selection")]
     [SyncVar] public int characterCode;
@@ -37,6 +39,27 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         InitRequiredVars();
         base.OnStartClient();
+        
+        InvokeRepeating(nameof(CmdSetPing), 0, 1);
+    }
+
+    [Command]
+    private void CmdSetPing()
+    {
+        ping = string.Format("{0}ms", (int)(NetworkTime.rtt * 1000));
+        UpdatePingDisplay();
+    }
+    
+    public void UpdatePingDisplay()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
+
+            // TODO: Test only
+            card.username.text = player.steamUsername + " " + player.ping;
+        }
     }
 
     private void InitRequiredVars()
@@ -155,7 +178,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.playerCard.SetActive(true);
 
             // User name
-            card.username.text = player.steamUsername;
+            card.username.text = player.steamUsername + " " + player.ping; // TODO: Test only
 
             // If steam is active, set steam avatars
             //card.avatar.texture = GetSteamImageAsTexture(player.steamAvatarId);

@@ -41,6 +41,7 @@ public class Room_UI : MonoBehaviour
         public Button changeCharacterButton;
         public ButtonHoverTween changeCharacterButtonHoverTween;
         public Image[] colorFrames;
+        public TMP_Text pingDisplay;
     }
 
     [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
