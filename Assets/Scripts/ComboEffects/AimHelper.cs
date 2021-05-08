@@ -8,7 +8,9 @@ public class AimHelper : MonoBehaviour
     public GameObject target = null;
     public GameObject targetQuad = null;
 
-    float prevIndex = 0;
+    // caches
+    float prevIndex = -1;
+    float prevDist = -1;
 
     // hard coded values
     private float[] angles = { 60f, 0f, -60f, -120, 180f, 120f};
@@ -49,17 +51,25 @@ public class AimHelper : MonoBehaviour
         if (target != null)
         {
 
-            int dist = other.gameObject.GetComponent<PlayerSpin>().currentChargeLevel;
-            Debug.Log("target: " + dist);
+            int newDist = other.gameObject.GetComponent<PlayerSpin>().currentChargeLevel;
 
-            LeanTween.moveLocalX(target, distances[dist], 0.2f)
-                .setEase(LeanTweenType.easeOutExpo);
+            if (prevDist != newDist)
+            {
+                prevDist = newDist;
 
-            LeanTween.moveLocalX(targetQuad, distances[dist] / 2, 0.2f)
-                .setEase(LeanTweenType.easeOutExpo);
+                // Move the target
+                LeanTween.moveLocalX(target, distances[newDist], 0.2f)
+                    .setEase(LeanTweenType.easeOutExpo);
 
-            LeanTween.scaleX(targetQuad, (130f * dist) + quadScaleOffset, 0.2f)
-                .setEase(LeanTweenType.easeOutExpo);
+                // Move the quad to the center of the target and bomb
+                LeanTween.moveLocalX(targetQuad, distances[newDist] / 2, 0.2f)
+                    .setEase(LeanTweenType.easeOutExpo);
+
+                // Scale the quad accordingly
+                LeanTween.scaleX(targetQuad, (130f * newDist) + quadScaleOffset, 0.2f)
+                    .setEase(LeanTweenType.easeOutExpo);
+            }
+
         }
 
     }
@@ -70,7 +80,11 @@ public class AimHelper : MonoBehaviour
 
         radialArrow.gameObject.GetComponentInChildren<ColorTween>().StartTween();
 
-        if (target != null) target.gameObject.GetComponent<ColorTween>().StartTween();
+        if (target != null)
+        {
+            target.gameObject.GetComponent<ColorTween>().StartTween();
+            targetQuad.SetActive(true);
+        }
     }
 
     protected virtual void OnTriggerExit(Collider other)
@@ -79,7 +93,11 @@ public class AimHelper : MonoBehaviour
 
         radialArrow.gameObject.GetComponentInChildren<ColorTween>().EndTween();
 
-        if (target != null) target.gameObject.GetComponent<ColorTween>().EndTween();
+        if (target != null)
+        {
+            target.gameObject.GetComponent<ColorTween>().EndTween();
+            targetQuad.SetActive(false);
+        }
     }
 
     private int CalculateRotationEdge(GameObject player)
