@@ -297,8 +297,8 @@ public class RoundManager : NetworkBehaviour
 
 		// printing game results in console
 
-		statTracker.PrintStats();
-		statTracker.CreateStatsUIElement();
+		RpcPrintResults(statTracker.gameObject);
+		
 		
 
 		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
@@ -321,6 +321,13 @@ public class RoundManager : NetworkBehaviour
     {
         FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = true;
     }
+
+	[ClientRpc]
+	private void RpcPrintResults(GameObject statTracker)
+	{
+		// statTracker.PrintStats();
+		statTracker.GetComponent<PlayerStatTracker>().CreateStatsUIElement();
+	}
 
     [Server]
     public void ChooseReturnToLobby()
