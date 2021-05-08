@@ -43,6 +43,9 @@ public class PlayerStatTracker : NetworkBehaviour
 		}
 	}
 
+	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
+	[SerializeField] public int StatUIBlockSpacing = 112; // not too robust, maybe use array of preset anchors like in LivesUI later?
+
 	public List<PlayerStats> playerStatsList = new List<PlayerStats>();
 	public List<PlayerStats> playerStatsOrderedByElimination = new List<PlayerStats>();
 
@@ -136,8 +139,27 @@ public class PlayerStatTracker : NetworkBehaviour
 			Debug.Log("num players in lobby: " + roundManager.playerList.Count);
 			Debug.Log("dead player in stat tracker: " + playerThatDied);
 			int lobbyNumPlayers = roundManager.playerList.Count;
-			playerStatsList[deadPlayerIndex].placement = lobbyNumPlayers - playerStatsOrderedByElimination.Count;
-			playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
+			
+
+			if (!(lobbyNumPlayers <= 1))
+			{
+				playerStatsList[deadPlayerIndex].placement = lobbyNumPlayers - playerStatsOrderedByElimination.Count;
+				playerStatsOrderedByElimination.Insert(0, playerStatsList[deadPlayerIndex]);
+			}
+
+			/*
+			// if that was the second to last player, only one remains so add them to ordered list
+			if (roundManager.alivePlayers.Count <= 1)
+			{
+				// this is so fucked lol
+				// to get the last player's PlayerStat object, find their position in the player list by using the round manager's alivePlayers list
+				PlayerStats winningPlayerStat = playerStatsList[getPlayerIndexInList(roundManager.alivePlayers[0].player.gameObject)];
+
+				winningPlayerStat.placement = 1;
+
+				playerStatsOrderedByElimination.Insert(0, winningPlayerStat);
+			}
+			*/
 		}
 	}
 
@@ -178,9 +200,41 @@ public class PlayerStatTracker : NetworkBehaviour
 		}
 	}
 
+
+	#region UI/Display
+	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
+
+	// populate stat block with the necessary stats
+	public void CreateStatsUIElement(PlayerStats playerStat)
+	{
+		for (int i = 0; i < playerStatsOrderedByElimination.Count; i++)
+		{
+			Player playerObject = playerStatsOrderedByElimination[i].player.GetComponent<Player>();
+
+			GameObject obj = Instantiate(
+				PlayerStatsUIElementPrefab,
+				new Vector3(0, 0, 0),
+				Quaternion.identity,
+				roundManager.statsElementUIAnchorObject.transform);
+
+			obj.transform.position += new Vector3(0, i * StatUIBlockSpacing, 0);
+
+			PlayerStatsUIElement uiElement = obj.GetComponent<PlayerStatsUIElement>();
+
+			uiElement.avatar.sprite = uiElement.GetComponent<CharacterHelper>().GetCharImage(playerObject.characterCode);
+			uiElement.playerName.text = playerObject.steamName;
+
+			uiElement.killsText.text = playerStat.kills.ToString();
+			uiElement.deathsText.text = playerStat.deaths.ToString();
+			uiElement.combosMadeText.text = playerStat.totalCombosMade.ToString();
+		}
+	}
+
+	#endregion
+
 	#region Helpers
 
-	private int getPlayerIndexInList(GameObject player)
+	public int getPlayerIndexInList(GameObject player)
 	{
 		int playerIndex = -1;
 		for (int i = 0; i < playerStatsList.Count; i++)
@@ -199,32 +253,44 @@ public class PlayerStatTracker : NetworkBehaviour
 		return playerIndex;
 	}
 
-	public string PrintStats(GameObject player)
+	public void PrintStats()
 	{
-		string toPrint = "";
+		
 
-		if (!player.GetComponent<Player>())
+		// int playerToPrint = getPlayerIndexInList(player);
+
+		for (int i = 0; i < playerStatsOrderedByElimination.Count; i++)
 		{
-			return "Player component not found, cannot print stats";
+			string toPrint = "";
+			toPrint = playerStatsOrderedByElimination[i].player.GetComponent<Player>().steamName + "\n" +
+				"Placement: " + playerStatsOrderedByElimination[i].placement + "\n" +
+				"Kills: " + playerStatsOrderedByElimination[i].kills + "\n" +
+				"Deaths: " + playerStatsOrderedByElimination[i].deaths + "\n" +
+				"Assists: " + playerStatsOrderedByElimination[i].assists + "\n" +
+				"Total Combos Made: " + playerStatsOrderedByElimination[i].totalCombosMade + "\n" +
+				"Total Bombs Created: " + playerStatsOrderedByElimination[i].bombsMade + "\n" +
+				"Total Sludges Created: " + playerStatsOrderedByElimination[i].sludgesMade + "\n" +
+				"Total Lasers Created: " + playerStatsOrderedByElimination[i].lasersMade + "\n" +
+				"Total Plasmas Created: " + playerStatsOrderedByElimination[i].plasmasMade;
+			Debug.Log(toPrint);
 		}
-
-		int playerToPrint = getPlayerIndexInList(player);
-
-		toPrint = player.GetComponent<Player>().steamName +"\n" +
-			"Placement: " + playerStatsList[playerToPrint].placement + "\n" +
-			"Kills: " + playerStatsList[playerToPrint].kills + "\n" +
-			"Deaths: " + playerStatsList[playerToPrint].deaths + "\n" +
-			"Assists: " + playerStatsList[playerToPrint].assists + "\n" +
-			"Total Combos Made: " + playerStatsList[playerToPrint].totalCombosMade + "\n" +
-			"Total Bombs Created: " + playerStatsList[playerToPrint].bombsMade + "\n" +
-			"Total Sludges Created: " + playerStatsList[playerToPrint].sludgesMade + "\n" +
-			"Total Lasers Created: " + playerStatsList[playerToPrint].lasersMade + "\n" +
-			"Total Plasmas Created: " + playerStatsList[playerToPrint].plasmasMade;
-
+		/*
+		toPrint = playerStatsOrderedByElimination[placement].player.GetComponent<Player>().steamName +"\n" +
+			"Placement: " + playerStatsOrderedByElimination[placement].placement + "\n" +
+			"Kills: " + playerStatsOrderedByElimination[placement].kills + "\n" +
+			"Deaths: " + playerStatsOrderedByElimination[placement].deaths + "\n" +
+			"Assists: " + playerStatsOrderedByElimination[placement].assists + "\n" +
+			"Total Combos Made: " + playerStatsOrderedByElimination[placement].totalCombosMade + "\n" +
+			"Total Bombs Created: " + playerStatsOrderedByElimination[placement].bombsMade + "\n" +
+			"Total Sludges Created: " + playerStatsOrderedByElimination[placement].sludgesMade + "\n" +
+			"Total Lasers Created: " + playerStatsOrderedByElimination[placement].lasersMade + "\n" +
+			"Total Plasmas Created: " + playerStatsOrderedByElimination[placement].plasmasMade;
+			
+		 */
 
 		// toPrint = "Kills: " + playerStatsList[index].kills + ", Deaths: " + playerStatsList[index].deaths + ", Assists: " + playerStatsList[index].assists;
 
-		return toPrint;
+		// return toPrint;
 	}
 
 	#endregion
