@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Mirror;
 using TMPro;
 using Steamworks;
+using System.Collections.Generic;
 
 public class PlayerInterface : NetworkBehaviour
 {
@@ -38,26 +39,25 @@ public class PlayerInterface : NetworkBehaviour
     private Player player;
     private GameUIManager gameUIManager;
 
+    private PlayerInterface[] playerList = null;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        // Turn off held hex and inventory UI for other players
-        if (!isLocalPlayer)
-        {
-            hexUI.gameObject.SetActive(false);
-            inventoryUI.gameObject.SetActive(false);
-
-            playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
-
-            //spinUI.SetActive(false);
-        }
 
         CmdUpdatePlayerName(this.gameObject);
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
 
         UpdateInventoryQuantity();
+
+        if (!isLocalPlayer)
+        {
+            hexUI.gameObject.SetActive(false);
+            inventoryUI.gameObject.SetActive(false);
+            playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
+
+        }
 
         gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
@@ -76,36 +76,15 @@ public class PlayerInterface : NetworkBehaviour
         // If player null, return
         if (!player) return;
 
-        PlayerSpin ps = player.GetComponent<PlayerSpin>();
+        UpdateSpinCharge();
 
-        // Show full opacity charge bar if sludged
-        if (player.GetComponent<Player>().isSludged == true) spinUI.GetComponent<CanvasGroup>().alpha = 1;
-        else spinUI.GetComponent<CanvasGroup>().alpha = .5f;
-
-        if (ps.spinHeld)
+        // Show other player infos when the key is pressed
+        if (KeyBindingManager.GetKey(KeyAction.ShowInfo))
         {
-            spinChargeStarted = true; 
-            spinUI.GetComponent<CanvasGroup>().alpha = 1;
-        } else if (spinChargeStarted)
+            ShowPlayerInfo();
+        } else
         {
-            // Reset the spin charge to the level that it acheived
-            int level = ps.CalculateSpinLevel(spinChargeTime);
-            if (level == 0) spinChargeTime = 0;
-            else spinChargeTime = ps.spinTimings[level - 1];
-            
-            // Spin charge has finished 
-            spinChargeStarted = false;
-
-            // Reupdate the UI
-            UpdateSpinChargeBar();
-
-            // Set to back to zero after a short time
-            StartCoroutine(DelaySpinChargeExit());
-        }
-
-        if (spinChargeStarted)
-        {
-            UpdateSpinChargeBar();
+            UnshowPlayerInfo();
         }
     }
 
@@ -120,6 +99,42 @@ public class PlayerInterface : NetworkBehaviour
         spinChargeTime = 0;
         spinUI.GetComponent<CanvasGroup>().alpha = 0.5f;
         UpdateSpinChargeBar();
+    }
+
+    [Client] private void UpdateSpinCharge()
+    {
+        PlayerSpin ps = player.GetComponent<PlayerSpin>();
+
+        // Show full opacity charge bar if sludged
+        if (player.GetComponent<Player>().isSludged == true) spinUI.GetComponent<CanvasGroup>().alpha = 1;
+        else spinUI.GetComponent<CanvasGroup>().alpha = .5f;
+
+        if (ps.spinHeld)
+        {
+            spinChargeStarted = true;
+            spinUI.GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else if (spinChargeStarted)
+        {
+            // Reset the spin charge to the level that it acheived
+            int level = ps.CalculateSpinLevel(spinChargeTime);
+            if (level == 0) spinChargeTime = 0;
+            else spinChargeTime = ps.spinTimings[level - 1];
+
+            // Spin charge has finished 
+            spinChargeStarted = false;
+
+            // Reupdate the UI
+            UpdateSpinChargeBar();
+
+            // Set to back to zero after a short time
+            StartCoroutine(DelaySpinChargeExit());
+        }
+
+        if (spinChargeStarted)
+        {
+            UpdateSpinChargeBar();
+        }
     }
 
     public void UpdateSpinChargeBar()
@@ -207,6 +222,42 @@ public class PlayerInterface : NetworkBehaviour
         int selected = this.GetComponent<PlayerInventory>().selectedSlot;
 
         selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
+    }
+
+    [Client] private void ShowPlayerInfo()
+    {
+        if (playerList == null) playerList = FindObjectsOfType<PlayerInterface>();
+
+        foreach (PlayerInterface p in playerList)
+        {
+            if (p.GetComponent<Player>().isEliminated) continue;
+
+            if (p == this) continue;
+
+            if (!p.inventoryUI.gameObject.activeSelf)
+            {
+                //p.hexUI.gameObject.SetActive(true);
+                p.inventoryUI.gameObject.SetActive(true);
+                p.playerName.transform.localPosition = new Vector3(0f, 12.2f, 0f);
+            }
+        }
+    }
+
+    [Client] private void UnshowPlayerInfo()
+    {
+        if (playerList == null) return;
+
+        foreach (PlayerInterface p in playerList)
+        {
+            if (p == this) continue;
+
+            if (p.inventoryUI.gameObject.activeSelf)
+            {
+                p.hexUI.gameObject.SetActive(false);
+                p.inventoryUI.gameObject.SetActive(false);
+                p.playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
+            }
+        }
     }
 
     #endregion
