@@ -40,7 +40,7 @@ public class PlayerSpin : NetworkBehaviour
     /// The current spin charge level when spin charge is held.
     /// A value of negative 1 means that the charge is not being held
     /// </summary>
-    private int currentChargeLevel = 0;
+    [HideInInspector] public int currentChargeLevel = 0;
 
     [Header("Spin Charge Flash Effects")]
     [SerializeField] private float[] flashSpeeds = { 0f, 10f, 15f, 20f };
@@ -210,6 +210,7 @@ public class PlayerSpin : NetworkBehaviour
 
         // Reset the charge time and spinHeld vars
         spinChargeTime = 0f;
+        currentChargeLevel = 0;
         CmdSetSpinHeld(false);
     }
 
