@@ -74,12 +74,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         if (!_characterSelectionInfo)
         {
+            subscribed = false;
             _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
             if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
         }
 
         if (!room)
         {
+            subscribed = false;
             room = NetworkManager.singleton as SteamNetworkManager;
             if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
             if (!room) Debug.LogError("room not found");
@@ -87,6 +89,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         if (!roomUI)
         {
+            subscribed = false;
             roomUI = Room_UI.singleton;
             if (!roomUI) Debug.LogError("room not found");
         }
@@ -123,14 +126,25 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
+    // Whether THIS player is subscribed to the events already or not
+    private bool subscribed = false;
+
     public override void OnClientEnterRoom()
     {
         base.OnClientEnterRoom();
 
+        Debug.Log("on client enter: player " + index);
+
         // Subscribe to events
-        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-        roomUI.EventStartButtonClicked += OnStartButtonClick;
+        InitRequiredVars();
+
+        if (!subscribed)
+        {
+            _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+            roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+            roomUI.EventStartButtonClicked += OnStartButtonClick;
+            subscribed = true;
+        }
     }
 
     public override void OnClientExitRoom()
