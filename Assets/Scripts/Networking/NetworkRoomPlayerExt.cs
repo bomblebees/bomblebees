@@ -22,6 +22,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
     [SerializeField] private string defaultUsername;
+
+    private PingDisplay _pingDisplay;
     
     // Temp list of player colors
     private List<Color> listColors = new List<Color> {
@@ -39,13 +41,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         InitRequiredVars();
         base.OnStartClient();
-        
-        InvokeRepeating(nameof(SetPing), 0, 1);
+
+        _pingDisplay = FindObjectOfType<PingDisplay>();
+        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
     }
 
     private void SetPing()
     {
-        CmdSetPing(string.Format("{0}ms", (int)(NetworkTime.rtt * 1000)));
+        CmdSetPing(_pingDisplay.myPing);
         UpdatePingDisplay();
     }
 
