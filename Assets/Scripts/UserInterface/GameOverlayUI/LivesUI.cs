@@ -69,51 +69,50 @@ public class LivesUI : MonoBehaviour
 
     }
 
-    public void UpdateLives()
+    public void UpdateLives(Player player)
     {
-        Player[] players = FindObjectsOfType<Player>();
+        int i = player.playerListIndex;
 
-        for (int i = 0; i < players.Length; i++)
+        // If player name has not been updated, initialize it
+        if (livesUIs[i].playerName.text.Length <= 0)
         {
-            // If player name has not been updated, initialize it
-            if (livesUIs[i].playerName.text.Length <= 0)
+            ulong steamId = player.steamId;
+
+            string userName = "[Player Name]";
+
+            // Set steam user name and avatars
+            if (steamId != 0)
             {
-                ulong steamId = players[i].steamId;
+                CSteamID steamID = new CSteamID(steamId);
 
-                string userName = "[Player Name]";
-
-                // Set steam user name and avatars
-                if (steamId != 0)
-                {
-                    CSteamID steamID = new CSteamID(steamId);
-
-                    userName = SteamFriends.GetFriendPersonaName(steamID);
-                }
-
-                // Update username
-                livesUIs[i].playerName.text = userName;
+                userName = SteamFriends.GetFriendPersonaName(steamID);
             }
 
-            // Update health
-            int lifeCount = players[i].GetComponent<Health>().currentLives;
+            // Update username
+            livesUIs[i].playerName.text = userName;
+        }
 
-            livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
+        // Update health
+        int lifeCount = player.GetComponent<Health>().currentLives;
 
-            switch (lifeCount)
-            {
-                case 2: { livesUIs[i].hearts[2].SetActive(false); break; }
-                case 1: {
-                        livesUIs[i].hearts[1].SetActive(false);
-                        livesUIs[i].background.GetComponent<ColorTween>().LoopTween(); 
-                        break;
-                    }
-                case 0: {
-                        livesUIs[i].hearts[0].SetActive(false);
-                        livesUIs[i].background.GetComponent<ColorTween>().EndLoopTween();
-                        livesUIs[i].background.color = new Vector4(.1f, .1f, .1f, 1f); // not working for some reason
-                        livesUIs[i].avatar.color = new Vector4(.5f, .5f, .5f, 5f);
-                        break;
+        Debug.Log("player " + i + " has " + lifeCount + " lives");
+
+        livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
+
+        switch (lifeCount)
+        {
+            case 2: { livesUIs[i].hearts[2].SetActive(false); break; }
+            case 1: {
+                    livesUIs[i].hearts[1].SetActive(false);
+                    livesUIs[i].background.GetComponent<ColorTween>().LoopTween(); 
+                    break;
                 }
+            case 0: {
+                    livesUIs[i].hearts[0].SetActive(false);
+                    livesUIs[i].background.GetComponent<ColorTween>().EndLoopTween();
+                    livesUIs[i].background.color = new Vector4(.1f, .1f, .1f, 1f); // not working for some reason
+                    livesUIs[i].avatar.color = new Vector4(.5f, .5f, .5f, 5f);
+                    break;
             }
         }
     }

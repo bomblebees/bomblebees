@@ -121,8 +121,6 @@ public class GameUIManager : NetworkBehaviour
         for (int i = 0; i < playerList.Count; i++)
         {
             playerObjects[i] = playerList[i].player.gameObject;
-
-            
         }
 
         RpcEnableLivesUI(playerObjects);
@@ -141,7 +139,7 @@ public class GameUIManager : NetworkBehaviour
 
     [Client] public void ClientUpdateLives(int currentHealth, int _, GameObject player)
     {
-        livesUI.UpdateLives();
+        livesUI.UpdateLives(player.GetComponent<Player>());
     }
 
     #endregion

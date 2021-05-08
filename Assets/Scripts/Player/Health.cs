@@ -115,6 +115,7 @@ public class Health : NetworkBehaviour
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
         eventManager.OnPlayerTookDamage(currentLives, bomb, player);
+        EventLivesChanged?.Invoke(currentLives, maxLives, player);
     }
 
 	[Command]
