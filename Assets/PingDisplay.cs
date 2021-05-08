@@ -12,7 +12,7 @@ public class PingDisplay : MonoBehaviour
     {
         _text = GetComponent<TMP_Text>();
         
-        InvokeRepeating(nameof(UpdatePingDisplay), (float)NetworkTime.rtt, updateInterval);
+        InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
     }
 
     private void UpdatePingDisplay()
