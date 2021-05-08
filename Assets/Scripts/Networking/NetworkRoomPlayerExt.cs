@@ -24,6 +24,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SerializeField] private string defaultUsername;
 
     private PingDisplay _pingDisplay;
+    private SteamNetworkManager _steamNetworkManager;
     
     // Temp list of player colors
     private List<Color> listColors = new List<Color> {
@@ -44,10 +45,30 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         base.OnStartClient();
 
         _pingDisplay = FindObjectOfType<PingDisplay>();
+        _steamNetworkManager = FindObjectOfType<SteamNetworkManager>();
+
+        if (_steamNetworkManager.networkAddress.Equals("localhost"))
+        {
+            InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
+        }
+        else
+        {
+            InvokeRepeating(nameof(FirstSetPing), 0f, 0.1f);
+        }
         
-        InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
     }
 
+    private void FirstSetPing()
+    {
+        SetPing();
+        
+        if (!_pingDisplay.myPing.Equals("connecting...") || _steamNetworkManager.networkAddress.Equals("localhost"))
+        {
+            CancelInvoke(nameof(FirstSetPing));
+            InvokeRepeating(nameof(SetPing), _pingDisplay.updateInterval, _pingDisplay.updateInterval);
+        }
+    }
+    
     private void SetPing()
     {
         CmdSetPing(_pingDisplay.myPing);
@@ -67,7 +88,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
-            // TODO: Test only
+            // TODO: Temporary ping display
             card.username.text = player.steamUsername + " " + player.ping;
         }
     }
@@ -202,7 +223,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.playerCard.SetActive(true);
 
             // User name
-            card.username.text = player.steamUsername + " " + player.ping; // TODO: Test only
+            // TODO: Temporary ping display
+            card.username.text = player.steamUsername + " " + player.ping; 
 
             // If steam is active, set steam avatars
             //card.avatar.texture = GetSteamImageAsTexture(player.steamAvatarId);
