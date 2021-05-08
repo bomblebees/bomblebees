@@ -287,6 +287,7 @@ public class RoundManager : NetworkBehaviour
 				{
 					// go through the set of player stats and add to the ordered list in order of kills, then combos made
 					PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[i].player.gameObject)];
+					currentPlayer.placement = playerList.Count - statTracker.playerStatsOrderedByElimination.Count;
 					statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
 				}
 			}
