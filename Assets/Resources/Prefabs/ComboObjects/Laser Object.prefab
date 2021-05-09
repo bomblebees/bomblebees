@@ -5310,7 +5310,7 @@ MonoBehaviour:
   sfxDuration: 5
   hitboxDuration: 4
   lingerDuration: 8
-  startupDelay: 0.8
+  startupDelay: 1
   queenStartupDelay: 0
   ownerIsQueen: 0
   hasStarted: 0
@@ -6160,6 +6160,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radialArrow: {fileID: 6141495322366806736}
+  target: {fileID: 0}
+  targetQuad: {fileID: 0}
 --- !u!1 &7138946257445458459
 GameObject:
   m_ObjectHideFlags: 0
