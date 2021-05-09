@@ -69,7 +69,7 @@ public class LivesUI : MonoBehaviour
 
     }
 
-    public void UpdateLives(Player player)
+    public void UpdateLives(int currentLives, Player player)
     {
         int i = player.playerListIndex;
 
@@ -93,7 +93,7 @@ public class LivesUI : MonoBehaviour
         }
 
         // Update health
-        int lifeCount = player.GetComponent<Health>().currentLives;
+        int lifeCount = currentLives;
 
         Debug.Log("player " + i + " has " + lifeCount + " lives");
 
