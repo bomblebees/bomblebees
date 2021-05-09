@@ -406,6 +406,7 @@ public class RoundManager : NetworkBehaviour
     private void Update()
     {
         // TODO: Delete later
+        // Cheats
         if (Input.GetKeyDown(KeyCode.Alpha5) && Input.GetKey(KeyCode.C))
         {
             ChooseRematch();
@@ -414,6 +415,22 @@ public class RoundManager : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha6) && Input.GetKey(KeyCode.C))
         {
             ChooseReturnToLobby();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha7) && Input.GetKey(KeyCode.C))
+        {
+	        if (CheckRoundEnd()) return;
+
+	        Player winner = GetWinnerPlayerByLives();
+
+	        if (winner != null)
+	        {
+		        EndRound(winner.gameObject);
+	        } 
+	        else
+	        {
+		        EndRound();
+	        }
         }
     }
 }
