@@ -9,6 +9,7 @@ public class PingDisplay : MonoBehaviour
     public int myPingValue;
     public string myPingDisplay;
     public bool isHost;
+    public int lastSessionPing;
     
     private NetworkManager _networkManager;
     private TMP_Text _text;
@@ -36,6 +37,7 @@ public class PingDisplay : MonoBehaviour
     {
         CancelInvoke(nameof(InitializePingDisplay));
         CancelInvoke(nameof(UpdatePingDisplay));
+        lastSessionPing = myPingValue;
         myPingValue = 0;
         _text.text = null;
         myPingDisplay = _text.text;
@@ -54,9 +56,18 @@ public class PingDisplay : MonoBehaviour
                 ConnectingStatus();
                 break;
             default:
-                CancelInvoke(nameof(InitializePingDisplay));
-                InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
+            {
+                if (((int) (NetworkTime.rtt * 1000)).Equals(lastSessionPing))
+                {
+                    ConnectingStatus();
+                }
+                else
+                {
+                    CancelInvoke(nameof(InitializePingDisplay));
+                    InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
+                }
                 break;
+            }
         }
     }
 
