@@ -477,7 +477,7 @@ MonoBehaviour:
   minimumLifeDuration: 4
   rotateLerpRate: 0.15
   stayPermanent: 1
-  projectileSpeed: 4
+  projectileSpeed: 3
   startOffset: 9
   hitboxIterationDuration: 0.2
   FireSFX: {fileID: 1935200310931157549}
@@ -17949,6 +17949,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radialArrow: {fileID: 176836860620064451}
+  target: {fileID: 0}
+  targetQuad: {fileID: 0}
 --- !u!1 &8451613306942955731
 GameObject:
   m_ObjectHideFlags: 0
