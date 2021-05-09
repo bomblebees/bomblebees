@@ -5,31 +5,29 @@ using UnityEngine;
 public class PingDisplay : MonoBehaviour
 {
     [SerializeField] public float updateInterval = 5f;
+
+    public int myPingValue;
+    public string myPingDisplay;
+    public bool isHost;
     
-    public string myPing;
-    
-    private TMP_Text _text;
     private NetworkManager _networkManager;
-    private bool _isHost;
+    private TMP_Text _text;
 
     private void Awake()
     {
-        _text = GetComponent<TMP_Text>();
         _networkManager = FindObjectOfType<SteamNetworkManager>();
+        _text = GetComponentInChildren<TMP_Text>();
     }
 
     private void OnEnable()
     {
         if (_networkManager.networkAddress.Equals("localhost"))
         {
-            // If host
-            _isHost = true;
-            InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
+            HostStatus();
         }
         else
         {
-            // If not host
-            _isHost = false;
+            ConnectingStatus();
             InvokeRepeating(nameof(InitializePingDisplay), 0f, 0.1f);
         }
     }
@@ -38,37 +36,52 @@ public class PingDisplay : MonoBehaviour
     {
         CancelInvoke(nameof(InitializePingDisplay));
         CancelInvoke(nameof(UpdatePingDisplay));
-        _text.text = "0ms";
-        myPing = _text.text;
+        myPingValue = 0;
+        _text.text = null;
+        myPingDisplay = _text.text;
+        isHost = false;
     }
 
     private void InitializePingDisplay()
     {
-        if (!string.Format("{0}ms", (int)(NetworkTime.rtt * 1000)).Equals("0ms") 
-            || _networkManager.networkAddress.Equals("localhost"))
+        switch ((int) (NetworkTime.rtt * 1000))
         {
-            CancelInvoke(nameof(InitializePingDisplay));
-            InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
-        }
-        else
-        {
-            _text.text = "connecting...";
-            myPing = _text.text;
+            case 0 when _networkManager.networkAddress.Equals("localhost"):
+                Debug.LogWarning("This should never be called");
+                HostStatus();
+                break;
+            case 0:
+                ConnectingStatus();
+                break;
+            default:
+                CancelInvoke(nameof(InitializePingDisplay));
+                InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
+                break;
         }
     }
 
     private void UpdatePingDisplay()
     {
-        if (!_isHost)
-        {
-            _text.text = string.Format("{0}ms", (int) (NetworkTime.rtt * 1000));
-            myPing = _text.text;
-        }
-        else
-        {
-            _text.text = "Host";
-            myPing = _text.text;
-            CancelInvoke(nameof(UpdatePingDisplay));
-        }
+        myPingValue = (int) (NetworkTime.rtt * 1000);
+        _text.text = myPingValue + "ms";
+        myPingDisplay = _text.text;
+    }
+
+    private void HostStatus()
+    {
+        isHost = true;
+        myPingValue = 0;
+        _text.text = "Host";
+        myPingDisplay = _text.text;
+        CancelInvoke(nameof(InitializePingDisplay));
+        CancelInvoke(nameof(UpdatePingDisplay));
+    }
+
+    private void ConnectingStatus()
+    {
+        isHost = false;
+        myPingValue = 0;
+        _text.text = "connecting...";
+        myPingDisplay = _text.text;
     }
 }

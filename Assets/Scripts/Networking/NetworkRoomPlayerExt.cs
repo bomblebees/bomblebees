@@ -40,44 +40,39 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void Awake()
     {
-        _pingDisplay = FindObjectOfType<PingDisplay>();
         _networkManager = FindObjectOfType<NetworkManager>();
+        _pingDisplay = FindObjectOfType<PingDisplay>();
     }
-
 
     public override void OnStartClient()
     {
         InitRequiredVars();
         base.OnStartClient();
 
-        if (_networkManager.networkAddress.Equals("localhost"))
+        switch (_networkManager.networkAddress)
         {
-            // If host
-            InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
+            case "localhost":
+                InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
+                break;
+            default:
+                SetPing();
+                InvokeRepeating(nameof(WaitForFirstPing), 0f, 0.1f);
+                break;
         }
-        else
-        {
-            // If not host
-            InvokeRepeating(nameof(SetInitialPing), 0f, 0.1f);
-        }
-        
     }
 
-    private void SetInitialPing()
+    private void WaitForFirstPing()
     {
-        SetPing();
+        if (_pingDisplay.myPingDisplay.Equals("connecting...") && !_pingDisplay.isHost) return;
         
-        if (!_pingDisplay.myPing.Equals("connecting...") || _networkManager.networkAddress.Equals("localhost"))
-        {
-            CancelInvoke(nameof(SetInitialPing));
-            InvokeRepeating(nameof(SetPing), _pingDisplay.updateInterval, _pingDisplay.updateInterval);
-            RpcUpdatePingDisplay();
-        }
+        CancelInvoke(nameof(WaitForFirstPing));
+        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
+        RpcUpdatePingDisplay();
     }
     
     private void SetPing()
     {
-        CmdSetPing(_pingDisplay.myPing);
+        CmdSetPing(_pingDisplay.myPingDisplay);
         UpdatePingDisplay();
     }
 
@@ -99,6 +94,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         {
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
+
+            if (player is null) continue;
             
             card.username.text = player.steamUsername + " (" + player.ping + ")";
         }
