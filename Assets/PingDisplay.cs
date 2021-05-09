@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class PingDisplay : MonoBehaviour
 {
-    [SerializeField] public float updateInterval = 1f;
-    private TMP_Text _text;
+    [SerializeField] public float updateInterval = 5f;
+    
     public string myPing;
+    
+    private TMP_Text _text;
     private NetworkManager _networkManager;
+    private bool _isHost;
 
     private void Awake()
     {
@@ -20,11 +23,13 @@ public class PingDisplay : MonoBehaviour
         if (_networkManager.networkAddress.Equals("localhost"))
         {
             // If host
+            _isHost = true;
             InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
         }
         else
         {
             // If not host
+            _isHost = false;
             InvokeRepeating(nameof(InitializePingDisplay), 0f, 0.1f);
         }
     }
@@ -54,7 +59,16 @@ public class PingDisplay : MonoBehaviour
 
     private void UpdatePingDisplay()
     {
-        _text.text = string.Format("{0}ms", (int)(NetworkTime.rtt * 1000));
-        myPing = _text.text;
+        if (!_isHost)
+        {
+            _text.text = string.Format("{0}ms", (int) (NetworkTime.rtt * 1000));
+            myPing = _text.text;
+        }
+        else
+        {
+            _text.text = "Host";
+            myPing = _text.text;
+            CancelInvoke(nameof(UpdatePingDisplay));
+        }
     }
 }

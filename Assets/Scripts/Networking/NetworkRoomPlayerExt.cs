@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
-    [SyncVar] public ulong steamId = 0;
+    [SyncVar] public ulong steamId;
     [SyncVar] public string steamUsername = "Username";
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
@@ -100,7 +100,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
             
-            card.username.text = player.steamUsername + " " + player.ping;
+            card.username.text = player.steamUsername + " (" + player.ping + ")";
         }
     }
 
@@ -151,7 +151,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             roomUI.DeactivateStartButton();
         }
 
-        // If not ready, and character portrait is unavailable, deactive ready button
+        // If not ready, and character portrait is unavailable, deactivate ready button
         if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
         {
             roomUI.DeactivateReadyButton();
@@ -234,7 +234,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.playerCard.SetActive(true);
 
             // User name
-            card.username.text = player.steamUsername + " " + player.ping; 
+            card.username.text = player.steamUsername + " (" + player.ping + ")"; 
 
             // If steam is active, set steam avatars
             //card.avatar.texture = GetSteamImageAsTexture(player.steamAvatarId);
@@ -309,7 +309,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (!_characterSelectionInfo) return;
 
-        if (newReadyState == true)
+        if (newReadyState)
         {
             _characterSelectionInfo.characterAvailable[characterCode] = false;
         } else
