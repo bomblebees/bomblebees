@@ -74,7 +74,7 @@ public class Health : NetworkBehaviour
 
 		playerModel.SetActive(false);
 
-		EventLivesChanged?.Invoke(newLives, maxLives, this.gameObject);
+		// EventLivesChanged?.Invoke(newLives, maxLives, this.gameObject);
 
 		switch (UnityEngine.Random.Range(1,4))
 		{

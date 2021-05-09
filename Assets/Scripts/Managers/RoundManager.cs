@@ -28,8 +28,10 @@ public class RoundManager : NetworkBehaviour
 
 	// potential to-do: separate stat tracker UI stuff into separate script away from roundmanager
 	[Header("Stat Tracker")]
-	[SerializeField] public PlayerStatTracker statTracker;
-	[SerializeField] public GameObject statsElementUIAnchorObject;
+	[SerializeField] public GameObject[] statsElementUIAnchorObjects;
+
+	// order of elimination so we can print out the placements in results screen in right order
+	public SyncList<GameObject> orderedPlayerList = new SyncList<GameObject>();
 
 	[Header("Round Settings")]
     [SerializeField] public int startGameFreezeDuration = 5;
@@ -66,11 +68,14 @@ public class RoundManager : NetworkBehaviour
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
-    }
 
-    #region Setup
+		
+	}
 
-    public override void OnStartServer()
+
+	#region Setup
+
+	public override void OnStartServer()
     {
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         totalRoomPlayers = room.roomSlots.Count;
@@ -116,7 +121,7 @@ public class RoundManager : NetworkBehaviour
         playerList.Add(playerInfo);
 
 		// add player to stat tracker list and store reference to the player gameobject
-		statTracker.CreatePlayerStatObject(sender.identity.gameObject);
+		// statTracker.CreatePlayerStatObject(sender.identity.gameObject);
 
         // invoke event after added to list
         EventPlayerConnected?.Invoke(playerInfo);
@@ -171,20 +176,54 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void EndRound(GameObject winner = null)
     {
-
-
-		
-
-		
-
-		
-
 		// Append all player objects to player list for event manager
 		List<Player> players = new List<Player>();
         playerList.ForEach(pi => 
 		{
 			players.Add(pi.player);
 		});
+
+		
+
+		if (winner != null)
+		{
+			for (int i = 1; i <= playerMaxLives; i++)
+			{
+				for (int j = 0; j < alivePlayers.Count; j++)
+				{
+					if (alivePlayers[j].health.currentLives == i)
+					{
+						// If two players tie in health, arbitrary rank order for now; how would we sort this by whoever has more kills or something? :/ 
+						orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
+					}
+				}
+			}
+		}
+		else // there is no winner, so tie match
+		{
+			if (alivePlayers.Count < 1)
+			{
+				// no winner but none alive either, single player game, player was already inserted into ordered list
+				Debug.Log("single player game");
+				// orderedPlayerList.Insert(0, playerList[0].player.gameObject);
+			}
+			else
+			{
+				Debug.Log("tie with more than one remaining");
+				// add the rest of the alive players to eliminated players list in order of health (still arbitrary)
+				for (int i = 1; i <= playerMaxLives; i++)
+				{
+					for (int j = 0; j < alivePlayers.Count; j++)
+					{
+						if (alivePlayers[j].health.currentLives == i)
+						{
+							orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
+						}
+					}
+				}
+			}
+		}
+
 
         eventManager.OnEndRound(players);
         RpcEndRound(winner);
@@ -234,72 +273,8 @@ public class RoundManager : NetworkBehaviour
 
 		yield return new WaitForSeconds(endGameFreezeDuration);
 
-		if (winner != null)
-		{
-			/*
-			PlayerStatTracker.PlayerStats winningPlayerStat = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
-			winningPlayerStat.placement = 1;
-			statTracker.playerStatsOrderedByElimination.Insert(0, winningPlayerStat);
-			*/
-
-			// if we have a winner, but we also have other survivors
-			if (alivePlayers.Count > 1)
-			{
-				// add to ordered stats list in order of less lives to max
-				for (int i = 1; i <= playerMaxLives; i++)
-				{
-					for (int j = 0; j < alivePlayers.Count; j++)
-					{
-						if (alivePlayers[j].player.GetComponent<Health>().currentLives == i)
-						{
-							PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[j].player.gameObject)];
-							currentPlayer.placement = playerList.Count - statTracker.playerStatsOrderedByElimination.Count;
-							statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
-						}
-					}
-				}
-			}
-			else // we have just one winner
-			{
-				// player is in index 0, last one standing
-				
-				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[0].player.gameObject)];
-				currentPlayer.placement = 1;
-				statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
-				
-			}
-		}
-		else
-		{
-			Debug.Log("no winners, winner is null");
-			// tie
-			if (alivePlayers.Count == 0)
-			{
-				// round ended before time but last one standing was also person to die; single player game
-				Debug.Log("single player game");
-				PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(playerList[0].player.gameObject)];
-				currentPlayer.placement = 1;
-				statTracker.playerStatsOrderedByElimination.Insert(0, statTracker.playerStatsList[statTracker.getPlayerIndexInList(playerList[0].player.gameObject)]);
-
-			}
-			else // no winner, round ended by time 
-			{
-				for (int i = 0; i < alivePlayers.Count; i++)
-				{
-					// go through the set of player stats and add to the ordered list in order of kills, then combos made
-					PlayerStatTracker.PlayerStats currentPlayer = statTracker.playerStatsList[statTracker.getPlayerIndexInList(alivePlayers[i].player.gameObject)];
-					currentPlayer.placement = playerList.Count - statTracker.playerStatsOrderedByElimination.Count;
-					statTracker.playerStatsOrderedByElimination.Insert(0, currentPlayer);
-				}
-			}
-		}
-		RpcShowEndCard();
-
-		// printing game results in console
-
 		RpcPrintResults();
-		
-		
+		RpcShowEndCard();
 
 		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
@@ -308,7 +283,6 @@ public class RoundManager : NetworkBehaviour
             button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
         }
     }
-
 
     [ClientRpc]
     private void RpcShowEndCard()
@@ -325,8 +299,13 @@ public class RoundManager : NetworkBehaviour
 	[ClientRpc]
 	private void RpcPrintResults()
 	{
-		// statTracker.PrintStats();
-		statTracker.CreateStatsUIElement();
+		for (int i = 0; i < orderedPlayerList.Count; i++)
+		{
+			orderedPlayerList[i].GetComponent<PlayerStatTracker>().placement = i + 1;
+			orderedPlayerList[i].GetComponent<PlayerStatTracker>().PrintStats();
+			orderedPlayerList[i].GetComponent<PlayerStatTracker>().CreateStatsUIElement(statsElementUIAnchorObjects[i]);
+		}
+		
 	}
 
     [Server]
@@ -352,6 +331,7 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void OnLivesChanged(int currentHealth, int _, GameObject player)
     {
+		if (roundOver) return;
         if (currentHealth < 1)
         {
             // Remove players that are dead
@@ -364,10 +344,11 @@ public class RoundManager : NetworkBehaviour
                 }
             }
 
+			Debug.Log("inserting dead player to ordered elimination list");
+			orderedPlayerList.Insert(0, player);
+
             // update alive count
             aliveCount = alivePlayers.Count;
-
-			Debug.Log(player.name);
 
 			// check if the round has ended
 			CheckRoundEnd();
@@ -379,10 +360,11 @@ public class RoundManager : NetworkBehaviour
     [Server] // returns true if the round ended successfully, false otherwise
     public bool CheckRoundEnd()
     {
-        // End the round if only one player alive
-        if (aliveCount <= 1 && !roundOver)
+		// End the round if only one player alive
+		if (roundOver) return true;
+        if (aliveCount <= 1)
         {
-            if (aliveCount == 0) EndRound();
+            if (aliveCount == 0) EndRound(); // if round is over and nobody is alive, single player game
             else EndRound(alivePlayers[0].player.gameObject);
 			roundOver = true;
             return true;
