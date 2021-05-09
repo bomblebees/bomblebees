@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.NetworkInformation;
-using Mirror;
+﻿using Mirror;
 using TMPro;
 using UnityEngine;
 
