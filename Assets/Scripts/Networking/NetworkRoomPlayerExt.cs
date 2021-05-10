@@ -14,6 +14,11 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
     [SyncVar] public string ping;
+
+    /// <summary>
+    /// Variable representing the team that the player is on. -1 represents no team chosen
+    /// </summary>
+    [SyncVar] public int teamIndex = -1;
     
     [Header("Character Selection")]
     [SyncVar] public int characterCode;
@@ -92,7 +97,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         for (var i = 0; i < room.roomSlots.Count; i++)
         {
-            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+            PlayerLobbyCard card = roomUI.playerCardsList[i];
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
 
             if (player is null) continue;
@@ -196,11 +201,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Update all existing players
         for (int i = 0; i < 4; i++)
         {
-            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+            PlayerLobbyCard card = roomUI.playerCardsList[i];
 
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
+                //card.gameObject.SetActive(false);
                 card.username.text = defaultUsername;
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
@@ -208,6 +214,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 continue;
             }
 
+            // if this is the host, enable the crown icon
+            if (i == 0) card.crown.SetActive(true);
+
+            // enable the character portrait
             card.characterPortrait.enabled = true;
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;

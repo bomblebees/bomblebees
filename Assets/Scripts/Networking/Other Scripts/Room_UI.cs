@@ -30,21 +30,10 @@ public class Room_UI : MonoBehaviour
     private ButtonHoverTween _buttonReadyButtonHoverTween;
     private CanvasRenderer[] _buttonReadyCanvasRenderer;
 
-    [Serializable]
-    public class PlayerLobbyCard
-    {
-        public GameObject playerCard;
-        public RawImage avatar;
-        public TMP_Text username;
-        public GameObject readyStatus;
-        public RawImage characterPortrait;
-        public Button changeCharacterButton;
-        public ButtonHoverTween changeCharacterButtonHoverTween;
-        public Image[] colorFrames;
-        public TMP_Text pingDisplay;
-    }
+    [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab = null;
+    [SerializeField] private GameObject playerCardsParent;
+    [HideInInspector] public PlayerLobbyCard[] playerCardsList = new PlayerLobbyCard[4];
 
-    [SerializeField] public PlayerLobbyCard[] playerLobbyUi = new PlayerLobbyCard[4];
     [SerializeField] public TMP_Text lobbyName;
 
     // events
@@ -97,6 +86,36 @@ public class Room_UI : MonoBehaviour
         // Initialize button states
         DeactivateStartButton();
         ActivateReadyButton();
+
+        // Initialize player cards
+        InitializePlayerCards();
+    }
+
+    private void InitializePlayerCards()
+    {
+        CharacterSelectionInfo charSelect = FindObjectOfType<CharacterSelectionInfo>();
+
+        float gapBetweenCards = 450;
+        float startPosX = -675;
+        float posY = -300;
+
+        for (int i = 0; i < playerCardsList.Length; i++)
+        {
+            // instantiate the player card
+            PlayerLobbyCard card = Instantiate(
+                playerLobbyCardPrefab,
+                new Vector3(0, 0, 0),
+                Quaternion.identity,
+                playerCardsParent.transform);
+
+            // set the position on the UI
+            card.transform.localPosition = new Vector3(startPosX + (gapBetweenCards * i), posY);
+
+            card.changeCharacterButton.onClick.AddListener(charSelect.OnChangeCharacter);
+
+            // add it to the list of player cards
+            playerCardsList[i] = card;
+        }
     }
 
     public void Back()
@@ -120,6 +139,8 @@ public class Room_UI : MonoBehaviour
     public void OnStartButtonClick()
     {
         EventStartButtonClicked?.Invoke();
+
+        if (!matchmaker) matchmaker = Matchmaking.singleton;
         matchmaker.OnMirrorSetStatus("In Game");
     }
 

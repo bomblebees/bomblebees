@@ -12,16 +12,13 @@ public class Player : NetworkBehaviour
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
-
     [SyncVar] public int playerListIndex;
 
-    //[Header("Debug")]
-    //public bool debugMode = false;
-    //public string debugBombPress1 = "8";
-    //public string debugBombPress2 = "9";
-    //public string debugBombPress3 = "e";
-    //public string debugBombPress4 = ";";
-    //public string debugGroundItemSpawn = "g";
+    /// <summary>
+    /// Variable representing the team that the player is on.
+    /// A value of -1 represents no team chosen
+    /// </summary>
+    [SyncVar] public int teamIndex;
 
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
