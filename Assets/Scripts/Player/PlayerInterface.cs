@@ -19,6 +19,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] public Image spinChargeBar;
     [SerializeField] public GameObject spinUI;
     [SerializeField] public GameObject inventoryUI;
+	[SerializeField] public GameObject inventoryUIRadial;
 	[SerializeField] public GameObject sludgedSpinBarUI;
 
     [Header("User Interface")]
@@ -34,6 +35,7 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Inventory")]
     [SerializeField] private Image selectedHighlight;
     [SerializeField] private Image[] invSlots = new Image[4];
+	[SerializeField] private Image[] invSlotsRadial = new Image[4];
     [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
     [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
 
@@ -203,11 +205,9 @@ public class PlayerInterface : NetworkBehaviour
 	[ClientRpc]
     public void DisplayInventoryAdd(int slot, int amt)
     {
+		
         invAddTexts[slot].text = "+" + amt.ToString();
         //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
-
-
-
         invAddTexts[slot].GetComponent<AlphaTextTween>().StartTween();
         invAddTexts[slot].GetComponent<MoveTween>().StartTween();
     }
@@ -216,6 +216,7 @@ public class PlayerInterface : NetworkBehaviour
     {
         SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
 
+		// non-radial
         for (int i = 0; i < list.Count; i++)
         {
             invCounters[i].text = list[i].ToString();
@@ -226,6 +227,12 @@ public class PlayerInterface : NetworkBehaviour
             if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
             else invSlots[i].color = new Color(1f, 1f, 1f);
         }
+
+		// radial
+		for (int i = 0; i < list.Count; i++)
+		{
+			invSlotsRadial[i].fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
+		}
     }
 
     public void UpdateInventorySelected()
