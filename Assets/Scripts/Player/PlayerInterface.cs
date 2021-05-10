@@ -58,6 +58,7 @@ public class PlayerInterface : NetworkBehaviour
         {
             hexUI.gameObject.SetActive(false);
             inventoryUI.gameObject.SetActive(false);
+			inventoryUIRadial.gameObject.SetActive(false);
             playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
 
         }
@@ -256,6 +257,7 @@ public class PlayerInterface : NetworkBehaviour
             {
                 //p.hexUI.gameObject.SetActive(true);
                 p.inventoryUI.gameObject.SetActive(true);
+				p.inventoryUIRadial.gameObject.SetActive(true);
                 p.playerName.transform.localPosition = new Vector3(0f, 12.2f, 0f);
             }
         }
@@ -273,7 +275,8 @@ public class PlayerInterface : NetworkBehaviour
             {
                 p.hexUI.gameObject.SetActive(false);
                 p.inventoryUI.gameObject.SetActive(false);
-                p.playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
+				p.inventoryUIRadial.gameObject.SetActive(false);
+				p.playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
             }
         }
     }
