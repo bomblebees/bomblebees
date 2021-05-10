@@ -99,11 +99,10 @@ public class PlayerStatTracker : NetworkBehaviour
 		}
 		else
 		{
-			totalCombosMade++;
-
 			// if 1 or more bombs awarded, add to respective counter
 			if (numBombsAwarded > 0)
 			{
+				totalCombosMade++;
 				// this shit will be a problem when we rework colors unless we can go through the codebase and change all the hardcoded color values
 				switch (oldKey)
 				{
