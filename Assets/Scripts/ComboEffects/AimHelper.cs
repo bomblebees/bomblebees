@@ -36,6 +36,14 @@ public class AimHelper : MonoBehaviour
             radialArrow.SetActive(false);
         }
 
+        // If this was a plasma bomb and it was already hit, disable the arrow
+        if (gameObject.transform.root.gameObject.GetComponent<PlasmaObject>() != null
+            && gameObject.transform.root.gameObject.GetComponent<PlasmaObject>().wasHit)
+        {
+            radialArrow.SetActive(false);
+            return;
+        }
+
 
         // Arrow Rotation
         int newIndex = CalculateRotationEdge(other.gameObject);
