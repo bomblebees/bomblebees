@@ -16,6 +16,7 @@ public class RoundManager : NetworkBehaviour
         public Player player;
         public ulong steamId;
     }
+	private bool roundOver = false;
 
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
@@ -23,9 +24,19 @@ public class RoundManager : NetworkBehaviour
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
     public int aliveCount = -1;
 
-    [Header("Round Settings")]
+	[SerializeField] private Canvas serverEndSelectionCanvas;
+
+	// potential to-do: separate stat tracker UI stuff into separate script away from roundmanager
+	[Header("Stat Tracker")]
+	[SerializeField] public GameObject[] statsElementUIAnchorObjects;
+
+	// order of elimination so we can print out the placements in results screen in right order
+	public SyncList<GameObject> orderedPlayerList = new SyncList<GameObject>();
+
+	[Header("Round Settings")]
     [SerializeField] public int startGameFreezeDuration = 5;
     [SerializeField] public int endGameFreezeDuration = 5;
+	[SerializeField] public int playerMaxLives = 3;
 
     [SerializeField] public bool useRoundTimer = true;
     [SerializeField] public float roundDuration = 60.0f;
@@ -57,15 +68,17 @@ public class RoundManager : NetworkBehaviour
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
-    }
 
-    #region Setup
+		
+	}
 
-    public override void OnStartServer()
+
+	#region Setup
+
+	public override void OnStartServer()
     {
         NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         totalRoomPlayers = room.roomSlots.Count;
-
         // Event manager singleton
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
@@ -106,6 +119,9 @@ public class RoundManager : NetworkBehaviour
         playerInfo.steamId = steamId;
 
         playerList.Add(playerInfo);
+
+		// add player to stat tracker list and store reference to the player gameobject
+		// statTracker.CreatePlayerStatObject(sender.identity.gameObject);
 
         // invoke event after added to list
         EventPlayerConnected?.Invoke(playerInfo);
@@ -160,13 +176,58 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void EndRound(GameObject winner = null)
     {
-        // Append all player objects to player list for event manager
-        List<Player> players = new List<Player>();
-        playerList.ForEach(pi => players.Add(pi.player));
+		// Append all player objects to player list for event manager
+		List<Player> players = new List<Player>();
+        playerList.ForEach(pi => 
+		{
+			players.Add(pi.player);
+		});
+
+		
+
+		if (winner != null)
+		{
+			for (int i = 1; i <= playerMaxLives; i++)
+			{
+				for (int j = 0; j < alivePlayers.Count; j++)
+				{
+					if (alivePlayers[j].health.currentLives == i)
+					{
+						// If two players tie in health, arbitrary rank order for now; how would we sort this by whoever has more kills or something? :/ 
+						orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
+					}
+				}
+			}
+		}
+		else // there is no winner, so tie match
+		{
+			if (alivePlayers.Count < 1)
+			{
+				// no winner but none alive either, single player game, player was already inserted into ordered list
+				Debug.Log("single player game");
+				// orderedPlayerList.Insert(0, playerList[0].player.gameObject);
+			}
+			else
+			{
+				Debug.Log("tie with more than one remaining");
+				// add the rest of the alive players to eliminated players list in order of health (still arbitrary)
+				for (int i = 1; i <= playerMaxLives; i++)
+				{
+					for (int j = 0; j < alivePlayers.Count; j++)
+					{
+						if (alivePlayers[j].health.currentLives == i)
+						{
+							orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
+						}
+					}
+				}
+			}
+		}
+
 
         eventManager.OnEndRound(players);
         RpcEndRound(winner);
-        StartCoroutine(ServerEndRound());
+        StartCoroutine(ServerEndRound(winner));
     }
 
     [ClientRpc]
@@ -180,7 +241,7 @@ public class RoundManager : NetworkBehaviour
         EventRoundEnd?.Invoke(winner);
     }
 
-	// Call this event when player gets eliminated, but for now not if player is last kill/in 1v1 duel (otherwise whistle plays)
+	// Call this event when player gets eliminated
 	[ClientRpc]
 	public void RpcPlayerEliminated(GameObject eliminatedPlayer)
 	{
@@ -195,6 +256,7 @@ public class RoundManager : NetworkBehaviour
         {
             alivePlayers.Add(playerList[i]);
             Player p = playerList[i].player;
+			p.playerListIndex = i;
             //p.SetCanPlaceBombs(true);
             //p.SetCanSpin(true);
             //p.SetCanSwap(true); 
@@ -206,20 +268,21 @@ public class RoundManager : NetworkBehaviour
     }
 
     [Server]
-    public IEnumerator ServerEndRound()
+    public IEnumerator ServerEndRound(GameObject winner = null)
     {
-        yield return new WaitForSeconds(endGameFreezeDuration);
-        RpcShowEndCard();
-        
-        Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+
+		yield return new WaitForSeconds(endGameFreezeDuration);
+
+		RpcPrintResults();
+		RpcShowEndCard();
+
+		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
         {
             button.interactable = true;
             button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
         }
     }
-
-    [SerializeField] private Canvas serverEndSelectionCanvas;
 
     [ClientRpc]
     private void RpcShowEndCard()
@@ -232,6 +295,18 @@ public class RoundManager : NetworkBehaviour
     {
         FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = true;
     }
+
+	[ClientRpc]
+	private void RpcPrintResults()
+	{
+		for (int i = 0; i < orderedPlayerList.Count; i++)
+		{
+			orderedPlayerList[i].GetComponent<PlayerStatTracker>().placement = i + 1;
+			orderedPlayerList[i].GetComponent<PlayerStatTracker>().PrintStats();
+			orderedPlayerList[i].GetComponent<PlayerStatTracker>().CreateStatsUIElement(statsElementUIAnchorObjects[i]);
+		}
+		
+	}
 
     [Server]
     public void ChooseReturnToLobby()
@@ -256,6 +331,7 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void OnLivesChanged(int currentHealth, int _, GameObject player)
     {
+		if (roundOver) return;
         if (currentHealth < 1)
         {
             // Remove players that are dead
@@ -268,10 +344,11 @@ public class RoundManager : NetworkBehaviour
                 }
             }
 
+			Debug.Log("inserting dead player to ordered elimination list");
+			orderedPlayerList.Insert(0, player);
+
             // update alive count
             aliveCount = alivePlayers.Count;
-
-			Debug.Log(player.name);
 
 			// check if the round has ended
 			CheckRoundEnd();
@@ -283,11 +360,13 @@ public class RoundManager : NetworkBehaviour
     [Server] // returns true if the round ended successfully, false otherwise
     public bool CheckRoundEnd()
     {
-        // End the round if only one player alive
+		// End the round if only one player alive
+		if (roundOver) return true;
         if (aliveCount <= 1)
         {
-            if (aliveCount == 0) EndRound();
+            if (aliveCount == 0) EndRound(); // if round is over and nobody is alive, single player game
             else EndRound(alivePlayers[0].player.gameObject);
+			roundOver = true;
             return true;
         }
 
@@ -327,9 +406,31 @@ public class RoundManager : NetworkBehaviour
     private void Update()
     {
         // TODO: Delete later
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        // Cheats
+        if (Input.GetKeyDown(KeyCode.Alpha5) && Input.GetKey(KeyCode.C))
         {
             ChooseRematch();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha6) && Input.GetKey(KeyCode.C))
+        {
+            ChooseReturnToLobby();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha7) && Input.GetKey(KeyCode.C))
+        {
+	        if (CheckRoundEnd()) return;
+
+	        Player winner = GetWinnerPlayerByLives();
+
+	        if (winner != null)
+	        {
+		        EndRound(winner.gameObject);
+	        } 
+	        else
+	        {
+		        EndRound();
+	        }
         }
     }
 }

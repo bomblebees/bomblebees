@@ -28,6 +28,7 @@ public class PlayerSpin : NetworkBehaviour
     /// The timings in seconds required to reach a specific spin charge level.
     /// </summary>
     [SerializeField] public float[] spinTimings = { 0.5f, 1.0f, 1.5f, 2.0f };
+    
 
     /// <summary>
     /// The spin power of each spin level. The number represents the distance in hexes
@@ -39,7 +40,7 @@ public class PlayerSpin : NetworkBehaviour
     /// The current spin charge level when spin charge is held.
     /// A value of negative 1 means that the charge is not being held
     /// </summary>
-    private int currentChargeLevel = 0;
+    [HideInInspector] public int currentChargeLevel = 0;
 
     [Header("Spin Charge Flash Effects")]
     [SerializeField] private float[] flashSpeeds = { 0f, 10f, 15f, 20f };
@@ -87,7 +88,7 @@ public class PlayerSpin : NetworkBehaviour
     void Update()
     {
         // Code after this point is run only on the local player
-        if (!isLocalPlayer) return;
+        if (!isLocalPlayer || this.GetComponent<Player>().isEliminated) return;
 
         // Check for key press every frame
         ListenForSpinInput();
@@ -127,7 +128,9 @@ public class PlayerSpin : NetworkBehaviour
             currentChargeLevel = 0;
 
             // Bounce the charge bar right away
-            this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+            // here
+            // this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
+            // this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
 
             CmdSetSpinHeld(true);
         }
@@ -144,7 +147,7 @@ public class PlayerSpin : NetworkBehaviour
     public void SpinRelease()
     {
         // Get the spin power
-        spinPower = CalculateSpinPower();
+        spinPower = spinPowerDist[CalculateSpinLevel(spinChargeTime)];
 
         //@@ ExitInvincibility();
 
@@ -207,14 +210,16 @@ public class PlayerSpin : NetworkBehaviour
 
         // Reset the charge time and spinHeld vars
         spinChargeTime = 0f;
+        currentChargeLevel = 0;
         CmdSetSpinHeld(false);
     }
 
     /// <summary>
     /// Calculates the spin power based on the current spin charge time
     /// </summary>
-    /// <returns>The spin power</returns>
-    [Client] public int CalculateSpinPower()
+    /// <param name="spinTime"> The current time elapsed of the spin charge </param>
+    /// <returns>The index of the spin charge level</returns>
+    [Client] public int CalculateSpinLevel(float spinTime)
     {
         // For each spin level in ascending order
         for (int i = 0; i < spinTimings.Length; i++)
@@ -222,13 +227,13 @@ public class PlayerSpin : NetworkBehaviour
             // If maximum power, dont need to check timing
             if (i == spinTimings.Length - 1)
             {
-                return spinPowerDist[i];
+                return i;
             }
 
             // If chrage time is below this spin level, then that is the spin power
-            if (spinChargeTime < spinTimings[i])
+            if (spinTime < spinTimings[i])
             {
-                return spinPowerDist[i];
+                return i;
             }
         }
 

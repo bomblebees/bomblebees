@@ -55,12 +55,6 @@ public class Health : NetworkBehaviour
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
     }
 
-    [ClientRpc]
-    private void RpcLivesChangedDelegate(int currentHealth, int maxHealth)
-    {
-        EventLivesChanged?.Invoke(currentHealth, maxHealth, this.gameObject);
-    }
-
 	[Client]
 	private void DisableItemPickup()
 	{
@@ -80,6 +74,7 @@ public class Health : NetworkBehaviour
 
 		playerModel.SetActive(false);
 
+		// EventLivesChanged?.Invoke(newLives, maxLives, this.gameObject);
 
 		switch (UnityEngine.Random.Range(1,4))
 		{
@@ -107,7 +102,6 @@ public class Health : NetworkBehaviour
     private void SetHealth(int value)
     {
         currentLives = value;
-        RpcLivesChangedDelegate(currentLives, maxLives); // Run event for all
     }
 
     // Starts when Player starts existing on server
@@ -121,6 +115,7 @@ public class Health : NetworkBehaviour
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));
         eventManager.OnPlayerTookDamage(currentLives, bomb, player);
+        EventLivesChanged?.Invoke(currentLives, maxLives, player);
     }
 
 	[Command]
@@ -225,11 +220,16 @@ public class Health : NetworkBehaviour
                 return;
         }
 
-        if (cachedCollider == other.gameObject.transform.parent.gameObject) return;
+		// the Health component has client authority, is hittable, and the collider is also a combo object hitbox
+
+		// grab the triggeringPlayer from the comboObject here
+
+		if (cachedCollider == other.gameObject.transform.parent.gameObject) return;
         else cachedCollider = other.gameObject.transform.parent.gameObject;
 
         var obj = other.gameObject.transform;
         var objRootName = obj.root.name;
+		/*
         if (
             (
                 objRootName == "Plasma Object(Clone)"
@@ -242,7 +242,9 @@ public class Health : NetworkBehaviour
         {
             cachedCollider = null;
         }
-		else if (objRootName == "Sludge Object(Clone)")
+		else
+		*/
+		if (objRootName == "Sludge Object(Clone)")
         {
             Debug.Log("triggered");
 
@@ -253,7 +255,7 @@ public class Health : NetworkBehaviour
         {
 			// if hit/life is taken, drop the player's stuff
 			CmdDropItems();
-
+			Debug.Log("hit by damaging ability");
             playerScript.canBeHit = false; // might remove later. this is for extra security
             this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
         }
@@ -264,7 +266,7 @@ public class Health : NetworkBehaviour
         playerInv.SetActive(false);
         playerModel.SetActive(false);
         playerScript.canBeHit = false;
-        playerScript.isDead = true;
+        playerScript.isEliminated = true;
     }
 
     #endregion

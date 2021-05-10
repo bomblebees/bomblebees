@@ -3,15 +3,22 @@ using UnityEngine;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
-    [SyncVar] public ulong steamId = 0;
+    [SyncVar] public ulong steamId;
     [SyncVar] public string steamUsername = "Username";
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
+    [SyncVar] public string ping;
+
+    /// <summary>
+    /// Variable representing the team that the player is on. -1 represents no team chosen
+    /// </summary>
+    [SyncVar] public int teamIndex = -1;
     
     [Header("Character Selection")]
     [SyncVar] public int characterCode;
@@ -20,6 +27,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Header("Default UI")]
     [SerializeField] private Texture2D defaultAvatar;
     [SerializeField] private string defaultUsername;
+
+    private PingDisplay _pingDisplay;
+    private NetworkManager _networkManager;
     
     // Temp list of player colors
     private List<Color> listColors = new List<Color> {
@@ -33,20 +43,67 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     NetworkRoomManagerExt room;
 
+    private void Awake()
+    {
+        _networkManager = FindObjectOfType<NetworkManager>();
+        _pingDisplay = FindObjectOfType<PingDisplay>();
+    }
+
     public override void OnStartClient()
     {
         InitRequiredVars();
         base.OnStartClient();
+
+        switch (_networkManager.networkAddress)
+        {
+            case "localhost":
+                InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
+                break;
+            default:
+                SetPing();
+                InvokeRepeating(nameof(WaitForFirstPing), 0f, 0.1f);
+                break;
+        }
     }
 
-    public override void OnStartLocalPlayer()
+    private void WaitForFirstPing()
     {
-        base.OnStartLocalPlayer();
+        if (_pingDisplay.myPingDisplay.Equals("connecting...") && !_pingDisplay.isHost) return;
+        
+        CancelInvoke(nameof(WaitForFirstPing));
+        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
+        RpcUpdatePingDisplay();
+    }
+    
+    private void SetPing()
+    {
+        CmdSetPing(_pingDisplay.myPingDisplay);
+        UpdatePingDisplay();
+    }
 
-        // Subscribe to events
-        _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-        roomUI.EventStartButtonClicked += OnStartButtonClick;
+    [Command]
+    private void CmdSetPing(string newPing)
+    {
+        ping = newPing;
+    }
+
+    [ClientRpc]
+    private void RpcUpdatePingDisplay()
+    {
+        UpdatePingDisplay();
+    }
+
+    private void UpdatePingDisplay()
+    {
+        for (var i = 0; i < room.roomSlots.Count; i++)
+        {
+            PlayerLobbyCard card = roomUI.playerCardsList[i];
+            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
+
+            if (player is null) continue;
+            
+            card.username.text = player.steamUsername + " (" + player.ping + ")";
+        }
     }
 
     private void InitRequiredVars()
@@ -56,12 +113,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         if (!_characterSelectionInfo)
         {
+            subscribed = false;
             _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
             if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
         }
 
         if (!room)
         {
+            subscribed = false;
             room = NetworkManager.singleton as SteamNetworkManager;
             if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
             if (!room) Debug.LogError("room not found");
@@ -69,6 +128,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         if (!roomUI)
         {
+            subscribed = false;
             roomUI = Room_UI.singleton;
             if (!roomUI) Debug.LogError("room not found");
         }
@@ -93,7 +153,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             roomUI.DeactivateStartButton();
         }
 
-        // If not ready, and character portrait is unavailable, deactive ready button
+        // If not ready, and character portrait is unavailable, deactivate ready button
         if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
         {
             roomUI.DeactivateReadyButton();
@@ -105,11 +165,25 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         UpdateLobbyList();
     }
 
+    // Whether THIS player is subscribed to the events already or not
+    private bool subscribed = false;
+
     public override void OnClientEnterRoom()
     {
         base.OnClientEnterRoom();
 
+        Debug.Log("on client enter: player " + index);
 
+        // Subscribe to events
+        InitRequiredVars();
+
+        if (!subscribed)
+        {
+            _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
+            roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+            roomUI.EventStartButtonClicked += OnStartButtonClick;
+            subscribed = true;
+        }
     }
 
     public override void OnClientExitRoom()
@@ -127,11 +201,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Update all existing players
         for (int i = 0; i < 4; i++)
         {
-            Room_UI.PlayerLobbyCard card = roomUI.playerLobbyUi[i];
+            PlayerLobbyCard card = roomUI.playerCardsList[i];
 
             // if player does not exist
             if (i >= room.roomSlots.Count)
             {
+                //card.gameObject.SetActive(false);
                 card.username.text = defaultUsername;
                 card.avatar.texture = FlipTexture(defaultAvatar);
                 card.readyStatus.SetActive(false);
@@ -139,6 +214,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 continue;
             }
 
+            // if this is the host, enable the crown icon
+            if (i == 0) card.crown.SetActive(true);
+
+            // enable the character portrait
             card.characterPortrait.enabled = true;
 
             NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
@@ -162,7 +241,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             card.playerCard.SetActive(true);
 
             // User name
-            card.username.text = player.steamUsername;
+            card.username.text = player.steamUsername + " (" + player.ping + ")"; 
 
             // If steam is active, set steam avatars
             //card.avatar.texture = GetSteamImageAsTexture(player.steamAvatarId);
@@ -237,7 +316,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (!_characterSelectionInfo) return;
 
-        if (newReadyState == true)
+        if (newReadyState)
         {
             _characterSelectionInfo.characterAvailable[characterCode] = false;
         } else

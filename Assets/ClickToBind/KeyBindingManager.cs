@@ -60,6 +60,7 @@ public enum KeyAction
 	Swap,
 	Place,
 	Spin,
+	ShowInfo,
 	RotateNext,
 	RotatePrevious,
 	BigBomb,

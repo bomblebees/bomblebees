@@ -47,7 +47,7 @@ public class PlayerBombPlace : NetworkBehaviour
     void Update()
     {
         // Code after this point is run only on the local player
-        if (!isLocalPlayer) return;
+        if (!isLocalPlayer || this.GetComponent<Player>().isEliminated) return;
 
         // Check for key press every frame
         ListenForPlaceInput();
@@ -130,11 +130,16 @@ public class PlayerBombPlace : NetworkBehaviour
         // Instantiate the bomb
         GameObject _bomb = Instantiate(prefab, this.gameObject.transform.position + new Vector3(0f, 10f, 0f), Quaternion.identity);
 
-        // Set the owner player as this player
-        _bomb.GetComponent<ComboObject>().ownerPlayer = this.gameObject;
+		ComboObject bombComponent = _bomb.GetComponent<ComboObject>();
 
-        // Spawn the object on the server
-        NetworkServer.Spawn(_bomb);
+		// Set the owner player as this player
+		bombComponent.ownerPlayer = this.gameObject;
+
+		// Set the initial triggered player as this player
+		bombComponent.triggeringPlayer = this.gameObject;
+
+		// Spawn the object on the server
+		NetworkServer.Spawn(_bomb);
 
         // Call the bomb placed event
         eventManager.OnBombPlaced(_bomb, this.gameObject);

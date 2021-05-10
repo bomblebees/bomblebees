@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
@@ -11,14 +12,13 @@ public class Player : NetworkBehaviour
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
+    [SyncVar] public int playerListIndex;
 
-    //[Header("Debug")]
-    //public bool debugMode = false;
-    //public string debugBombPress1 = "8";
-    //public string debugBombPress2 = "9";
-    //public string debugBombPress3 = "e";
-    //public string debugBombPress4 = ";";
-    //public string debugGroundItemSpawn = "g";
+    /// <summary>
+    /// Variable representing the team that the player is on.
+    /// A value of -1 represents no team chosen
+    /// </summary>
+    [SyncVar] public int teamIndex;
 
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
@@ -29,10 +29,17 @@ public class Player : NetworkBehaviour
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
-    public bool isDead = false; // when player has lost ALL lives
+	[Header("Multikill Settings")]
+	public double multikillMaxTimeThreshold = 2;
+	private double lastKillTime = -1;
+	private int multiKillCount = 1;
 
-    // Added for easy referencing of local player from anywhere
-    public override void OnStartLocalPlayer()
+    public bool isEliminated = false; // when player has lost ALL lives
+
+	private EventManager eventManager;
+
+	// Added for easy referencing of local player from anywhere
+	public override void OnStartLocalPlayer()
     {
         gameObject.name = "LocalPlayer";
         base.OnStartLocalPlayer();
@@ -50,10 +57,12 @@ public class Player : NetworkBehaviour
     {
         base.OnStartServer();
 
-        //fixedY = this.transform.position.y;  // To prevent bugs from collisions
+		//fixedY = this.transform.position.y;  // To prevent bugs from collisions
+		eventManager = EventManager.Singleton;
+		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
-        // Subscribe to damage events
-        this.GetComponent<Health>().EventLivesLowered += SetCanBeHit;
+		// Subscribe to damage events
+		this.GetComponent<Health>().EventLivesLowered += SetCanBeHit;
         this.GetComponent<Health>().EventGhostExit += SetCanExitInvincibility;
     }
 
@@ -64,7 +73,7 @@ public class Player : NetworkBehaviour
         // Code after this point is run only on the local player
         if (!isLocalPlayer) return;
 
-        if (isDead) return; // if dead, disable all player updates
+        if (isEliminated) return; // if dead, disable all player updates
 
         // -- Any update code for the player can go here --
 
@@ -101,7 +110,6 @@ public class Player : NetworkBehaviour
     {
         this.canBeHit = val;
 
-		Debug.Log("val in SetCanBeHit in player: " + val);
 		isSludged = val;
 	}
 
@@ -231,5 +239,36 @@ public class Player : NetworkBehaviour
         // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", val);
     }
 
-    #endregion
+	#endregion
+
+	#region Multikill Tracking
+	[Server]
+	public void TrackMultiKill(double timeOfThisKill)
+	{
+		Debug.Log("Tracking multikill; time of this kill: " + timeOfThisKill);
+		Debug.Log("Time of last kill: " + lastKillTime);
+		if (lastKillTime == -1)
+		{
+			// player's first kill, set the lastKillTime and return
+			lastKillTime = NetworkTime.time;
+			return;
+		}
+		// if the multikill threshold time has already passed, reset counter to 1
+		if (timeOfThisKill - lastKillTime > multikillMaxTimeThreshold)
+		{
+			multiKillCount = 1;
+		}
+		else
+		{
+			// time elapsed is less than the threshold, add to multikill
+			multiKillCount++;
+			// time from last kill is under threshold, count the multikill and send the event with the player attached
+			Debug.Log("Multikill number " + multiKillCount + " achieved, time from last kill: " + (NetworkTime.time - lastKillTime));
+
+			eventManager.OnPlayerMultikill(gameObject, multiKillCount);
+		}
+
+		lastKillTime = NetworkTime.time;
+	}
+	#endregion
 }

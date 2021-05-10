@@ -47,7 +47,8 @@ public class GameUIManager : NetworkBehaviour
         roundManager.EventRoundStart += ServerStartRound;
 
         eventManager.EventPlayerTookDamage += RpcOnKillEvent;
-        eventManager.EventPlayerSwap += ServerOnSwapEvent;
+		eventManager.EventMultikill += RpcOnMultikillEvent;
+        // eventManager.EventPlayerSwap += ServerOnSwapEvent;
         eventManager.EventPlayerSpin += ServerOnSpinEvent;
     }
 
@@ -120,40 +121,26 @@ public class GameUIManager : NetworkBehaviour
         for (int i = 0; i < playerList.Count; i++)
         {
             playerObjects[i] = playerList[i].player.gameObject;
-
-            // Subscribe to lives change event for specific player
-            playerList[i].health.EventLivesChanged += ServerUpdateLives;
-        }
+			playerObjects[i].GetComponent<Health>().EventLivesChanged += RpcClientUpdateLives;
+		}
 
         RpcEnableLivesUI(playerObjects);
     }
 
     [ClientRpc] public void RpcEnableLivesUI(GameObject[] players)
     {
+        foreach (GameObject p in players)
+        {
+            // Subscribe to lives change event for specific player
+            // p.GetComponent<Health>().EventLivesChanged += ClientUpdateLives;
+        }
+
         livesUI.EnableLivesUI(players);
     }
 
-    // technical debt: having reference to individual player whose live changed is better
-    [Server]
-    public void ServerUpdateLives(int currentHealth, int _, GameObject player)
+    [ClientRpc] public void RpcClientUpdateLives(int currentHealth, int _, GameObject player)
     {
-        // Convert playerinfo struct to network transportable gameObjects
-        List<RoundManager.PlayerInfo> playerList = roundManager.playerList;
-
-        GameObject[] playerObjects = new GameObject[playerList.Count];
-
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            playerObjects[i] = playerList[i].player.gameObject;
-        }
-
-        RpcClientUpdateLives(playerObjects);
-    }
-
-    [ClientRpc]
-    public void RpcClientUpdateLives(GameObject[] players)
-    {
-        livesUI.UpdateLives(players);
+        livesUI.UpdateLives(currentHealth, player.GetComponent<Player>());
     }
 
     #endregion
@@ -166,7 +153,13 @@ public class GameUIManager : NetworkBehaviour
         messageFeed.OnKillEvent(bomb, player);
     }
 
-    [Server]
+	[ClientRpc]
+	public void RpcOnMultikillEvent(GameObject player, int multiKillAmount)
+	{
+		messageFeed.OnMultikillEvent(player, multiKillAmount);
+	}
+
+	[Server]
     public void ServerOnSwapEvent(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
     {
         if (combo)

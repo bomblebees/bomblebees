@@ -62,11 +62,15 @@ public class PlayerSwap : NetworkBehaviour
         // Code after this point is run only on the local player
         if (!isLocalPlayer) return;
 
+        // Applies the tile selection highlight
+        ApplyTileHighlight();
+
+        // Only run the rest of update if the player is not eliminated
+        if (this.GetComponent<Player>().isEliminated) return;
+
         // Check for key press every frame
         ListenForSwapInput();
 
-        // Applies the tile selection highlight
-        ApplyTileHighlight();
     }
 
     #region Swap
@@ -170,7 +174,7 @@ public class PlayerSwap : NetworkBehaviour
     void ApplyTileHighlight()
     {
         // If tile highlights are disabled or player is dead, disable the highlight model 
-        if (!tileHighlights || this.GetComponent<Player>().isDead)
+        if (!tileHighlights || this.GetComponent<Player>().isEliminated)
         {
             highlightModel.SetActive(false);
             //if (selectedTile) selectedTile.GetComponent<Renderer>().material.SetFloat("Boolean_11CD7E77", 0f);

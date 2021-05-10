@@ -44,7 +44,7 @@ public class ComboObject : NetworkBehaviour
     protected bool didEarlyEffects = false;
 
     // player who triggered the bomb
-    protected GameObject triggeringPlayer;
+    public GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
     
     [FormerlySerializedAs("objectMat")] public GameObject model;
@@ -281,12 +281,12 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DisableObjectModel()
     {
-        GameObject _model = this.gameObject.transform.Find("Model").gameObject;
-        if (!_model)
+        //GameObject _model = this.gameObject.transform.Find("Model").gameObject;
+        if (!model)
         {
             print("ERROR: Model not found for a Bomb! Make sure the Model's name is 'Model'");
         }
-        _model.SetActive(false);
+        model.SetActive(false);
         yield return new WaitForSeconds(lingerDuration);
     }
 
@@ -302,7 +302,7 @@ public class ComboObject : NetworkBehaviour
     {
         this.travelDistanceInHexes = newTravelDistance;
         this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
-        Push(edgeIndex, triggeringPlayer);
+		Push(edgeIndex, triggeringPlayer);
     }
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
@@ -382,6 +382,7 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
+			// Update "owner" of bomb (the player who kicked it last)
             triggeringPlayer = other.transform.parent.gameObject;
 
             // Adjust travel distance based on spin power
@@ -401,7 +402,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator DestroySelf()
     {
-        yield return new WaitForSeconds(0);
+		yield return new WaitForSeconds(0);
         NotifyOccupiedTile(false);
         NetworkServer.Destroy(this.gameObject);
     }
@@ -409,7 +410,6 @@ public class ComboObject : NetworkBehaviour
     // For extension time
     protected virtual IEnumerator DestroySelf(float extensionTime)
     {
-        Debug.Log("Extending for "+extensionTime);
         yield return new WaitForSeconds(extensionTime);
         NotifyOccupiedTile(false);
         NetworkServer.Destroy(this.gameObject);

@@ -9,7 +9,7 @@ using UnityEngine;
 public class TriggerObject : ComboObject
 {
     public float breakdownDuration = 3f;
-    protected bool wasHit = false;
+    public bool wasHit = false;
     protected bool canBeTriggered = true; // to make sure it's only hit once.
     protected float timeAlive = 0f; // Seconds since object was instantiated
     protected float timeTriggered = 0f;

@@ -33,8 +33,10 @@ public class MessageFeed : MonoBehaviour
 
         // Set the character image, if applicable
         if (charCode != -1)
-        {
-            message.GetComponentInChildren<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(charCode);
+		{
+			message.GetComponentInChildren<Image>().enabled = true;
+
+			message.GetComponentInChildren<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(charCode);
         }
 
         // Get initial anchor position
@@ -75,18 +77,53 @@ public class MessageFeed : MonoBehaviour
 
         for (int i = 0; i < feedUIs.Count; i++)
         {
-            LeanTween.moveLocalY(feedUIs[i], ancPos.y - (i * 50), 0.5f).setEase(LeanTweenType.easeOutExpo);
+            LeanTween.moveLocalY(feedUIs[i], ancPos.y + (i * 50), 0.5f).setEase(LeanTweenType.easeOutExpo);
         }
     }
 
     #region Message Types
 
-    public void OnKillEvent(GameObject bomb, GameObject player)
+    public void OnKillEvent(GameObject bomb, GameObject killedPlayer)
     {
-        string killtext = " died to " + GetBombText(bomb) + "!";
+		// string killtext = " died to " + GetBombText(bomb) + "!";
 
-        CreateMessage(killtext, player.GetComponent<Player>().characterCode);
+		GameObject killer = bomb.GetComponent<ComboObject>().triggeringPlayer;
+
+		string killtext = GetPlayerText(killer) + " " + GetBombIcon(bomb) + " " + GetPlayerText(killedPlayer);
+
+		// No portraits for kills
+        CreateMessage(killtext, -1);
     }
+
+	public void OnMultikillEvent(GameObject player, int multikillNumber)
+	{
+		// We will probably display multikills in large letters through some announcer feed later;
+		// just make a multikill message type for now
+		string playerName = GetPlayerTextUppercase(player);
+
+		string killAmountText = "";
+
+		switch (multikillNumber)
+		{
+			case 1:
+				// multikill should never be called with just one kill, but just in case haha lol xd
+				killAmountText = "SINGLE KILL! CODE IS BROKEN! LOL";
+				break;
+			case 2:
+				killAmountText = "DOUBLE KILL!";
+				break;
+			case 3:
+				killAmountText = "TRIPLE KILL!";
+				break;
+			default:
+				killAmountText = "SUPER KILL!";
+				break;
+		}
+
+		string multikillText = playerName + " " + killAmountText;
+
+		CreateMessage(multikillText, -1);
+	}
 
     public void OnSwapEvent(char comboKey, GameObject player, int numBombsAwarded)
     {
@@ -137,7 +174,14 @@ public class MessageFeed : MonoBehaviour
         return "<b><color=#" + ColorUtility.ToHtmlStringRGB(p.playerColor) + ">" + p.steamName + "</color></b>";
     }
 
-    private string GetBombText(GameObject bomb)
+	private string GetPlayerTextUppercase(GameObject player)
+	{
+		Player p = player.GetComponent<Player>();
+		string playerUppercaseName = p.steamName.ToUpper();
+		return "<b><color=#" + ColorUtility.ToHtmlStringRGB(p.playerColor) + ">" + playerUppercaseName + "</color></b>";
+	}
+
+	private string GetBombText(GameObject bomb)
     {
         if (bomb.GetComponent<BombObject>() != null)
         {
@@ -166,7 +210,36 @@ public class MessageFeed : MonoBehaviour
         }
     }
 
-    private string GetComboText(char key)
+	private string GetBombIcon(GameObject bomb)
+	{
+		if (bomb.GetComponent<BombObject>() != null)
+		{
+			return "<sprite index=1>";
+		}
+		else if (bomb.GetComponent<LaserObject>() != null)
+		{
+			return "<sprite index=0>";
+		}
+		else if (bomb.GetComponent<PlasmaObject>() != null)
+		{
+			return "<sprite index=3>";
+		}
+		//else if (bomb.GetComponent<BlinkObject>() != null)
+		//{
+		//	return "<color=#00D9FF>Blink Bomb</color>";
+		//}
+		else if (bomb.GetComponent<SludgeObject>() != null)
+		{
+			return "<sprite index=2>";
+		}
+		else
+		{
+			Debug.LogError("Could not get bomb type!");
+			return "";
+		}
+	}
+
+	private string GetComboText(char key)
     {
         switch (key)
         {
