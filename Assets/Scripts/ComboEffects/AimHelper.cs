@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +14,10 @@ public class AimHelper : MonoBehaviour
 
     // hard coded values
     private float[] angles = { 60f, 0f, -60f, -120, 180f, 120f};
-    private float[] distances = { 130f, 258.7f, 388.5f, 518.4f};
+    // private float[] distances = { 130f, 258.7f, 388.5f, 518.4f};
+    private float[] distances = { 130f, 390f, 650f, 910f}; // adjusted values for new spin distances
+    // 128.7, 258.5, 388.4
+    
 
 
     /// <summary>
@@ -31,14 +34,6 @@ public class AimHelper : MonoBehaviour
         if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf)
         {
             radialArrow.SetActive(false);
-
-            if (target != null)
-            {
-                target.SetActive(false);
-                targetQuad.SetActive(false);
-            }
-
-            return;
         }
 
 
@@ -78,7 +73,8 @@ public class AimHelper : MonoBehaviour
                     .setEase(LeanTweenType.easeOutExpo);
 
                 // Scale the quad accordingly
-                LeanTween.scaleX(targetQuad, (130f * newDist) + quadScaleOffset, 0.2f)
+                // LeanTween.scaleX(targetQuad, (130f * newDist) + quadScaleOffset, 0.2f)
+                LeanTween.scaleX(targetQuad, (260f * newDist) + quadScaleOffset, 0.2f) // new dist vals
                     .setEase(LeanTweenType.easeOutExpo);
             }
 
@@ -89,9 +85,8 @@ public class AimHelper : MonoBehaviour
     protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.name != "LocalPlayer") return;
-        if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf) return;
 
-        radialArrow.GetComponentInChildren<ColorTween>().StartTween();
+        radialArrow.gameObject.GetComponentInChildren<ColorTween>().StartTween();
 
         if (target != null)
         {
@@ -103,9 +98,8 @@ public class AimHelper : MonoBehaviour
     protected virtual void OnTriggerExit(Collider other)
     {
         if (other.gameObject.name != "LocalPlayer") return;
-        if (!gameObject.transform.root.gameObject.GetComponent<ComboObject>().model.activeSelf) return;
 
-        radialArrow.GetComponentInChildren<ColorTween>().EndTween();
+        radialArrow.gameObject.GetComponentInChildren<ColorTween>().EndTween();
 
         if (target != null)
         {
