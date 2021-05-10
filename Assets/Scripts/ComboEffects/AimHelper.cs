@@ -40,7 +40,7 @@ public class AimHelper : MonoBehaviour
         if (gameObject.transform.root.gameObject.GetComponent<PlasmaObject>() != null
             && gameObject.transform.root.gameObject.GetComponent<PlasmaObject>().wasHit)
         {
-            radialArrow.SetActive(false);
+            //radialArrow.SetActive(false);
             return;
         }
 
