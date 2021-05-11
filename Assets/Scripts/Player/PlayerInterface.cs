@@ -149,7 +149,7 @@ public class PlayerInterface : NetworkBehaviour
     {
         float[] spinTimes = player.GetComponent<PlayerSpin>().spinTimings;
         spinChargeTime += Time.deltaTime;
-        spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 2];
+        spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 3];
     }
 
     public void OnPlayerTakeDamage(int currentHealth, int _, GameObject __)
