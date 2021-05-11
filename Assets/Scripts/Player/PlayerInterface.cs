@@ -266,7 +266,7 @@ public class PlayerInterface : NetworkBehaviour
     {
         int selected = this.GetComponent<PlayerInventory>().selectedSlot;
 
-        selectedHighlight.gameObject.transform.localPosition = invSlots[selected].transform.localPosition;
+        selectedHighlight.gameObject.transform.localPosition = invSlotsRadial[selected].transform.localPosition;
     }
 
     [Client] private void ShowPlayerInfo()
