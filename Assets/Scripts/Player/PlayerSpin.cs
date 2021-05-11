@@ -164,7 +164,7 @@ public class PlayerSpin : NetworkBehaviour
     [Client] private void UpdateChargeLevel()
     {
         // If we reached the max spin level, just return
-        if (currentChargeLevel == spinTimings.Length - 1)
+        if (currentChargeLevel == spinTimings.Length - 2)
         {
             return;
         }
