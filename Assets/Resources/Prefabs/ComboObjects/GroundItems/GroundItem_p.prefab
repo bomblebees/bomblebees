@@ -46,7 +46,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7772138325108953873}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 0}
 --- !u!23 &2522025860672668527
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -100,6 +100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneId: 0
   serverOnly: 0
+  visible: 0
   m_AssetId: 
   hasSpawned: 0
 --- !u!114 &2101770075255410373
@@ -122,6 +123,7 @@ MonoBehaviour:
   sinTimeOffsetRange: 20
   bobFrequency: 8
   amplitude: 0.35
+  lifeTime: 5
 --- !u!136 &6912602339728870424
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -154,6 +156,9 @@ MonoBehaviour:
   localPositionSensitivity: 0.01
   localRotationSensitivity: 0.01
   localScaleSensitivity: 0.01
+  compressRotation: 0
+  interpolateScale: 1
+  syncScale: 1
 --- !u!54 &608020106921755596
 Rigidbody:
   m_ObjectHideFlags: 0
