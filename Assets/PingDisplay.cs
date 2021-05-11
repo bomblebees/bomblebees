@@ -18,6 +18,7 @@ public class PingDisplay : MonoBehaviour
     private void Awake()
     {
         _networkManager = FindObjectOfType<SteamNetworkManager>();
+        if (!_networkManager) _networkManager = FindObjectOfType<NetworkRoomManagerExt>();
         _text = GetComponentInChildren<TMP_Text>();
     }
 
