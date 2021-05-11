@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7249909577646941388}
   - component: {fileID: 2780598825551518867}
   - component: {fileID: 5301169573410814745}
-  - component: {fileID: -3794567861739904679}
   m_Layer: 0
   m_Name: Circle Spin VFX
   m_TagString: Untagged
@@ -4814,22 +4813,6 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
---- !u!114 &-3794567861739904679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7274719735903540578}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
 --- !u!1 &8545850550850459336
 GameObject:
   m_ObjectHideFlags: 0

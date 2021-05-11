@@ -113,11 +113,14 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
 
-        ClientScene.ClearSpawners();
+        NetworkClient.ClearSpawners();
 
         foreach (var prefab in spawnablePrefabs)
         {
-            ClientScene.RegisterPrefab(prefab);
+            if (!prefab.name.StartsWith("_"))
+            {
+                NetworkClient.RegisterPrefab(prefab);
+            }
         }
     }
 
