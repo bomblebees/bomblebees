@@ -12,11 +12,13 @@ public class GroundItem : NetworkBehaviour
 	[SerializeField] private float sinTimeOffsetRange = 0f;
 	[SerializeField] private float bobFrequency = 7f;
 	[SerializeField] private float amplitude = .2f;
+	[SerializeField] private float lifeTime = 5.0f;
 
 	private float thisOffset = 0f;
 
 	// when destroying, flag and destroy in next 
 	private bool flagToDestroy = false;
+	private IEnumerator DestroyAfterLifetimeRoutine;
 
 	// Start is called before the first frame update
 	public override void OnStartClient()
@@ -25,7 +27,14 @@ public class GroundItem : NetworkBehaviour
 		thisOffset = UnityEngine.Random.Range(0f, sinTimeOffsetRange);
 	}
 
-    // Update is called once per frame
+	public override void OnStartServer()
+	{
+		DestroyAfterLifetimeRoutine = DestroyAfterLifetime();
+		StartCoroutine(DestroyAfterLifetimeRoutine);
+	}
+
+	// Update is called once per frame
+	[Client]
     void FixedUpdate()
     {
 		// Gives a sin-based animation based on editable parameters
@@ -38,6 +47,14 @@ public class GroundItem : NetworkBehaviour
 		{
 			DestroyItem();
 		}
+	}
+
+	// Coroutine is defined and started in server, so server will set destroy flag to true, destroying it on server and for all players
+	[Server]
+	private IEnumerator DestroyAfterLifetime()
+	{
+		yield return new WaitForSeconds(lifeTime);
+		flagToDestroy = true;
 	}
 
 	[ServerCallback]
@@ -57,7 +74,6 @@ public class GroundItem : NetworkBehaviour
 				AddToInventory(other, inventoryComponent);
 			}
 		}
-
 	}
 
 	[Server]
