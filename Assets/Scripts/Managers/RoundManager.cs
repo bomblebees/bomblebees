@@ -137,7 +137,7 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     public void CmdAddPlayerToRound(ulong steamId, NetworkConnectionToClient sender = null)
     {
         playersConnected++;
