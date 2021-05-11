@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Castle.Components.DictionaryAdapter;
+﻿using System.Collections.Generic;
 using Mirror;
 using TMPro;
 using UnityEngine;
@@ -8,27 +6,28 @@ using UnityEngine.UI;
 
 public class Room_UI : MonoBehaviour
 {
-
-    private NetworkManager networkManager;
-    private MainMenu_UI mainMenuUI;
-    private Matchmaking matchmaker;
+    private NetworkManager _networkManager;
+    private MainMenu_UI _mainMenuUI;
+    private Matchmaking _matchmaker;
 
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
     [SerializeField] private GameObject screenControls;
+    
     [Header("Start Button")] 
     private GlobalButtonSettings _globalButtonSettings;
     [SerializeField] public GameObject buttonStart;
     public Button buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
     private List<CanvasRenderer> _buttonStartCanvasRenderers;
+    
     [Header("Ready Button")]
     [SerializeField] public GameObject buttonReady;
     private Button _buttonReadyButton;
     private ButtonHoverTween _buttonReadyButtonHoverTween;
     private List<CanvasRenderer> _buttonReadyCanvasRenderers;
 
-    [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab = null;
+    [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab;
     [SerializeField] private GameObject playerCardsParent;
     [HideInInspector] public PlayerLobbyCard[] playerCardsList = new PlayerLobbyCard[4];
 
@@ -40,35 +39,35 @@ public class Room_UI : MonoBehaviour
     public event ReadyClickDelegate EventReadyButtonClicked;
     public event StartClickDelegate EventStartButtonClicked;
 
-    public static Room_UI singleton;
+    public static Room_UI Singleton;
     private void Awake()
     {
-        singleton = this;
+        Singleton = this;
     }
 
     public void Start()
     {
-        networkManager = NetworkManager.singleton;
-        mainMenuUI = MainMenu_UI.singleton;
-        matchmaker = Matchmaking.singleton;
+        _networkManager = NetworkManager.singleton;
+        _mainMenuUI = MainMenu_UI.singleton;
+        _matchmaker = Matchmaking.singleton;
 
-        if (mainMenuUI.screenLoading.activeSelf)
+        if (_mainMenuUI.screenLoading.activeSelf)
         {
-            mainMenuUI.screenLoading.SetActive(false);
+            _mainMenuUI.screenLoading.SetActive(false);
 
         }
 
-        if (!mainMenuUI.screenNavigation.activeSelf)
+        if (!_mainMenuUI.screenNavigation.activeSelf)
         {
-            mainMenuUI.screenNavigation.SetActive(true);
+            _mainMenuUI.screenNavigation.SetActive(true);
         }
 
-        mainMenuUI.gameObject.SetActive(false);
+        _mainMenuUI.gameObject.SetActive(false);
 
-        if (matchmaker)
+        if (_matchmaker)
         {
-            lobbyName.text = matchmaker.GetLobbyName();
-            matchmaker.OnMirrorSetStatus("In Lobby");
+            lobbyName.text = _matchmaker.GetLobbyName();
+            _matchmaker.OnMirrorSetStatus("In Lobby");
         }
 
         _globalButtonSettings = FindObjectOfType<GlobalButtonSettings>();
@@ -122,19 +121,19 @@ public class Room_UI : MonoBehaviour
 
     public void Back()
     {
-        if (matchmaker)
+        if (_matchmaker)
         {
-            matchmaker.MirrorLeaveLobby();
+            _matchmaker.MirrorLeaveLobby();
         }
         else
         {
-            if (NetworkServer.active) networkManager.StopHost();
-            else networkManager.StopClient();
+            if (NetworkServer.active) _networkManager.StopHost();
+            else _networkManager.StopClient();
 
             // For some reason network manager is moved out of don't destroy, this is to put it back
-            DontDestroyOnLoad(networkManager.gameObject);
+            DontDestroyOnLoad(_networkManager.gameObject);
 
-            mainMenuUI.gameObject.SetActive(true);
+            _mainMenuUI.gameObject.SetActive(true);
         }
     }
 
@@ -142,8 +141,8 @@ public class Room_UI : MonoBehaviour
     {
         EventStartButtonClicked?.Invoke();
 
-        if (!matchmaker) matchmaker = Matchmaking.singleton;
-        matchmaker.OnMirrorSetStatus("In Game");
+        if (!_matchmaker) _matchmaker = Matchmaking.singleton;
+        _matchmaker.OnMirrorSetStatus("In Game");
     }
 
     public void OnReadyButtonClick()
