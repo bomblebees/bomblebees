@@ -8,8 +8,9 @@ public class PlayerInventory : NetworkBehaviour
     [Tooltip("Controls the order of bombs as shown in the player HUD")]
     [SerializeField] private static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
 
-    [Tooltip("Controls the max amount of bombs a player can carry for each bomb type")]
+    [Tooltip("Controls the max and starting amount of bombs a player can carry for each bomb type")]
     [SerializeField] private static int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
+	[SerializeField] private static int INVEN_START_VALUE = 3;
 
 	[Tooltip("Ground item prefabs for spawning bombs on ground")]
 	[SerializeField] private GameObject groundItem_r;
@@ -17,22 +18,38 @@ public class PlayerInventory : NetworkBehaviour
 	[SerializeField] private GameObject groundItem_y;
 	[SerializeField] private GameObject groundItem_g;
 
-	// A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
-	public readonly SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
 
-    // The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
-    [SyncVar(hook=nameof(OnSelectedSlotChange))] public int selectedSlot = 0;
+	public readonly SyncList<int> inventorySize = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	// A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
+	public SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	
+
+	// The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
+	[SyncVar(hook=nameof(OnSelectedSlotChange))] public int selectedSlot = 0;
 
     // Singleton
     private GameUIManager gameUIManager;
+	private RoundManager roundManager;
 
     public override void OnStartServer()
     {
         base.OnStartServer();
 
-        // Subscribe to the damage event on the server
-        this.GetComponent<Health>().EventLivesLowered += OnGhostEnter;
-    }
+
+		// Subscribe to the damage event on the server
+		this.GetComponent<Health>().EventLivesLowered += OnGhostEnter;
+
+		roundManager = RoundManager.Singleton;
+		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+		roundManager.EventInventorySizeChanged += ChangeInventorySize;
+
+		for (int i = 0; i < inventorySize.Count; i++)
+		{
+			inventorySize[i] = roundManager.currentGlobalInventorySize;
+		}
+		GetComponent<PlayerInterface>().UpdateInventorySize();
+		// inventorySize.Callback += OnInventorySizeChange;
+	}
 
     // When player enters ghost mode, reset the inventroy
     [Server] private void OnGhostEnter(bool _) { ResetInventory(); }
@@ -44,7 +61,8 @@ public class PlayerInventory : NetworkBehaviour
 
         // Subscribe to the synclist hook
         inventoryList.Callback += OnInventoryChange;
-    }
+		inventorySize.Callback += OnInventorySizeChange;
+	}
 
     private void Update()
     {
@@ -122,18 +140,18 @@ public class PlayerInventory : NetworkBehaviour
         int idx = Array.IndexOf(INVEN_BOMB_TYPES, type);
 
         // Store the extra bombs (bomb amount - spaces left) so we can drop extras on the ground 
-        int fullInvOverflowValue = (inventoryList[idx] + amt) - INVEN_MAX_VALUES[idx];
+        int fullInvOverflowValue = (inventoryList[idx] + amt) - inventorySize[idx];
 
 
         // First check if inventory for this bomb type isn't completely full:
-        if (!(inventoryList[idx] == INVEN_MAX_VALUES[idx]))
+        if (!(inventoryList[idx] == inventorySize[idx]))
         {
             // If the amount we want to add is larger than max values, then set the bomb quantity to max
-            if (inventoryList[idx] + amt > INVEN_MAX_VALUES[idx])
+            if (inventoryList[idx] + amt > inventorySize[idx])
             {
-                inventoryList[idx] = INVEN_MAX_VALUES[idx];
+                inventoryList[idx] = inventorySize[idx];
 
-                if (inventoryList[idx] + amt != INVEN_MAX_VALUES[idx])
+                if (inventoryList[idx] + amt != inventorySize[idx])
                 {
                     // Add conditional so that inventory add UI doesn't get displayed if inventory is already full
                     this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt - fullInvOverflowValue);
@@ -178,17 +196,29 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         // if inventory is full, nothing gets added.
-
     }
+
+	/// <summary>
+	/// Listening to inventory size change event in RoundManager, set the new inventory size to this amt
+	/// </summary>
+	/// <param name="size"></param>
+	[Server] public void ChangeInventorySize(int size)
+	{
+		for (int i = 0; i < inventorySize.Count; i++)
+		{
+			inventorySize[i] = size;
+		}
+		Debug.Log("Changing inventory size on " + gameObject.name);
+	}
 
     public char[] GetBombTypes()
     {
         return INVEN_BOMB_TYPES;
     }
 
-    public int[] GetMaxInvSizes()
+    public SyncList<int> GetMaxInvSizes()
     {
-        return INVEN_MAX_VALUES;
+        return inventorySize;
     }
 
 
@@ -253,17 +283,30 @@ public class PlayerInventory : NetworkBehaviour
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
 
+		Debug.Log("OnInventoryChange on " + gameObject.name);
+
         if (idx == selectedSlot && isLocalPlayer)
         {
             gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[idx], inventoryList[idx]);
         }
     }
 
-    /// <summary>
-    /// Returns the bomb type corresponding to the currently selected bomb
-    /// </summary>
-    /// <returns> The character of the bomb type. Returns 'e' if the bomb slot is empty</returns>
-    public char GetSelectedBombType()
+	/// <summary>
+	/// SyncList hook for variable InventorySize
+	/// </summary>
+	[ClientCallback] private void OnInventorySizeChange(SyncList<int>.Operation op, int idx, int oldAmt, int newAmt)
+	{
+		// Refresh the inventory UI so it shows the new frame and updated fill amount comparative to the inventory size change
+		this.GetComponent<PlayerInterface>().UpdateInventorySize();
+		Debug.Log("Inventory size change synclist callback for " + gameObject.name);
+
+	}
+
+	/// <summary>
+	/// Returns the bomb type corresponding to the currently selected bomb
+	/// </summary>
+	/// <returns> The character of the bomb type. Returns 'e' if the bomb slot is empty</returns>
+	public char GetSelectedBombType()
     {
         if (inventoryList[selectedSlot] <= 0) return 'e';
 

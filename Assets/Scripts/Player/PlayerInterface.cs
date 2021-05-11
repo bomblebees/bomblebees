@@ -36,7 +36,11 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private Image selectedHighlight;
     [SerializeField] private Image[] invSlots = new Image[4];
 	[SerializeField] private Image[] invSlotsRadial = new Image[4];
-    [SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+
+	// Each game object in array holds either 3, 4, or 5 slot UI frames which change on inv size change
+	[SerializeField] private GameObject[] slottedFrames = new GameObject[4];
+
+	[SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
     [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
 
     private Player player;
@@ -236,7 +240,29 @@ public class PlayerInterface : NetworkBehaviour
 		}
     }
 
-    public void UpdateInventorySelected()
+	public void UpdateInventorySize()
+	{
+		SyncList<int> playerInventorySizes = this.GetComponent<PlayerInventory>().inventorySize;
+		SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
+
+		Debug.Log("updating inventory size on client");
+
+		// for each radial frame container, deactivate each frame inside, and reactivate the correct one
+		for (int i = 0; i < slottedFrames.Length; i++)
+		{
+			InventoryRadialSlottedFrame frameImage = slottedFrames[i].GetComponent<InventoryRadialSlottedFrame>();
+
+			frameImage.SwapFrame(playerInventorySizes[i]);
+		}
+
+		for (int i = 0; i < list.Count; i++)
+		{
+			invSlotsRadial[i].fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
+		}
+	}
+
+
+	public void UpdateInventorySelected()
     {
         int selected = this.GetComponent<PlayerInventory>().selectedSlot;
 
