@@ -7,7 +7,7 @@ public class GlobalButtonSettings : MonoBehaviour
     [Range(0f, 1f)] [SerializeField] private float deactivatedOpacity = 0.2f;
     [Range(0f, 1f)] [SerializeField] private float activatedOpacity = 1f;
 
-    public void DeactivateButton(List<CanvasRenderer> canvasRenderers)
+    public void DeactivateButtonOpacity(List<CanvasRenderer> canvasRenderers)
     {
         foreach (var canvasRenderer in canvasRenderers)
         {
@@ -15,7 +15,7 @@ public class GlobalButtonSettings : MonoBehaviour
         }
     }
 
-    public void DeactivateButton(CanvasRenderer[] canvasRenderers)
+    public void DeactivateButtonOpacity(CanvasRenderer[] canvasRenderers)
     {
         foreach (var canvasRenderer in canvasRenderers)
         {
@@ -23,7 +23,7 @@ public class GlobalButtonSettings : MonoBehaviour
         }
     }
     
-    public void ActivateButton(List<CanvasRenderer> canvasRenderers)
+    public void ActivateButtonOpacity(List<CanvasRenderer> canvasRenderers)
     {
         foreach (var canvasRenderer in canvasRenderers)
         {
@@ -31,7 +31,7 @@ public class GlobalButtonSettings : MonoBehaviour
         }
     }
     
-    public void ActivateButton(CanvasRenderer[] canvasRenderers)
+    public void ActivateButtonOpacity(CanvasRenderer[] canvasRenderers)
     {
         foreach (var canvasRenderer in canvasRenderers)
         {

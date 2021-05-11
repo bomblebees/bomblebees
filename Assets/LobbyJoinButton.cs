@@ -22,7 +22,7 @@ public class LobbyJoinButton : MonoBehaviour
     public void DeactivateButton()
     {
         _button.interactable = false;
-        _globalButtonSettings.DeactivateButton(_canvasRenderers);
+        _globalButtonSettings.DeactivateButtonOpacity(_canvasRenderers);
         if (!(_buttonHoverTween is null))
         {
             _buttonHoverTween.enabled = false;
@@ -33,7 +33,7 @@ public class LobbyJoinButton : MonoBehaviour
     public void ActivateButton()
     {
         _button.interactable = true;
-        _globalButtonSettings.ActivateButton(_canvasRenderers);
+        _globalButtonSettings.ActivateButtonOpacity(_canvasRenderers);
         if (!(_buttonHoverTween is null))
         {
             _buttonHoverTween.enabled = true;

@@ -156,7 +156,7 @@ public class Room_UI : MonoBehaviour
         buttonStartButton.interactable = true;
         
         // Update appearance
-        _globalButtonSettings.ActivateButton(_buttonStartCanvasRenderers);
+        _globalButtonSettings.ActivateButtonOpacity(_buttonStartCanvasRenderers);
         buttonStart.transform.localScale.Set(1f,1f,1f);
         _buttonStartButtonHoverTween.enabled = true;
     }
@@ -167,7 +167,7 @@ public class Room_UI : MonoBehaviour
         buttonStartButton.interactable = false;
         
         // Update appearance
-        _globalButtonSettings.DeactivateButton(_buttonStartCanvasRenderers);
+        _globalButtonSettings.DeactivateButtonOpacity(_buttonStartCanvasRenderers);
         _buttonStartButtonHoverTween.enabled = false;
         buttonStart.transform.localScale.Set(1f,1f,1f);
     }
@@ -178,7 +178,7 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButton.interactable = true;
         
         // Update appearance
-        _globalButtonSettings.ActivateButton(_buttonReadyCanvasRenderers);
+        _globalButtonSettings.ActivateButtonOpacity(_buttonReadyCanvasRenderers);
         buttonReady.transform.localScale.Set(1f,1f,1f);
         _buttonReadyButtonHoverTween.enabled = true;
     }
@@ -189,7 +189,7 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButton.interactable = false;
         
         // Update appearance
-        _globalButtonSettings.DeactivateButton(_buttonReadyCanvasRenderers);
+        _globalButtonSettings.DeactivateButtonOpacity(_buttonReadyCanvasRenderers);
         _buttonReadyButtonHoverTween.enabled = false;
         buttonReady.transform.localScale.Set(1f,1f,1f);
     }

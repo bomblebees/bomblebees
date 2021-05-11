@@ -330,7 +330,7 @@ MonoBehaviour:
   txtNumMem: {fileID: 1004237310779195515}
   txtVer: {fileID: 7159896105705493296}
   txtStatus: {fileID: 7493042246566405667}
-  button1: {fileID: 179331040483862153}
+  joinButton: {fileID: 0}
 --- !u!1 &2136189309326097769
 GameObject:
   m_ObjectHideFlags: 0
@@ -420,11 +420,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4225120181081827797}
+  - component: {fileID: 946463025342520914}
   - component: {fileID: 4446806063034494426}
   - component: {fileID: 8329138998300847532}
   - component: {fileID: 179331040483862153}
   - component: {fileID: 5423810810217522744}
-  - component: {fileID: 946463025342520914}
   m_Layer: 5
   m_Name: btnJoin
   m_TagString: Untagged
@@ -453,6 +453,18 @@ RectTransform:
   m_AnchoredPosition: {x: 318, y: 0}
   m_SizeDelta: {x: 174.9, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &946463025342520914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4735352142017644255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 376814cf2416d0f4489b445f389a6f8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &4446806063034494426
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -548,18 +560,6 @@ MonoBehaviour:
   scaleMultipler: 1.1
   easeIn: 18
   easeOut: 18
---- !u!114 &946463025342520914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4735352142017644255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 376814cf2416d0f4489b445f389a6f8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5419104028651412029
 GameObject:
   m_ObjectHideFlags: 0

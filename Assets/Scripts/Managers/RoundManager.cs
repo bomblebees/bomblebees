@@ -16,7 +16,7 @@ public class RoundManager : NetworkBehaviour
         public Player player;
         public ulong steamId;
     }
-	private bool roundOver = false;
+	private bool roundOver;
 
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
@@ -24,9 +24,11 @@ public class RoundManager : NetworkBehaviour
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
     public int aliveCount = -1;
 
+    [Header("Server End Selection")]
 	[SerializeField] private Canvas serverEndSelectionCanvas;
+    private GlobalButtonSettings _globalButtonSettings;
 
-	// potential to-do: separate stat tracker UI stuff into separate script away from roundmanager
+	// potential to-do: separate stat tracker UI stuff into separate script away from round manager
 	[Header("Stat Tracker")]
 	[SerializeField] public GameObject[] statsElementUIAnchorObjects;
 
@@ -41,7 +43,7 @@ public class RoundManager : NetworkBehaviour
     [SerializeField] public bool useRoundTimer = true;
     [SerializeField] public float roundDuration = 60.0f;
 
-    [NonSerialized] public int playersConnected = 0;
+    [NonSerialized] public int playersConnected;
     [NonSerialized] public int totalRoomPlayers;
 
     [NonSerialized]
@@ -69,8 +71,17 @@ public class RoundManager : NetworkBehaviour
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
 
-		
-	}
+        // Setup buttons
+        _globalButtonSettings = FindObjectOfType<GlobalButtonSettings>();
+        Button[] buttons = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+        foreach (var button in buttons)
+        {
+	        button.interactable = false;
+	        button.gameObject.GetComponent<ButtonHoverTween>().enabled = false;
+	        CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
+	        _globalButtonSettings.DeactivateButtonOpacity(canvasRenderers);
+        }
+    }
 
 
 	#region Setup
@@ -279,8 +290,11 @@ public class RoundManager : NetworkBehaviour
 		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
         {
-            button.interactable = true;
+	        CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
+	        
+	        button.interactable = true;
             button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
+            _globalButtonSettings.ActivateButtonOpacity(canvasRenderers);
         }
     }
 
