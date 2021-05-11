@@ -54,9 +54,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         InitRequiredVars();
         base.OnStartClient();
 
-        switch (_networkManager.networkAddress)
+        switch (_pingDisplay.isHost)
         {
-            case "localhost":
+            case true:
                 InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
                 break;
             default:
@@ -68,10 +68,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     private void WaitForFirstPing()
     {
-        if (_pingDisplay.myPingDisplay.Equals("connecting...") && !_pingDisplay.isHost) return;
+        if (_pingDisplay.isConnecting) return;
         
         CancelInvoke(nameof(WaitForFirstPing));
-        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
+        InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
         RpcUpdatePingDisplay();
     }
     
