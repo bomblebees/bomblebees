@@ -129,7 +129,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (!roomUI)
         {
             subscribed = false;
-            roomUI = Room_UI.singleton;
+            roomUI = Room_UI.Singleton;
             if (!roomUI) Debug.LogError("room not found");
         }
     }
