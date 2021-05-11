@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Castle.Components.DictionaryAdapter;
 using Mirror;
 using TMPro;
 using UnityEngine;
@@ -14,21 +16,17 @@ public class Room_UI : MonoBehaviour
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
     [SerializeField] private GameObject screenControls;
-    [Header("Opacity Configuration")]
-    [Range(0f, 1f)]
-    [SerializeField] private float deactivatedOpacity = 0.2f;
-    [Range(0f, 1f)]
-    [SerializeField] private float activatedOpacity = 1f;
-    [Header("Start Button")]
+    [Header("Start Button")] 
+    private GlobalButtonSettings _globalButtonSettings;
     [SerializeField] public GameObject buttonStart;
     public Button buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
-    private CanvasRenderer[] _buttonStartCanvasRenderer;
+    private List<CanvasRenderer> _buttonStartCanvasRenderers;
     [Header("Ready Button")]
     [SerializeField] public GameObject buttonReady;
     private Button _buttonReadyButton;
     private ButtonHoverTween _buttonReadyButtonHoverTween;
-    private CanvasRenderer[] _buttonReadyCanvasRenderer;
+    private List<CanvasRenderer> _buttonReadyCanvasRenderers;
 
     [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab = null;
     [SerializeField] private GameObject playerCardsParent;
@@ -73,15 +71,19 @@ public class Room_UI : MonoBehaviour
             matchmaker.OnMirrorSetStatus("In Lobby");
         }
 
+        _globalButtonSettings = FindObjectOfType<GlobalButtonSettings>();
+        
         // Cache start button components
         buttonStartButton = buttonStart.GetComponent<Button>();
         _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
-        _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
+        _buttonStartCanvasRenderers = 
+            new List<CanvasRenderer>(buttonStart.GetComponentsInChildren<CanvasRenderer>());
 
         // Cache ready button components
         _buttonReadyButton = buttonReady.GetComponent<Button>();
         _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
-        _buttonReadyCanvasRenderer = buttonReady.GetComponentsInChildren<CanvasRenderer>();
+        _buttonReadyCanvasRenderers =
+            new List<CanvasRenderer>(buttonReady.GetComponentsInChildren<CanvasRenderer>());
 
         // Initialize button states
         DeactivateStartButton();
@@ -155,10 +157,7 @@ public class Room_UI : MonoBehaviour
         buttonStartButton.interactable = true;
         
         // Update appearance
-        foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
-        {
-            t.SetAlpha(activatedOpacity);
-        }
+        _globalButtonSettings.ActivateButton(_buttonStartCanvasRenderers);
         buttonStart.transform.localScale.Set(1f,1f,1f);
         _buttonStartButtonHoverTween.enabled = true;
     }
@@ -169,11 +168,7 @@ public class Room_UI : MonoBehaviour
         buttonStartButton.interactable = false;
         
         // Update appearance
-        foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
-        {
-            t.SetAlpha(deactivatedOpacity);
-        }
-        
+        _globalButtonSettings.DeactivateButton(_buttonStartCanvasRenderers);
         _buttonStartButtonHoverTween.enabled = false;
         buttonStart.transform.localScale.Set(1f,1f,1f);
     }
@@ -184,10 +179,7 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButton.interactable = true;
         
         // Update appearance
-        foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
-        {
-            t.SetAlpha(activatedOpacity);
-        }
+        _globalButtonSettings.ActivateButton(_buttonReadyCanvasRenderers);
         buttonReady.transform.localScale.Set(1f,1f,1f);
         _buttonReadyButtonHoverTween.enabled = true;
     }
@@ -198,29 +190,18 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButton.interactable = false;
         
         // Update appearance
-        foreach (CanvasRenderer t in _buttonReadyCanvasRenderer)
-        {
-            t.SetAlpha(deactivatedOpacity);
-        }
+        _globalButtonSettings.DeactivateButton(_buttonReadyCanvasRenderers);
         _buttonReadyButtonHoverTween.enabled = false;
         buttonReady.transform.localScale.Set(1f,1f,1f);
     }
-    
-    #region Screen: HOW TO PLAY
 
     public void ToggleScreenHowToPlay()
     {
         screenHowToPlay.SetActive(!screenHowToPlay.activeSelf);
     }
 
-    #endregion
-
-    #region Screen: BOMB LIST
-
     public void ToggleScreenControls()
     {
         screenControls.SetActive(!screenControls.activeSelf);
     }
-    
-    #endregion
 }

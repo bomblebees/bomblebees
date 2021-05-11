@@ -6,7 +6,6 @@
 // Copyright 2020 Inugoya.  All rights reserverd.
 //-----------------------------------------------------------------------------
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
@@ -28,11 +27,7 @@ using Mirror;
 
 public class Matchmaking : MonoBehaviour
 {
-    [Header("Button Opacity Configuration")]
-    [Range(0f, 1f)]
-    [SerializeField] private float deactivatedOpacity = 0.2f;
-    [Range(0f, 1f)]
-    [SerializeField] private float activatedOpacity = 1f;
+    private GlobalButtonSettings _globalButtonSettings;
 
     private string LOBBY_MATCHING_KEY = "[key:bomblebees-lobby]";
     private string LOBBY_MATCHING_VALUE = "[true]";
@@ -315,32 +310,19 @@ public class Matchmaking : MonoBehaviour
             rc.txtNumMem.text = SteamMatchmaking.GetNumLobbyMembers(l) + " / " + (SteamMatchmaking.GetLobbyMemberLimit(l) - 1);
             rc.txtVer.text = SteamMatchmaking.GetLobbyData(l, "LobbyVersion");
             rc.txtStatus.text = SteamMatchmaking.GetLobbyData(l, "gameStatus");
-
-
-
-            CanvasRenderer[] button1CanvasRenderer = rc.button1.GetComponentsInChildren<CanvasRenderer>();
-            ButtonHoverTween button1ButtonHoverTween = rc.button1.GetComponent<ButtonHoverTween>();
-            rc.button1.interactable = false;
-            button1ButtonHoverTween.enabled = false;
-            rc.button1.transform.localScale.Set(1f, 1f, 1f);
-            foreach (CanvasRenderer t in button1CanvasRenderer)
-            {
-                t.SetAlpha(deactivatedOpacity);
-            }
+            
+            // Update join button
+            LobbyJoinButton lobbyJoinButton = rc.joinButton.GetComponent<LobbyJoinButton>();
+            lobbyJoinButton.DeactivateButton();
 
             if (SteamMatchmaking.GetNumLobbyMembers(l) != SteamMatchmaking.GetLobbyMemberLimit(l) - 1 &&
                 SteamMatchmaking.GetLobbyData(l, "gameStatus") != "In Game" &&
                 SteamMatchmaking.GetLobbyData(l, "LobbyVersion") == Application.version)
             {
-                rc.button1.interactable = true;
-                button1ButtonHoverTween.enabled = true;
-                foreach (CanvasRenderer t in button1CanvasRenderer)
-                {
-                    t.SetAlpha(activatedOpacity);
-                }
+                lobbyJoinButton.ActivateButton();
             }
             
-            rc.button1.onClick.AddListener(delegate { uiJoinLobby(l.m_SteamID); });
+            rc.joinButton.onClick.AddListener(delegate { uiJoinLobby(l.m_SteamID); });
 
             i++;
         }

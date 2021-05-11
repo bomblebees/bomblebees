@@ -1,20 +1,18 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ScenelessObjectManager : MonoBehaviour
 {
-    [Header("Scene")]
-    [Scene] [SerializeField] private string roomScene, gameScene;
+    [Header("Scene")] 
+    [Scene] [SerializeField] private string roomScene;
+    [Scene] [SerializeField] private string gameScene;
+    
     [Header("Misc.")]
-    [SerializeField] private GlobalSettings globalSettings;
-    [SerializeField] private GameObject settingButton;
-    [SerializeField] private PingDisplay pingDisplay;
-
-    private void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
+    [SerializeField] private GameObject globalSettings;
+    [SerializeField] private GameObject settingsButton;
+    [SerializeField] private GameObject pingDisplay;
 
     private void OnEnable()
     {
@@ -30,13 +28,13 @@ public class ScenelessObjectManager : MonoBehaviour
     {
         if (scene.path == roomScene || scene.path == gameScene)
         {
-            settingButton.SetActive(false);
-            pingDisplay.gameObject.SetActive(true);
+            settingsButton.SetActive(false);
+            pingDisplay.SetActive(true);
         }
         else
         {
-            settingButton.SetActive(true);
-            pingDisplay.gameObject.SetActive(false);
+            settingsButton.SetActive(true);
+            pingDisplay.SetActive(false);
         }
     }
     
@@ -50,6 +48,6 @@ public class ScenelessObjectManager : MonoBehaviour
 
     public void ToggleSettingsScreen()
     {
-        globalSettings.gameObject.SetActive(!globalSettings.gameObject.activeSelf);
+        globalSettings.SetActive(!globalSettings.gameObject.activeSelf);
     }
 }
