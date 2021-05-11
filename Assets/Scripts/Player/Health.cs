@@ -110,7 +110,7 @@ public class Health : NetworkBehaviour
         SetHealth(maxLives);
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     private void CmdTakeDamage(int damage, GameObject bomb, GameObject player)
     {
         SetHealth(Mathf.Max(currentLives - damage, 0));

@@ -170,7 +170,7 @@ public class PlayerInterface : NetworkBehaviour
 
     #region Heads Up Display (HUD)
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority = false)]
     public void CmdUpdatePlayerName(GameObject player)
     {
         RpcUpdatePlayerName(player);

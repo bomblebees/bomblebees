@@ -1,21 +1,41 @@
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Mirror
 {
-    // UnityEvent definitions
-    [Serializable] public class ClientDataReceivedEvent : UnityEvent<ArraySegment<byte>, int> { }
-    [Serializable] public class UnityEventException : UnityEvent<Exception> { }
-    [Serializable] public class UnityEventInt : UnityEvent<int> { }
-    [Serializable] public class ServerDataReceivedEvent : UnityEvent<int, ArraySegment<byte>, int> { }
-    [Serializable] public class UnityEventIntException : UnityEvent<int, Exception> { }
-
     /// <summary>
     /// Abstract transport layer component
     /// </summary>
     /// <remarks>
-    /// note: Not all transports need a port, so add it to yours if needed.
+    /// <h2>
+    ///   Transport Rules
+    /// </h2>
+    /// <list type="bullet">
+    ///   <listheader><description>
+    ///     All transports should follow these rules so that they work correctly with mirror
+    ///   </description></listheader>
+    ///   <item><description>
+    ///     When Monobehaviour is disabled the Transport should not invoke callbacks
+    ///   </description></item>
+    ///   <item><description>
+    ///     Callbacks should be invoked on main thread. It is best to do this from LateUpdate
+    ///   </description></item>
+    ///   <item><description>
+    ///     Callbacks can be invoked after <see cref="ServerStop"/> or <see cref="ClientDisconnect"/> as been called
+    ///   </description></item>
+    ///   <item><description>
+    ///     <see cref="ServerStop"/> or <see cref="ClientDisconnect"/> can be called by mirror multiple times
+    ///   </description></item>
+    ///   <item><description>
+    ///     <see cref="Available"/> should check the platform and 32 vs 64 bit if the transport only works on some of them
+    ///   </description></item>
+    ///   <item><description>
+    ///     <see cref="GetMaxPacketSize"/> should return size even if transport is not running
+    ///   </description></item>
+    ///   <item><description>
+    ///     Default channel should be reliable <see cref="Channels.Reliable"/>
+    ///   </description></item>
+    /// </list>
     /// </remarks>
     public abstract class Transport : MonoBehaviour
     {
@@ -35,25 +55,28 @@ namespace Mirror
 
         #region Client
         /// <summary>
-        /// Notify subscribers when when this client establish a successful connection to the server
+        /// Notify subscribers when this client establish a successful connection to the server
+        /// <para>callback()</para>
         /// </summary>
-        [HideInInspector] public UnityEvent OnClientConnected = new UnityEvent();
+        public Action OnClientConnected = () => Debug.LogWarning("OnClientConnected called with no handler");
 
         /// <summary>
         /// Notify subscribers when this client receive data from the server
+        /// <para>callback(ArraySegment&lt;byte&gt; data, int channel)</para>
         /// </summary>
-        // Note: we provide channelId for NetworkDiagnostics.
-        [HideInInspector] public ClientDataReceivedEvent OnClientDataReceived = new ClientDataReceivedEvent();
+        public Action<ArraySegment<byte>, int> OnClientDataReceived = (data, channel) => Debug.LogWarning("OnClientDataReceived called with no handler");
 
         /// <summary>
         /// Notify subscribers when this client encounters an error communicating with the server
+        /// <para>callback(Exception e)</para>
         /// </summary>
-        [HideInInspector] public UnityEventException OnClientError = new UnityEventException();
+        public Action<Exception> OnClientError = (error) => Debug.LogWarning("OnClientError called with no handler");
 
         /// <summary>
         /// Notify subscribers when this client disconnects from the server
+        /// <para>callback()</para>
         /// </summary>
-        [HideInInspector] public UnityEvent OnClientDisconnected = new UnityEvent();
+        public Action OnClientDisconnected = () => Debug.LogWarning("OnClientDisconnected called with no handler");
 
         /// <summary>
         /// Determines if we are currently connected to the server
@@ -106,24 +129,27 @@ namespace Mirror
 
         /// <summary>
         /// Notify subscribers when a client connects to this server
+        /// <para>callback(int connId)</para>
         /// </summary>
-        [HideInInspector] public UnityEventInt OnServerConnected = new UnityEventInt();
+        public Action<int> OnServerConnected = (connId) => Debug.LogWarning("OnServerConnected called with no handler");
 
         /// <summary>
         /// Notify subscribers when this server receives data from the client
+        /// <para>callback(int connId, ArraySegment&lt;byte&gt; data, int channel)</para>
         /// </summary>
-        // Note: we provide channelId for NetworkDiagnostics.
-        [HideInInspector] public ServerDataReceivedEvent OnServerDataReceived = new ServerDataReceivedEvent();
+        public Action<int, ArraySegment<byte>, int> OnServerDataReceived = (connId, data, channel) => Debug.LogWarning("OnServerDataReceived called with no handler");
 
         /// <summary>
         /// Notify subscribers when this server has some problem communicating with the client
+        /// <para>callback(int connId, Exception e)</para>
         /// </summary>
-        [HideInInspector] public UnityEventIntException OnServerError = new UnityEventIntException();
+        public Action<int, Exception> OnServerError = (connId, error) => Debug.LogWarning("OnServerError called with no handler");
 
         /// <summary>
         /// Notify subscribers when a client disconnects from this server
+        /// <para>callback(int connId)</para>
         /// </summary>
-        [HideInInspector] public UnityEventInt OnServerDisconnected = new UnityEventInt();
+        public Action<int> OnServerDisconnected = (connId) => Debug.LogWarning("OnServerDisconnected called with no handler");
 
         /// <summary>
         /// Determines if the server is up and running
@@ -178,30 +204,58 @@ namespace Mirror
         /// </summary>
         /// <param name="channelId">channel id</param>
         /// <returns>the size in bytes that can be sent via the provided channel</returns>
-        public abstract int GetMaxPacketSize(int channelId = Channels.DefaultReliable);
+        public abstract int GetMaxPacketSize(int channelId = Channels.Reliable);
+
+        /// <summary>
+        /// The maximum batch(!) size for a given channel.
+        /// Uses GetMaxPacketSize by default.
+        /// Some transports like kcp support large max packet sizes which should
+        /// not be used for batching all the time because they end up being too
+        /// slow (head of line blocking etc.).
+        /// </summary>
+        /// <param name="channelId">channel id</param>
+        /// <returns>the size in bytes that should be batched via the provided channel</returns>
+        public virtual int GetMaxBatchSize(int channelId) =>
+            GetMaxPacketSize(channelId);
+
+        // block Update & LateUpdate to show warnings if Transports still use
+        // them instead of using
+        //   Client/ServerEarlyUpdate: to process incoming messages
+        //   Client/ServerLateUpdate: to process outgoing messages
+        // those are called by NetworkClient/Server at the right time.
+        //
+        // allows transports to implement the proper network update order of:
+        //      process_incoming()
+        //      update_world()
+        //      process_outgoing()
+        //
+        // => see NetworkLoop.cs for detailed explanations!
+#pragma warning disable UNT0001 // Empty Unity message
+        public void Update() {}
+        public void LateUpdate() {}
+#pragma warning restore UNT0001 // Empty Unity message
+
+        /// <summary>
+        /// NetworkLoop NetworkEarly/LateUpdate were added for a proper network
+        /// update order. the goal is to:
+        ///    process_incoming()
+        ///    update_world()
+        ///    process_outgoing()
+        /// in order to avoid unnecessary latency and data races.
+        /// </summary>
+        // => split into client and server parts so that we can cleanly call
+        //    them from NetworkClient/Server
+        // => VIRTUAL for now so we can take our time to convert transports
+        //    without breaking anything.
+        public virtual void ClientEarlyUpdate() {}
+        public virtual void ServerEarlyUpdate() {}
+        public virtual void ClientLateUpdate() {}
+        public virtual void ServerLateUpdate() {}
 
         /// <summary>
         /// Shut down the transport, both as client and server
         /// </summary>
         public abstract void Shutdown();
-
-        // block Update() to force Transports to use LateUpdate to avoid race
-        // conditions. messages should be processed after all the game state
-        // was processed in Update.
-        // -> in other words: use LateUpdate!
-        // -> uMMORPG 480 CCU stress test: when bot machine stops, it causes
-        //    'Observer not ready for ...' log messages when using Update
-        // -> occupying a public Update() function will cause Warnings if a
-        //    transport uses Update.
-        //
-        // IMPORTANT: set script execution order to >1000 to call Transport's
-        //            LateUpdate after all others. Fixes race condition where
-        //            e.g. in uSurvival Transport would apply Cmds before
-        //            ShoulderRotation.LateUpdate, resulting in projectile
-        //            spawns at the point before shoulder rotation.
-#pragma warning disable UNT0001 // Empty Unity message
-        public void Update() { }
-#pragma warning restore UNT0001 // Empty Unity message
 
         /// <summary>
         /// called when quitting the application by closing the window / pressing stop in the editor
