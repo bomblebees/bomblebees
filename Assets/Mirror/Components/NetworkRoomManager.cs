@@ -258,6 +258,14 @@ namespace Mirror
                 return;
             }
 
+            allPlayersReady = false;
+
+            foreach (NetworkRoomPlayer player in roomSlots)
+            {
+                if (player != null)
+                    player.GetComponent<NetworkRoomPlayer>().readyToBegin = false;
+            }
+
             base.OnServerConnect(conn);
             OnRoomServerConnect(conn);
         }
