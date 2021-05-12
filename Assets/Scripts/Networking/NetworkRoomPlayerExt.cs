@@ -65,7 +65,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Start updating ping
         if (isLocalPlayer)
         {
-            InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
+            SetPing();
+            InvokeRepeating(nameof(WaitForFirstPing), 0f, 0.1f);
         }
     }
 
@@ -351,13 +352,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     #region Ping
 
-    //private void WaitForFirstPing()
-    //{
-    //    if (_pingDisplay.myPingDisplay.Equals("connecting...") && !_pingDisplay.isHost) return;
+    private void WaitForFirstPing()
+    {
+        if (!_pingDisplay.isConnected) return;
 
-    //    CancelInvoke(nameof(WaitForFirstPing));
-    //    InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
-    //}
+        CancelInvoke(nameof(WaitForFirstPing));
+        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
+    }
 
     [Client] private void SetPing()
     {
