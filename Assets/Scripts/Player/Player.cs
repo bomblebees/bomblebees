@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
 
     // Game Objects
     [Header("Required", order = 2)]
-    [SerializeField] private GameObject playerMesh;
+    public GameObject playerMesh;
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
