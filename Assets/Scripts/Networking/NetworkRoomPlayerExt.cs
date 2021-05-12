@@ -240,9 +240,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] private void InitPlayerCard()
     {
-        // if this is the host, enable the crown icon
-        if (index == 0) playerCard.crown.SetActive(true);
-
         // enable the character portrait
         playerCard.characterPortrait.enabled = true;
 
@@ -254,6 +251,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SetCardReadyStatus();
         SetCardCharacterPortrait();
         SetCardButtons();
+        SetCardHostCrown();
     }
 
     #endregion
@@ -341,6 +339,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             playerCard.changeCharacterButtonHoverTween.enabled = false;
         }
     }
+
+    [Client] private void SetCardHostCrown()
+    {
+        // if this is the host, enable the crown icon
+        if (index == 0) playerCard.crown.SetActive(true);
+        else playerCard.crown.SetActive(false);
+    }
+
     #endregion
 
     #region Ping
@@ -387,6 +393,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         // Propagate updates to the player card
         SetCardPosition();
+        SetCardHostCrown();
     }
 
     /// <summary>
