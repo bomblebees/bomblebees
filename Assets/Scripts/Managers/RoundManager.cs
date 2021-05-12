@@ -279,7 +279,7 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public void OnWinConditionSatisfied()
     {
-        ServerEndRound();
+        EndRound();
     }
 
     [Server]
@@ -295,6 +295,10 @@ public class RoundManager : NetworkBehaviour
         WinCondition test = this.gameObject.AddComponent<LivesCondition>();
         test.StartWinCondition();
         test.EventWinConditionSatisfied += OnWinConditionSatisfied;
+
+        WinCondition test2 = this.gameObject.AddComponent<TimerCondition>();
+        test2.StartWinCondition();
+        test2.EventWinConditionSatisfied += OnWinConditionSatisfied;
 
 
         //UpdateGridsAliveCount(0, aliveCount);
