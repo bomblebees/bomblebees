@@ -44,7 +44,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
         // generate unique ID based on the time in ms, for development
         DateTimeOffset curDate = new DateTimeOffset(DateTime.UtcNow);
-        ulong timeId = (ulong) curDate.ToUnixTimeMilliseconds();
+        ulong timeId = (ulong)curDate.ToUnixTimeMilliseconds();
 
         // set the steamId temporarily to a timeId
         gamePlayer.GetComponent<Player>().playerId = timeId;
@@ -54,7 +54,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
         // transfer the character chosen
         gamePlayer.GetComponent<Player>().characterCode = roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode;
-        
+
         // transfer the team chosen
         gamePlayer.GetComponent<Player>().teamIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().teamIndex;
 
@@ -98,7 +98,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             NetworkServer.Spawn(Instantiate(audioManager));
         }
     }
-        
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -106,18 +106,18 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         spawnPrefabs.Clear();
         spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
     }
-        
+
     public override void OnStartClient()
     {
         base.OnStartClient();
-            
+
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
 
-        ClientScene.ClearSpawners();
+        NetworkClient.ClearSpawners();
 
         foreach (var prefab in spawnablePrefabs)
         {
-            ClientScene.RegisterPrefab(prefab);
+            NetworkClient.RegisterPrefab(prefab);
         }
     }
 

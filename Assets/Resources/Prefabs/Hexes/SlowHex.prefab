@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3826763822169304207}
   - component: {fileID: 815199921052709533}
   - component: {fileID: 4403383142516716891}
-  - component: {fileID: 6457303220706423717}
   m_Layer: 17
   m_Name: SlowHitbox
   m_TagString: ComboHitbox
@@ -95,22 +94,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 6099800089077584851, guid: e931c1c0417776542aac00d7edc28bff, type: 3}
---- !u!114 &6457303220706423717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2703188199410271570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
 --- !u!1 &5019543899690969146
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,5 +204,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneId: 0
   serverOnly: 0
+  visible: 0
   m_AssetId: 
   hasSpawned: 0

@@ -9,6 +9,7 @@ public class PingDisplay : MonoBehaviour
     public int myPingValue;
     public string myPingDisplay;
     public bool isHost;
+    public bool isConnecting;
     public int lastSessionPing;
     
     private NetworkManager _networkManager;
@@ -17,6 +18,7 @@ public class PingDisplay : MonoBehaviour
     private void Awake()
     {
         _networkManager = FindObjectOfType<SteamNetworkManager>();
+        if (!_networkManager) _networkManager = FindObjectOfType<NetworkRoomManagerExt>();
         _text = GetComponentInChildren<TMP_Text>();
     }
 
@@ -42,11 +44,14 @@ public class PingDisplay : MonoBehaviour
         _text.text = null;
         myPingDisplay = _text.text;
         isHost = false;
+        isConnecting = false;
     }
 
     private void InitializePingDisplay()
     {
-        switch ((int) (NetworkTime.rtt * 1000))
+        myPingValue = (int) (NetworkTime.rtt * 1000);
+        
+        switch (myPingValue)
         {
             case 0 when _networkManager.networkAddress.Equals("localhost"):
                 Debug.LogWarning("This should never be called");
@@ -57,7 +62,7 @@ public class PingDisplay : MonoBehaviour
                 break;
             default:
             {
-                if (((int) (NetworkTime.rtt * 1000)).Equals(lastSessionPing))
+                if (myPingValue.Equals(lastSessionPing))
                 {
                     ConnectingStatus();
                 }
@@ -76,10 +81,17 @@ public class PingDisplay : MonoBehaviour
         myPingValue = (int) (NetworkTime.rtt * 1000);
         _text.text = myPingValue + "ms";
         myPingDisplay = _text.text;
+
+        if (_networkManager.networkAddress.Equals("localhost"))
+        {
+            Debug.LogWarning("This should never be called");
+            HostStatus();
+        }
     }
 
     private void HostStatus()
     {
+        isConnecting = false;
         isHost = true;
         myPingValue = 0;
         _text.text = "Host";
@@ -91,6 +103,7 @@ public class PingDisplay : MonoBehaviour
     private void ConnectingStatus()
     {
         isHost = false;
+        isConnecting = true;
         myPingValue = 0;
         _text.text = "connecting...";
         myPingDisplay = _text.text;

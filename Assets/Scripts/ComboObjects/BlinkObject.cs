@@ -74,7 +74,7 @@ public class BlinkObject : TickObject
         StartCoroutine(Breakdown());
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     void NotifyServerPosition(GameObject triggeringPlayer) {
         triggeringPlayer.transform.position = this.gameObject.transform.position;
     }

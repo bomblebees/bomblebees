@@ -16,17 +16,24 @@ public class RoundManager : NetworkBehaviour
         public Player player;
         public ulong steamId;
     }
-	private bool roundOver = false;
+	private bool roundOver;
 
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
 
+	public int numPlayers = 0;
+
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
     public int aliveCount = -1;
 
-	[SerializeField] private Canvas serverEndSelectionCanvas;
+	[SyncVar]
+	public int currentGlobalInventorySize = 3;
 
-	// potential to-do: separate stat tracker UI stuff into separate script away from roundmanager
+    [Header("Server End Selection")]
+	[SerializeField] private Canvas serverEndSelectionCanvas;
+    private GlobalButtonSettings _globalButtonSettings;
+
+	// potential to-do: separate stat tracker UI stuff into separate script away from round manager
 	[Header("Stat Tracker")]
 	[SerializeField] public GameObject[] statsElementUIAnchorObjects;
 
@@ -41,7 +48,7 @@ public class RoundManager : NetworkBehaviour
     [SerializeField] public bool useRoundTimer = true;
     [SerializeField] public float roundDuration = 60.0f;
 
-    [NonSerialized] public int playersConnected = 0;
+    [NonSerialized] public int playersConnected;
     [NonSerialized] public int totalRoomPlayers;
 
     [NonSerialized]
@@ -53,37 +60,63 @@ public class RoundManager : NetworkBehaviour
     public delegate void RoundStartDelegate();
     public delegate void RoundEndDelegate(GameObject winner);
 	public delegate void PlayerEliminatedDelegate(GameObject eliminatedPlayer);
+	public delegate void GlobalInventorySizeChangeDelegate(int newSize);
     public event PlayerConnectedDelegate EventPlayerConnected;
     public event RoundStartDelegate EventRoundStart;
     public event RoundEndDelegate EventRoundEnd;
 	public event PlayerEliminatedDelegate EventPlayerEliminated;
+	public event GlobalInventorySizeChangeDelegate EventInventorySizeChanged;
 
     // singletons
     public static RoundManager _instance;
     public static RoundManager Singleton { get { return _instance;  } }
 
     private EventManager eventManager;
+	NetworkRoomManagerExt room;
 
-    private void Awake()
+
+	private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
 
-		
-	}
+        // Setup buttons
+        _globalButtonSettings = FindObjectOfType<GlobalButtonSettings>();
+        Button[] buttons = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+        foreach (var button in buttons)
+        {
+	        button.interactable = false;
+	        button.gameObject.GetComponent<ButtonHoverTween>().enabled = false;
+	        CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
+	        _globalButtonSettings.DeactivateButtonOpacity(canvasRenderers);
+        }
+    }
 
 
 	#region Setup
 
 	public override void OnStartServer()
     {
-        NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
         totalRoomPlayers = room.roomSlots.Count;
         // Event manager singleton
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
         hexGrid = GameObject.FindObjectOfType<HexGrid>();
-    }
+
+		numPlayers = FindObjectsOfType<NetworkRoomPlayerExt>().Length;
+
+		Debug.Log("num players in round manager start: " + numPlayers);
+
+		if (numPlayers > 1)
+		{
+			currentGlobalInventorySize = (numPlayers - 7) * -1;
+		}
+		else
+		{
+			currentGlobalInventorySize = 5;
+		}
+	}
 
     public void UpdateGridsAliveCount(int oldAliveCount, int newAliveCount)
     {
@@ -104,7 +137,7 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     public void CmdAddPlayerToRound(ulong steamId, NetworkConnectionToClient sender = null)
     {
         playersConnected++;
@@ -119,7 +152,8 @@ public class RoundManager : NetworkBehaviour
         playerInfo.steamId = steamId;
 
         playerList.Add(playerInfo);
-
+		// player.GetComponent<PlayerInventory>().ChangeInventorySize(currentGlobalInventorySize);
+		
 		// add player to stat tracker list and store reference to the player gameobject
 		// statTracker.CreatePlayerStatObject(sender.identity.gameObject);
 
@@ -132,7 +166,8 @@ public class RoundManager : NetworkBehaviour
 
         if (totalRoomPlayers == playersConnected)
         {
-            StartRound();
+			
+			StartRound();
         }
     }
 
@@ -144,6 +179,8 @@ public class RoundManager : NetworkBehaviour
         eventManager.OnStartRound();
         RpcStartRound();
         StartCoroutine(ServerStartRound());
+
+
     }
 
     [Server]
@@ -251,7 +288,9 @@ public class RoundManager : NetworkBehaviour
     [Server]
     public IEnumerator ServerStartRound()
     {
-        yield return new WaitForSeconds(startGameFreezeDuration + 1);
+		// EventInventorySizeChanged?.Invoke(currentGlobalInventorySize);
+		yield return new WaitForSeconds(startGameFreezeDuration + 1);
+
         for (int i = 0; i < playerList.Count; i++)
         {
             alivePlayers.Add(playerList[i]);
@@ -263,7 +302,12 @@ public class RoundManager : NetworkBehaviour
             //p.SetCanMove(true);
         }
         aliveCount = alivePlayers.Count;
-        UpdateGridsAliveCount(0, aliveCount);
+
+		
+
+
+
+		UpdateGridsAliveCount(0, aliveCount);
         if (useRoundTimer) StartCoroutine(StartRoundTimer());
     }
 
@@ -279,8 +323,11 @@ public class RoundManager : NetworkBehaviour
 		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
         {
-            button.interactable = true;
+	        CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
+	        
+	        button.interactable = true;
             button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
+            _globalButtonSettings.ActivateButtonOpacity(canvasRenderers);
         }
     }
 
@@ -350,12 +397,34 @@ public class RoundManager : NetworkBehaviour
             // update alive count
             aliveCount = alivePlayers.Count;
 
+			IncreaseGlobalLivesAmt();
+
 			// check if the round has ended
 			CheckRoundEnd();
 			EventPlayerEliminated?.Invoke(player);
 			
         }
     }
+
+	[Server]
+	public void IncreaseGlobalLivesAmt()
+	{
+		if (aliveCount > 1)
+		{
+			// if there are still more than 1 person left after this death, increase global inv size
+			currentGlobalInventorySize++;
+			EventInventorySizeChanged?.Invoke(currentGlobalInventorySize);
+			// RpcIncreaseGlobalLivesAmt(currentGlobalInventorySize);
+		}
+	}
+
+	/*
+	[ClientRpc]
+	public void RpcIncreaseGlobalLivesAmt(int size)
+	{
+		EventInventorySizeChanged?.Invoke(
+	}
+	*/
 
     [Server] // returns true if the round ended successfully, false otherwise
     public bool CheckRoundEnd()
@@ -432,5 +501,11 @@ public class RoundManager : NetworkBehaviour
 		        EndRound();
 	        }
         }
-    }
+
+		// cheat for increasing inv size
+		if (Input.GetKeyDown(KeyCode.Alpha1) && Input.GetKey(KeyCode.B))
+		{
+			IncreaseGlobalLivesAmt();
+		}
+	}
 }

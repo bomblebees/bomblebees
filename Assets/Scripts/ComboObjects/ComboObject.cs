@@ -44,6 +44,7 @@ public class ComboObject : NetworkBehaviour
     protected bool didEarlyEffects = false;
 
     // player who triggered the bomb
+	[SyncVar]
     public GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
     

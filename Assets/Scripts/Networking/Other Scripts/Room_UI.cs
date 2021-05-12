@@ -30,8 +30,8 @@ public class Room_UI : MonoBehaviour
     private ButtonHoverTween _buttonReadyButtonHoverTween;
     private CanvasRenderer[] _buttonReadyCanvasRenderer;
 
-    [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab = null;
-    [SerializeField] private GameObject playerCardsParent;
+    //[SerializeField] private PlayerLobbyCard playerLobbyCardPrefab = null;
+    [SerializeField] public GameObject playerCardsParent;
     [HideInInspector] public PlayerLobbyCard[] playerCardsList = new PlayerLobbyCard[4];
 
     [SerializeField] public TMP_Text lobbyName;
@@ -93,29 +93,29 @@ public class Room_UI : MonoBehaviour
 
     private void InitializePlayerCards()
     {
-        CharacterSelectionInfo charSelect = FindObjectOfType<CharacterSelectionInfo>();
+        //CharacterSelectionInfo charSelect = FindObjectOfType<CharacterSelectionInfo>();
 
-        float gapBetweenCards = 450;
-        float startPosX = -675;
-        float posY = -300;
+        //float gapBetweenCards = 450;
+        //float startPosX = -675;
+        //float posY = -300;
 
-        for (int i = 0; i < playerCardsList.Length; i++)
-        {
-            // instantiate the player card
-            PlayerLobbyCard card = Instantiate(
-                playerLobbyCardPrefab,
-                new Vector3(0, 0, 0),
-                Quaternion.identity,
-                playerCardsParent.transform);
+        //for (int i = 0; i < playerCardsList.Length; i++)
+        //{
+        //    // instantiate the player card
+        //    PlayerLobbyCard card = Instantiate(
+        //        playerLobbyCardPrefab,
+        //        new Vector3(0, 0, 0),
+        //        Quaternion.identity,
+        //        playerCardsParent.transform);
 
-            // set the position on the UI
-            card.transform.localPosition = new Vector3(startPosX + (gapBetweenCards * i), posY);
+        //    // set the position on the UI
+        //    card.transform.localPosition = new Vector3(startPosX + (gapBetweenCards * i), posY);
 
-            card.changeCharacterButton.onClick.AddListener(charSelect.OnChangeCharacter);
+        //    card.changeCharacterButton.onClick.AddListener(charSelect.OnChangeCharacter);
 
-            // add it to the list of player cards
-            playerCardsList[i] = card;
-        }
+        //    // add it to the list of player cards
+        //    playerCardsList[i] = card;
+        //}
     }
 
     public void Back()

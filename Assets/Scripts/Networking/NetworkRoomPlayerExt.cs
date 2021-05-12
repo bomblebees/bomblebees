@@ -9,28 +9,32 @@ using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
+    [Header("SyncVars")]
     [SyncVar] public ulong steamId;
     [SyncVar] public string steamUsername = "Username";
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
-    [SyncVar] public string ping;
 
-    /// <summary>
-    /// Variable representing the team that the player is on. -1 represents no team chosen
-    /// </summary>
+    /// <summary>The ping of the player</summary>
+    [SyncVar(hook=nameof(PingChanged))] public string ping;
+
+    /// <summary>The selected character/color</summary>
+    [SyncVar(hook = nameof(CharacterChanged))] public int characterCode;
+
+    /// <summary>The selected team. -1 represents no team chosen </summary>
     [SyncVar] public int teamIndex = -1;
-    
-    [Header("Character Selection")]
-    [SyncVar] public int characterCode;
-    private CharacterSelectionInfo _characterSelectionInfo;
 
-    [Header("Default UI")]
-    [SerializeField] private Texture2D defaultAvatar;
-    [SerializeField] private string defaultUsername;
-
+    [Header("Required")]
+    [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab;
     private PingDisplay _pingDisplay;
     private NetworkManager _networkManager;
-    
+    private CharacterSelectionInfo _characterSelectionInfo;
+
+    /// <summary>
+    /// The player lobby card UI of this player. A value of null means it is uninitialized.
+    /// </summary>
+    private PlayerLobbyCard playerCard = null;
+
     // Temp list of player colors
     private List<Color> listColors = new List<Color> {
         Color.red,
@@ -38,7 +42,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         Color.yellow,
         Color.green,
     };
-    
+
     Room_UI roomUI;
 
     NetworkRoomManagerExt room;
@@ -49,78 +53,133 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         _pingDisplay = FindObjectOfType<PingDisplay>();
     }
 
-    public override void OnStartClient()
-    {
-        InitRequiredVars();
-        base.OnStartClient();
+    #region Joining/Leaving Lobby
 
-        switch (_networkManager.networkAddress)
+    /// <summary>
+    /// Called when the client first connects to the lobby.
+    /// </summary>
+    [Client] public override void OnStartClient()
+    {
+        SetupLobby();
+
+        // Start updating ping
+        if (isLocalPlayer)
         {
-            case "localhost":
-                InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
-                break;
-            default:
-                SetPing();
-                InvokeRepeating(nameof(WaitForFirstPing), 0f, 0.1f);
-                break;
+            InvokeRepeating(nameof(SetPing), 0f, _pingDisplay.updateInterval);
         }
     }
 
-    private void WaitForFirstPing()
+
+    /// <summary>
+    /// Called when the client disconnects from the lobby
+    /// </summary>
+    [Client] public override void OnStopClient()
     {
-        if (_pingDisplay.myPingDisplay.Equals("connecting...") && !_pingDisplay.isHost) return;
-        
-        CancelInvoke(nameof(WaitForFirstPing));
-        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
-        RpcUpdatePingDisplay();
+        DestroyPlayerCard();
+    }
+
+    /// <summary>
+    /// Called when the client enters the lobby scene.
+    /// <para>We should only use this for when the client re-enters the lobby from the game scene.
+    /// For when the client first joins the lobby, use OnStartClient instead</para>
+    /// </summary>
+    [Client] public override void OnClientEnterRoom()
+    {
+        SetupLobby();
+    }
+
+    /// <summary>
+    /// Called when the client leaves the lobby scene.
+    /// <para>Note: This function is not called when the player leaves the lobby (use OnStopClient),
+    /// only when the player leaves the lobby joining the game.</para>
+    /// </summary>
+    [Client] public override void OnClientExitRoom()
+    {
+        isSetup = false;
+    }
+
+    #endregion
+
+    #region Update Loop
+
+    private void Update()
+    {
+        // Exit if required vars are not initialized
+        if (!_characterSelectionInfo || !room || !roomUI) return;
+
+        UpdateLobby();
+    }
+
+    /// <summary>
+    /// Updates certain elements of the lobby every frame.
+    /// <para>Only updates that cannot be updated using SyncVar hooks should be implemented here.</para>
+    /// </summary>
+    [Client] private void UpdateLobby()
+    {
+        // For local lobby buttons
+        if (isLocalPlayer)
+        {
+            // Enable/disable the start game button (for host only)
+            if (room.allPlayersReady && room.showStartButton)
+                roomUI.ActivateStartButton();
+            else
+                roomUI.DeactivateStartButton();
+
+            // Enable/disable the ready button
+            if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[this.characterCode])
+                roomUI.DeactivateReadyButton();
+            else
+                roomUI.ActivateReadyButton();
+        }
+
+        // If not ready, and character portrait is unavailable, grey out the portrait
+        if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[this.characterCode])
+            playerCard.characterPortrait.color = new Color(0.4f, 0.4f, 0.4f);
+        else
+            playerCard.characterPortrait.color = new Color(1f, 1f, 1f);
+    }
+
+    #endregion
+
+    #region Lobby Creation
+
+    /// <summary>
+    /// Whether or not the lobby is already setup
+    /// </summary>
+    private bool isSetup = false;
+
+    /// <summary>
+    /// Sets up the lobby for this player
+    /// </summary>
+    [Client] private void SetupLobby()
+    {
+        // Exit if lobby is already setup
+        if (isSetup) return;
+
+        InitRequiredVars();
+        InitLobbyButtons();
+        CreatePlayerCard();
+        InitPlayerCard();
+
+        isSetup = true;
     }
     
-    private void SetPing()
-    {
-        CmdSetPing(_pingDisplay.myPingDisplay);
-        UpdatePingDisplay();
-    }
-
-    [Command]
-    private void CmdSetPing(string newPing)
-    {
-        ping = newPing;
-    }
-
-    [ClientRpc]
-    private void RpcUpdatePingDisplay()
-    {
-        UpdatePingDisplay();
-    }
-
-    private void UpdatePingDisplay()
-    {
-        for (var i = 0; i < room.roomSlots.Count; i++)
-        {
-            PlayerLobbyCard card = roomUI.playerCardsList[i];
-            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
-
-            if (player is null) continue;
-            
-            card.username.text = player.steamUsername + " (" + player.ping + ")";
-        }
-    }
-
-    private void InitRequiredVars()
+    /// <summary>
+    /// Initializes lobby room variables
+    /// </summary>
+    [Client] private void InitRequiredVars()
     {
         // Only init if we are in the room scene
         if (SceneManager.GetActiveScene().name != "Room") return;
 
         if (!_characterSelectionInfo)
         {
-            subscribed = false;
             _characterSelectionInfo = FindObjectOfType<CharacterSelectionInfo>();
             if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
         }
 
         if (!room)
         {
-            subscribed = false;
             room = NetworkManager.singleton as SteamNetworkManager;
             if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
             if (!room) Debug.LogError("room not found");
@@ -128,156 +187,260 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         if (!roomUI)
         {
-            subscribed = false;
             roomUI = Room_UI.singleton;
             if (!roomUI) Debug.LogError("room not found");
         }
     }
 
-    private void Update()
+    /// <summary>
+    /// Initializes lobby room buttons
+    /// </summary>
+    [Client] private void InitLobbyButtons()
     {
-        InitRequiredVars();
-
-        // EXIT IF REQUIRED VARS NOT INITIALIZED
-        if (!_characterSelectionInfo || !room || !roomUI) return;
-
-        // EXIT IF IS LOCAL PLAYER
+        // Exit if we are not the local player
         if (!isLocalPlayer) return;
 
-        if (room.allPlayersReady && room.showStartButton)
+        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+        roomUI.EventStartButtonClicked += OnStartButtonClick;
+
+        Debug.Log("InitLobbyButtons Subscribed");
+    }
+
+    /// <summary>
+    /// Creates and instantiates the player card game object
+    /// </summary>
+    [Client] private void CreatePlayerCard()
+    {
+        // if the card is already created, do not create again
+        if (playerCard) return;
+
+        // instantiate the player card
+        playerCard = Instantiate(
+            playerLobbyCardPrefab,
+            new Vector3(0, 0, 0),
+            Quaternion.identity,
+            roomUI.playerCardsParent.transform);
+
+
+        // add button event listeners for the local player
+        if (isLocalPlayer)
         {
-            roomUI.ActivateStartButton();
+            playerCard.changeCharacterButton.onClick.AddListener(OnCharacterClicked);
+            //playerCard.changeTeamButton.onClick.AddListener(OnTeamClicked);
+
+        }
+
+
+        // set the transform of the card
+        SetCardPosition();
+    }
+
+    /// <summary>
+    /// Initializes the player card that was created
+    /// </summary>
+    [Client] private void InitPlayerCard()
+    {
+        // if this is the host, enable the crown icon
+        if (index == 0) playerCard.crown.SetActive(true);
+
+        // enable the character portrait
+        playerCard.characterPortrait.enabled = true;
+
+        // set the player name
+        playerCard.username.text = this.steamUsername + " (" + this.ping + ")";
+
+        // set initial card variables
+        SetCardPosition();
+        SetCardReadyStatus();
+        SetCardCharacterPortrait();
+        SetCardButtons();
+    }
+
+    #endregion
+
+    #region Lobby Destruction
+
+    /// <summary>
+    /// Destroys the lobby player card of this player
+    /// </summary>
+    [Client] private void DestroyPlayerCard()
+    {
+        if (playerCard)
+        {
+            Destroy(playerCard.gameObject);
+        }
+    }
+
+    #endregion
+
+    #region Player Card
+
+    // Static positions used in SetCardPosition()
+    private static float distBetweenCards = 450;
+    private static float cardStartPosX = -675;
+    private static float cardPosY = -300;
+
+    /// <summary>
+    /// Sets the position of this player's lobby player to a position based on the player's index in the lobby.
+    /// </summary>
+    [Client] private void SetCardPosition()
+    {
+        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardPosition()!"); return; }
+
+        playerCard.transform.localPosition = new Vector3(cardStartPosX + (distBetweenCards * index), cardPosY);
+    }
+
+    /// <summary>
+    /// Sets the ready status of this player based on their current ready status
+    /// </summary>
+    [Client] private void SetCardReadyStatus()
+    {
+        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardReadyStatus()!"); return; }
+
+        // Enable/Diable the ready status UI
+        playerCard.readyStatus.SetActive(this.readyToBegin);
+
+        // Lock character code if player is readied
+        _characterSelectionInfo.characterAvailable[characterCode] = !this.readyToBegin;
+    }
+
+    /// <summary>
+    /// Sets the character portrait of this player based on their current selected character code
+    /// </summary>
+    [Client] private void SetCardCharacterPortrait()
+    {
+        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardCharacterPortrait()!"); return; }
+
+        // Set the character portrait
+        playerCard.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[this.characterCode];
+
+        // Set colors of the color frames
+        foreach (Image elem in playerCard.colorFrames)
+        {
+            elem.color = listColors[this.characterCode];
+        }
+    }
+
+    /// <summary>
+    /// Sets the card buttons for this player.
+    /// <para>Card specific buttons should only be interactable by the local player.</para>
+    /// </summary>
+    [Client] private void SetCardButtons()
+    {
+        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardButtons()!"); return; }
+
+        if (isLocalPlayer)
+        {
+            // Allow local player to change the portrait
+            playerCard.changeCharacterButton.enabled = !this.readyToBegin;
+            playerCard.changeCharacterButtonHoverTween.enabled = !this.readyToBegin;
         }
         else
         {
-            roomUI.DeactivateStartButton();
+            playerCard.changeCharacterButton.enabled = false;
+            playerCard.changeCharacterButtonHoverTween.enabled = false;
         }
-
-        // If not ready, and character portrait is unavailable, deactivate ready button
-        if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
-        {
-            roomUI.DeactivateReadyButton();
-        } else
-        {
-            roomUI.ActivateReadyButton();
-        }
-
-        UpdateLobbyList();
     }
+    #endregion
 
-    // Whether THIS player is subscribed to the events already or not
-    private bool subscribed = false;
+    #region Ping
 
-    public override void OnClientEnterRoom()
+    //private void WaitForFirstPing()
+    //{
+    //    if (_pingDisplay.myPingDisplay.Equals("connecting...") && !_pingDisplay.isHost) return;
+
+    //    CancelInvoke(nameof(WaitForFirstPing));
+    //    InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
+    //}
+
+    [Client] private void SetPing()
     {
-        base.OnClientEnterRoom();
-
-        Debug.Log("on client enter: player " + index);
-
-        // Subscribe to events
-        InitRequiredVars();
-
-        if (!subscribed)
-        {
-            _characterSelectionInfo.EventCharacterChanged += OnCharacterChanged;
-            roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-            roomUI.EventStartButtonClicked += OnStartButtonClick;
-            subscribed = true;
-        }
+        CmdSetPing(_pingDisplay.myPingDisplay);
+        UpdatePingDisplay();
     }
 
-    public override void OnClientExitRoom()
+    [Command] private void CmdSetPing(string newPing)
     {
-        SteamNetworkManager room = NetworkManager.singleton as SteamNetworkManager;
-        if (!room) return;
-        Debug.Log("exit room count" + room.roomSlots.Count);
-
-        //this.playerColor = listColors[index];
-        Debug.Log("player " + index + " left");
+        ping = newPing;
     }
 
-    public void UpdateLobbyList()
+    [ClientCallback] private void PingChanged(string prevPing, string newPing)
     {
-        // Update all existing players
-        for (int i = 0; i < 4; i++)
-        {
-            PlayerLobbyCard card = roomUI.playerCardsList[i];
-
-            // if player does not exist
-            if (i >= room.roomSlots.Count)
-            {
-                //card.gameObject.SetActive(false);
-                card.username.text = defaultUsername;
-                card.avatar.texture = FlipTexture(defaultAvatar);
-                card.readyStatus.SetActive(false);
-                card.characterPortrait.enabled = false;
-                continue;
-            }
-
-            // if this is the host, enable the crown icon
-            if (i == 0) card.crown.SetActive(true);
-
-            // enable the character portrait
-            card.characterPortrait.enabled = true;
-
-            NetworkRoomPlayerExt player = room.roomSlots[i] as NetworkRoomPlayerExt;
-
-            // If it is the local player, allow them to change the portrait
-            if (player == this)
-            {
-                if (this.readyToBegin)
-                {
-                    card.changeCharacterButton.enabled = false;
-                    card.changeCharacterButtonHoverTween.enabled = false;
-                }
-                else
-                {
-                    card.changeCharacterButton.enabled = true;
-                    card.changeCharacterButtonHoverTween.enabled = true;
-                }
-            }
-
-            // Player list background
-            card.playerCard.SetActive(true);
-
-            // User name
-            card.username.text = player.steamUsername + " (" + player.ping + ")"; 
-
-            // If steam is active, set steam avatars
-            //card.avatar.texture = GetSteamImageAsTexture(player.steamAvatarId);
-
-            // Character selection
-            card.characterPortrait.enabled = true;
-            card.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[player.characterCode];
-
-            // Ready status
-            card.readyStatus.SetActive(player.readyToBegin);
-
-            // Set colors of the color frames
-            foreach (Image elem in card.colorFrames)
-            {
-                elem.color = listColors[player.characterCode];
-            }
-
-            // If not ready, and character portrait is unavailable, grey out the portrait
-            if (!player.readyToBegin && !_characterSelectionInfo.characterAvailable[player.characterCode])
-            {
-                card.characterPortrait.color = new Color(0.4f, 0.4f, 0.4f);
-            }
-            else
-            {
-                card.characterPortrait.color = new Color(1f, 1f, 1f);
-            }
-
-            // if player is ready, update the character availability
-            if (player.readyToBegin && _characterSelectionInfo.characterAvailable[player.characterCode])
-            {
-                _characterSelectionInfo.characterAvailable[player.characterCode] = false;
-            }
-        }
+        UpdatePingDisplay();
     }
 
-    // Returns the next available character in the character array
+    [Client] private void UpdatePingDisplay()
+    {
+        if (playerCard == null) return;
+
+        playerCard.username.text = this.steamUsername + " (" + this.ping + ")";
+    }
+
+    #endregion
+
+    #region SyncVar Hooks
+
+    /// <summary>
+    /// SyncVar hook for the index of the lobby player
+    /// </summary>
+    [ClientCallback] public override void IndexChanged(int prevIndex, int newIndex)
+    {
+        // Propagate updates to the player card
+        SetCardPosition();
+    }
+
+    /// <summary>
+    /// SyncVar hook for the ready status of the lobby player
+    /// </summary>
+    [ClientCallback] public override void ReadyStateChanged(bool prevReadyState, bool newReadyState)
+    {
+        // Propagate updates to the player card
+        SetCardReadyStatus();
+        SetCardButtons();
+    }
+
+    /// <summary>
+    /// SyncVar hook for the variable characterCode
+    /// </summary>
+    [ClientCallback] private void CharacterChanged(int prevCharCode, int newCharCode)
+    {
+        // Propagate updates to the player card
+        SetCardCharacterPortrait();
+    }
+
+    #endregion
+
+    #region Button Click Events
+
+    // Called by the local host player when the start button is clicked
+    [Client] public void OnStartButtonClick()
+    {
+        room.showStartButton = false;
+        room.ServerChangeScene(room.GameplayScene);
+    }
+
+    // Called by the local player when ready button is clicked
+    [Client] public void OnReadyButtonClick()
+    {
+        Debug.Log("OnReadyButtonClick clicked");
+        CmdChangeReadyState(!readyToBegin);
+    }
+
+    // Called by the local player when the character card is pressed
+    [Client] public void OnCharacterClicked()
+    {
+        Debug.Log("on character clicked");
+        CmdChangeCharacterCode(GetNextAvailableCharacter());
+    }
+
+    // Called by the local player when the team button is pressed
+    [Client] public void OnTeamClicked()
+    {
+        // unimpl
+    }
+
+    #endregion
+
     [Client] public int GetNextAvailableCharacter()
     {
         int nextCode = -1;
@@ -298,93 +461,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         return nextCode;
     }
 
-    // Called when the start button is clicked
-    [Client] public void OnStartButtonClick()
-    {
-        room.showStartButton = false;
-        room.ServerChangeScene(room.GameplayScene);
-    }
-
-    // Called by the local player when ready button is clicked
-    [Client] public void OnReadyButtonClick()
-    {
-        CmdChangeReadyState(!readyToBegin);
-    }
-
-    // Syncvar Callback for ready status
-    [ClientCallback] public override void ReadyStateChanged(bool _, bool newReadyState)
-    {
-        if (!_characterSelectionInfo) return;
-
-        if (newReadyState)
-        {
-            _characterSelectionInfo.characterAvailable[characterCode] = false;
-        } else
-        {
-            _characterSelectionInfo.characterAvailable[characterCode] = true;
-        }
-    }
-
-    // Called by the local player when the character card is pressed
-    [Client] public void OnCharacterChanged()
-    {
-        CmdChangeCharacterCode(GetNextAvailableCharacter());
-    }
-
     [Command] private void CmdChangeCharacterCode(int code)
     {
         characterCode = code;
-    }
-
-    private Texture2D GetSteamImageAsTexture(int iImage)
-    {
-        Texture2D texture = null;
-
-        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
-
-
-        if (isValid)
-        {
-            byte[] image = new byte[width * height * 4];
-
-            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
-
-            if (isValid)
-            {
-                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
-                texture.LoadRawTextureData(image);
-                texture.Apply();
-            }
-        }
-
-        return texture;
-    }
-
-    Texture2D FlipTexture(Texture2D original, bool upSideDown = true)
-    {
-
-        Texture2D flipped = new Texture2D(original.width, original.height);
-
-        int xN = original.width;
-        int yN = original.height;
-
-
-        for (int i = 0; i < xN; i++)
-        {
-            for (int j = 0; j < yN; j++)
-            {
-                if (upSideDown)
-                {
-                    flipped.SetPixel(j, xN - i - 1, original.GetPixel(j, i));
-                }
-                else
-                {
-                    flipped.SetPixel(xN - i - 1, j, original.GetPixel(i, j));
-                }
-            }
-        }
-        flipped.Apply();
-
-        return flipped;
     }
 }
