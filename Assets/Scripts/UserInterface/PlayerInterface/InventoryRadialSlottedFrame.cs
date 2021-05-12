@@ -31,7 +31,7 @@ public class InventoryRadialSlottedFrame : MonoBehaviour
 				slottedFrameImage.sprite = fiveSlottedFrameSprite;
 				break;
 			default:
-				Debug.Log("Tried to switch inventory frame to unavailable UI sprite");
+				// Debug.Log("Tried to switch inventory frame to unavailable UI sprite");
 				break;
 		}
 	}

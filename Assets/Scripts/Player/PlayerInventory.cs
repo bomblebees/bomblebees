@@ -19,9 +19,9 @@ public class PlayerInventory : NetworkBehaviour
 	[SerializeField] private GameObject groundItem_g;
 
 
-	public readonly SyncList<int> inventorySize = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	public readonly SyncList<int> inventorySize = new SyncList<int>();
 	// A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
-	public SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	public readonly SyncList<int> inventoryList = new SyncList<int>();
 	
 
 	// The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
@@ -31,24 +31,27 @@ public class PlayerInventory : NetworkBehaviour
     private GameUIManager gameUIManager;
 	private RoundManager roundManager;
 
-    public override void OnStartServer()
+
+	public override void OnStartServer()
     {
-        base.OnStartServer();
+		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventorySize.Add(0);
+		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventoryList.Add(0);
 
-
+		base.OnStartServer();
 		// Subscribe to the damage event on the server
 		this.GetComponent<Health>().EventLivesLowered += OnGhostEnter;
 
 		roundManager = RoundManager.Singleton;
 		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
 		roundManager.EventInventorySizeChanged += ChangeInventorySize;
 
+		Debug.Log("iterating through inventorysize refreshing with roundmanager value, current roundmanager inv size: " + roundManager.currentGlobalInventorySize);
 		for (int i = 0; i < inventorySize.Count; i++)
 		{
 			inventorySize[i] = roundManager.currentGlobalInventorySize;
 		}
-		GetComponent<PlayerInterface>().UpdateInventorySize();
-		// inventorySize.Callback += OnInventorySizeChange;
+
 	}
 
     // When player enters ghost mode, reset the inventroy
@@ -56,12 +59,18 @@ public class PlayerInventory : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        gameUIManager = GameUIManager.Singleton;
+		inventoryList.Callback += OnInventoryChange;
+		inventorySize.Callback += OnInventorySizeChange;
+
+		gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: GameUIManager");
 
-        // Subscribe to the synclist hook
-        inventoryList.Callback += OnInventoryChange;
-		inventorySize.Callback += OnInventorySizeChange;
+		Debug.Log("Client PlayerInventory starting for: " + gameObject.name);
+
+		this.GetComponent<PlayerInterface>().UpdateInventorySize();
+		// Subscribe to the synclist hook
+		// inventoryList.Callback += OnInventoryChange;
+		// inventorySize.Callback += OnInventorySizeChange;
 	}
 
     private void Update()
@@ -208,7 +217,6 @@ public class PlayerInventory : NetworkBehaviour
 		{
 			inventorySize[i] = size;
 		}
-		Debug.Log("Changing inventory size on " + gameObject.name);
 	}
 
     public char[] GetBombTypes()
@@ -298,7 +306,6 @@ public class PlayerInventory : NetworkBehaviour
 	{
 		// Refresh the inventory UI so it shows the new frame and updated fill amount comparative to the inventory size change
 		this.GetComponent<PlayerInterface>().UpdateInventorySize();
-		Debug.Log("Inventory size change synclist callback for " + gameObject.name);
 
 	}
 

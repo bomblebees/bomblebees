@@ -127,7 +127,8 @@ public class RoundManager : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-        try
+		Debug.Log("Adding player on client roundmanager");
+		try
         {
             ulong steamId = SteamUser.GetSteamID().m_SteamID;
             CmdAddPlayerToRound(steamId);
@@ -163,7 +164,7 @@ public class RoundManager : NetworkBehaviour
         // Subscribe to life change event
         live.EventLivesChanged += OnLivesChanged;
 
-
+		
         if (totalRoomPlayers == playersConnected)
         {
 			
