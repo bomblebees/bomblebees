@@ -123,13 +123,6 @@ public class RoundManager : NetworkBehaviour
         if(hexGrid)
         hexGrid.SetAliveCount(newAliveCount);
     }
-    
-    [Client]
-    public override void OnStartClient()
-    {
-
-    }
-
 
     /// <summary>
     /// Called when the player finishes loading into the scene.
@@ -175,8 +168,6 @@ public class RoundManager : NetworkBehaviour
         eventManager.OnStartRound();
         RpcStartRound();
         StartCoroutine(ServerStartRound());
-
-
     }
 
     [Server]
