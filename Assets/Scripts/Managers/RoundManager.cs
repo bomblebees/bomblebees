@@ -24,7 +24,7 @@ public class RoundManager : NetworkBehaviour
 	public int numPlayers = 0;
 
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
-    public int aliveCount = -1;
+    public int aliveCount = 0;
 
 	[SyncVar]
 	public int currentGlobalInventorySize = 3;
@@ -141,10 +141,15 @@ public class RoundManager : NetworkBehaviour
         playerInfo.steamId = player.steamId;
 
         playerList.Add(playerInfo);
-		// player.GetComponent<PlayerInventory>().ChangeInventorySize(currentGlobalInventorySize);
-		
-		// add player to stat tracker list and store reference to the player gameobject
-		// statTracker.CreatePlayerStatObject(sender.identity.gameObject);
+
+        // Add the player to list of alive players
+        alivePlayers.Add(playerInfo);
+        aliveCount++;
+
+        // player.GetComponent<PlayerInventory>().ChangeInventorySize(currentGlobalInventorySize);
+
+        // add player to stat tracker list and store reference to the player gameobject
+        // statTracker.CreatePlayerStatObject(sender.identity.gameObject);
 
         // invoke event after added to list
         EventPlayerConnected?.Invoke(playerInfo);
@@ -152,10 +157,9 @@ public class RoundManager : NetworkBehaviour
         // Subscribe to life change event
         live.EventLivesChanged += OnLivesChanged;
 
-		
+
         if (totalRoomPlayers == playersConnected)
         {
-			
 			StartRound();
         }
     }
@@ -273,29 +277,28 @@ public class RoundManager : NetworkBehaviour
 	}
 
     [Server]
+    public void OnWinConditionSatisfied()
+    {
+        ServerEndRound();
+    }
+
+    [Server]
     public IEnumerator ServerStartRound()
     {
-		// EventInventorySizeChanged?.Invoke(currentGlobalInventorySize);
-		yield return new WaitForSeconds(startGameFreezeDuration + 1);
+        // -- Pre-game behaviours can go here -- //
 
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            alivePlayers.Add(playerList[i]);
-            Player p = playerList[i].player;
-			p.playerListIndex = i;
-            //p.SetCanPlaceBombs(true);
-            //p.SetCanSpin(true);
-            //p.SetCanSwap(true); 
-            //p.SetCanMove(true);
-        }
-        aliveCount = alivePlayers.Count;
+        // Wait for freeze duration
+        yield return new WaitForSeconds(startGameFreezeDuration + 1);
 
-		
+        // -- Game Starts Here -- //
+
+        WinCondition test = this.gameObject.AddComponent<LivesCondition>();
+        test.StartWinCondition();
+        test.EventWinConditionSatisfied += OnWinConditionSatisfied;
 
 
-
-		UpdateGridsAliveCount(0, aliveCount);
-        if (useRoundTimer) StartCoroutine(StartRoundTimer());
+        //UpdateGridsAliveCount(0, aliveCount);
+        //if (useRoundTimer) StartCoroutine(StartRoundTimer());
     }
 
     [Server]

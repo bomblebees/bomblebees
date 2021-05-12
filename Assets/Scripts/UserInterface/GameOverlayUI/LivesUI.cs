@@ -71,7 +71,7 @@ public class LivesUI : MonoBehaviour
 
     public void UpdateLives(int currentLives, Player player)
     {
-        int i = player.playerListIndex;
+        int i = player.playerRoomIndex;
 
         // If player name has not been updated, initialize it
         if (livesUIs[i].playerName.text.Length <= 0)

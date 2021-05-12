@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
-    [SyncVar] public int playerListIndex;
+    [SyncVar] public int playerRoomIndex; // index of the player in the lobby
 
     /// <summary>
     /// Variable representing the team that the player is on.
