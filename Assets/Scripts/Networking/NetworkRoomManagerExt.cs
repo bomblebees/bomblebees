@@ -12,6 +12,9 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     [SerializeField] private GameObject roundManager;
     [SerializeField] private GameObject gameUIManager;
     [SerializeField] private GameObject audioManager;
+    [SerializeField] private GameObject lobbySettings;
+
+    private GameObject settings = null;
 
     public override void OnStartServer()
     {
@@ -25,6 +28,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnStartClient();
 
+        // Prefab Loading
         var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
 
         NetworkClient.ClearSpawners();
@@ -44,9 +48,26 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnRoomStopClient();
     }
 
+    public override void OnRoomStartServer()
+    {
+        base.OnRoomStartServer();
+
+        if (!settings)
+        {
+            settings = Instantiate(lobbySettings);
+            NetworkServer.Spawn(settings);
+        }
+    }
+
     public override void OnRoomStopServer()
     {
         base.OnRoomStopServer();
+
+        if (settings)
+        {
+            NetworkServer.Destroy(settings);
+            settings = null;
+        }
     }
 
     // Temp list of player colors

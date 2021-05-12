@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.SceneManagement;
 
 public class LobbySettings : NetworkBehaviour
 {
@@ -17,9 +18,9 @@ public class LobbySettings : NetworkBehaviour
     /// </summary>
     public int teams = 2;
 
-    private void OnEnable()
+    private void Awake()
     {
         // Persist this object across scenes
-        DontDestroyOnLoad(this);
+        DontDestroyOnLoad(this.gameObject);
     }
 }

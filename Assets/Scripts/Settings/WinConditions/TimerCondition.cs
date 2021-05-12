@@ -8,18 +8,25 @@ using Mirror;
 /// </summary>
 public class TimerCondition : WinCondition
 {
-    private float timerDuration = 5f;
+    private float timerDuration = 120f;
 
     #region Virtuals
 
     [Server]public override void InitWinCondition()
     {
         // we should request timerDuration here from lobby settings
+
+
+        // initialize the UI timer
+        FindObjectOfType<RoundTimer>().InitTimer(timerDuration);
     }
 
     [Server] public override void StartWinCondition()
     {
         StartCoroutine(TimerCoroutine());
+
+        // start the UI timer
+        FindObjectOfType<RoundTimer>().StartTimer(timerDuration);
     }
 
     #endregion
