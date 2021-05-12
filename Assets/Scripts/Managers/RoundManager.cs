@@ -106,7 +106,7 @@ public class RoundManager : NetworkBehaviour
 
 		numPlayers = FindObjectsOfType<NetworkRoomPlayerExt>().Length;
 
-		Debug.Log("num players in round manager start: " + numPlayers);
+		//Debug.Log("num players in round manager start: " + numPlayers);
 
 		if (numPlayers > 1)
 		{
@@ -127,30 +127,25 @@ public class RoundManager : NetworkBehaviour
     [Client]
     public override void OnStartClient()
     {
-		Debug.Log("Adding player on client roundmanager");
-		try
-        {
-            ulong steamId = SteamUser.GetSteamID().m_SteamID;
-            CmdAddPlayerToRound(steamId);
-        } catch
-        {
-            CmdAddPlayerToRound(0);
-        }
+
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdAddPlayerToRound(ulong steamId, NetworkConnectionToClient sender = null)
+
+    /// <summary>
+    /// Called when the player finishes loading into the scene.
+    /// </summary>
+    [Server] public void AddPlayerToRound(GameObject playerObject)
     {
         playersConnected++;
 
         // Add player to list
-        Player player = sender.identity.gameObject.GetComponent<Player>();
-        Health live = sender.identity.gameObject.GetComponent<Health>();
+        Player player = playerObject.GetComponent<Player>();
+        Health live = playerObject.gameObject.GetComponent<Health>();
 
         PlayerInfo playerInfo = new PlayerInfo();
         playerInfo.player = player;
         playerInfo.health = live;
-        playerInfo.steamId = steamId;
+        playerInfo.steamId = player.steamId;
 
         playerList.Add(playerInfo);
 		// player.GetComponent<PlayerInventory>().ChangeInventorySize(currentGlobalInventorySize);

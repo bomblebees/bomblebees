@@ -202,8 +202,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         roomUI.EventReadyButtonClicked += OnReadyButtonClick;
         roomUI.EventStartButtonClicked += OnStartButtonClick;
-
-        Debug.Log("InitLobbyButtons Subscribed");
     }
 
     /// <summary>
@@ -342,6 +340,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     [Client] private void SetCardHostCrown()
     {
+        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardHostCrown()!"); return; }
+
         // if this is the host, enable the crown icon
         if (index == 0) playerCard.crown.SetActive(true);
         else playerCard.crown.SetActive(false);
@@ -429,14 +429,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     // Called by the local player when ready button is clicked
     [Client] public void OnReadyButtonClick()
     {
-        Debug.Log("OnReadyButtonClick clicked");
         CmdChangeReadyState(!readyToBegin);
     }
 
     // Called by the local player when the character card is pressed
     [Client] public void OnCharacterClicked()
     {
-        Debug.Log("on character clicked");
         CmdChangeCharacterCode(GetNextAvailableCharacter());
     }
 

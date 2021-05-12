@@ -141,7 +141,7 @@ public class Room_UI : MonoBehaviour
         EventStartButtonClicked?.Invoke();
 
         if (!matchmaker) matchmaker = Matchmaking.singleton;
-        matchmaker.OnMirrorSetStatus("In Game");
+        if (matchmaker) matchmaker.OnMirrorSetStatus("In Game");
     }
 
     public void OnReadyButtonClick()

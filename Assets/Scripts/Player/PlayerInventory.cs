@@ -46,7 +46,7 @@ public class PlayerInventory : NetworkBehaviour
 
 		roundManager.EventInventorySizeChanged += ChangeInventorySize;
 
-		Debug.Log("iterating through inventorysize refreshing with roundmanager value, current roundmanager inv size: " + roundManager.currentGlobalInventorySize);
+		//Debug.Log("iterating through inventorysize refreshing with roundmanager value, current roundmanager inv size: " + roundManager.currentGlobalInventorySize);
 		for (int i = 0; i < inventorySize.Count; i++)
 		{
 			inventorySize[i] = roundManager.currentGlobalInventorySize;
@@ -65,7 +65,7 @@ public class PlayerInventory : NetworkBehaviour
 		gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: GameUIManager");
 
-		Debug.Log("Client PlayerInventory starting for: " + gameObject.name);
+		//Debug.Log("Client PlayerInventory starting for: " + gameObject.name);
 
 		this.GetComponent<PlayerInterface>().UpdateInventorySize();
 		// Subscribe to the synclist hook
