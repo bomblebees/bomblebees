@@ -8,7 +8,7 @@ public class PlayerMovement : NetworkBehaviour
 {
     [Header("Required")]
     [SerializeField] private GameObject ghostModel;
-    [SerializeField] private GameObject playerModel;
+    [SerializeField] public GameObject playerModel;
     [SerializeField] private CharacterController controller;
 
     private float horizontalAxis;
