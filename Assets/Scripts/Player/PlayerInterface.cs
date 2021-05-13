@@ -48,13 +48,18 @@ public class PlayerInterface : NetworkBehaviour
 
     private PlayerInterface[] playerList = null;
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        RpcUpdatePlayerName(this.gameObject);
+
+        this.gameObject.GetComponent<Health>().EventLivesChanged += RpcOnPlayerTakeDamage;
+    }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        CmdUpdatePlayerName(this.gameObject);
-
-        this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
 
         UpdateInventoryQuantity();
 
@@ -152,7 +157,7 @@ public class PlayerInterface : NetworkBehaviour
         spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 3];
     }
 
-    public void OnPlayerTakeDamage(int currentHealth, int _, GameObject __)
+    [ClientRpc] public void RpcOnPlayerTakeDamage(int currentHealth, int _, GameObject __)
     {
         if (!isLocalPlayer) return;
 
