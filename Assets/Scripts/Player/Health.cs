@@ -49,6 +49,20 @@ public class Health : NetworkBehaviour
     // Event manager singleton
     private EventManager eventManager;
 
+
+    // Starts when Player starts existing on server
+    public override void OnStartServer()
+    {
+        SetHealth(maxLives);
+    }
+
+    // Starts when Player starts existing on server
+    public override void OnStartClient()
+    {
+        // Enable lives for this player
+        FindObjectOfType<LivesUI>().EnableLivesUI(this.GetComponent<Player>());
+    }
+
     private void Start()
     {
         eventManager = EventManager.Singleton;
@@ -102,12 +116,6 @@ public class Health : NetworkBehaviour
     private void SetHealth(int value)
     {
         currentLives = value;
-    }
-
-    // Starts when Player starts existing on server
-    public override void OnStartServer()
-    {
-        SetHealth(maxLives);
     }
 
     [Command(requiresAuthority = false)]

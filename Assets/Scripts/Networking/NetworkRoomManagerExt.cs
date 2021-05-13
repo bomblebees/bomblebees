@@ -108,9 +108,9 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         // transfer the team chosen
         gamePlayer.GetComponent<Player>().teamIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().teamIndex;
 
-        // let the round manager know that the player has finished loading
-        RoundManager roundManager = FindObjectOfType<RoundManager>();
-        roundManager.OnPlayerLoadedIntoRound(gamePlayer);
+        // let the event manager know that the player has finished loading
+        EventManager eventManager = FindObjectOfType<EventManager>();
+        eventManager.OnPlayerLoadedIntoGame(gamePlayer);
 
         return true;
     }

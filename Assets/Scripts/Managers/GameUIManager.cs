@@ -42,9 +42,10 @@ public class GameUIManager : NetworkBehaviour
     {
         InitSingletons();
 
-        // Subscribe to server round events
-        roundManager.EventPlayerConnected += ServerPlayerConnected;
-        roundManager.EventRoundStart += ServerStartRound;
+        // Subscribe to relevant events
+        eventManager.EventPlayerLoaded += ServerPlayerConnected;
+        eventManager.EventStartRound += ServerStartRound;
+        eventManager.EventEndRound += ServerEndRound;
 
         eventManager.EventPlayerTookDamage += RpcOnKillEvent;
 		eventManager.EventMultikill += RpcOnMultikillEvent;
@@ -56,10 +57,6 @@ public class GameUIManager : NetworkBehaviour
     public override void OnStartClient()
     {
         InitSingletons();
-
-        // Subscribe to client round events
-        roundManager.EventRoundStart += ClientStartRound;
-        roundManager.EventRoundEnd += ClientEndRound;
     }
 
     public override void OnStartLocalPlayer()
@@ -68,21 +65,11 @@ public class GameUIManager : NetworkBehaviour
         localPlayer = GameObject.Find("LocalPlayer");
     }
 
-    //private void Update()
-    //{
-    //    if (localPlayer == null)
-    //    {
-    //        localPlayer = GameObject.Find("LocalPlayer");
-            
-    //        if (localPlayer != null) localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
-    //    }
-        
-    //}
-
     // When a player loads into the game (on server)
-    [Server] public void ServerPlayerConnected(RoundManager.PlayerInfo p)
+    [Server] public void ServerPlayerConnected(GameObject player, int remaining)
     {
-        RpcPlayerConnected(roundManager.playersConnected, roundManager.totalRoomPlayers);
+        ServerEnableLivesUI(player);
+        RpcPlayerConnected(eventManager.playersLoaded, eventManager.totalPlayers);
     }
 
     // When a player loads into the game (on client)
@@ -93,49 +80,34 @@ public class GameUIManager : NetworkBehaviour
 
     #region Round Start & End
 
-    [Client] public void ClientStartRound()
+    [Server] public void ServerStartRound()
+    {
+        ClientStartRound();
+    }
+
+    [Server] public void ServerEndRound(List<Player> players)
+    {
+        ClientEndRound();
+    }
+
+    [ClientRpc] public void ClientStartRound()
     {
         StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
-        //StartCoroutine(roundTimer.InitTimer(roundManager.roundDuration, roundManager.startGameFreezeDuration));
-
     }
-    [Client] public void ClientEndRound(GameObject winner)
+
+    [ClientRpc] public void ClientEndRound()
     {
-        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration, winner));
+        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration, null));
     }
 
     #endregion
 
     #region Lives
 
-    [Server] public void ServerStartRound() { ServerEnableLivesUI(); }
-
     [Server]
-    public void ServerEnableLivesUI()
+    public void ServerEnableLivesUI(GameObject player)
     {
-        // Convert playerinfo struct to network transportable gameObjects
-        List<RoundManager.PlayerInfo> playerList = roundManager.playerList;
-
-        GameObject[] playerObjects = new GameObject[playerList.Count];
-
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            playerObjects[i] = playerList[i].player.gameObject;
-			playerObjects[i].GetComponent<Health>().EventLivesChanged += RpcClientUpdateLives;
-		}
-
-        RpcEnableLivesUI(playerObjects);
-    }
-
-    [ClientRpc] public void RpcEnableLivesUI(GameObject[] players)
-    {
-        foreach (GameObject p in players)
-        {
-            // Subscribe to lives change event for specific player
-            // p.GetComponent<Health>().EventLivesChanged += ClientUpdateLives;
-        }
-
-        livesUI.EnableLivesUI(players);
+        player.GetComponent<Health>().EventLivesChanged += RpcClientUpdateLives;
     }
 
     [ClientRpc] public void RpcClientUpdateLives(int currentHealth, int _, GameObject player)

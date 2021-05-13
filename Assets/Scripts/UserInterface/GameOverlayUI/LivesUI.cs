@@ -29,44 +29,38 @@ public class LivesUI : MonoBehaviour
 
     private List<LivesUIElement> livesUIs = new List<LivesUIElement>();
 
-    public void EnableLivesUI(GameObject[] players)
+    public void EnableLivesUI(Player p)
     {
-        for (int i = 0; i < players.Length; i++)
+        // create the player card
+        GameObject obj = Instantiate(
+            livesUIElementPrefab,
+            new Vector3(0, 0, 0),
+            Quaternion.identity,
+            livesAnchors[p.playerRoomIndex].transform);
+
+        // to make sure its positioned at 0 0 0 locally
+        obj.transform.localPosition = new Vector3(0, 0, 0);
+
+        LivesUIElement elem = obj.GetComponent<LivesUIElement>();
+
+        // add to a list
+        livesUIs.Add(elem);
+
+        // enable ui for players
+        elem.livesObject.SetActive(true);
+
+        // set the avatar
+        elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
+
+        // initialize username
+        //elem.playerName.text = p.steamName;
+
+        // Set the lives
+        for (int j = 0; j < elem.hearts.Length; j++)
         {
-            Player p = players[i].GetComponent<Player>();
-
-            // create the player card
-            GameObject obj = Instantiate(
-                livesUIElementPrefab,
-                new Vector3(0, 0, 0),
-                Quaternion.identity,
-                livesAnchors[i].transform);
-
-            // to make sure its positioned at 0 0 0 locally
-            obj.transform.localPosition = new Vector3(0, 0, 0);
-
-            LivesUIElement elem = obj.GetComponent<LivesUIElement>();
-
-            // add to a list
-            livesUIs.Add(elem);
-
-            // enable ui for players
-            elem.livesObject.SetActive(true);
-
-            // set the avatar
-            elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
-
-            // initialize username
-            //elem.playerName.text = p.steamName;
-
-            // Set the lives
-            for (int j = 0; j < elem.hearts.Length; j++)
-            {
-                elem.hearts[j].SetActive(true);
-                elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
-            }
+            elem.hearts[j].SetActive(true);
+            elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
         }
-
     }
 
     public void UpdateLives(int currentLives, Player player)
