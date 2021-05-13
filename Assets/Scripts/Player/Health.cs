@@ -27,8 +27,8 @@ public class Health : NetworkBehaviour
     public delegate void InvincibleExitDelegate();
 
     [Header("Required")]
-    public GameObject playerModel;
-    public GameObject ghostModel;
+    private GameObject playerModel;
+    private GameObject ghostModel;
     public GameObject revivingModel;
     public GameObject playerInv;
 
@@ -53,6 +53,9 @@ public class Health : NetworkBehaviour
     {
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+
+        playerModel = this.GetComponent<Player>().playerModel;
+        ghostModel = this.GetComponent<Player>().ghostModel;
     }
 
 	[Client]

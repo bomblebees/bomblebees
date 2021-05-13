@@ -26,6 +26,8 @@ public class Player : NetworkBehaviour
     // Game Objects
     [Header("Required", order = 2)]
     public GameObject playerMesh;
+    public GameObject playerModel;
+    public GameObject ghostModel;
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
@@ -69,7 +71,7 @@ public class Player : NetworkBehaviour
         model.transform.localScale = new Vector3(playerModelScale, playerModelScale, playerModelScale);
 
         // Assign the player model of the movement to this
-        gamePlayer.GetComponent<PlayerMovement>().playerModel = model;
+        gamePlayer.GetComponent<Player>().playerModel = model;
 
         // Assign the network transform child to this model
         gamePlayer.GetComponent<NetworkTransformChild>().target = model.transform;
