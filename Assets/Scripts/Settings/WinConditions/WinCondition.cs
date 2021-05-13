@@ -14,6 +14,11 @@ public abstract class WinCondition : NetworkBehaviour
     public bool conditionSatisfied = false;
 
     /// <summary>
+    /// Whether this condition is stopped
+    /// </summary>
+    public bool conditionStopped = false;
+
+    /// <summary>
     /// An event that can be invoked when the win condition is satisfied
     /// </summary>
     public event WinConditionDelegate EventWinConditionSatisfied;
@@ -42,7 +47,7 @@ public abstract class WinCondition : NetworkBehaviour
     /// Deconstructs any behaviours for this win condition
     /// <para>Called after the round has ended</para>
     /// </summary>
-    public virtual void StopWinCondition() { }
+    public virtual void StopWinCondition() { conditionStopped = true;  }
 
     /// <summary>
     /// Checks whether this win condition is satisfied.
@@ -59,7 +64,10 @@ public abstract class WinCondition : NetworkBehaviour
         conditionSatisfied = true;
 
         // Invoke the event before we finish win condition, order may matter
-        EventWinConditionSatisfied.Invoke();
-        FinishWinCondition();
+        if (!conditionStopped)
+        {
+            EventWinConditionSatisfied.Invoke();
+            FinishWinCondition();
+        }
     }
 }

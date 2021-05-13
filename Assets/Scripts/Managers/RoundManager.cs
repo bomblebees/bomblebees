@@ -7,6 +7,7 @@ using TMPro;
 using System;
 using Mirror;
 using Steamworks;
+using System.Linq;
 
 public class RoundManager : NetworkBehaviour
 {
@@ -23,9 +24,6 @@ public class RoundManager : NetworkBehaviour
     // Lists
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<WinCondition> winConditions = new List<WinCondition>();
-
-    // order of elimination so we can print out the placements in results screen in right order
-    public SyncList<GameObject> orderedPlayerList = new SyncList<GameObject>();
 
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
     public int aliveCount;
@@ -194,7 +192,7 @@ public class RoundManager : NetworkBehaviour
         roundOver = true;
 
         // Collect the winning order of the players
-        CollectWinningOrder();
+        GameObject[] winningOrder = CollectWinningOrder();
 
         // Invoke end round event
         List<Player> players = new List<Player>();
@@ -213,7 +211,7 @@ public class RoundManager : NetworkBehaviour
 
         // -- Game Ends Here -- //
 
-        RpcPrintResultsAndShowEndCard();
+        RpcPrintResultsAndShowEndCard(winningOrder);
 
         Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
@@ -226,61 +224,29 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
-    [Server] private void CollectWinningOrder()
+    [Server] private GameObject[] CollectWinningOrder()
     {
-        Debug.Log("-- Collecting Winning Order --");
-        foreach (PlayerInfo p in playerList)
+        // Order the player list by winning order
+        playerList = playerList.OrderByDescending(p => p.health.currentLives) // order by lives
+                    .ThenByDescending(p => p.timeOfElim).ToList(); // then by time of death (if applicable)
+
+        // Transfer playerList into network transferrable GameObject array
+        GameObject[] orderedList = new GameObject[playerList.Count];
+        for (int i = 0; i < orderedList.Length; i++)
         {
-            Debug.Log("Player " + p.player.playerRoomIndex + " died at " + p.timeOfElim);
+            orderedList[i] = playerList[i].player.gameObject;
         }
 
-        playerList.Sort((p1, p2) =>
+        for (int i = 0; i < orderedList.Length; i++)
         {
-            // -1 = p1 before p2
-            // 0 = p1 same as p2
-            // 1 = p1 after p2
+            Player player = orderedList[i].GetComponent<Player>();
+            Health health = orderedList[i].GetComponent<Health>();
 
-            return 0;
-        });
+            Debug.Log("Pos " + i + " | Player " + player.playerRoomIndex + " with lives " + health.currentLives);
+        }
 
-        //if (winner != null)
-        //{
-        //    for (int i = 1; i <= playerMaxLives; i++)
-        //    {
-        //        for (int j = 0; j < alivePlayers.Count; j++)
-        //        {
-        //            if (alivePlayers[j].health.currentLives == i)
-        //            {
-        //                // If two players tie in health, arbitrary rank order for now; how would we sort this by whoever has more kills or something? :/ 
-        //                orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
-        //            }
-        //        }
-        //    }
-        //}
-        //else // there is no winner, so tie match
-        //{
-        //    if (alivePlayers.Count < 1)
-        //    {
-        //        // no winner but none alive either, single player game, player was already inserted into ordered list
-        //        Debug.Log("single player game");
-        //        // orderedPlayerList.Insert(0, playerList[0].player.gameObject);
-        //    }
-        //    else
-        //    {
-        //        Debug.Log("tie with more than one remaining");
-        //        // add the rest of the alive players to eliminated players list in order of health (still arbitrary)
-        //        for (int i = 1; i <= playerMaxLives; i++)
-        //        {
-        //            for (int j = 0; j < alivePlayers.Count; j++)
-        //            {
-        //                if (alivePlayers[j].health.currentLives == i)
-        //                {
-        //                    orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+        // Return the array
+        return orderedList;
     }
 
     #region Subscriptions
@@ -379,16 +345,17 @@ public class RoundManager : NetworkBehaviour
 
     #region End Game Results
 
-    [ClientRpc]
-    private void RpcPrintResultsAndShowEndCard()
+    [ClientRpc] private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder)
     {
         serverEndSelectionCanvas.enabled = true;
 
-        for (int i = 0; i < orderedPlayerList.Count; i++)
+        for (int i = 0; i < winningOrder.Length; i++)
         {
-            orderedPlayerList[i].GetComponent<PlayerStatTracker>().placement = i + 1;
-            orderedPlayerList[i].GetComponent<PlayerStatTracker>().PrintStats();
-            orderedPlayerList[i].GetComponent<PlayerStatTracker>().CreateStatsUIElement(statsElementUIAnchorObjects[i]);
+            PlayerStatTracker stat = winningOrder[i].GetComponent<PlayerStatTracker>();
+
+            stat.placement = i + 1;
+            stat.PrintStats();
+            stat.CreateStatsUIElement(statsElementUIAnchorObjects[i]);
         }
     }
     
