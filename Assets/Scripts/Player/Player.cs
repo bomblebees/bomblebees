@@ -166,15 +166,15 @@ public class Player : NetworkBehaviour
 
     public void SetInvincibilityVFX(bool enabled)
     {
-        if (enabled)
-        {
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.5f);
-        } else
-        {
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
-        }
+        //if (enabled)
+        //{
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.5f);
+        //} else
+        //{
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
+        //}
     }
 
     public void ExitInvincibility()

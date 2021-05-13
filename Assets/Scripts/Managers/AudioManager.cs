@@ -22,14 +22,8 @@ public class AudioManager : NetworkBehaviour
         eventManager.EventBombPlaced += RpcPlayPlaceSound;
         eventManager.EventEndRound += ServerPlayerWhistleSound;
         eventManager.EventPlayerSpin += RpcPlayHitSound;
-
-		// wanted to try subscribing to an event in RoundManager instead of EventManager for player eliminated sound
-		// The other way would be to put the event in EventManager instead of RoundManager and invoke in RoundManager?
-
-		roundManager.EventPlayerEliminated += RpcPlayPlayerEliminatedSound;
+        eventManager.EventPlayerEliminated += RpcPlayPlayerEliminatedSound;
     }
-
-
 
 	[System.Serializable]
     public class Sound
@@ -155,7 +149,7 @@ public class AudioManager : NetworkBehaviour
 	[Server] public void ServerPlayerWhistleSound(List<Player> players) { RpcPlayWhistleSound(); }
 
 	[ClientRpc]
-	public void RpcPlayPlayerEliminatedSound(GameObject eliminatedPlayer)
+	public void RpcPlayPlayerEliminatedSound(double timeOfElim, GameObject eliminatedPlayer)
 	{
 		Debug.Log("Play player eliminated sound");
 		PlaySound("playerEliminated");

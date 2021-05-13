@@ -20,6 +20,7 @@ public class EventManager : NetworkBehaviour
     public delegate void ReturnToLobbyDelegate();
     public delegate void BombPlacedDelegate(GameObject bomb, GameObject player);
     public delegate void PlayerTookDamageDelegate(int newLives, GameObject bomb, GameObject player);
+    public delegate void PlayerEliminatedDelegate(double timeOfElim, GameObject player);
     public delegate void PlayerSwapDelegate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded);
     public delegate void PlayerSpinDelegate(GameObject player, GameObject bomb);
 	public delegate void PlayerMultikillDelegate(GameObject player, int killNumber);
@@ -31,6 +32,7 @@ public class EventManager : NetworkBehaviour
     public event ReturnToLobbyDelegate EventReturnToLobby;
     public event BombPlacedDelegate EventBombPlaced;
     public event PlayerTookDamageDelegate EventPlayerTookDamage;
+    public event PlayerEliminatedDelegate EventPlayerEliminated;
     public event PlayerSwapDelegate EventPlayerSwap;
     public event PlayerSpinDelegate EventPlayerSpin;
 	public event PlayerMultikillDelegate EventMultikill;
@@ -146,6 +148,12 @@ public class EventManager : NetworkBehaviour
                 bomb.GetComponent<ComboObject>().GetOwnerPlayer(),
                 Time.time - roundStartTime);
             EventPlayerTookDamage?.Invoke(newLives, bomb, player);
+        }
+
+        // The player was eliminated
+        if (newLives <= 0)
+        {
+            EventPlayerEliminated?.Invoke(NetworkTime.time, player);
         }
 
 		// Take the NetworkTime.time and pass it into a method on Player for detecting multi kills
