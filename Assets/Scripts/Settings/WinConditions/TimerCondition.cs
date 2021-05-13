@@ -8,14 +8,17 @@ using Mirror;
 /// </summary>
 public class TimerCondition : WinCondition
 {
+    /// <summary>
+    /// Duration of the timer in seconds, defaults to 2 minutes
+    /// </summary>
     private float timerDuration = 120f;
 
     #region Virtuals
 
     [Server]public override void InitWinCondition()
     {
-        // we should request timerDuration here from lobby settings
-
+        // Update the timer duration with the duration specified in lobby settings
+        timerDuration = FindObjectOfType<LobbySettings>().roundDuration;
 
         // initialize the UI timer
         FindObjectOfType<RoundTimer>().InitTimer(timerDuration);
@@ -37,7 +40,6 @@ public class TimerCondition : WinCondition
         yield return new WaitForSeconds(timerDuration - 1);
 
         // Condition is satisfied after timer ends
-        conditionSatisfied = true;
-        InvokeWinConditionSatisfied();
+        base.InvokeWinConditionSatisfied();
     }
 }

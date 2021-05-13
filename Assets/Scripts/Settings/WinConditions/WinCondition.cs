@@ -56,6 +56,8 @@ public abstract class WinCondition : NetworkBehaviour
     /// </summary>
     public void InvokeWinConditionSatisfied()
     {
+        conditionSatisfied = true;
+
         // Invoke the event before we finish win condition, order may matter
         EventWinConditionSatisfied.Invoke();
         FinishWinCondition();

@@ -18,15 +18,21 @@ public class RoundManager : NetworkBehaviour
     }
 	private bool roundOver;
 
+    // Lists
     public List<PlayerInfo> playerList = new List<PlayerInfo>();
     public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
+    public List<WinCondition> winConditions = new List<WinCondition>();
 
 	public int numPlayers = 0;
 
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
     public int aliveCount = 0;
+    public void UpdateGridsAliveCount(int _, int newAliveCount)
+    {
+        if (hexGrid) hexGrid.SetAliveCount(newAliveCount);
+    }
 
-	[SyncVar]
+    [SyncVar]
 	public int currentGlobalInventorySize = 3;
 
     [Header("Server End Selection")]
@@ -50,9 +56,7 @@ public class RoundManager : NetworkBehaviour
 
     [NonSerialized] public int playersConnected;
     [NonSerialized] public int totalRoomPlayers;
-
-    [NonSerialized]
-    public HexGrid hexGrid;
+    
 
 
     // events
@@ -71,11 +75,14 @@ public class RoundManager : NetworkBehaviour
     public static RoundManager _instance;
     public static RoundManager Singleton { get { return _instance;  } }
 
+    // Required Variables
     private EventManager eventManager;
-	NetworkRoomManagerExt room;
+	private NetworkRoomManagerExt room;
+    private HexGrid hexGrid;
+    private LobbySettings settings;
 
 
-	private void Awake()
+    private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
@@ -97,12 +104,16 @@ public class RoundManager : NetworkBehaviour
 
 	public override void OnStartServer()
     {
-        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        InitRequiredVars();
+
+
+        // Get the total number of players using the room manager since players may not have loaded in 
         totalRoomPlayers = room.roomSlots.Count;
+
         // Event manager singleton
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
-        hexGrid = GameObject.FindObjectOfType<HexGrid>();
+
 
 		numPlayers = FindObjectsOfType<NetworkRoomPlayerExt>().Length;
 
@@ -116,18 +127,16 @@ public class RoundManager : NetworkBehaviour
 		{
 			currentGlobalInventorySize = 5;
 		}
-	}
 
-    public void UpdateGridsAliveCount(int oldAliveCount, int newAliveCount)
-    {
-        if(hexGrid)
-        hexGrid.SetAliveCount(newAliveCount);
+        InitRoundManager();
     }
+
+
 
     /// <summary>
     /// Called when the player finishes loading into the scene.
     /// </summary>
-    [Server] public void AddPlayerToRound(GameObject playerObject)
+    [Server] public void OnPlayerLoadedIntoRound(GameObject playerObject)
     {
         playersConnected++;
 
@@ -165,6 +174,27 @@ public class RoundManager : NetworkBehaviour
     }
 
     #endregion
+
+    /// <summary>
+    /// Initializes the required variables for the round manager
+    /// </summary>
+    [Server] private void InitRequiredVars()
+    {
+        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        hexGrid = FindObjectOfType<HexGrid>();
+        settings = FindObjectOfType<LobbySettings>();
+    }
+
+
+    /// <summary>
+    /// Initializes win conditions and etc.
+    /// </summary>
+    [Server] private void InitRoundManager()
+    {
+        // -- ALL WIN CONDITIONS INITALIZED HERE -- //
+        if (settings.byLastAlive) winConditions.Add(this.gameObject.AddComponent<LivesCondition>());
+        if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());
+    }
 
     [Server]
     public void StartRound()
@@ -276,10 +306,30 @@ public class RoundManager : NetworkBehaviour
 		EventPlayerEliminated?.Invoke(eliminatedPlayer);
 	}
 
-    [Server]
-    public void OnWinConditionSatisfied()
+
+    /// <summary>
+    /// Called whenever a win condition is satisfied
+    /// </summary>
+    /// <param name="cond">The win condition that was satisfied</param>
+    [Server] public void OnWinConditionSatisfied(WinCondition cond)
     {
-        EndRound();
+        if (settings.endAfterFirstWinCondition)
+        {
+            // End the round right after a win condition is satisfied
+            EndRound();
+        } else
+        {
+            bool notSatisfied = true;
+
+            // Check if all conditions are satisfied
+            foreach (WinCondition c in winConditions)
+            {
+                notSatisfied &= c.CheckWinCondition();
+            }
+
+            // If they are, end the round
+            if (!notSatisfied) EndRound();
+        }
     }
 
     [Server]
@@ -287,18 +337,23 @@ public class RoundManager : NetworkBehaviour
     {
         // -- Pre-game behaviours can go here -- //
 
+        // Initialize and subscribe to all win conditions
+        foreach (WinCondition c in winConditions)
+        {
+            c.InitWinCondition();
+            c.EventWinConditionSatisfied += () => OnWinConditionSatisfied(c);
+        }
+
         // Wait for freeze duration
         yield return new WaitForSeconds(startGameFreezeDuration + 1);
 
         // -- Game Starts Here -- //
 
-        WinCondition test = this.gameObject.AddComponent<LivesCondition>();
-        test.StartWinCondition();
-        test.EventWinConditionSatisfied += OnWinConditionSatisfied;
-
-        WinCondition test2 = this.gameObject.AddComponent<TimerCondition>();
-        test2.StartWinCondition();
-        test2.EventWinConditionSatisfied += OnWinConditionSatisfied;
+        // Start all win conditions
+        foreach (WinCondition c in winConditions)
+        {
+            c.StartWinCondition();
+        }
 
 
         //UpdateGridsAliveCount(0, aliveCount);

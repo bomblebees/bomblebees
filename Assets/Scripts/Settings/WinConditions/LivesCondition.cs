@@ -28,22 +28,6 @@ public class LivesCondition : WinCondition
         totalPlayers = healths.Length;
     }
 
-    [Server] public override bool CheckWinCondition()
-    {
-        if (totalPlayers == 1 && eliminatedPlayers == 1) // singleplayer case
-        {
-            conditionSatisfied = true;
-            InvokeWinConditionSatisfied();
-        }
-        else if (eliminatedPlayers == totalPlayers - 1) // multiplayer case
-        {
-            conditionSatisfied = true;
-            InvokeWinConditionSatisfied();
-        }
-
-        return conditionSatisfied;
-    }
-
     #endregion
 
     private void OnLivesChanged(int currentHealth, int maxHealth, GameObject player)
@@ -53,7 +37,11 @@ public class LivesCondition : WinCondition
         if (currentHealth <= 0)
         {
             eliminatedPlayers++;
-            CheckWinCondition();
+
+            if (totalPlayers == 1 && eliminatedPlayers == 1) // singleplayer case
+                base.InvokeWinConditionSatisfied();
+            else if (eliminatedPlayers == totalPlayers - 1) // multiplayer case
+                base.InvokeWinConditionSatisfied();
         }
     }
 }

@@ -52,7 +52,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStartServer();
 
-        if (!settings)
+        if (settings == null)
         {
             settings = Instantiate(lobbySettings);
             NetworkServer.Spawn(settings);
@@ -63,7 +63,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStopServer();
 
-        if (settings)
+        if (settings != null)
         {
             NetworkServer.Destroy(settings);
             settings = null;
@@ -110,7 +110,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
         // let the round manager know that the player has finished loading
         RoundManager roundManager = FindObjectOfType<RoundManager>();
-        roundManager.AddPlayerToRound(gamePlayer);
+        roundManager.OnPlayerLoadedIntoRound(gamePlayer);
 
         return true;
     }
