@@ -26,6 +26,8 @@ public class Player : NetworkBehaviour
     // Game Objects
     [Header("Required", order = 2)]
     public GameObject playerMesh;
+    public GameObject playerModel;
+    public GameObject ghostModel;
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
@@ -38,8 +40,57 @@ public class Player : NetworkBehaviour
 
 	private EventManager eventManager;
 
-	// Added for easy referencing of local player from anywhere
-	public override void OnStartLocalPlayer()
+
+
+    [Header("Custom Player Models")]
+    [Tooltip("Selects model based on character chosen.")]
+    [SerializeField] private GameObject[] playerModels = new GameObject[4];
+
+    [Tooltip("The animator used for the player models")]
+    [SerializeField] private RuntimeAnimatorController playerRuntimeAnimator;
+
+    [Tooltip("The scale of the player model")]
+    [SerializeField] private float playerModelScale = 9.9f;
+
+
+    private void Awake()
+    {
+        CreateAndLinkPlayerModel(this.gameObject);
+    }
+
+    public void CreateAndLinkPlayerModel(GameObject gamePlayer)
+    {
+        // Instantiate the object model under the game player
+        GameObject model = Instantiate(
+            playerModels[gamePlayer.GetComponent<Player>().characterCode],
+            gamePlayer.transform.position,
+            Quaternion.identity,
+            gamePlayer.transform);
+
+        // Rescale the model
+        model.transform.localScale = new Vector3(playerModelScale, playerModelScale, playerModelScale);
+
+        // Assign the player model of the movement to this
+        gamePlayer.GetComponent<Player>().playerModel = model;
+
+        // Assign the network transform child to this model
+        gamePlayer.GetComponent<NetworkTransformChild>().target = model.transform;
+
+        // Add the animator component to the model
+        Animator anim = model.AddComponent<Animator>();
+
+        // Set the animator controller
+        anim.runtimeAnimatorController = playerRuntimeAnimator;
+
+        // Assign the network animator this model's animator
+        gamePlayer.GetComponent<NetworkAnimator>().animator = anim;
+
+        // Destroy dummy animator
+        Destroy(gamePlayer.GetComponent<Animator>());
+    }
+
+    // Added for easy referencing of local player from anywhere
+    public override void OnStartLocalPlayer()
     {
         gameObject.name = "LocalPlayer";
         base.OnStartLocalPlayer();
@@ -50,7 +101,7 @@ public class Player : NetworkBehaviour
         base.OnStartClient();
 
         // Set player color
-        playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
+        //playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
     }
 
     public override void OnStartServer()

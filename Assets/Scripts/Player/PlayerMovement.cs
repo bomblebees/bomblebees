@@ -7,9 +7,9 @@ using Mirror;
 public class PlayerMovement : NetworkBehaviour
 {
     [Header("Required")]
-    [SerializeField] private GameObject ghostModel;
-    [SerializeField] private GameObject playerModel;
     [SerializeField] private CharacterController controller;
+    private GameObject playerModel;
+    private GameObject ghostModel;
 
     private float horizontalAxis;
     private float verticalAxis;
@@ -28,6 +28,12 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Speeds")] 
     [SerializeField] private float movementSpeed = 50f;
     [SerializeField] private float turnSpeed = 17f;
+
+    private void Start()
+    {
+        playerModel = this.GetComponent<Player>().playerModel;
+        ghostModel = this.GetComponent<Player>().ghostModel;
+    }
 
     public override void OnStartClient()
     {

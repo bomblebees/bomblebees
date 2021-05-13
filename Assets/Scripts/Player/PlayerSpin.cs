@@ -197,8 +197,8 @@ public class PlayerSpin : NetworkBehaviour
     /// </summary>
     [ClientCallback] public void OnChangeChargeEffectLevel(int oldLevel, int newLevel)
     {
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeeds[newLevel]);
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmnts[newLevel]);
+        //playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeeds[newLevel]);
+        //playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmnts[newLevel]);
     }
 
     [Client] public void ResetSpinCharge()
