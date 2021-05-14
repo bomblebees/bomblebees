@@ -245,6 +245,24 @@ public class PlayerSpin : NetworkBehaviour
 
     #region Spin
 
+    [Client] public IEnumerator Spin()
+    {
+        if (canSpin)
+        {
+            // Play spin animation
+            StartCoroutine(HandleSpinAnim());
+
+            // Notify all players that you are spinning
+            CmdSpin(spinPower);
+
+            // The player cannot spin until spinTotalCooldown is up
+            canSpin = false;
+            yield return new WaitForSeconds(spinTotalCooldown);
+            canSpin = true;
+            //@@ if (sludgeEffectEnded) canSpin = true;
+        }
+    }
+
     [Command] void CmdSpin(int spinPower)
     {
         // Invoke spin event
@@ -258,27 +276,11 @@ public class PlayerSpin : NetworkBehaviour
     {
         this.spinPower = spinPower;
 
-        // Play sfx and vfx feedback for spin
-        PlayFeedback();
+        // Play spin sound
+        FindObjectOfType<AudioManager>().PlaySound("playerSpin");
 
         // Enable hitbox
         StartCoroutine(HandleSpinHitbox());
-    }
-
-    [Client] public IEnumerator Spin()
-    {
-        if (canSpin)
-        {
-
-            // Notify all players that you are spinning
-            CmdSpin(spinPower);
-
-            // The player cannot spin until spinTotalCooldown is up
-            canSpin = false;
-            yield return new WaitForSeconds(spinTotalCooldown);
-            canSpin = true;
-            //@@ if (sludgeEffectEnded) canSpin = true;
-        }
     }
 
     /// <summary>
@@ -311,18 +313,7 @@ public class PlayerSpin : NetworkBehaviour
     //    }
     //}
 
-    #region VFX/SFX Feedback
-
-    /// <summary>
-    /// Plays all SFX and VFX for spin
-    /// </summary>
-    [Client] private void PlayFeedback()
-    {
-        StartCoroutine(HandleSpinAnim());
-
-        // Play spin sound
-        FindObjectOfType<AudioManager>().PlaySound("playerSpin");
-    }
+    #region Animations
 
     /// <summary>
     /// Enables the spin animations for spinAnimDuration seconds

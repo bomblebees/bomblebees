@@ -392,6 +392,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [ClientCallback] public override void IndexChanged(int prevIndex, int newIndex)
     {
+        // Prevent updating card before it is created (this function is fired on join)
+        if (playerCard == null) return;
+
         // Propagate updates to the player card
         SetCardPosition();
         SetCardHostCrown();
