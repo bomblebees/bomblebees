@@ -78,6 +78,7 @@ public class LobbySettings : NetworkBehaviour
     {
         // If new duration is 0, disable the timer win condition
         if (newSelection == 0) byTimerFinished = false;
+        else byTimerFinished = true;
 
         // New duration is now that
         roundDuration = durations[newSelection];
