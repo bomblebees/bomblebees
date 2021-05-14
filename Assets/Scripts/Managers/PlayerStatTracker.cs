@@ -39,14 +39,10 @@ public class PlayerStatTracker : NetworkBehaviour
 
 	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
 
-	private RoundManager roundManager;
 	private EventManager eventManager;
 
 	private void InitSingletons()
 	{
-		roundManager = RoundManager.Singleton;
-		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
-
 		eventManager = EventManager.Singleton;
 		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
@@ -67,7 +63,6 @@ public class PlayerStatTracker : NetworkBehaviour
 	public override void OnStartClient()
 	{
 		InitSingletons();
-		
 	}
 
 

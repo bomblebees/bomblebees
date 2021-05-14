@@ -81,7 +81,7 @@ public class EventManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Called when the round starts
+    /// Called when the round starts, after freeze time
     /// </summary>
     [Server]
     public void OnStartRound()

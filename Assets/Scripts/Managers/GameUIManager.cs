@@ -22,6 +22,7 @@ public class GameUIManager : NetworkBehaviour
 
     private RoundManager roundManager;
     private EventManager eventManager;
+    private LobbySettings lobbySettings;
 
     private void Awake()
     {
@@ -36,6 +37,9 @@ public class GameUIManager : NetworkBehaviour
 
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+
+        lobbySettings = FindObjectOfType<LobbySettings>();
+        if (lobbySettings == null) Debug.LogError("Cannot find Singleton: LobbySettings");
     }
 
     public override void OnStartServer()
@@ -75,7 +79,14 @@ public class GameUIManager : NetworkBehaviour
     // When a player loads into the game (on client)
     [ClientRpc] public void RpcPlayerConnected(int connPlayers, int totalPlayers)
     {
+        roundTimer.InitTimer(lobbySettings.roundDuration);
         roundStartEnd.UpdateRoundWaitUI(connPlayers, totalPlayers);
+
+        // If all players loaded, start freeze time
+        if (totalPlayers - connPlayers == 0)
+        {
+            StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
+        }
     }
 
     #region Round Start & End
@@ -92,7 +103,7 @@ public class GameUIManager : NetworkBehaviour
 
     [ClientRpc] public void ClientStartRound()
     {
-        StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
+        roundTimer.StartTimer(lobbySettings.roundDuration);
     }
 
     [ClientRpc] public void ClientEndRound()

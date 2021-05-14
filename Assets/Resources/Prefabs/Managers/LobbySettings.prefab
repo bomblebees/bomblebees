@@ -47,7 +47,11 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   maxPlayers: 0
-  teamMode: 0
+  teams: 2
+  roundDuration: 120
+  endAfterFirstWinCondition: 1
+  byLastAlive: 1
+  byTimerFinished: 1
 --- !u!114 &7902624618716854098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,6 +65,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneId: 0
-  serverOnly: 1
+  serverOnly: 0
+  visible: 0
   m_AssetId: 
   hasSpawned: 0

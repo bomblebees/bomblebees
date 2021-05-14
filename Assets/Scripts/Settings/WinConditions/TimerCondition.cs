@@ -19,17 +19,11 @@ public class TimerCondition : WinCondition
     {
         // Update the timer duration with the duration specified in lobby settings
         timerDuration = FindObjectOfType<LobbySettings>().roundDuration;
-
-        // initialize the UI timer
-        FindObjectOfType<RoundTimer>().InitTimer(timerDuration);
     }
 
     [Server] public override void StartWinCondition()
     {
         StartCoroutine(TimerCoroutine());
-
-        // start the UI timer
-        FindObjectOfType<RoundTimer>().StartTimer(timerDuration);
     }
 
     #endregion

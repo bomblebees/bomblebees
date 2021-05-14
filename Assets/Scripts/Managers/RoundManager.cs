@@ -158,9 +158,6 @@ public class RoundManager : NetworkBehaviour
         // Set alive count to number of players
         aliveCount = playerList.Count;
 
-        // Invoke start round event
-        eventManager.OnStartRound();
-
         // Initialize and subscribe to all win conditions
         foreach (WinCondition c in winConditions)
         {
@@ -172,6 +169,9 @@ public class RoundManager : NetworkBehaviour
         yield return new WaitForSeconds(startGameFreezeDuration + 1);
 
         // -- Game Starts Here -- //
+
+        // Invoke start round event
+        eventManager.OnStartRound();
 
         // Start all win conditions
         foreach (WinCondition c in winConditions)
