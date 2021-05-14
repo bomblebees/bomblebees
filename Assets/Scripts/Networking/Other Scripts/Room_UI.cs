@@ -205,7 +205,12 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButtonHoverTween.enabled = false;
         buttonReady.transform.localScale.Set(1f,1f,1f);
     }
-    
+
+    public void OnSettingsButtonClick()
+    {
+        FindObjectOfType<LobbySettings>().OnClickOpenSettings();
+    }
+
     #region Screen: HOW TO PLAY
 
     public void ToggleScreenHowToPlay()
