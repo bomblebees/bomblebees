@@ -19,20 +19,25 @@ public class GlobalSettings : MonoBehaviour
     
     private void Start()
     {
-        // Start with windowed mode
-        _fullScreenModeIndex = 0;
-        Screen.fullScreenMode = _fullScreenModes[_fullScreenModeIndex];
-        UpdateFullscreenText();
+        CheckFullScreenMode();
+    }
+
+    #region FullScreenMode
+
+    private void CheckFullScreenMode()
+    {
+        _fullScreenModeIndex = (int) Screen.fullScreenMode;
+        UpdateFullScreenText();
     }
 
     public void ToggleFullScreenMode()
     {
         _fullScreenModeIndex = (_fullScreenModeIndex + 1) % 4;
         Screen.fullScreenMode = _fullScreenModes[_fullScreenModeIndex];
-        UpdateFullscreenText();
+        UpdateFullScreenText();
     }
 
-    private void UpdateFullscreenText()
+    private void UpdateFullScreenText()
     {
         switch (_fullScreenModeIndex)
         {
@@ -50,6 +55,8 @@ public class GlobalSettings : MonoBehaviour
                 break;
         }
     }
+    
+    #endregion
 
     public void ToggleKeyBindingsCanvas()
     {
