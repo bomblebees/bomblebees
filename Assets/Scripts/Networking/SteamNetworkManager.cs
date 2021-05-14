@@ -12,14 +12,7 @@ public class SteamNetworkManager : NetworkRoomManagerExt
 
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
-        // transfer steam id to player
-        gamePlayer.GetComponent<Player>().steamId = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId;
-        gamePlayer.GetComponent<Player>().steamName = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamUsername;
-
-        // transfer rest of variables
-        base.OnRoomServerSceneLoadedForPlayer(conn, roomPlayer, gamePlayer);
-
-        return true;
+        return base.OnRoomServerSceneLoadedForPlayer(conn, roomPlayer, gamePlayer);
     }
 
     public override GameObject OnRoomServerCreateRoomPlayer(NetworkConnection conn)

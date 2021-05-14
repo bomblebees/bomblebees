@@ -96,6 +96,12 @@ public class NetworkRoomManagerExt : NetworkRoomManager
             gamePlayer.GetComponent<Player>().playerId = timeId;
         }
 
+        // transfer steam id
+        gamePlayer.GetComponent<Player>().steamId = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId;
+
+        // transfer steam username
+        gamePlayer.GetComponent<Player>().steamName = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamUsername;
+
         // transfer the index
         gamePlayer.GetComponent<Player>().playerRoomIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().index;
         

@@ -52,14 +52,14 @@ public class PlayerInterface : NetworkBehaviour
     {
         base.OnStartServer();
 
-        RpcUpdatePlayerName(this.gameObject);
-
         this.gameObject.GetComponent<Health>().EventLivesChanged += RpcOnPlayerTakeDamage;
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        UpdatePlayerName();
 
         UpdateInventoryQuantity();
 
@@ -175,17 +175,10 @@ public class PlayerInterface : NetworkBehaviour
 
     #region Heads Up Display (HUD)
 
-    [Command(requiresAuthority = false)]
-    public void CmdUpdatePlayerName(GameObject player)
+    [Client] public void UpdatePlayerName()
     {
-        RpcUpdatePlayerName(player);
-    }
-
-    [ClientRpc]
-    public void RpcUpdatePlayerName(GameObject player)
-    {
-        playerName.text = player.GetComponent<Player>().steamName;
-        playerName.color = player.GetComponent<Player>().playerColor;
+        playerName.text = this.GetComponent<Player>().steamName;
+        playerName.color = this.GetComponent<Player>().playerColor;
     }
 
     public void UpdateHexHud(char key)
