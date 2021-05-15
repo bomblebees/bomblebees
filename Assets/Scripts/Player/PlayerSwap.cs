@@ -16,6 +16,7 @@ public class PlayerSwap : NetworkBehaviour
     /// Whether the player can swap.
     /// </summary>
     [HideInInspector] public bool canSwap = true;
+	[SerializeField] public bool canSwapWhileGhost = false;
 
     /// <summary>
     /// The currently held tile of the player represented as a color character
@@ -54,7 +55,7 @@ public class PlayerSwap : NetworkBehaviour
     }
 
     // Cannot swap in ghost mode
-    private void OnGhostEnter(bool _) { canSwap = false; }
+    private void OnGhostEnter(bool _) { canSwap = canSwapWhileGhost; }
     private void OnGhostExit(bool _) { canSwap = true; }
 
     void Update()
