@@ -1,9 +1,6 @@
-using System;
 using UnityEngine;
 using Mirror;
-using Steamworks;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -60,6 +57,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] public override void OnStartClient()
     {
+        CmdResetCharacterAvailability();
         SetupLobby();
 
         // Start updating ping
@@ -77,6 +75,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] public override void OnStopClient()
     {
         DestroyPlayerCard();
+        CmdResetCharacterAvailability();
     }
 
     /// <summary>
@@ -473,5 +472,16 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Command] private void CmdChangeCharacterCode(int code)
     {
         characterCode = code;
+    }
+
+    [Command]
+    private void CmdResetCharacterAvailability()
+    {
+        RpcResetCharacterAvailability();
+    }
+    
+    [ClientRpc] private void RpcResetCharacterAvailability()
+    {
+        FindObjectOfType<CharacterSelectionInfo>().ResetAvailability();
     }
 }
