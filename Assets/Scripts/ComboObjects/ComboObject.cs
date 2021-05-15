@@ -392,7 +392,7 @@ public class ComboObject : NetworkBehaviour
 
             int newTravelDistanceInHexes = power + 1;
 
-            NotifyOccupiedTile(false); // Update occupation status of tile
+            // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
 

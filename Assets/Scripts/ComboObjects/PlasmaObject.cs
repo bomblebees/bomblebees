@@ -74,7 +74,8 @@ public class PlasmaObject : TriggerObject
 		// do we need to do the same for particles?
 		this.plasmaSphereModel.SetActive(true);
         base.Push(edgeIndex, triggeringPlayer); // This shoulda been at the top lol
-    }
+		StartCoroutine(Breakdown());
+	}
 
     public Vector3 lastPosition;
 

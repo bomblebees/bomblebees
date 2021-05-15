@@ -19,9 +19,10 @@ public class TriggerObject : ComboObject
     protected float targetAngle = 0f;
     protected float startAngle;
     protected bool isRotating = false;
+	public bool isSpinnable = true;
 
 
-    protected IEnumerator
+	protected IEnumerator
         procCoroutine =
             null; // when Proc coroutine starts, store to this null var so that we can reference and stop it in Breakdown() even after Proc happens
 
@@ -91,8 +92,8 @@ public class TriggerObject : ComboObject
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
+        // StartCoroutine(DisableObjectCollider());
+        // StartCoroutine(DisableObjectModel());
     }
 
     protected virtual void ListenForDespawn()
@@ -142,14 +143,17 @@ public class TriggerObject : ComboObject
     {
         var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
 
-        hitbox.SetActive(true);
+		// once hitbox is enabled, triggerobject cannot be spun anymore
+		isSpinnable = false;
+		hitbox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitbox.SetActive(false);
+		StartCoroutine(Breakdown());
     }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        NotifyOccupiedTile(false); // prolly move this later
+        // NotifyOccupiedTile(false); // prolly move this later
         wasHit = true;
         return true;
     }
@@ -159,6 +163,8 @@ public class TriggerObject : ComboObject
         didEarlyEffects = true;
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
+
+		hitBox.SetActive(false);
 
         NotifyOccupiedTile(false);
 

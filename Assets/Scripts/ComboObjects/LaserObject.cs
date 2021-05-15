@@ -27,7 +27,11 @@ public class LaserObject : TriggerObject
 			chargeSFX.SetActive(true);
 		}
 
-        GetSpunDirection(edgeIndex, triggeringPlayer, true);
+		if (isSpinnable) // boolean defined in TriggerObject; set to false when hitbox is activated
+		{
+			GetSpunDirection(edgeIndex, triggeringPlayer, true);
+		}
+
         return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
 

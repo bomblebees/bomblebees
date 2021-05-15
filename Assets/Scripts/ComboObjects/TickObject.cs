@@ -106,8 +106,17 @@ public class TickObject : ComboObject
         ProcEffects();
     }
 
+	protected override void OnTriggerEnter(Collider other)
+	{
+		base.OnTriggerEnter(other);
+		if (other.gameObject.CompareTag("Spin"))
+		{
+			NotifyOccupiedTile(false);
+		}
+	}
 
-    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
+
+	protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         if (!tickStarted) StartCoroutine(TickDown());
         bool result = base.Push(edgeIndex, triggeringPlayer);
