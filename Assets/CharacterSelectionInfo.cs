@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using UnityEngine;
 
-public class CharacterSelectionInfo : MonoBehaviour
+public class CharacterSelectionInfo : NetworkBehaviour
 {
     [SerializeField] public Texture2D[] characterPortraitList;
 
@@ -8,21 +9,9 @@ public class CharacterSelectionInfo : MonoBehaviour
     public event ChangeCharacterDelegate EventCharacterChanged;
 
     public bool[] characterAvailable = { true, true, true, true };
-    private bool[] _defaultCharacterAvailable;
-
-    private void Start()
-    {
-        _defaultCharacterAvailable = characterAvailable;
-    }
 
     public void OnChangeCharacter()
     {
         EventCharacterChanged?.Invoke();
-    }
-
-    public void ResetAvailability()
-    {
-        Debug.Log("Character availability has been reset.");
-        characterAvailable = _defaultCharacterAvailable;
     }
 }
