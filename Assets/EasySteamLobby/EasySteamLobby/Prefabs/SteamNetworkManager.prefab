@@ -48,10 +48,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
+  PersistNetworkManagerToOfflineScene: 0
   runInBackground: 1
   autoStartServerBuild: 1
-  showDebugMessages: 0
   serverTickRate: 30
+  serverBatching: 1
+  serverBatchInterval: 0
   offlineScene: Assets/Scenes/MainMenu.unity
   onlineScene: Assets/Scenes/Room.unity
   transport: {fileID: 1277953192888279607}
@@ -70,7 +72,7 @@ MonoBehaviour:
   roomPlayerPrefab: {fileID: 114033720796874720, guid: deae2134a1d77704b9c595efe69767dd,
     type: 3}
   RoomScene: Assets/Scenes/Room.unity
-  GameplayScene: Assets/Scenes/Level1.1.unity
+  GameplayScene: 
   _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
@@ -81,6 +83,7 @@ MonoBehaviour:
   gameUIManager: {fileID: 0}
   audioManager: {fileID: 7230157094182336862, guid: 269b415ed09918044b2ef1f91fe511aa,
     type: 3}
+  lobbySettings: {fileID: 0}
   showStartButton: 0
 --- !u!114 &1277953192888279592
 MonoBehaviour:
@@ -106,34 +109,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea368fb6f27ec2f40a40e20977992b9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnClientConnected:
-    m_PersistentCalls:
-      m_Calls: []
-  OnClientDataReceived:
-    m_PersistentCalls:
-      m_Calls: []
-  OnClientError:
-    m_PersistentCalls:
-      m_Calls: []
-  OnClientDisconnected:
-    m_PersistentCalls:
-      m_Calls: []
-  OnServerConnected:
-    m_PersistentCalls:
-      m_Calls: []
-  OnServerDataReceived:
-    m_PersistentCalls:
-      m_Calls: []
-  OnServerError:
-    m_PersistentCalls:
-      m_Calls: []
-  OnServerDisconnected:
-    m_PersistentCalls:
-      m_Calls: []
   Channels: 02000000
   Timeout: 25
   SteamAppID: 480
   AllowSteamRelay: 1
+  UseNextGenSteamNetworking: 1
   SteamUserID: 0
 --- !u!114 &1277953192888279606
 MonoBehaviour:
@@ -159,7 +139,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc654f29862fc2643b948f772ebb9e68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showPing: 1
-  position: {x: 10, y: 10}
-  fontSize: 12
-  textColor: {r: 1, g: 1, b: 1, a: 0.3137255}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  padding: 2
