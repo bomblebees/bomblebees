@@ -45,6 +45,10 @@ public class Player : NetworkBehaviour
     [Tooltip("Selects mesh based on character chosen.")]
     [SerializeField] private Mesh[] playerMeshes = new Mesh[4];
 
+    [Header("Custom Player Colors")]
+    [Tooltip("Selects color based on character chosen.")]
+    [SerializeField] private Material[] playerColors = new Material[4];
+
 
     // Added for easy referencing of local player from anywhere
     public override void OnStartLocalPlayer()
@@ -61,7 +65,9 @@ public class Player : NetworkBehaviour
         playerMesh.GetComponent<SkinnedMeshRenderer>().sharedMesh = playerMeshes[characterCode];
 
         // Set player color
-        //playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
+        Material[] mats = playerMesh.GetComponent<SkinnedMeshRenderer>().materials;
+        mats[3] = playerColors[characterCode];
+        playerMesh.GetComponent<SkinnedMeshRenderer>().materials = mats;
     }
 
     public override void OnStartServer()
