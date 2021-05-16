@@ -8,7 +8,7 @@ public class MessageFeed : MonoBehaviour
 {
     [SerializeField] private GameObject messageFeedPrefab;
     [SerializeField] private GameObject messageFeedCanvas;
-    [SerializeField] private GameObject messsageFeedAnchor;
+    [SerializeField] private GameObject messageFeedAnchor;
     [SerializeField] private int maxMessages = 10;
     [SerializeField] private float fadeDelay = 4f;
 
@@ -40,10 +40,10 @@ public class MessageFeed : MonoBehaviour
         }
 
         // Get initial anchor position
-        Vector2 pos = messsageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
+        Vector2 pos = messageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
 
         // Start the height above where it will endup for a nice drop in transition
-        pos.y += 50;
+        pos.y -= 50;
 
         //killfeed.GetComponent<RectTransform>().anchoredPosition = new Vector3(-180, 50 + (feedUIs.Count * 50), 0);
 
@@ -73,7 +73,7 @@ public class MessageFeed : MonoBehaviour
 
     public void UpdateMessagefeed()
     {
-        Vector2 ancPos = messsageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
+        Vector2 ancPos = messageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
 
         for (int i = 0; i < feedUIs.Count; i++)
         {
