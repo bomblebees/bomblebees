@@ -14,6 +14,8 @@ public class Room_UI : MonoBehaviour
     [Header("Screen")]
     [SerializeField] private GameObject screenHowToPlay;
     [SerializeField] private GameObject screenControls;
+    [SerializeField] private GameObject screenLeavePopup;
+
     [Header("Opacity Configuration")]
     [Range(0f, 1f)]
     [SerializeField] private float deactivatedOpacity = 0.2f;
@@ -118,7 +120,7 @@ public class Room_UI : MonoBehaviour
         //}
     }
 
-    public void Back()
+    public void ExitLobby()
     {
         if (matchmaker)
         {
@@ -132,6 +134,11 @@ public class Room_UI : MonoBehaviour
             // For some reason network manager is moved out of don't destroy, this is to put it back
             DontDestroyOnLoad(networkManager.gameObject);
         }
+    }
+
+    public void OnLeaveLobbyClick()
+    {
+        screenLeavePopup.SetActive(true);
     }
 
     public void OnStartButtonClick()
