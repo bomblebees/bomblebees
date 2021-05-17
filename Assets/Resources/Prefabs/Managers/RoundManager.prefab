@@ -1092,6 +1092,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneId: 0
   serverOnly: 0
+  visible: 0
   m_AssetId: 
   hasSpawned: 0
 --- !u!114 &4286371612849763445
@@ -1108,7 +1109,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  winConditions: []
   aliveCount: -1
+  currentGlobalInventorySize: 3
   serverEndSelectionCanvas: {fileID: 1352525446624707517}
   statsElementUIAnchorObjects:
   - {fileID: 3951571497989581796}
@@ -1117,9 +1120,6 @@ MonoBehaviour:
   - {fileID: 5434736946321218160}
   startGameFreezeDuration: 3
   endGameFreezeDuration: 5
-  playerMaxLives: 3
-  useRoundTimer: 1
-  roundDuration: 240
 --- !u!1 &3351989164086919518
 GameObject:
   m_ObjectHideFlags: 0

@@ -108,7 +108,7 @@ public class GameUIManager : NetworkBehaviour
 
     [ClientRpc] public void ClientEndRound()
     {
-        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration, null));
+        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.endGameFreezeDuration));
     }
 
     #endregion
