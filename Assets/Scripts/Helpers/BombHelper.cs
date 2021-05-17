@@ -46,8 +46,8 @@ public class BombHelper : MonoBehaviour
             case 'b': return "Blink";
             case 'g': return "Plasma";
             case 'y': return "Laser";
-            case 'r': return "Big";
-            case 'p': return "Sludge";
+            case 'r': return "Bomble";
+            case 'p': return "Honey";
             case 'w': return "Queen Bee";
             default: return "None";
         }
