@@ -14,4 +14,12 @@ public class CharacterSelectionInfo : NetworkBehaviour
     {
         EventCharacterChanged?.Invoke();
     }
+
+    public void ResetAll()
+    {
+        for (int i = 0; i < characterAvailable.Length; i++)
+        {
+            characterAvailable[i] = true;
+        }
+    }
 }

@@ -76,6 +76,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] public override void OnStopClient()
     {
+        _characterSelectionInfo.ResetAll();
         DestroyPlayerCard();
     }
 
@@ -89,15 +90,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SetupLobby();
     }
 
-    /// <summary>
-    /// Called when the client leaves the lobby scene.
-    /// <para>Note: This function is not called when the player leaves the lobby (use OnStopClient),
-    /// only when the player leaves the lobby joining the game.</para>
-    /// </summary>
-    [Client] public override void OnClientExitRoom()
-    {
-        isSetup = false;
-    }
+    ///// <summary>
+    ///// Called when the client leaves the lobby scene.
+    ///// </summary>
+    //[Client] public override void OnClientExitRoom()
+    //{
+    //    isSetup = false;
+    //}
 
     #endregion
 
@@ -151,24 +150,17 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     #region Lobby Creation
 
     /// <summary>
-    /// Whether or not the lobby is already setup
-    /// </summary>
-    private bool isSetup = false;
-
-    /// <summary>
     /// Sets up the lobby for this player
     /// </summary>
     [Client] private void SetupLobby()
     {
         // Exit if lobby is already setup
-        if (isSetup) return;
+        if (playerCard) return;
 
         InitRequiredVars();
         InitLobbyButtons();
         CreatePlayerCard();
         InitPlayerCard();
-
-        isSetup = true;
     }
     
     /// <summary>
@@ -439,6 +431,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     // Called by the local player when ready button is clicked
     [Client] public void OnReadyButtonClick()
     {
+        Debug.Log("ready called");
         CmdChangeReadyState(!readyToBegin);
     }
 
