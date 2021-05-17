@@ -311,17 +311,6 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Gets the player than won this round
-    /// </summary>
-    /// <returns> The player who won, null if not applicable</returns>
-    public Player GetWinnerPlayer()
-    {
-        if (!roundOver) return null;
-
-        return playerList[0].player;
-    }
-
     #region End Game Results
 
     [ClientRpc] private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder)
@@ -336,8 +325,13 @@ public class RoundManager : NetworkBehaviour
             stat.PrintStats();
             stat.CreateStatsUIElement(statsElementUIAnchorObjects[i]);
         }
+
+        // Set text on ui
+        string winText = winningOrder[0].GetComponent<Player>().steamName + " won!";
+        FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(winText);
+
     }
-    
+
     [ClientRpc]
     private void RpcShowLoadingScreen()
     {

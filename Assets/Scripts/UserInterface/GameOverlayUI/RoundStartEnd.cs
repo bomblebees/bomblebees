@@ -30,11 +30,6 @@ public class RoundStartEnd : MonoBehaviour
 
     public IEnumerator EndRoundFreezetime(int freezetime)
     {
-        Player winner = RoundManager.Singleton.GetWinnerPlayer();
-
-        string winText = winner.steamName + " won!";
-        FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(winText);
-
         titleText.text = "Game!";
 
         yield return new WaitForSeconds(freezetime);
