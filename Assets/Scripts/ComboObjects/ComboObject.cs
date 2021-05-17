@@ -258,6 +258,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableSFX()
     {
+		Debug.Log("starting sound");
         if (SFX) {
             SFX.SetActive(true);
             yield return new WaitForSeconds(sfxDuration);

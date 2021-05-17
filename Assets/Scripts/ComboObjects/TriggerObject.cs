@@ -87,12 +87,15 @@ public class TriggerObject : ComboObject
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
 
+		Debug.Log("proccing triggerobject");
+		
         canBeTriggered = false; // To stop it from being triggered twice
         timeTriggered = timeAlive;
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
-        // StartCoroutine(DisableObjectCollider());
+
+		// StartCoroutine(DisableObjectCollider());
         // StartCoroutine(DisableObjectModel());
     }
 
