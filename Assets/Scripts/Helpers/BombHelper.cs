@@ -24,7 +24,7 @@ public class BombHelper : MonoBehaviour
         }
     }
 
-    public Color GetKeyColor(char key)
+    public static Color GetKeyColor(char key)
     {
         switch (key)
         {
@@ -39,7 +39,7 @@ public class BombHelper : MonoBehaviour
         }
     }
 
-    public string GetBombTextByKey(char key)
+    public static string GetBombTextByKey(char key)
     {
         switch (key)
         {

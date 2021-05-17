@@ -6,11 +6,11 @@ using Mirror;
 public class PlayerInventory : NetworkBehaviour
 {
     [Tooltip("Controls the order of bombs as shown in the player HUD")]
-    [SerializeField] private static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
+    [SerializeField] public static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
 
     [Tooltip("Controls the max and starting amount of bombs a player can carry for each bomb type")]
-    [SerializeField] private static int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
-	[SerializeField] private static int INVEN_START_VALUE = 3;
+    [SerializeField] public static int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
+	[SerializeField] public static int INVEN_START_VALUE = 3;
 
 	[Tooltip("Ground item prefabs for spawning bombs on ground")]
 	[SerializeField] private GameObject groundItem_r;

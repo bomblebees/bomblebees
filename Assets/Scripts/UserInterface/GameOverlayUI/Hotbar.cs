@@ -135,8 +135,8 @@ public class Hotbar : MonoBehaviour
 
         char selectedKey = localPlayer.GetComponent<PlayerSwap>().selectedTile.GetComponentInParent<HexCell>().GetKey();
 
-        backHex.color = bombHelper.GetKeyColor(selectedKey);
-        frontHex.color = bombHelper.GetKeyColor(localPlayer.GetComponent<PlayerSwap>().heldKey);
+        backHex.color = BombHelper.GetKeyColor(selectedKey);
+        frontHex.color = BombHelper.GetKeyColor(localPlayer.GetComponent<PlayerSwap>().heldKey);
     }
 
     public void StartSpinCooldown()
@@ -149,7 +149,7 @@ public class Hotbar : MonoBehaviour
 
     public void SwapHexes(char newFrontKey)
     {
-        frontHex.color = bombHelper.GetKeyColor(newFrontKey);
+        frontHex.color = BombHelper.GetKeyColor(newFrontKey);
     }
 
     public void UpdateInventoryUI(char key, int amt)
@@ -161,5 +161,4 @@ public class Hotbar : MonoBehaviour
 
         nextBomb.sprite = bombHelper.GetKeySprite(key);
     }
-
 }

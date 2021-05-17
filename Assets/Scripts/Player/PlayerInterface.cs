@@ -27,6 +27,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private GameObject damageIndicator;
     [SerializeField] private GameObject damageFlash;
+    [SerializeField] private TMP_Text selectedBombText;
 
     [Header("Settings")]
     [SerializeField] private int deathUItime = 3;
@@ -265,8 +266,14 @@ public class PlayerInterface : NetworkBehaviour
 	public void UpdateInventorySelected()
     {
         int selected = this.GetComponent<PlayerInventory>().selectedSlot;
-
         selectedHighlight.gameObject.transform.localPosition = invSlotsRadial[selected].transform.parent.transform.localPosition;
+            
+        if (isLocalPlayer)
+        {
+            char key = PlayerInventory.INVEN_BOMB_TYPES[selected];
+            selectedBombText.text = BombHelper.GetBombTextByKey(key) + " Bomb";
+            selectedBombText.GetComponent<ColorTween>().StartTween();
+        }
     }
 
     [Client] private void ShowPlayerInfo()
