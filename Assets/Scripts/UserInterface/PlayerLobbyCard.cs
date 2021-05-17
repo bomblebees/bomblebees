@@ -16,4 +16,5 @@ public class PlayerLobbyCard : MonoBehaviour
     public Image[] colorFrames;
     public TMP_Text pingDisplay;
     public GameObject crown;
+    public TMP_Text disabledText;
 }

@@ -135,9 +135,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
         // If not ready, and character portrait is unavailable, grey out the portrait
         if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[this.characterCode])
+        {
             playerCard.characterPortrait.color = new Color(0.4f, 0.4f, 0.4f);
+            if (isLocalPlayer) playerCard.disabledText.gameObject.SetActive(true);
+        }
         else
+        {
             playerCard.characterPortrait.color = new Color(1f, 1f, 1f);
+            if (isLocalPlayer) playerCard.disabledText.gameObject.SetActive(false);
+        }
     }
 
     #endregion
