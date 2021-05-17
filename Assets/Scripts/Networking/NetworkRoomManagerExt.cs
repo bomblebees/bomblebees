@@ -45,6 +45,10 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         Matchmaking mm = Matchmaking.singleton;
         if (mm) mm.uiLeaveLobby();
 
+        // re-enable the main menu ui
+        MainMenu_UI mainMenuUI = MainMenu_UI.singleton;
+        if (mainMenuUI) mainMenuUI.gameObject.SetActive(true);
+
         base.OnRoomStopClient();
     }
 

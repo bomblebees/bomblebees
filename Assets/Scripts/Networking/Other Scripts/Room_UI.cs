@@ -131,8 +131,6 @@ public class Room_UI : MonoBehaviour
 
             // For some reason network manager is moved out of don't destroy, this is to put it back
             DontDestroyOnLoad(networkManager.gameObject);
-
-            mainMenuUI.gameObject.SetActive(true);
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
+using Mirror;
 
 public class GlobalSettings : MonoBehaviour
 {
@@ -64,7 +65,19 @@ public class GlobalSettings : MonoBehaviour
         keyBindingsCanvas.enabled = !keyBindingsCanvas.enabled;
     }
 
-    public void OnClickQuitGameButton()
+    public void OnClickQuitToMenu()
+    {
+        NetworkRoomManagerExt networkManager = NetworkManager.singleton as NetworkRoomManagerExt;
+
+        if (networkManager)
+        {
+            if (NetworkServer.active) networkManager.StopHost();
+            else networkManager.StopClient();
+        }
+
+    }
+
+    public void OnClickQuitToDesktop()
     {
         Application.Quit();
     }
