@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8688043872554924943}
   - component: {fileID: 5610567358672211263}
   - component: {fileID: 7933164392646439457}
-  - component: {fileID: 9146517008061959679}
   m_Layer: 0
   m_Name: MessageFeed
   m_TagString: Untagged
@@ -68,7 +67,7 @@ MonoBehaviour:
   m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c2f49fe8c22d94f9a9e6cd06ad490155, type: 2}
-  m_sharedMaterial: {fileID: 7374927986402738804, guid: c1482dbce654844b9ba1c753cbea5d80,
+  m_sharedMaterial: {fileID: 3074828514974314926, guid: c2f49fe8c22d94f9a9e6cd06ad490155,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -135,19 +134,3 @@ MonoBehaviour:
   m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &9146517008061959679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 84228145205705458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0

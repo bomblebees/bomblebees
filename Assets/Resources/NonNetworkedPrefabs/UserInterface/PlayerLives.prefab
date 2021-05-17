@@ -88,6 +88,8 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 1}
   easeInTime: 0.5
   easeOutTime: 0.4
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 1.5
   easeIn: 1
   easeOut: 1
@@ -683,7 +685,6 @@ GameObject:
   - component: {fileID: 3499066091584970253}
   - component: {fileID: 1524517968439215428}
   - component: {fileID: 1243153256424259692}
-  - component: {fileID: -6650405747879053136}
   m_Layer: 0
   m_Name: PlayerLives
   m_TagString: Untagged
@@ -744,22 +745,6 @@ MonoBehaviour:
   - {fileID: 6525103341970470680}
   playerName: {fileID: 4461748534391653847}
   livesCounter: {fileID: 2620180706383815650}
---- !u!114 &-6650405747879053136
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6984068959478206409}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
 --- !u!1 &7007508562056418797
 GameObject:
   m_ObjectHideFlags: 0
