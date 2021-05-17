@@ -227,8 +227,12 @@ public class RoundManager : NetworkBehaviour
     [Server] private GameObject[] CollectWinningOrder()
     {
         // Order the player list by winning order
-        playerList = playerList.OrderByDescending(p => p.health.currentLives) // order by lives
-                    .ThenByDescending(p => p.timeOfElim).ToList(); // then by time of death (if applicable)
+        playerList = playerList.OrderByDescending(p => p.health.currentLives) // order by most health first
+                    .ThenByDescending(p => p.timeOfElim) // then by latest time of death (if applicable)
+                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().kills) // then by most kills
+                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().totalCombosMade) // then by most combos
+                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().doubleKills) // then by most double kills
+                    .ToList(); // turn into list
 
         // Transfer playerList into network transferrable GameObject array
         GameObject[] orderedList = new GameObject[playerList.Count];
@@ -285,12 +289,6 @@ public class RoundManager : NetworkBehaviour
 
         // Set the time of elimination for this player
         playerList.Find(p => p.player.gameObject == player).timeOfElim = timeOfElim;
-
-
-        //Debug.Log("inserting dead player to ordered elimination list");
-        //orderedPlayerList.Insert(0, player);
-
-
 
         IncreaseGlobalLivesAmt();
     }
