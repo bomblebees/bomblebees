@@ -420,7 +420,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Standard
+  m_text: '[Gamemode Name]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c2f49fe8c22d94f9a9e6cd06ad490155, type: 2}
   m_sharedMaterial: {fileID: 3074828514974314926, guid: c2f49fe8c22d94f9a9e6cd06ad490155,
@@ -508,7 +508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &754875073081684229
 RectTransform:
   m_ObjectHideFlags: 0
@@ -966,7 +966,7 @@ RectTransform:
   m_AnchorMin: {x: 0.4743627, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 300}
-  m_SizeDelta: {x: -200.00002, y: 279.2273}
+  m_SizeDelta: {x: -200.00002, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &4180089678020563628
 MonoBehaviour:
@@ -1039,10 +1039,10 @@ RectTransform:
   m_Father: {fileID: 965784977194941657}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 422.25537, y: -45.053642}
-  m_SizeDelta: {x: 844.51074, y: 90.107285}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 90.107285}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6906621314444283805
 CanvasRenderer:
@@ -1382,10 +1382,10 @@ RectTransform:
   m_Father: {fileID: 965784977194941657}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 422.25537, y: -189.22728}
-  m_SizeDelta: {x: 844.51074, y: 180}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2639152902041243341
 GameObject:
@@ -1428,7 +1428,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0.4743627, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 300}
-  m_SizeDelta: {x: -200, y: 735.3094}
+  m_SizeDelta: {x: -200, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &8801718301807738822
 MonoBehaviour:
@@ -1786,10 +1786,10 @@ RectTransform:
   m_Father: {fileID: 9207390896112113745}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 478.7068, y: -189.22728}
-  m_SizeDelta: {x: 957.4136, y: 180}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &4426050420249192650
 GameObject:
@@ -1882,6 +1882,8 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 1}
   easeInTime: 0
   easeOutTime: 0.35
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 0
   easeIn: 1
   easeOut: 6
@@ -1951,14 +1953,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '**Other modes coming soon!**
-
-
-    The classic free for all Bomblebees
-    experience
-
-
-    <color=#DDEF1F>The last bee standing wins!</color>'
+  m_text: '[Gamemode Description]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c1482dbce654844b9ba1c753cbea5d80, type: 2}
   m_sharedMaterial: {fileID: 7374927986402738804, guid: c1482dbce654844b9ba1c753cbea5d80,
@@ -2268,10 +2263,10 @@ RectTransform:
   m_Father: {fileID: 9207390896112113745}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 478.7068, y: -94.66728}
-  m_SizeDelta: {x: 957.4136, y: 4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8611474277761524217
 CanvasRenderer:
@@ -2429,8 +2424,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: ToggleFullScreenMode
+      - m_Target: {fileID: 5052376188629550881}
+        m_MethodName: OnClickGamemode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2472,10 +2467,10 @@ RectTransform:
   m_Father: {fileID: 9207390896112113745}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 478.7068, y: -45.053642}
-  m_SizeDelta: {x: 957.4136, y: 90.107285}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 90.107285}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7015207244692138648
 CanvasRenderer:
@@ -2587,6 +2582,8 @@ GameObject:
   - component: {fileID: 5737296139642274241}
   - component: {fileID: 5052376188629550881}
   - component: {fileID: 7902624618716854098}
+  - component: {fileID: 2571414835740817801}
+  - component: {fileID: 4194710596932988677}
   m_Layer: 0
   m_Name: LobbySettings
   m_TagString: Untagged
@@ -2627,6 +2624,12 @@ MonoBehaviour:
   endAfterFirstWinCondition: 1
   byLastAlive: 1
   byTimerFinished: 1
+  gamemodeButtonText: {fileID: 3579841835062456627}
+  gamemodeDescriptionText: {fileID: 3311784330089273500}
+  gamemodes:
+  - {fileID: 2571414835740817801}
+  - {fileID: 4194710596932988677}
+  gamemodeSelected: 0
   screenSettings: {fileID: 1405020294247809689}
   roundDurationText: {fileID: 4388054743382354940}
   durations:
@@ -2635,7 +2638,6 @@ MonoBehaviour:
   - 120
   - 180
   - 240
-  durationSelected: 2
 --- !u!114 &7902624618716854098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2653,6 +2655,40 @@ MonoBehaviour:
   visible: 0
   m_AssetId: 
   hasSpawned: 0
+--- !u!114 &2571414835740817801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5476808900698637262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef5897a86bca90d41ac235c347b6e594, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gamemodeName: Standard
+  roundDuration: 180
+  endAfterFirstWinCondition: 1
+  byLastAlive: 1
+  byTimerFinished: 1
+--- !u!114 &4194710596932988677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5476808900698637262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abcf6c1d84e040a43ac5faaed212eb35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gamemodeName: Teams
+  roundDuration: 120
+  endAfterFirstWinCondition: 1
+  byLastAlive: 1
+  byTimerFinished: 1
 --- !u!1 &5532194748030511247
 GameObject:
   m_ObjectHideFlags: 0
@@ -2759,10 +2795,10 @@ RectTransform:
   m_Father: {fileID: 965784977194941657}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 422.25537, y: -94.66728}
-  m_SizeDelta: {x: 844.51074, y: 4}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5549606706899473263
 CanvasRenderer:
@@ -3102,10 +3138,10 @@ RectTransform:
   m_Father: {fileID: 965784977194941657}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 422.25537, y: -508.54834}
-  m_SizeDelta: {x: 844.51074, y: 453.5221}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 453.5221}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8427616700686099918
 GameObject:
@@ -3376,7 +3412,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '2 min
+  m_text: '[Round Time]
 
 '
   m_isRightToLeft: 0

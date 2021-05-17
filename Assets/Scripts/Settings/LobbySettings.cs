@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
-
+using System;
 
 /// <summary>
 /// Settings for a game, these values only have effect if they are
@@ -12,12 +12,13 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class LobbySettings : NetworkBehaviour
 {
-    [Header("Diagnostics - Server")]
+    [Header("Diagnostics - Game Settings")]
 
-    // -- Game Settings -- //
+    [SyncVar(hook = nameof(OnChangeRoundDuration))]
     public float roundDuration = 120f;
 
-    // -- Win Conditions -- //
+    // -------------------- SERVER ONLY -------------------- //
+    [Header("Diagnostics - Win Conditions (Server only)")]
     public bool endAfterFirstWinCondition = true;
     public bool byLastAlive = true;
     public bool byTimerFinished = true;
@@ -33,8 +34,57 @@ public class LobbySettings : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        
+        LoadGamemodePreset(gamemodeSelected);
     }
+
+    public override void OnStartClient()
+    {
+        InitGamemode();
+        InitRoundDuration();
+    }
+
+    #region Gamemodes
+
+    [Header("Gamemodes")]
+    [SerializeField] private TMP_Text gamemodeButtonText;
+    [SerializeField] private TMP_Text gamemodeDescriptionText;
+
+    [SerializeField] private Gamemode[] gamemodes;
+    [SyncVar(hook = nameof(OnChangeGamemode))] public int gamemodeSelected = 0;
+
+    [Client] private void InitGamemode()
+    {
+        SetGamemodeText();
+    }
+
+    [Server] private void LoadGamemodePreset(int select)
+    {
+        gamemodes[select].LoadGamemode();
+    }
+
+    [Server] public void OnClickGamemode()
+    {
+        if (!isServer) return; // Only host can change settings
+
+        // Get next selected duration
+        gamemodeSelected = (gamemodeSelected + 1) % gamemodes.Length;
+
+        // Load the selected gamemode settings
+        LoadGamemodePreset(gamemodeSelected);
+    }
+
+    [ClientCallback] private void OnChangeGamemode(int _, int newSelection)
+    {
+        SetGamemodeText();
+    }
+
+    [Client] private void SetGamemodeText()
+    {
+        gamemodeButtonText.text = gamemodes[gamemodeSelected].ToString();
+        gamemodeDescriptionText.text = gamemodes[gamemodeSelected].GetDescription();
+    }
+
+    #endregion
 
     #region Settings Menu
 
@@ -59,11 +109,11 @@ public class LobbySettings : NetworkBehaviour
     [SerializeField] private TMP_Text roundDurationText;
 
     [SerializeField] private float[] durations = { 0f, 60f, 120f, 180f, 240f };
-    [SyncVar(hook = nameof(OnChangeRoundDuration))] public int durationSelected = 2;
+    private int durationSelected = 2;
 
-    private void InitRoundDuration()
+    [Client] private void InitRoundDuration()
     {
-        SetRoundDurationText(durationSelected);
+        SetRoundDurationText();
     }
 
     [Server] public void OnClickRoundDurationButton()
@@ -72,30 +122,28 @@ public class LobbySettings : NetworkBehaviour
 
         // Get next selected duration
         durationSelected = (durationSelected + 1) % durations.Length;
-    }
-
-    [ClientCallback] private void OnChangeRoundDuration(int _, int newSelection)
-    {
-        // If new duration is 0, disable the timer win condition
-        if (newSelection == 0) byTimerFinished = false;
-        else byTimerFinished = true;
 
         // New duration is now that
-        roundDuration = durations[newSelection];
-
-        SetRoundDurationText(newSelection);
+        roundDuration = durations[durationSelected];
     }
 
-    private void SetRoundDurationText(int select)
+    [ClientCallback] private void OnChangeRoundDuration(float _, float newDuration)
     {
-        switch (select)
+        // If new duration is 0, disable the timer win condition
+        if (newDuration == 0) byTimerFinished = false;
+        else byTimerFinished = true;
+
+        SetRoundDurationText();
+    }
+
+    [Client] private void SetRoundDurationText()
+    {
+        if (roundDuration == 0)
         {
-            case 0: roundDurationText.text = "Disabled"; break;
-            case 1: roundDurationText.text = "1 Minute"; break;
-            case 2: roundDurationText.text = "2 Minutes"; break;
-            case 3: roundDurationText.text = "3 Minutes"; break;
-            case 4: roundDurationText.text = "4 Minutes"; break;
+            roundDurationText.text = "Disabled"; return;
         }
+
+        roundDurationText.text = roundDuration.ToString() + " seconds";
     }
 
     #endregion
