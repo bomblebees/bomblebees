@@ -35,7 +35,7 @@ public class PlayerInventory : NetworkBehaviour
 	public override void OnStartServer()
     {
 		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventorySize.Add(0);
-		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventoryList.Add(0);
+		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventoryList.Add(1);
 
 		base.OnStartServer();
 		// Subscribe to the damage event on the server
@@ -244,6 +244,9 @@ public class PlayerInventory : NetworkBehaviour
         {
             // Decrement the bomb quantity by one
             inventoryList[idx]--;
+
+            // If its now empty, automatically get the next selected bomb
+            if (inventoryList[idx] == 0) selectedSlot = GetNextAvailableBomb();
         } else
         {
             // This function should not be called if bomb type has zero quantity
