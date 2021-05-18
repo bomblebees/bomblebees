@@ -4,15 +4,22 @@ using UnityEngine;
 
 public abstract class Gamemode : MonoBehaviour
 {
+    public abstract string GamemodeName { get; }
+
     // -- Game Settings -- //
-    public virtual float RoundDuration { get; } = 0f;
-
-    // -- Win Conditions -- //
-    public virtual bool EndAfterFirstWinCondition { get; } = false;
-    public virtual bool ByLastAlive { get; } = false;
-    public virtual bool ByTimerFinished { get; } = false;
+    public virtual float RoundDuration { get; } = 180f; // default 3 minutes
+    public virtual int PlayerLives { get; } = 3; // default 3 lives
+    public virtual bool EndAfterFirstWinCondition { get; } = true; // default true
 
 
+
+    /// <summary>
+    /// Overrides the ToString function to return the gamemode name
+    /// </summary>
+    public override string ToString()
+    {
+        return GamemodeName;
+    }
 
     /// <summary>
     /// Gets a description of the gamemode to be displayed on the settings menu
@@ -20,7 +27,7 @@ public abstract class Gamemode : MonoBehaviour
     /// <returns> A description of the gamemode</returns>
     public virtual string GetDescription()
     {
-        return "Description WIP";
+        return "Gamemode WIP";
     }
 
 
@@ -35,11 +42,14 @@ public abstract class Gamemode : MonoBehaviour
 
         // Load game settings
         settings.roundDuration = RoundDuration;
+        if (RoundDuration > 0) settings.byTimerFinished = true;
+        else settings.byTimerFinished = false;
 
-        // Load win conditions
+        settings.playerLives = PlayerLives;
+        if (PlayerLives > 0) settings.byLastAlive = true;
+        else settings.byLastAlive = false;
+
         settings.endAfterFirstWinCondition = EndAfterFirstWinCondition;
-        settings.byLastAlive = ByLastAlive;
-        settings.byTimerFinished = ByTimerFinished;
     }
 
 }

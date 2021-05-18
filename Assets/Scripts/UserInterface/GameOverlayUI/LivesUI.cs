@@ -27,7 +27,7 @@ public class LivesUI : MonoBehaviour
 
     [SerializeField] GameUIManager gameUIManager = null;
 
-    private List<LivesUIElement> livesUIs = new List<LivesUIElement>();
+    private LivesUIElement[] livesUIs = new LivesUIElement[4];
 
     public void EnableLivesUI(Player p)
     {
@@ -44,7 +44,7 @@ public class LivesUI : MonoBehaviour
         LivesUIElement elem = obj.GetComponent<LivesUIElement>();
 
         // add to a list
-        livesUIs.Add(elem);
+        livesUIs[p.playerRoomIndex] = elem;
 
         // enable ui for players
         elem.livesObject.SetActive(true);
@@ -58,8 +58,15 @@ public class LivesUI : MonoBehaviour
         // Set the lives
         for (int j = 0; j < elem.hearts.Length; j++)
         {
-            elem.hearts[j].SetActive(true);
-            elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+            if (j < p.GetComponent<Health>().maxLives)
+            {
+                elem.hearts[j].SetActive(true);
+                elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+            } else
+            {
+                elem.hearts[j].SetActive(false);
+            }
+
         }
     }
 
@@ -67,24 +74,26 @@ public class LivesUI : MonoBehaviour
     {
         int i = player.playerRoomIndex;
 
-        // If player name has not been updated, initialize it
-        if (livesUIs[i].playerName.text.Length <= 0)
-        {
-            ulong steamId = player.steamId;
+        Debug.Log("index in update lives: " + i);
 
-            string userName = "[Player Name]";
+        //// If player name has not been updated, initialize it
+        //if (livesUIs[i].playerName.text.Length <= 0)
+        //{
+        //    ulong steamId = player.steamId;
 
-            // Set steam user name and avatars
-            if (steamId != 0)
-            {
-                CSteamID steamID = new CSteamID(steamId);
+        //    string userName = "[Player Name]";
 
-                userName = SteamFriends.GetFriendPersonaName(steamID);
-            }
+        //    // Set steam user name and avatars
+        //    if (steamId != 0)
+        //    {
+        //        CSteamID steamID = new CSteamID(steamId);
 
-            // Update username
-            livesUIs[i].playerName.text = userName;
-        }
+        //        userName = SteamFriends.GetFriendPersonaName(steamID);
+        //    }
+
+        //    // Update username
+        //    livesUIs[i].playerName.text = userName;
+        //}
 
         // Update health
         int lifeCount = currentLives;
