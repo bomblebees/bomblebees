@@ -8,7 +8,9 @@ using UnityEngine;
 // No generics in Mirror
 public class Health : NetworkBehaviour
 {
-    [Header("Settings")] [SerializeField] public int maxLives = 3;
+    [Header("Settings")] 
+    
+    [SyncVar] public int maxLives = 3;
 
     [SyncVar(hook = nameof(OnLivesChanged))]
     public int currentLives;
@@ -53,6 +55,11 @@ public class Health : NetworkBehaviour
     // Starts when Player starts existing on server
     public override void OnStartServer()
     {
+        LobbySettings settings = FindObjectOfType<LobbySettings>();
+
+        if (settings.playerLives == 0) maxLives = 1000; // simulate inf life
+        else maxLives = settings.playerLives;
+
         SetHealth(maxLives);
     }
 
@@ -87,6 +94,10 @@ public class Health : NetworkBehaviour
     [Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
+        if (newLives == maxLives) return;
+
+        Debug.Log("lives changed from " + oldLives + " to " + newLives);
+
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
 
 		playerModel.SetActive(false);
