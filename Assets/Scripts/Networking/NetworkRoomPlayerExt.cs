@@ -329,6 +329,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             // Allow local player to change the portrait
             playerCard.changeCharacterButton.enabled = !this.readyToBegin;
             playerCard.changeCharacterButtonHoverTween.enabled = !this.readyToBegin;
+
+            roomUI.buttonReady.GetComponentInChildren<TMP_Text>().text = this.readyToBegin ? "Unready" : "Ready";
         }
         else
         {
