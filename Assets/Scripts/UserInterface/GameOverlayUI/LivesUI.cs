@@ -40,6 +40,7 @@ public class LivesUI : MonoBehaviour
 
         // to make sure its positioned at 0 0 0 locally
         obj.transform.localPosition = new Vector3(0, 0, 0);
+        obj.transform.localRotation = Quaternion.identity;
 
         LivesUIElement elem = obj.GetComponent<LivesUIElement>();
 

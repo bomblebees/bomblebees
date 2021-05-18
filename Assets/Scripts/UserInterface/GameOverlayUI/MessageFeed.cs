@@ -28,6 +28,9 @@ public class MessageFeed : MonoBehaviour
             Quaternion.identity,
             messageFeedCanvas.transform);
 
+        // reset the local rotation (for some reason it is instantiated in global space)
+        message.GetComponent<RectTransform>().localRotation = Quaternion.identity;
+
         // Set the text
         message.GetComponent<TMP_Text>().text = messageText;
 
@@ -39,16 +42,14 @@ public class MessageFeed : MonoBehaviour
 			message.GetComponentInChildren<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(charCode);
         }
 
-        // Get initial anchor position
-        Vector2 pos = messageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
+        // Get initial position
+        Vector2 pos = messageFeedAnchor.GetComponent<RectTransform>().localPosition;
 
         // Start the height above where it will endup for a nice drop in transition
         pos.y -= 50;
 
-        //killfeed.GetComponent<RectTransform>().anchoredPosition = new Vector3(-180, 50 + (feedUIs.Count * 50), 0);
-
         // Set the position of the message
-        message.GetComponent<RectTransform>().anchoredPosition = pos;
+        message.GetComponent<RectTransform>().localPosition = pos;
 
         // Add killfeed to list
         feedUIs.Insert(0, message);
@@ -73,7 +74,7 @@ public class MessageFeed : MonoBehaviour
 
     public void UpdateMessagefeed()
     {
-        Vector2 ancPos = messageFeedAnchor.GetComponent<RectTransform>().anchoredPosition;
+        Vector2 ancPos = messageFeedAnchor.GetComponent<RectTransform>().localPosition;
 
         for (int i = 0; i < feedUIs.Count; i++)
         {
