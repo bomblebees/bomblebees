@@ -18296,6 +18296,8 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 0}
   easeInTime: 0.12
   easeOutTime: 0.12
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 0
   easeIn: 17
   easeOut: 18
@@ -18640,21 +18642,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7624084671803026054}
     m_Modifications:
-    - target: {fileID: 2877997116617332508, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_Convex
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3358929368640287846, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_AssetId
@@ -18715,40 +18702,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4015979404735605875, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 57.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4015979404735605875, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 4015979404735605875, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 57.5
-      objectReference: {fileID: 0}
     - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_Name
       value: EffectHex
-      objectReference: {fileID: 0}
-    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_Layer
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_TagString
-      value: ComboHitbox
-      objectReference: {fileID: 0}
-    - target: {fileID: 4391096846772909769, guid: 22e55748bfbe50548b2e502b71221370,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22e55748bfbe50548b2e502b71221370, type: 3}
