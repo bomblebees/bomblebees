@@ -35,7 +35,7 @@ public class PlayerInterface : NetworkBehaviour
 
     [Header("Inventory")]
     [SerializeField] private Image selectedHighlight;
-    [SerializeField] private Image[] invSlots = new Image[4];
+    [SerializeField] private GameObject[] invSlotsContainers = new GameObject[4];
 	[SerializeField] private Image[] invSlotsRadial = new Image[4];
 
 	// Each game object in array holds either 3, 4, or 5 slot UI frames which change on inv size change
@@ -216,6 +216,13 @@ public class PlayerInterface : NetworkBehaviour
         //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
         invAddTexts[slot].GetComponent<AlphaTextTween>().StartTween();
         invAddTexts[slot].GetComponent<MoveTween>().StartTween();
+
+		ScaleTween scaleTween = invSlotsContainers[slot].GetComponent<ScaleTween>();
+
+		// 1 = 1.1, 2 = 1.4, 3+ = 1.9
+		scaleTween.scaleMultipler = 1.3f + ((amt * amt) / 10f);
+
+		scaleTween.StartTween();
     }
 
     public void UpdateInventoryQuantity()
@@ -223,6 +230,7 @@ public class PlayerInterface : NetworkBehaviour
         SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
 
 		// non-radial
+		/*
         for (int i = 0; i < list.Count; i++)
         {
             invCounters[i].text = list[i].ToString();
@@ -233,6 +241,7 @@ public class PlayerInterface : NetworkBehaviour
             if (list[i] <= 0) invSlots[i].color = new Color(0.5f, 0.5f, 0.5f);
             else invSlots[i].color = new Color(1f, 1f, 1f);
         }
+		*/
 
 		// radial
 		for (int i = 0; i < list.Count; i++)
