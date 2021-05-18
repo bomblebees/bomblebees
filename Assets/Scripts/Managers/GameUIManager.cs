@@ -72,7 +72,9 @@ public class GameUIManager : NetworkBehaviour
     // When a player loads into the game (on server)
     [Server] public void ServerPlayerConnected(GameObject player, int remaining)
     {
-        ServerEnableLivesUI(player);
+        Debug.Log("player connected: " + player.GetComponent<Player>().playerRoomIndex);
+
+        //ServerEnableLivesUI(player);
         RpcPlayerConnected(eventManager.playersLoaded, eventManager.totalPlayers);
     }
 
@@ -131,9 +133,10 @@ public class GameUIManager : NetworkBehaviour
     #region MessageFeed
 
     [ClientRpc]
-    public void RpcOnKillEvent(int _, GameObject bomb, GameObject player)
+    public void RpcOnKillEvent(int newLives, GameObject bomb, GameObject player)
     {
         messageFeed.OnKillEvent(bomb, player);
+        livesUI.UpdateLives(newLives, player.GetComponent<Player>());
     }
 
 	[ClientRpc]

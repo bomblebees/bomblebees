@@ -72,9 +72,10 @@ public class ColorTween : MonoBehaviour
         LeanTween.delayedCall(gameObject, timeBetweenLoop, () => {
             if (loopEnd) return;
 
-            LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
+            cur = LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
                 .setEase(easeIn)
-                .setLoopPingPong(1);
+                .setLoopPingPong(1)
+                .id;
 
         }).setRepeat(-1);
 
@@ -82,6 +83,8 @@ public class ColorTween : MonoBehaviour
 
     public void EndLoopTween()
     {
+        // Cancel the tween if we are already playing
+        LeanTween.cancel(cur);
         loopEnd = true;
     }
 
