@@ -204,7 +204,8 @@ public class PlayerInventory : NetworkBehaviour
             ////
         }
 
-        // if inventory is full, nothing gets added.
+        // automatically switch to this slot if our previously selected slot was empty
+        if (inventoryList[selectedSlot] == 0) selectedSlot = idx;
     }
 
 	/// <summary>
