@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Gamemode : MonoBehaviour
@@ -51,5 +52,14 @@ public abstract class Gamemode : MonoBehaviour
 
         settings.endAfterFirstWinCondition = EndAfterFirstWinCondition;
     }
+
+
+
+    /// <summary>
+    /// Gets the winning order of the player based on this gamemode
+    /// </summary>
+    /// <param name="playerList"> The unordered list of all players</param>
+    /// <returns> The ordered array of player gameobjects</returns>
+    public abstract GameObject[] GetWinningOrder(List<RoundManager.PlayerInfo> playerList);
 
 }

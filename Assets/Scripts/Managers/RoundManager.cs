@@ -226,31 +226,20 @@ public class RoundManager : NetworkBehaviour
 
     [Server] private GameObject[] CollectWinningOrder()
     {
-        // Order the player list by winning order
-        playerList = playerList.OrderByDescending(p => p.health.currentLives) // order by most health first
-                    .ThenByDescending(p => p.timeOfElim) // then by latest time of death (if applicable)
-                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().kills) // then by most kills
-                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().totalCombosMade) // then by most combos
-                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().doubleKills) // then by most double kills
-                    .ToList(); // turn into list
+        // Retrieve the winning order from the current gamemode
+        GameObject[] orderedArray = settings.gamemode.GetWinningOrder(playerList);
 
-        // Transfer playerList into network transferrable GameObject array
-        GameObject[] orderedList = new GameObject[playerList.Count];
-        for (int i = 0; i < orderedList.Length; i++)
+        // Debugging the array
+        for (int i = 0; i < orderedArray.Length; i++)
         {
-            orderedList[i] = playerList[i].player.gameObject;
-        }
-
-        for (int i = 0; i < orderedList.Length; i++)
-        {
-            Player player = orderedList[i].GetComponent<Player>();
-            Health health = orderedList[i].GetComponent<Health>();
+            Player player = orderedArray[i].GetComponent<Player>();
+            Health health = orderedArray[i].GetComponent<Health>();
 
             Debug.Log("Pos " + i + " | Player " + player.playerRoomIndex + " with lives " + health.currentLives);
         }
 
         // Return the array
-        return orderedList;
+        return orderedArray;
     }
 
     #region Subscriptions
