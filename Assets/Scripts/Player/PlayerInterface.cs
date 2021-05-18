@@ -184,28 +184,10 @@ public class PlayerInterface : NetworkBehaviour
 
     public void UpdateHexHud(char key)
     {
-        hexUI.color = GetKeyColor(key);
+        hexUI.color = BombHelper.GetKeyColor(key);
 
         // Run bounce anim
         hexUI.gameObject.GetComponent<ScaleTween>().StartTween();
-    }
-
-    // get color associated with key
-    Color GetKeyColor(char key)
-    {
-        switch (key)
-        {
-            case 'b': return new Color32(0, 217, 255, 255);
-            case 'g': return new Color32(23, 229, 117, 255);
-            // case 'y': return new Color32(249, 255, 35, 255);
-            case 'y': return new Color32(0, 217, 255, 255); // temp test
-            case 'r': return Color.red;
-            // case 'p': return new Color32(241, 83, 255, 255);
-            case 'p': return new Color32(249, 255, 35, 255); // temp test
-            case 'w': return new Color32(178, 178, 178, 255);
-            case 'e': return Color.white;
-            default: return Color.white;
-        }
     }
 
 	[ClientRpc]

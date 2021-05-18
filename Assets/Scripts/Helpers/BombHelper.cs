@@ -28,11 +28,10 @@ public class BombHelper : MonoBehaviour
     {
         switch (key)
         {
-            case 'b': return new Color32(0, 217, 255, 255);
-            case 'g': return new Color32(23, 229, 117, 255);
-            case 'y': return new Color32(249, 255, 35, 255);
-            case 'r': return Color.red;
-            case 'p': return new Color32(241, 83, 255, 255);
+            case 'g': return new Color32(159, 255, 100, 255);
+            case 'y': return new Color32(146, 209, 255, 255);
+            case 'r': return new Color32(255, 88, 88, 255);
+            case 'p': return new Color32(255, 220, 96, 255);
             case 'w': return new Color32(178, 178, 178, 255);
             case 'e': return Color.white;
             default: return Color.white;
