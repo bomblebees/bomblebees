@@ -28,10 +28,10 @@ public class BombHelper : MonoBehaviour
     {
         switch (key)
         {
-            case 'g': return new Color32(159, 255, 100, 255);
-            case 'y': return new Color32(146, 209, 255, 255);
-            case 'r': return new Color32(255, 88, 88, 255);
-            case 'p': return new Color32(255, 220, 96, 255);
+            case 'g': return new Color32(101, 231, 0, 255);
+            case 'y': return new Color32(97, 189, 255, 255); // ** for blue hex tile in game
+            case 'r': return new Color32(255, 88, 88, 255);  
+            case 'p': return new Color32(255, 216, 88, 255); // ** for yellow hex tile in game
             case 'w': return new Color32(178, 178, 178, 255);
             case 'e': return Color.white;
             default: return Color.white;
