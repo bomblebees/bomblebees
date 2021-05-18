@@ -35,7 +35,7 @@ public class TickObject : ComboObject
         // "Toggle on" radial timer
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
-        this.bombRadialTimerImage.color = new Vector4(1,1,1,1);
+        this.bombRadialTimerImage.color = new Vector4(1,1,1,.75f);
         if (!didEarlyEffects)
         {
             if (ownerIsQueen)
