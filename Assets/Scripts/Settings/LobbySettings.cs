@@ -15,13 +15,16 @@ public class LobbySettings : NetworkBehaviour
     [Header("Diagnostics - Game Settings")]
 
     [SyncVar(hook = nameof(OnChangeRoundDuration))]
-    public float roundDuration = 120f;
+    public float roundDuration;
+
+    [SyncVar(hook = nameof(OnChangePlayerLives))]
+    public int playerLives;
 
     // -------------------- SERVER ONLY -------------------- //
     [Header("Diagnostics - Win Conditions (Server only)")]
-    public bool endAfterFirstWinCondition = true;
-    public bool byLastAlive = true;
-    public bool byTimerFinished = true;
+    public bool endAfterFirstWinCondition;
+    public bool byLastAlive;
+    public bool byTimerFinished;
 
     private void Awake()
     {
@@ -41,6 +44,7 @@ public class LobbySettings : NetworkBehaviour
     {
         InitGamemode();
         InitRoundDuration();
+        InitPlayerLives();
     }
 
     #region Gamemodes
@@ -52,6 +56,12 @@ public class LobbySettings : NetworkBehaviour
     [SerializeField] private Gamemode[] gamemodes;
     [SyncVar(hook = nameof(OnChangeGamemode))] public int gamemodeSelected = 0;
 
+    /// <summary>
+    /// The gamemode object that is selected.
+    /// <para>Note: this is only synced on the server!</para>
+    /// </summary>
+    public Gamemode gamemode;
+
     [Client] private void InitGamemode()
     {
         SetGamemodeText();
@@ -59,7 +69,8 @@ public class LobbySettings : NetworkBehaviour
 
     [Server] private void LoadGamemodePreset(int select)
     {
-        gamemodes[select].LoadGamemode();
+        gamemode = gamemodes[select];
+        gamemode.LoadGamemode();
     }
 
     [Server] public void OnClickGamemode()
@@ -144,6 +155,51 @@ public class LobbySettings : NetworkBehaviour
         }
 
         roundDurationText.text = roundDuration.ToString() + " seconds";
+    }
+
+    #endregion
+
+    #region Player Lives
+
+    [Header("Player Lives")]
+    [SerializeField] private TMP_Text playerLivesText;
+
+    [SerializeField] private int[] lives = { 0, 1, 2, 3 };
+    private int livesSelected = 3;
+
+    [Client] private void InitPlayerLives()
+    {
+        SetPlayerLivesText();
+    }
+
+    [Server] public void OnClickPlayerLivesButton()
+    {
+        if (!isServer) return; // Only host can change settings
+
+        // Get next selected lives
+        livesSelected = (livesSelected + 1) % lives.Length;
+
+        // New lives is now that
+        playerLives = lives[livesSelected];
+    }
+
+    [ClientCallback] private void OnChangePlayerLives(int _, int newLives)
+    {
+        // If new lives is 0, disable the last alive condition
+        if (newLives == 0) byLastAlive = false;
+        else byLastAlive = true;
+
+        SetPlayerLivesText();
+    }
+
+    [Client] private void SetPlayerLivesText()
+    {
+        if (playerLives == 0)
+        {
+            playerLivesText.text = "Infinite"; return;
+        }
+
+        playerLivesText.text = playerLives.ToString() + " lives";
     }
 
     #endregion

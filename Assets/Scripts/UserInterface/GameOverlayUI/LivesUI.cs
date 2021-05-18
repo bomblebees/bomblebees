@@ -58,8 +58,15 @@ public class LivesUI : MonoBehaviour
         // Set the lives
         for (int j = 0; j < elem.hearts.Length; j++)
         {
-            elem.hearts[j].SetActive(true);
-            elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+            if (j < p.GetComponent<Health>().maxLives)
+            {
+                elem.hearts[j].SetActive(true);
+                elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+            } else
+            {
+                elem.hearts[j].SetActive(false);
+            }
+
         }
     }
 
