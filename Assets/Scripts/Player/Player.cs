@@ -206,7 +206,6 @@ public class Player : NetworkBehaviour
 
         // Reset spin charge and disallow player to spin while sludged
         this.GetComponent<PlayerSpin>().StopSpin();
-
 		
         // Wait for the sludge effect to end
         yield return new WaitForSeconds(duration);

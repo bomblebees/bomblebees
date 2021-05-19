@@ -13,7 +13,6 @@ public class BombObject : TickObject
         this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
         this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
-    
 
     // Note: this is when THIS object enters a collision
     protected override void OnTriggerEnter(Collider other)

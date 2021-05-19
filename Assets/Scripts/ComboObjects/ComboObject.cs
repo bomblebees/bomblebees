@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using Mono.CecilX;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -93,12 +94,24 @@ public class ComboObject : NetworkBehaviour
         ListenForMoving();
     }
 
+    float MapDist(float start, float end, float point)
+    {
+        // 
+        // float percent = end - start 
+        return 0f;
+    }
+
     protected void ListenForMoving()
     {
         if (this.isMoving)
         {
-            
-            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
+
+            // // decrease start speed, increase at end
+            // float deltaLerp = lerpRate * 0.1f;
+            // float mapDist = Math.
+            // lerpRate = Mathf.Clamp()
+            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, 1-Mathf.Pow(lerpRate, Time.deltaTime));  // move object
+            // this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
                 if (isServer)
