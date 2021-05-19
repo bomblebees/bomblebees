@@ -273,6 +273,7 @@ public class PlayerInterface : NetworkBehaviour
 	/// <summary>
 	/// Called when player removes a bomb from their inventory
 	/// </summary>
+	[ClientRpc]
 	public void DisplayInventoryUse()
 	{
 		if (isLocalPlayer)
