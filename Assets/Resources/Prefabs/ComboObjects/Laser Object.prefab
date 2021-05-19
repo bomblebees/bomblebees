@@ -5095,7 +5095,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4072086561471839230
 Transform:
   m_ObjectHideFlags: 0
@@ -5229,6 +5229,8 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 0}
   easeInTime: 0.12
   easeOutTime: 0.12
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 0
   easeIn: 17
   easeOut: 18
