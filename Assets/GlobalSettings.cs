@@ -70,8 +70,11 @@ public class GlobalSettings : MonoBehaviour
     {
         mainCanvas.enabled = !mainCanvas.enabled;
         keyBindings2.enabled = !keyBindings2.enabled;
+        
+        MenuManager menuManager = FindObjectOfType<MenuManager>();
+        menuManager.BindingsMenu.Hide();
+        menuManager.BindingsMenu.Show(menuManager.GameActions);
     }
-
     public void OnClickQuitToMenu()
     {
         NetworkRoomManagerExt networkManager = NetworkManager.singleton as NetworkRoomManagerExt;
@@ -81,7 +84,6 @@ public class GlobalSettings : MonoBehaviour
             if (NetworkServer.active) networkManager.StopHost();
             else networkManager.StopClient();
         }
-
     }
 
     public void OnClickQuitToDesktop()
