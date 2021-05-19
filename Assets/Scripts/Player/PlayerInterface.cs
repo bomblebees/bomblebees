@@ -213,7 +213,7 @@ public class PlayerInterface : NetworkBehaviour
 
         invStackItems[slot].invAddText.text = "+" + amt.ToString();
         //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
-        invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
+        //invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
         invStackItems[slot].invAddText.GetComponent<MoveTween>().StartTween();
 
 		ScaleTween scaleTween = invStackItems[slot].GetComponent<ScaleTween>();
