@@ -73,6 +73,7 @@ public class PlayerInterface : NetworkBehaviour
             hexUI.gameObject.SetActive(false);
             // inventoryUI.gameObject.SetActive(false);
 			inventoryUIRadial.gameObject.SetActive(false);
+			localPlayerSingleRadial.gameObject.SetActive(false);
             playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
 
         }
