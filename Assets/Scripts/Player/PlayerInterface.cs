@@ -178,8 +178,20 @@ public class PlayerInterface : NetworkBehaviour
 
     [Client] public void UpdatePlayerName()
     {
+
+        LobbySettings settings = FindObjectOfType<LobbySettings>();
+
+        // Set color of name if teams is on
+        if (settings.GetGamemode() is TeamsGamemode)
+        {
+            if (settings.localTeamIndex == this.GetComponent<Player>().teamIndex) playerName.color = Color.green;
+            else playerName.color = Color.red;
+        } else
+        {
+            playerName.color = this.GetComponent<Player>().playerColor;
+        }
+
         playerName.text = this.GetComponent<Player>().steamName;
-        playerName.color = this.GetComponent<Player>().playerColor;
     }
 
     public void UpdateHexHud(char key)

@@ -21,14 +21,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>The selected character/color</summary>
     [SyncVar(hook = nameof(CharacterChanged))] public int characterCode;
 
-    /// <summary>The selected team. -1 represents no team chosen </summary>
-    [SyncVar] public int teamIndex = -1;
+    /// <summary>The selected team</summary>
+    [SyncVar(hook = nameof(TeamChanged))] public int teamIndex = 0;
 
     [Header("Required")]
     [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab;
     private PingDisplay _pingDisplay;
     private NetworkManager _networkManager;
     private CharacterSelectionInfo _characterSelectionInfo;
+    private LobbySettings _lobbySettings;
 
     /// <summary>
     /// The player lobby card UI of this player. A value of null means it is uninitialized.
@@ -51,6 +52,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         _networkManager = FindObjectOfType<NetworkManager>();
         _pingDisplay = FindObjectOfType<PingDisplay>();
+        _lobbySettings = FindObjectOfType<LobbySettings>();
     }
 
     #region Joining/Leaving Lobby
@@ -130,6 +132,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 roomUI.DeactivateReadyButton();
             else
                 roomUI.ActivateReadyButton();
+
         }
 
         // If not ready, and character portrait is unavailable, grey out the portrait
@@ -142,6 +145,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         {
             playerCard.characterPortrait.color = new Color(1f, 1f, 1f);
             if (isLocalPlayer) playerCard.disabledText.gameObject.SetActive(false);
+        }
+
+        if (playerCard)
+        {
+            // If using teams gamemode, enable the button
+            if (_lobbySettings.GetGamemode() is TeamsGamemode)
+                playerCard.changeTeamButton.gameObject.SetActive(true);
+            else
+                playerCard.changeTeamButton.gameObject.SetActive(false);
         }
     }
 
@@ -223,8 +235,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (isLocalPlayer)
         {
             playerCard.changeCharacterButton.onClick.AddListener(OnCharacterClicked);
-            //playerCard.changeTeamButton.onClick.AddListener(OnTeamClicked);
-
+            playerCard.changeTeamButton.onClick.AddListener(OnTeamClicked);
         }
 
 
@@ -247,6 +258,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SetCardPosition();
         SetCardReadyStatus();
         SetCardCharacterPortrait();
+        SetCardTeamButton();
         SetCardButtons();
         SetCardHostCrown();
     }
@@ -314,6 +326,18 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         {
             elem.color = listColors[this.characterCode];
         }
+    }
+
+    /// <summary>
+    /// Sets the team button text on the player card
+    /// </summary>
+    [Client]
+    private void SetCardTeamButton()
+    {
+        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardTeamButton()!"); return; }
+
+        // Set the character portrait
+        playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = "Team " + teamIndex;
     }
 
     /// <summary>
@@ -419,6 +443,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SetCardCharacterPortrait();
     }
 
+    /// <summary>
+    /// SyncVar hook for the variable teamIndex
+    /// </summary>
+    [ClientCallback] private void TeamChanged(int prevTeamIdx, int newTeamIdx)
+    {
+        // Propagate updates to the player card
+        SetCardTeamButton();
+    }
+
     #endregion
 
     #region Button Click Events
@@ -433,7 +466,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     // Called by the local player when ready button is clicked
     [Client] public void OnReadyButtonClick()
     {
-        Debug.Log("ready called");
         CmdChangeReadyState(!readyToBegin);
     }
 
@@ -446,7 +478,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     // Called by the local player when the team button is pressed
     [Client] public void OnTeamClicked()
     {
-        // unimpl
+        int newTeam = (teamIndex + 1) % TeamsGamemode.maxTeams;
+
+        _lobbySettings.localTeamIndex = newTeam;
+        CmdChangeTeams(newTeam);
     }
 
     #endregion
@@ -474,5 +509,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Command] private void CmdChangeCharacterCode(int code)
     {
         characterCode = code;
+    }
+
+    [Command] private void CmdChangeTeams(int idx)
+    {
+        teamIndex = idx;
     }
 }

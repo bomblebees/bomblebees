@@ -17,4 +17,5 @@ public class PlayerLobbyCard : MonoBehaviour
     public TMP_Text pingDisplay;
     public GameObject crown;
     public TMP_Text disabledText;
+    public Button changeTeamButton;
 }

@@ -26,6 +26,9 @@ public class LobbySettings : NetworkBehaviour
     public bool byLastAlive;
     public bool byTimerFinished;
 
+    // local team index, client only
+    public int localTeamIndex;
+
     private void Awake()
     {
         // Persist this object across scenes
@@ -93,6 +96,11 @@ public class LobbySettings : NetworkBehaviour
     {
         gamemodeButtonText.text = gamemodes[gamemodeSelected].ToString();
         gamemodeDescriptionText.text = gamemodes[gamemodeSelected].GetDescription();
+    }
+
+    [Client] public Gamemode GetGamemode()
+    {
+        return gamemodes[gamemodeSelected];
     }
 
     #endregion

@@ -11,6 +11,8 @@ public class TeamsGamemode : Gamemode
     [SerializeField] private float roundDuration = 180f;
     [SerializeField] private int playerLives = 3;
 
+    public static int maxTeams = 4;
+
     // -- Fields -- //
     public override string GamemodeName { get { return gamemodeName; } }
     public override float RoundDuration { get { return roundDuration; } }
