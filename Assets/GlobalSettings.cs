@@ -6,7 +6,8 @@ public class GlobalSettings : MonoBehaviour
 {
     [Header("Canvas")]
     [SerializeField] private Canvas mainCanvas;
-    [SerializeField] private Canvas keyBindingsCanvas;
+    [SerializeField] private Canvas keyBindings;
+    [SerializeField] private Canvas keyBindings2;
     
     [Header("Others")]
     [SerializeField] private TMP_Text textFullscreen;
@@ -62,7 +63,13 @@ public class GlobalSettings : MonoBehaviour
     public void ToggleKeyBindingsCanvas()
     {
         mainCanvas.enabled = !mainCanvas.enabled;
-        keyBindingsCanvas.enabled = !keyBindingsCanvas.enabled;
+        keyBindings.enabled = !keyBindings.enabled;
+    }
+    
+    public void ToggleKeyBindings2Canvas()
+    {
+        mainCanvas.enabled = !mainCanvas.enabled;
+        keyBindings2.enabled = !keyBindings2.enabled;
     }
 
     public void OnClickQuitToMenu()
