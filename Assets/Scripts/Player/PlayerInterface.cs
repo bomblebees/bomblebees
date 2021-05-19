@@ -259,6 +259,7 @@ public class PlayerInterface : NetworkBehaviour
 		if (isLocalPlayer)
 		{
 			localPlayerSingleRadial.invSlotRadial.fillAmount = (float)list[selected] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[selected];
+			localPlayerSingleRadial.invCounter.text = list[selected].ToString();
             FindObjectOfType<AmmoDisplay>().UpdateInventoryQuantity(this.gameObject);
         }
 	}
@@ -334,7 +335,9 @@ public class PlayerInterface : NetworkBehaviour
 			// and then refresh it
 			localPlayerSingleRadial.invSlotRadial.fillAmount = (float)this.GetComponent<PlayerInventory>().inventoryList[selected] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[selected];
 
-            FindObjectOfType<AmmoDisplay>().UpdateInventorySelected(this.gameObject);
+			// also refresh the quantity number text
+			localPlayerSingleRadial.invCounter.text = GetComponent<PlayerInventory>().inventoryList[selected].ToString();
+			FindObjectOfType<AmmoDisplay>().UpdateInventorySelected(this.gameObject);
         }
     }
 
