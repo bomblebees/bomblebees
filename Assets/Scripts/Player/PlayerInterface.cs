@@ -35,14 +35,17 @@ public class PlayerInterface : NetworkBehaviour
 
     [Header("Inventory")]
     [SerializeField] private Image selectedHighlight;
-    [SerializeField] private GameObject[] invSlotsContainers = new GameObject[4];
-	[SerializeField] private Image[] invSlotsRadial = new Image[4];
+    [SerializeField] private InventoryStackItem[] invStackItems = new InventoryStackItem[4];
 
-	// Each game object in array holds either 3, 4, or 5 slot UI frames which change on inv size change
-	[SerializeField] private GameObject[] slottedFrames = new GameObject[4];
 
-	[SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
-    [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
+ //   [SerializeField] private GameObject[] invSlotsContainers = new GameObject[4];
+	//[SerializeField] private Image[] invSlotsRadial = new Image[4];
+
+	//// Each game object in array holds either 3, 4, or 5 slot UI frames which change on inv size change
+	//[SerializeField] private GameObject[] slottedFrames = new GameObject[4];
+
+	//[SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
+ //   [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
 
     private Player player;
     private GameUIManager gameUIManager;
@@ -96,7 +99,7 @@ public class PlayerInterface : NetworkBehaviour
         if (KeyBindingManager.GetKey(KeyAction.ShowInfo))
         {
             ShowPlayerInfo();
-        } else
+        } else if (!this.GetComponent<Player>().isEliminated)
         {
             UnshowPlayerInfo();
         }
@@ -162,6 +165,8 @@ public class PlayerInterface : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
+        ShowPlayerInfo();
+
         damageIndicator.GetComponent<ColorTween>().StartTween();
 
         if (currentHealth == 1)
@@ -205,13 +210,13 @@ public class PlayerInterface : NetworkBehaviour
 	[ClientRpc]
     public void DisplayInventoryAdd(int slot, int amt)
     {
-		
-        invAddTexts[slot].text = "+" + amt.ToString();
-        //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
-        invAddTexts[slot].GetComponent<AlphaTextTween>().StartTween();
-        invAddTexts[slot].GetComponent<MoveTween>().StartTween();
 
-		ScaleTween scaleTween = invSlotsContainers[slot].GetComponent<ScaleTween>();
+        invStackItems[slot].invAddText.text = "+" + amt.ToString();
+        //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
+        invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
+        invStackItems[slot].invAddText.GetComponent<MoveTween>().StartTween();
+
+		ScaleTween scaleTween = invStackItems[slot].GetComponent<ScaleTween>();
 
 		// 1 = 1.1, 2 = 1.4, 3+ = 1.9
 		scaleTween.scaleMultipler = 1.3f + ((amt * amt) / 10f);
@@ -240,8 +245,10 @@ public class PlayerInterface : NetworkBehaviour
 		// radial
 		for (int i = 0; i < list.Count; i++)
 		{
-			invSlotsRadial[i].fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
-		}
+            invStackItems[i].invSlotRadial.fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
+
+            invStackItems[i].invCounter.text = list[i].ToString();
+        }
     }
 
 	public void UpdateInventorySize()
@@ -252,24 +259,25 @@ public class PlayerInterface : NetworkBehaviour
 		Debug.Log("updating inventory size UI on " + gameObject.name + ", current inventory size in index 0: " + playerInventorySizes[0]);
 
 		// for each radial frame container, deactivate each frame inside, and reactivate the correct one
-		for (int i = 0; i < slottedFrames.Length; i++)
+		for (int i = 0; i < invStackItems.Length; i++)
 		{
-			InventoryRadialSlottedFrame frameImage = slottedFrames[i].GetComponent<InventoryRadialSlottedFrame>();
+			InventoryRadialSlottedFrame frameImage = invStackItems[i].slottedFrame.GetComponent<InventoryRadialSlottedFrame>();
 
 			frameImage.SwapFrame(playerInventorySizes[i]);
 		}
 
+
 		for (int i = 0; i < list.Count; i++)
 		{
-			invSlotsRadial[i].fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
-		}
+            invStackItems[i].invSlotRadial.fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
+        }
 	}
 
 
 	public void UpdateInventorySelected()
     {
         int selected = this.GetComponent<PlayerInventory>().selectedSlot;
-        selectedHighlight.gameObject.transform.localPosition = invSlotsRadial[selected].transform.parent.transform.localPosition;
+        selectedHighlight.gameObject.transform.localPosition = invStackItems[selected].invSlotRadial.transform.parent.transform.localPosition;
             
         if (isLocalPlayer)
         {

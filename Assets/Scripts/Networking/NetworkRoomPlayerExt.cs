@@ -461,7 +461,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         room.showStartButton = false;
 
-        FindObjectOfType<Matchmaking>().StartHost();
+        Matchmaking mm = FindObjectOfType<Matchmaking>();
+        if (mm) mm.StartHost();
 
         room.ServerChangeScene(room.GameplayScene);
     }
