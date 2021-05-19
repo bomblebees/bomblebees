@@ -38,7 +38,7 @@ public class Matchmaking : MonoBehaviour
     [SerializeField] private SteamNetworkManager networkManager;
 
     //this function will be called when the host player pressed the start button.
-    void StartHost()
+    public void StartHost()
     {
         Debug.Log("Created the match as the host.");
 
@@ -47,11 +47,11 @@ public class Matchmaking : MonoBehaviour
             SteamMatchmaking.SetLobbyMemberData(currentLobby, "PlayerState", "InGame");
             SteamMatchmaking.SetLobbyData(currentLobby, "gameStatus", "In Game");
 
-            // Change to game scene
-            networkManager.ServerChangeScene(networkManager.GameplayScene);
+            //// Change to game scene
+            //networkManager.ServerChangeScene(networkManager.GameplayScene);
 
-            // Disable ui
-            LobbyCanvas.SetActive(false);
+            //// Disable ui
+            //LobbyCanvas.SetActive(false);
         }
 
     }

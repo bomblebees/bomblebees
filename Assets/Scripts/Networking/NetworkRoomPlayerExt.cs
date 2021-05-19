@@ -460,6 +460,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] public void OnStartButtonClick()
     {
         room.showStartButton = false;
+
+        FindObjectOfType<Matchmaking>().StartHost();
+
         room.ServerChangeScene(room.GameplayScene);
     }
 
