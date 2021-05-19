@@ -68,6 +68,7 @@ public class PlayerInventory : NetworkBehaviour
 		//Debug.Log("Client PlayerInventory starting for: " + gameObject.name);
 
 		this.GetComponent<PlayerInterface>().UpdateInventorySize();
+		this.GetComponent<PlayerInterface>().UpdateInventorySelected();
 		// Subscribe to the synclist hook
 		// inventoryList.Callback += OnInventoryChange;
 		// inventorySize.Callback += OnInventorySizeChange;

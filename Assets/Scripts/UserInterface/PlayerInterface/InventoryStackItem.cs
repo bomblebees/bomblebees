@@ -10,4 +10,5 @@ public class InventoryStackItem : MonoBehaviour
     public GameObject slottedFrame;
     public TMP_Text invCounter;
     public TMP_Text invAddText;
+	public Sprite[] radialFillColors = new Sprite[4];
 }

@@ -36,6 +36,7 @@ public class PlayerInterface : NetworkBehaviour
     [Header("Inventory")]
     [SerializeField] private Image selectedHighlight;
     [SerializeField] private InventoryStackItem[] invStackItems = new InventoryStackItem[4];
+	[SerializeField] private InventoryStackItem localPlayerSingleRadial; // assign the single radial so local player can use this one
 
 
  //   [SerializeField] private GameObject[] invSlotsContainers = new GameObject[4];
@@ -212,9 +213,13 @@ public class PlayerInterface : NetworkBehaviour
     {
 
         invStackItems[slot].invAddText.text = "+" + amt.ToString();
-        //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
-        invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
-        invStackItems[slot].invAddText.GetComponent<MoveTween>().StartTween();
+		//invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
+
+		// Text/tween animation for 4 slot radial UI on combo made, reactivate later for separate UI settings
+		// invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
+		// invStackItems[slot].invAddText.GetComponent<MoveTween>().StartTween();
+
+		// invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
 
 		ScaleTween scaleTween = invStackItems[slot].GetComponent<ScaleTween>();
 
@@ -227,6 +232,7 @@ public class PlayerInterface : NetworkBehaviour
     public void UpdateInventoryQuantity()
     {
         SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
+		int selected = this.GetComponent<PlayerInventory>().selectedSlot;
 
 		// non-radial
 		/*
@@ -249,12 +255,17 @@ public class PlayerInterface : NetworkBehaviour
 
             invStackItems[i].invCounter.text = list[i].ToString();
         }
-    }
+		if (isLocalPlayer)
+		{
+			localPlayerSingleRadial.invSlotRadial.fillAmount = (float)list[selected] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[selected];
+		}
+	}
 
 	public void UpdateInventorySize()
 	{
 		SyncList<int> playerInventorySizes = this.GetComponent<PlayerInventory>().inventorySize;
 		SyncList<int> list = this.GetComponent<PlayerInventory>().inventoryList;
+		int selected = this.GetComponent<PlayerInventory>().selectedSlot;
 
 		Debug.Log("updating inventory size UI on " + gameObject.name + ", current inventory size in index 0: " + playerInventorySizes[0]);
 
@@ -266,25 +277,60 @@ public class PlayerInterface : NetworkBehaviour
 			frameImage.SwapFrame(playerInventorySizes[i]);
 		}
 
-
 		for (int i = 0; i < list.Count; i++)
 		{
             invStackItems[i].invSlotRadial.fillAmount = (float)list[i] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[i];
         }
+
+		// update local player HUD
+		if (isLocalPlayer)
+		{
+			localPlayerSingleRadial.invSlotRadial.fillAmount = (float)list[selected] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[selected];
+		}
 	}
 
 
 	public void UpdateInventorySelected()
     {
         int selected = this.GetComponent<PlayerInventory>().selectedSlot;
-        selectedHighlight.gameObject.transform.localPosition = invStackItems[selected].invSlotRadial.transform.parent.transform.localPosition;
+		SyncList<int> playerInventorySizes = this.GetComponent<PlayerInventory>().inventorySize;
+
+		selectedHighlight.gameObject.transform.localPosition = invStackItems[selected].invSlotRadial.transform.parent.transform.localPosition;
             
         if (isLocalPlayer)
         {
             char key = PlayerInventory.INVEN_BOMB_TYPES[selected];
             selectedBombText.text = BombHelper.GetBombTextByKey(key) + " Bomb";
             selectedBombText.GetComponent<ColorTween>().StartTween();
-        }
+
+			// change color of HUD radial UI frame
+			InventoryRadialSlottedFrame frame = localPlayerSingleRadial.GetComponentInChildren<InventoryRadialSlottedFrame>();
+			RadialFrameBombTypeIndicator frameType = localPlayerSingleRadial.GetComponentInChildren<RadialFrameBombTypeIndicator>();
+
+			frame.SetSlotColor(selected);
+			frame.SwapFrame(playerInventorySizes[selected]);
+
+			// Choosing which bomb type frame to display based on hard-coded inv slot values is fragile, refactor to-do
+			if (selected < 2)
+			{
+				// slot index is 0 or 1, pass in 0 for bomb or honey bomb
+				frameType.SwapType(0);
+			}
+			else if (selected > 1 && selected < 4)
+			{
+				// slot index is 2 or 3, pass in 1 for laser or plasma
+				frameType.SwapType(1);
+			}
+
+			frameType.SetFrameColor(selected);
+			frame.SwapFrame(playerInventorySizes[selected]);
+
+			// change color of radial fill charges
+			localPlayerSingleRadial.invSlotRadial.GetComponent<Image>().sprite = localPlayerSingleRadial.radialFillColors[selected];
+
+			// and then refresh it
+			localPlayerSingleRadial.invSlotRadial.fillAmount = (float)this.GetComponent<PlayerInventory>().inventoryList[selected] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[selected];
+		}
     }
 
     [Client] private void ShowPlayerInfo()
