@@ -16,6 +16,7 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private TMP_Text playerName;
 
     [SerializeField] private Image hexUI;
+    [SerializeField] private HeldHexUIIcon hexUIIcon;
     [SerializeField] public Image spinChargeBar;
     [SerializeField] public GameObject spinUI;
     [SerializeField] public GameObject inventoryUI;
@@ -205,7 +206,19 @@ public class PlayerInterface : NetworkBehaviour
     {
         hexUI.color = BombHelper.GetKeyColor(key);
 
+         // Set current hex icon to new color
+        if      (key == 'r') { hexUIIcon.SwapType(0); hexUIIcon.SetIconColor(0); }
+        else if (key == 'p') { hexUIIcon.SwapType(1); hexUIIcon.SetIconColor(1); }
+        else if (key == 'y') { hexUIIcon.SwapType(2); hexUIIcon.SetIconColor(2); }
+        else if (key == 'g') { hexUIIcon.SwapType(3); hexUIIcon.SetIconColor(3); }
+
+        
+
         // Run bounce anim
+        // hexUI.gameObject.GetComponent<ScaleTween>().StartTween();
+
+
+        // Run bounce anim (background tile)
         hexUI.gameObject.GetComponent<ScaleTween>().StartTween();
     }
 
