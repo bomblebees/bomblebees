@@ -21680,7 +21680,7 @@ MonoBehaviour:
   BeepSFX: {fileID: 9002714714615205504}
   bombRadialTimerImage: {fileID: 4761526922439252236}
   travelDistanceInHexes: 4
-  lerpRate: 0.15
+  lerpRate: 0.00001
   lerpRateSecondary: 0.5
   targetPosition: {x: 0, y: 0, z: 0}
   snapToCenterThreshold: 0.5
@@ -22157,6 +22157,8 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 0}
   easeInTime: 0.12
   easeOutTime: 0.12
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 0
   easeIn: 17
   easeOut: 18
@@ -34520,6 +34522,8 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 0}
   easeInTime: 0.12
   easeOutTime: 0.12
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 0
   easeIn: 17
   easeOut: 18
