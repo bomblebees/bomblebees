@@ -246,10 +246,10 @@ public class PlayerInventory : NetworkBehaviour
         {
             // Decrement the bomb quantity by one
             inventoryList[idx]--;
-
+			GetComponent<PlayerInterface>().DisplayInventoryUse();
 			// If its now empty, automatically get the next selected bomb
 			if (inventoryList[idx] == 0) selectedSlot = GetNextAvailableBomb();
-			else GetComponent<PlayerInterface>().DisplayInventoryUse();
+			 
         } else
         {
             // This function should not be called if bomb type has zero quantity
