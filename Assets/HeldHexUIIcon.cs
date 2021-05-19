@@ -50,19 +50,19 @@ public class HeldHexUIIcon : MonoBehaviour
 		{
 			case 0: // red/bomble bomb
 				// tileImage.color = new Color32(152, 0, 0, 255);
-                tileImage.color = new Color32(255, 0, 2, 255);
+                // tileImage.color = new Color32(255, 0, 2, 255);
 				break;
 			case 1: // yellow/honey bomb
 				// tileImage.color = new Color32(154, 112, 0, 255);
-                tileImage.color = new Color32(255, 236, 0, 255);
+                // tileImage.color = new Color32(255, 236, 0, 255);
 				break;
 			case 2: // blue/laser beem
 				// tileImage.color = new Color32(21,/ 57, 99, 255);
-                tileImage.color = new Color32(0, 176, 255, 255);
+                // tileImage.color = new Color32(0, 176, 255, 255);
 				break;
 			case 3: // green/plasma bomb
 				// tileImage.color = new Color32(48, 101, 0, 255);
-                tileImage.color = new Color32(41, 214, 53, 255);
+                // tileImage.color = new Color32(0, 255, 18, 255);
 				break;
 
 		}
