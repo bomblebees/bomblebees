@@ -199,7 +199,7 @@ public class PlayerInterface : NetworkBehaviour
         hexUI.color = BombHelper.GetKeyColor(key);
 
         // Run bounce anim
-        hexUI.gameObject.GetComponentInParent<ScaleTween>().StartTween();
+        hexUI.gameObject.GetComponent<ScaleTween>().StartTween();
     }
 
 	[ClientRpc]
