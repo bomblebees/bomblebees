@@ -148,6 +148,7 @@ public class RoundManager : NetworkBehaviour
         // -- ALL WIN CONDITIONS INITALIZED HERE -- //
         if (settings.byLastAlive) winConditions.Add(this.gameObject.AddComponent<LivesCondition>());
         if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());
+        if (settings.GetGamemode() is TeamsGamemode) winConditions.Add(this.gameObject.AddComponent<TeamsCondition>());
     }
 
     [Server]
@@ -211,7 +212,10 @@ public class RoundManager : NetworkBehaviour
 
         // -- Game Ends Here -- //
 
-        RpcPrintResultsAndShowEndCard(winningOrder);
+        RpcPrintResultsAndShowEndCard(winningOrder,
+            (settings.GetGamemode() is TeamsGamemode) ?
+              "Team " + winningOrder[0].GetComponent<Player>().teamIndex + " won!":
+               winningOrder[0].GetComponent<Player>().steamName + " won!");
 
         Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
@@ -302,7 +306,7 @@ public class RoundManager : NetworkBehaviour
 
     #region End Game Results
 
-    [ClientRpc] private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder)
+    [ClientRpc] private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder, string winText)
     {
         serverEndSelectionCanvas.enabled = true;
 
@@ -315,8 +319,8 @@ public class RoundManager : NetworkBehaviour
             stat.CreateStatsUIElement(statsElementUIAnchorObjects[i]);
         }
 
-        // Set text on ui
-        string winText = winningOrder[0].GetComponent<Player>().steamName + " won!";
+
+
         FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(winText);
 
     }
