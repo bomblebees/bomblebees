@@ -455,12 +455,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slottedFrameImage: {fileID: 4830371746871826049}
+  genericFrameSize: {x: 100, y: 100}
+  embellishedFrameSize: {x: 0, y: 0}
   threeSlottedFrameSprite: {fileID: 21300000, guid: dc8eba655dab5c346b1ab3747008ed1c,
     type: 3}
   fourSlottedFrameSprite: {fileID: 21300000, guid: c66b59482373c294b89442dd59d2443b,
     type: 3}
   fiveSlottedFrameSprite: {fileID: 21300000, guid: 5915fe801248f834488cb3f41c97e402,
     type: 3}
+  threeSlottedBombFrame: {fileID: 0}
+  fourSlottedBombFrame: {fileID: 0}
+  fiveSlottedBombFrame: {fileID: 0}
+  threeSlottedDeployableFrame: {fileID: 0}
+  fourSlottedDeployableSprite: {fileID: 0}
+  fiveSlottedDeployableSprite: {fileID: 0}
 --- !u!1 &8387605516148733897
 GameObject:
   m_ObjectHideFlags: 0
