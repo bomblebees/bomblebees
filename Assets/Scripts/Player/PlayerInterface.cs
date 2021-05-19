@@ -226,22 +226,62 @@ public class PlayerInterface : NetworkBehaviour
     public void DisplayInventoryAdd(int slot, int amt)
     {
 
-        invStackItems[slot].invAddText.text = "+" + amt.ToString();
+        
 		//invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
 
 		// Text/tween animation for 4 slot radial UI on combo made, reactivate later for separate UI settings
 		// invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
 		// invStackItems[slot].invAddText.GetComponent<MoveTween>().StartTween();
 
-		// invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
+		// localPlayerSingleRadial.GetComponent<ScaleTween>().StartTween();
+		
 
-		ScaleTween scaleTween = invStackItems[slot].GetComponent<ScaleTween>();
+		
 
 		// 1 = 1.1, 2 = 1.4, 3+ = 1.9
-		scaleTween.scaleMultipler = 1.3f + ((amt * amt) / 10f);
 
-		scaleTween.StartTween();
+		if (isLocalPlayer)
+		{
+			localPlayerSingleRadial.invAddText.text = "+" + amt.ToString();
+			switch (slot)
+			{
+				case 0:
+					localPlayerSingleRadial.invAddText.color = BombHelper.GetKeyColor('r');
+					break;
+				case 1:
+					localPlayerSingleRadial.invAddText.color = BombHelper.GetKeyColor('p');
+					break;
+				case 2:
+					localPlayerSingleRadial.invAddText.color = BombHelper.GetKeyColor('y');
+					break;
+				case 3:
+					localPlayerSingleRadial.invAddText.color = BombHelper.GetKeyColor('g');
+					break;
+			}
+
+			localPlayerSingleRadial.invAddText.GetComponent<AlphaTextTween>().StartTween();
+
+			// Configure scale tween for inventory "dots" HUD system later
+			/*
+			ScaleTween scaleTween = localPlayerSingleRadial.GetComponent<ScaleTween>();
+			scaleTween.scaleMultipler = 1.3f + ((amt * amt) / 10f);
+			scaleTween.StartTween();
+			*/
+		}
     }
+	
+	/// <summary>
+	/// Called when player removes a bomb from their inventory
+	/// </summary>
+	public void DisplayInventoryUse()
+	{
+		if (isLocalPlayer)
+		{
+			ScaleTween scaleTween = localPlayerSingleRadial.GetComponent<ScaleTween>();
+			scaleTween.scaleMultipler = 0.7f;
+			scaleTween.StartTween();
+		}
+	}
 
     public void UpdateInventoryQuantity()
     {
@@ -351,7 +391,12 @@ public class PlayerInterface : NetworkBehaviour
 			// also refresh the quantity number text
 			localPlayerSingleRadial.invCounter.text = GetComponent<PlayerInventory>().inventoryList[selected].ToString();
 			FindObjectOfType<AmmoDisplay>().UpdateInventorySelected(this.gameObject);
-        }
+
+			// Scale bounce tween upon switching selected slot
+			ScaleTween scaleTween = localPlayerSingleRadial.GetComponent<ScaleTween>();
+			scaleTween.scaleMultipler = 1.3f;
+			scaleTween.StartTween();
+		}
     }
 
     [Client] private void ShowPlayerInfo()
