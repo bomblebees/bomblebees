@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
-using Mirror;
 
 public class TeamsGamemode : Gamemode
 {
@@ -12,6 +10,8 @@ public class TeamsGamemode : Gamemode
     [Header("Defaults")]
     [SerializeField] private float roundDuration = 180f;
     [SerializeField] private int playerLives = 3;
+
+    public static int maxTeams = 4;
 
     // -- Fields -- //
     public override string GamemodeName { get { return gamemodeName; } }
@@ -48,60 +48,4 @@ public class TeamsGamemode : Gamemode
 
         return orderedArray;
     }
-
-    #region Settings
-
-    [Client]
-    public override void EnableGamemodeSettings()
-    {
-        teamsContainer.SetActive(true);
-    }
-
-    [Client]
-    public override void DisableGamemodeSettings()
-    {
-        teamsContainer.SetActive(false);
-    }
-
-    [Header("Settings")]
-    [SyncVar(hook = nameof(OnChangeTeams))]
-    public int teams;
-
-    [SerializeField] private GameObject teamsContainer;
-    [SerializeField] private TMP_Text teamsText;
-
-    [SerializeField] private int[] teamsList = { 2,3 };
-    private int teamsSelected = 0;
-
-    public override void OnStartClient()
-    {
-        teams = teamsList[teamsSelected];
-        SetTeamsText();
-    }
-
-    [Server]
-    public void OnClickTeamsButton()
-    {
-        if (!isServer) return; // Only host can change settings
-
-        // Get next selected lives
-        teamsSelected = (teamsSelected + 1) % teamsList.Length;
-
-        // New lives is now that
-        teams = teamsList[teamsSelected];
-    }
-
-    [ClientCallback]
-    private void OnChangeTeams(int _, int newElim)
-    {
-        SetTeamsText();
-    }
-
-    [Client]
-    private void SetTeamsText()
-    {
-        teamsText.text = teams.ToString() + " Teams";
-    }
-
-    #endregion
 }

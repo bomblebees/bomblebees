@@ -87,10 +87,8 @@ public class LobbySettings : NetworkBehaviour
         LoadGamemodePreset(gamemodeSelected);
     }
 
-    [ClientCallback] private void OnChangeGamemode(int oldSelection, int newSelection)
+    [ClientCallback] private void OnChangeGamemode(int _, int newSelection)
     {
-        gamemodes[oldSelection].DisableGamemodeSettings();
-        gamemodes[newSelection].EnableGamemodeSettings();
         SetGamemodeText();
     }
 

@@ -482,7 +482,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     // Called by the local player when the team button is pressed
     [Client] public void OnTeamClicked()
     {
-        int newTeam = (teamIndex + 1) % FindObjectOfType<TeamsGamemode>().teams;
+        int newTeam = (teamIndex + 1) % TeamsGamemode.maxTeams;
 
         _lobbySettings.localTeamIndex = newTeam;
         CmdChangeTeams(newTeam);

@@ -149,7 +149,6 @@ public class RoundManager : NetworkBehaviour
         if (settings.byLastAlive) winConditions.Add(this.gameObject.AddComponent<LivesCondition>());
         if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());
         if (settings.GetGamemode() is TeamsGamemode) winConditions.Add(this.gameObject.AddComponent<TeamsCondition>());
-        if (settings.GetGamemode() is EliminationGamemode) winConditions.Add(this.gameObject.AddComponent<EliminationCondition>());
     }
 
     [Server]

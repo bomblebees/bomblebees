@@ -24,7 +24,7 @@ public class TeamsCondition : WinCondition
         }
 
         // for each team add them to the teams list
-        for (int i = 0; i < FindObjectOfType<TeamsGamemode>().teams; i++)
+        for (int i = 0; i < TeamsGamemode.maxTeams; i++)
         {
             List<Player> t = players.Where(p => p.teamIndex == i).ToList();
 
@@ -37,6 +37,8 @@ public class TeamsCondition : WinCondition
 
     private void OnLivesChanged(int currentHealth, int maxHealth, GameObject player)
     {
+        // Everytime a player is eliminated, increment eliminatedPlayers counter and 
+        // check if the win condition was satisfied
         if (currentHealth <= 0)
         {
             // Remove the dead player from the list
@@ -44,6 +46,13 @@ public class TeamsCondition : WinCondition
 
             // Check if the team is now all dead
             if (teams[player.GetComponent<Player>().teamIndex].Count <= 0) base.InvokeWinConditionSatisfied();
+
+            //eliminatedPlayers++;
+
+            //if (totalPlayers == 1 && eliminatedPlayers == 1) // singleplayer case
+            //    base.InvokeWinConditionSatisfied();
+            //else if (eliminatedPlayers == totalPlayers - 1) // multiplayer case
+            //    base.InvokeWinConditionSatisfied();
         }
     }
 }
