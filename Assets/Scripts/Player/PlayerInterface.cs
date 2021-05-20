@@ -346,7 +346,12 @@ public class PlayerInterface : NetworkBehaviour
             FindObjectOfType<AmmoDisplay>().UpdateInventorySize(this.gameObject);
 
 			// copy pasted code to refresh local player HUD radial
+			InventoryRadialSlottedFrame frame = localPlayerSingleRadial.GetComponentInChildren<InventoryRadialSlottedFrame>();
 			RadialFrameBombTypeIndicator frameType = localPlayerSingleRadial.GetComponentInChildren<RadialFrameBombTypeIndicator>();
+
+			frame.SetSlotColor(selected);
+			frame.SwapFrame(playerInventorySizes[selected]);
+
 			if (selected < 2)
 			{
 				// slot index is 0 or 1, pass in 0 for bomb or honey bomb
@@ -357,6 +362,7 @@ public class PlayerInterface : NetworkBehaviour
 				// slot index is 2 or 3, pass in 1 for laser or plasma
 				frameType.SwapType(1);
 			}
+
 			frameType.SetFrameColor(selected);
 			frame.SwapFrame(playerInventorySizes[selected]);
 		}
