@@ -14,6 +14,8 @@ public class MenuManager : MonoBehaviour
 
 	public BindingsMenu BindingsMenu;
 
+	private string saveData;
+
 
 	void Awake()
 	{
@@ -30,6 +32,8 @@ public class MenuManager : MonoBehaviour
 		// Create the action sets for our menu and game controls.
 		MenuActions = MenuActions.CreateWithDefaultBindings();
 		GameActions = GameActions.CreateWithDefaultBindings();
+		
+		LoadBindings();
 
 		// Get the InControlInputModule, and attach menu navigation controls.
 		var inputModule = EventSystem.current.GetComponent<InControlInputModule>();
@@ -82,10 +86,26 @@ public class MenuManager : MonoBehaviour
 
 	void OnApplicationQuit()
 	{
+		PlayerPrefs.Save();
 		applicationIsQuitting = true;
 		instance = null;
 	}
+	
+	public void SaveBindings()
+	{
+		saveData = GameActions.Save();
+		PlayerPrefs.SetString( "Bindings", saveData );
+	}
 
+
+	private void LoadBindings()
+	{
+		if (PlayerPrefs.HasKey( "Bindings" ))
+		{
+			saveData = PlayerPrefs.GetString( "Bindings" );
+			GameActions.Load( saveData );
+		}
+	}
 
 	public static MenuManager Instance
 	{
