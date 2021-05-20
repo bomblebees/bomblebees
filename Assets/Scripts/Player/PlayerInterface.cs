@@ -358,6 +358,7 @@ public class PlayerInterface : NetworkBehaviour
 				frameType.SwapType(1);
 			}
 			frameType.SetFrameColor(selected);
+			frame.SwapFrame(playerInventorySizes[selected]);
 		}
 	}
 
