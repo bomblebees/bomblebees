@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using InControl;
 
@@ -14,7 +15,8 @@ public class MenuManager : MonoBehaviour
 
 	public BindingsMenu BindingsMenu;
 
-	private string saveData;
+	private string _gameActionsSaveData;
+	private string _menuActionsSaveData;
 
 
 	void Awake()
@@ -93,17 +95,26 @@ public class MenuManager : MonoBehaviour
 	
 	public void SaveBindings()
 	{
-		saveData = GameActions.Save();
-		PlayerPrefs.SetString( "Bindings", saveData );
+		_gameActionsSaveData = GameActions.Save();
+		PlayerPrefs.SetString( "Bindings: Game Actions", _gameActionsSaveData );
+
+		_menuActionsSaveData = MenuActions.Save();
+		PlayerPrefs.SetString( "Bindings: Menu Actions", _menuActionsSaveData );
 	}
 
 
 	private void LoadBindings()
 	{
-		if (PlayerPrefs.HasKey( "Bindings" ))
+		if (PlayerPrefs.HasKey( "Bindings: Game Actions" ))
 		{
-			saveData = PlayerPrefs.GetString( "Bindings" );
-			GameActions.Load( saveData );
+			_gameActionsSaveData = PlayerPrefs.GetString( "Bindings: Game Actions" );
+			GameActions.Load( _gameActionsSaveData );
+		}
+		
+		if (PlayerPrefs.HasKey( "Bindings: Menu Actions" ))
+		{
+			_menuActionsSaveData = PlayerPrefs.GetString( "Bindings: Menu Actions" );
+			MenuActions.Load( _menuActionsSaveData );
 		}
 	}
 
