@@ -13,7 +13,7 @@
 		/// <summary>
 		/// Include unknown controllers when listening for new bindings.
 		/// </summary>
-		public bool IncludeUnknownControllers = false;
+		public bool IncludeUnknownControllers = true;
 
 		/// <summary>
 		/// Include non-standard controls on controllers when listening for new bindings.
@@ -23,12 +23,12 @@
 		/// <summary>
 		/// Include mouse buttons when listening for new bindings.
 		/// </summary>
-		public bool IncludeMouseButtons = false;
+		public bool IncludeMouseButtons = true;
 
 		/// <summary>
 		/// Include mouse scroll wheel when listening for new bindings.
 		/// </summary>
-		public bool IncludeMouseScrollWheel = false;
+		public bool IncludeMouseScrollWheel = true;
 
 		/// <summary>
 		/// Include keyboard keys when listening for new bindings.
@@ -38,7 +38,7 @@
 		/// <summary>
 		/// Treat modifiers (Shift, Alt, Control, etc.) as first class keys instead of modifiers.
 		/// </summary>
-		public bool IncludeModifiersAsFirstClassKeys = false;
+		public bool IncludeModifiersAsFirstClassKeys = true;
 
 		/// <summary>
 		/// The maximum number of bindings allowed for the action.
