@@ -344,7 +344,21 @@ public class PlayerInterface : NetworkBehaviour
 		{
 			localPlayerSingleRadial.invSlotRadial.fillAmount = (float)list[selected] / (float)GetComponent<PlayerInventory>().GetMaxInvSizes()[selected];
             FindObjectOfType<AmmoDisplay>().UpdateInventorySize(this.gameObject);
-        }
+
+			// copy pasted code to refresh local player HUD radial
+			RadialFrameBombTypeIndicator frameType = localPlayerSingleRadial.GetComponentInChildren<RadialFrameBombTypeIndicator>();
+			if (selected < 2)
+			{
+				// slot index is 0 or 1, pass in 0 for bomb or honey bomb
+				frameType.SwapType(0);
+			}
+			else if (selected > 1 && selected < 4)
+			{
+				// slot index is 2 or 3, pass in 1 for laser or plasma
+				frameType.SwapType(1);
+			}
+			frameType.SetFrameColor(selected);
+		}
 	}
 
 
