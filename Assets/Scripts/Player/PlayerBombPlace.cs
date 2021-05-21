@@ -5,6 +5,8 @@ using Mirror;
 
 public class PlayerBombPlace : NetworkBehaviour
 {
+    private GameActions _gameActions;
+    
     [Header("Required")]
     public GameObject bombPrefab;
     public GameObject laserPrefab;
@@ -22,6 +24,11 @@ public class PlayerBombPlace : NetworkBehaviour
 
     // Event manager singleton
     private EventManager eventManager;
+    
+    private void Awake()
+    {
+        _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
 
     public override void OnStartClient()
     {
@@ -61,7 +68,7 @@ public class PlayerBombPlace : NetworkBehaviour
         if (!canPlaceBombs) return;
 
         // When place key is pressed down
-        if (KeyBindingManager.GetKeyDown(KeyAction.Place))
+        if (_gameActions.Place.WasPressed)
         {
             // Get the currently selected bomb type
             char bombType = this.GetComponent<PlayerInventory>().GetSelectedBombType();

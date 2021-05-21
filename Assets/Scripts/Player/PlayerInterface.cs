@@ -9,6 +9,8 @@ using System.Collections.Generic;
 
 public class PlayerInterface : NetworkBehaviour
 {
+	private GameActions _gameActions;
+	
     [SerializeField] private GameObject playerObject;
     //public GameObject playerModelsAndVfx;
 
@@ -54,6 +56,11 @@ public class PlayerInterface : NetworkBehaviour
 
     private PlayerInterface[] playerList = null;
 
+    private void Awake()
+    {
+	    _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
+    
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -99,7 +106,7 @@ public class PlayerInterface : NetworkBehaviour
         UpdateSpinCharge();
 
         // Show other player infos when the key is pressed
-        if (KeyBindingManager.GetKey(KeyAction.ShowInfo))
+        if (_gameActions.ShowInfo.IsPressed)
         {
             ShowPlayerInfo();
         } else if (!this.GetComponent<Player>().isEliminated)

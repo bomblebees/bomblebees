@@ -15,12 +15,13 @@ public class GameActions : PlayerActionSet
 		Swap, 
 		Place, 
 		Spin,
-		NextBomb,
-		PreviousBomb,
-		BombleBomb,
-		HoneyBomb,
-		LaserBeem,
-		PlasmaBall;
+		ShowInfo,
+		ChooseNextBomb,
+		ChoosePreviousBomb,
+		ChooseBombleBomb,
+		ChooseHoneyBomb,
+		ChooseLaserBeem,
+		ChoosePlasmaBall;
 
 	public GameActions()
 	{
@@ -33,12 +34,13 @@ public class GameActions : PlayerActionSet
 		Swap = CreatePlayerAction("Swap");
 		Place = CreatePlayerAction("Place");
 		Spin = CreatePlayerAction("Spin");
-		NextBomb = CreatePlayerAction("Next Bomb");
-		PreviousBomb = CreatePlayerAction("Previous Bomb");
-		BombleBomb = CreatePlayerAction("Bomble Bomb");
-		HoneyBomb = CreatePlayerAction("Honey Bomb");
-		LaserBeem = CreatePlayerAction("Laser Beem");
-		PlasmaBall = CreatePlayerAction("Plasma Ball");
+		ShowInfo = CreatePlayerAction("Show Info");
+		ChooseNextBomb = CreatePlayerAction("Next Bomb");
+		ChoosePreviousBomb = CreatePlayerAction("Previous Bomb");
+		ChooseBombleBomb = CreatePlayerAction("Bomble Bomb");
+		ChooseHoneyBomb = CreatePlayerAction("Honey Bomb");
+		ChooseLaserBeem = CreatePlayerAction("Laser Beem");
+		ChoosePlasmaBall = CreatePlayerAction("Plasma Ball");
 	}
 
 
@@ -54,12 +56,13 @@ public class GameActions : PlayerActionSet
 		actions.Swap.AddDefaultBinding(Key.Space);
 		actions.Place.AddDefaultBinding(Key.J);
 		actions.Spin.AddDefaultBinding(Key.K);
-		actions.NextBomb.AddDefaultBinding(Key.E);
-		actions.PreviousBomb.AddDefaultBinding(Key.Q);
-		actions.BombleBomb.AddDefaultBinding(Key.Key1);
-		actions.HoneyBomb.AddDefaultBinding(Key.Key2);
-		actions.LaserBeem.AddDefaultBinding(Key.Key3);
-		actions.PlasmaBall.AddDefaultBinding(Key.Key4);
+		actions.ShowInfo.AddDefaultBinding(Key.Tab);
+		actions.ChooseNextBomb.AddDefaultBinding(Key.E);
+		actions.ChoosePreviousBomb.AddDefaultBinding(Key.Q);
+		actions.ChooseBombleBomb.AddDefaultBinding(Key.Key1);
+		actions.ChooseHoneyBomb.AddDefaultBinding(Key.Key2);
+		actions.ChooseLaserBeem.AddDefaultBinding(Key.Key3);
+		actions.ChoosePlasmaBall.AddDefaultBinding(Key.Key4);
 
 		return actions;
 	}

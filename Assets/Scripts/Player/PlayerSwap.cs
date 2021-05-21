@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -6,6 +7,7 @@ using System.Linq;
 
 public class PlayerSwap : NetworkBehaviour
 {
+    private GameActions _gameActions;
 
     /// <summary>
     /// The reference to the hex board
@@ -26,6 +28,11 @@ public class PlayerSwap : NetworkBehaviour
     // Raycast caches for SwapHexes()
     private Ray tileRay;
     private RaycastHit tileHit;
+
+    private void Awake()
+    {
+        _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
 
     public override void OnStartServer()
     {
@@ -84,7 +91,7 @@ public class PlayerSwap : NetworkBehaviour
         if (!canSwap) return;
 
         // When swap key is pressed down
-        if (KeyBindingManager.GetKeyDown(KeyAction.Swap))
+        if (_gameActions.Swap.WasPressed)
         {
             SwapHexes();
         }

@@ -5,6 +5,8 @@ using Mirror;
 
 public class PlayerInventory : NetworkBehaviour
 {
+	private GameActions _gameActions;
+	
     [Tooltip("Controls the order of bombs as shown in the player HUD")]
     [SerializeField] public static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
 
@@ -32,6 +34,11 @@ public class PlayerInventory : NetworkBehaviour
 	private RoundManager roundManager;
 
 
+	private void Awake()
+	{
+		_gameActions = FindObjectOfType<MenuManager>().GameActions;
+	}
+	
 	public override void OnStartServer()
     {
 		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventorySize.Add(0);
@@ -89,13 +96,13 @@ public class PlayerInventory : NetworkBehaviour
     [Client] void ListenForSelectInput()
     {
         // If the "next bomb" key is pressed
-        if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext)) SelectItemStack();
+        if (_gameActions.ChooseNextBomb.WasPressed) SelectItemStack();
 
         // If the individual bombs are pressed
-        if (KeyBindingManager.GetKeyDown(KeyAction.BigBomb)) SelectItemStack(0);
-        if (KeyBindingManager.GetKeyDown(KeyAction.SludgeBomb)) SelectItemStack(1);
-        if (KeyBindingManager.GetKeyDown(KeyAction.LaserBeem)) SelectItemStack(2);
-        if (KeyBindingManager.GetKeyDown(KeyAction.PlasmaBall)) SelectItemStack(3);
+        if (_gameActions.ChooseBombleBomb.WasPressed) SelectItemStack(0);
+        if (_gameActions.ChooseHoneyBomb.WasPressed) SelectItemStack(1);
+        if (_gameActions.ChooseLaserBeem.WasPressed) SelectItemStack(2);
+        if (_gameActions.ChoosePlasmaBall.WasPressed) SelectItemStack(3);
     }
 
     /// <summary>

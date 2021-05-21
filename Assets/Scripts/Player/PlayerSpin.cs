@@ -5,6 +5,8 @@ using Mirror;
 
 public class PlayerSpin : NetworkBehaviour
 {
+    private GameActions _gameActions;
+    
     [Header("Required")]
     [SerializeField] private GameObject playerMesh;
 
@@ -62,6 +64,11 @@ public class PlayerSpin : NetworkBehaviour
     [Header("Other")]
     [SerializeField] public float spinTotalCooldown = 0.8f;
 
+    private void Awake()
+    {
+        _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
+    
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -102,13 +109,13 @@ public class PlayerSpin : NetworkBehaviour
         if (!canSpin) return;
 
         // When spin key is pressed down
-        if (KeyBindingManager.GetKey(KeyAction.Spin) && spinChargeTime < spinTimings[spinTimings.Length - 1])
+        if (_gameActions.Spin.IsPressed && spinChargeTime < spinTimings[spinTimings.Length - 1])
         {
             SpinHeldUpdate();
         }
 
         // When key is let go (this should only be called once)
-        if (KeyBindingManager.GetKeyUp(KeyAction.Spin))
+        if (_gameActions.Spin.WasReleased)
         {
             SpinRelease();
         }

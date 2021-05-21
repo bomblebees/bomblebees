@@ -7,6 +7,8 @@ using Mirror;
 
 public class Hotbar : MonoBehaviour
 {
+    private GameActions _gameActions;
+    
     private Player localPlayer = null;
     [SerializeField] GameUIManager gameUIManager = null;
 
@@ -35,6 +37,11 @@ public class Hotbar : MonoBehaviour
     [SerializeField] private GameObject rotateDisabledEffect;
     [SerializeField] private GameObject rotateKey;
 
+    private void Awake()
+    {
+        _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
+    
     private void Start()
     {
         bombHelper = this.gameObject.transform.parent.GetComponent<BombHelper>();
@@ -68,7 +75,7 @@ public class Hotbar : MonoBehaviour
     {
         if (localPlayer == null) return;
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.Spin))
+        if (_gameActions.Spin.WasPressed)
         {
             if (spinHudTimer == 0) spinKey.GetComponent<ScaleTween>().StartTween();
             else
@@ -77,7 +84,7 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.Swap))
+        if (_gameActions.Swap.WasPressed)
         {
             if (!swapDisabledEffect.activeSelf) swapKey.GetComponent<ScaleTween>().StartTween();
             else
@@ -89,7 +96,7 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.Place))
+        if (_gameActions.Place.WasPressed)
         {
             if (!placeDisabledEffect.activeSelf) placeKey.GetComponent<ScaleTween>().StartTween();
             else
@@ -100,7 +107,7 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext))
+        if (_gameActions.ChooseNextBomb.WasPressed)
         {
             if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<ScaleTween>().StartTween();
             else
