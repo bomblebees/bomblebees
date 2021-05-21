@@ -34,8 +34,9 @@ public class Hotbar : MonoBehaviour
     private float spinHudTimer = 0;
 
     [Header("Rotate")]
-    [SerializeField] private GameObject rotateDisabledEffect;
-    [SerializeField] private GameObject rotateKey;
+    //[SerializeField] private GameObject rotateDisabledEffect;
+    [SerializeField] private GameObject nextRotateKey;
+    [SerializeField] private GameObject prevRotateKey;
 
     private void Awake()
     {
@@ -109,11 +110,12 @@ public class Hotbar : MonoBehaviour
 
         if (_gameActions.ChooseNextBomb.WasPressed)
         {
-            if (!rotateDisabledEffect.activeSelf) rotateKey.GetComponent<ScaleTween>().StartTween();
-            else
-            {
-                // FindObjectOfType<AudioManager>().PlaySound("error1");
-            }
+            nextRotateKey.GetComponent<ScaleTween>().StartTween();
+        }
+
+        if (_gameActions.ChoosePreviousBomb.WasPressed)
+        {
+            prevRotateKey.GetComponent<ScaleTween>().StartTween();
         }
     }
     

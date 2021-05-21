@@ -17,8 +17,8 @@ public class GameActions : PlayerActionSet
 		Spin,
 		ShowInfo,
 		ChooseNextBomb,
-		//ChoosePreviousBomb,
-		ChooseBombleBomb,
+        ChoosePreviousBomb,
+        ChooseBombleBomb,
 		ChooseHoneyBomb,
 		ChooseLaserBeem,
 		ChoosePlasmaBall;
@@ -36,8 +36,8 @@ public class GameActions : PlayerActionSet
 		Spin = CreatePlayerAction("Spin");
 		ShowInfo = CreatePlayerAction("Show Info");
 		ChooseNextBomb = CreatePlayerAction("Next Bomb");
-		//ChoosePreviousBomb = CreatePlayerAction("Previous Bomb");
-		ChooseBombleBomb = CreatePlayerAction("Bomble Bomb");
+        ChoosePreviousBomb = CreatePlayerAction("Previous Bomb");
+        ChooseBombleBomb = CreatePlayerAction("Bomble Bomb");
 		ChooseHoneyBomb = CreatePlayerAction("Honey Bomb");
 		ChooseLaserBeem = CreatePlayerAction("Laser Beem");
 		ChoosePlasmaBall = CreatePlayerAction("Plasma Ball");
@@ -58,8 +58,8 @@ public class GameActions : PlayerActionSet
 		actions.Spin.AddDefaultBinding(Key.K);
 		actions.ShowInfo.AddDefaultBinding(Key.Tab);
 		actions.ChooseNextBomb.AddDefaultBinding(Key.E);
-		//actions.ChoosePreviousBomb.AddDefaultBinding(Key.Q);
-		actions.ChooseBombleBomb.AddDefaultBinding(Key.Key1);
+        actions.ChoosePreviousBomb.AddDefaultBinding(Key.Q);
+        actions.ChooseBombleBomb.AddDefaultBinding(Key.Key1);
 		actions.ChooseHoneyBomb.AddDefaultBinding(Key.Key2);
 		actions.ChooseLaserBeem.AddDefaultBinding(Key.Key3);
 		actions.ChoosePlasmaBall.AddDefaultBinding(Key.Key4);

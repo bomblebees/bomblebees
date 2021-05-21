@@ -96,7 +96,10 @@ public class PlayerInventory : NetworkBehaviour
     [Client] void ListenForSelectInput()
     {
         // If the "next bomb" key is pressed
-        if (_gameActions.ChooseNextBomb.WasPressed) SelectItemStack();
+        if (_gameActions.ChooseNextBomb.WasPressed) SelectNextItem();
+        
+        // If the "next bomb" key is pressed
+        if (_gameActions.ChoosePreviousBomb.WasPressed) SelectNextItem(true);
 
         // If the individual bombs are pressed
         if (_gameActions.ChooseBombleBomb.WasPressed) SelectItemStack(0);
@@ -108,37 +111,42 @@ public class PlayerInventory : NetworkBehaviour
     /// <summary>
     /// Selects the slot at the given index.
     /// </summary>
-    /// <param name="idx"> The index of the slot to switch to. -1 means to rotate the selection instead </param>
-    [Client] private void SelectItemStack(int idx = -1)
+    /// <param name="idx"> The index of the slot to switch to.</param>
+    [Client] private void SelectItemStack(int idx)
     {
         // Play the bomb selection sound
         FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 
-        // If -1, then get the next index
-        if (idx == -1) CmdSetSelectedSlot(GetNextAvailableBomb());
-        else CmdSetSelectedSlot(idx);
+        CmdSetSelectedSlot(idx);
+    }
+
+    [Client] private void SelectNextItem(bool left = false)
+    {
+        // Play the bomb selection sound
+        FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+
+        SelectItemStack(GetNextAvailableBomb(left));
     }
 
     /// <summary>
     /// Gets the next available slot. If no slots are available, the currently selected slot is returned
     /// </summary>
-    /// <returns> The index of the slot </returns>
-    [Client] private int GetNextAvailableBomb()
+    /// <param name="left"> Whether it will get the next bomb on the right or left</param>
+    /// <returns>The index of the slot</returns>
+    [Client] private int GetNextAvailableBomb(bool left)
     {
         // Start at current slot
         int nextSlot = selectedSlot;
 
-        // Set it to the next available slot
-        for (int i = 1; i <= inventoryList.Count; i++)
+        for (int i = 1; i < inventoryList.Count; i++)
         {
-            // Set to next slot
-            nextSlot = selectedSlot + i;
+            // get next slot ( right )
+            nextSlot = Helper.GetIndexInArray(selectedSlot + i, inventoryList.Count);
 
-            // If past the last slot rotate back to the beginning
-            if (nextSlot >= inventoryList.Count) nextSlot = nextSlot - inventoryList.Count;
+            // get next slot ( left )
+            if (left) nextSlot = Helper.GetIndexInArray(selectedSlot - i, inventoryList.Count);
 
-            // If this slot has bombs, leave loop
-            if (inventoryList[nextSlot] > 0) break;
+            if (inventoryList[nextSlot] > 0) break; // If this slot has bombs, leave loop
         }
 
         // Increment selected slot, if at the last slot rotate back to the beginning
@@ -255,7 +263,7 @@ public class PlayerInventory : NetworkBehaviour
             inventoryList[idx]--;
 			GetComponent<PlayerInterface>().DisplayInventoryUse();
 			// If its now empty, automatically get the next selected bomb
-			if (inventoryList[idx] == 0) selectedSlot = GetNextAvailableBomb();
+			if (inventoryList[idx] == 0) selectedSlot = GetNextAvailableBomb(false);
 			 
         } else
         {
