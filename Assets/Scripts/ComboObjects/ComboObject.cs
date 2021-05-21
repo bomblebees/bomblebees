@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
-using Mono.CecilX;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -289,6 +288,9 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableHitbox()
     {
+        // Play shake anim
+        FindObjectOfType<CameraShake>().InduceStress(0.2f);
+
         hitBox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitBox.SetActive(false);
