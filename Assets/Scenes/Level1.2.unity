@@ -12413,6 +12413,7 @@ GameObject:
   - component: {fileID: 586327339}
   - component: {fileID: 586327337}
   - component: {fileID: 586327338}
+  - component: {fileID: 586327340}
   m_Layer: 0
   m_Name: HUD Camera
   m_TagString: HUDCamera
@@ -12508,6 +12509,20 @@ Transform:
   m_Father: {fileID: 6225543505993673713}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 62.4, y: 0, z: 0}
+--- !u!114 &586327340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586327336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ceffa91763a64d4c908313fef79fe71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentCam: {fileID: 6225543505993673712}
+  cam: {fileID: 586327337}
 --- !u!1001 &615311900
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31371,6 +31386,7 @@ GameObject:
   - component: {fileID: 6225543505993673713}
   - component: {fileID: 6225543505993673712}
   - component: {fileID: 6225543505993673714}
+  - component: {fileID: 6225543505993673719}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -31378,3 +31394,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6225543505993673719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6225543505993673718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3d8075dcd0d2954589ede940dab11a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets: []
+  minArena: {x: 131, y: 443, z: -174}
+  maxArena: {x: 89, y: 443, z: -186}
+  offset: {x: 0, y: 435, z: -240}
+  smoothTime: 0.5
+  minZoom: 21
+  maxZoom: 18
+  zoomLimiter: 100
