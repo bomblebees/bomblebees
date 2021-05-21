@@ -19,6 +19,9 @@ public class PlayerSwap : NetworkBehaviour
     /// </summary>
     [HideInInspector] public bool canSwap = true;
 	[SerializeField] public bool canSwapWhileGhost = false;
+    [SerializeField] private GameObject HexIcon;
+    [SerializeField] private LineRenderer lineRenderer; // test
+
 
     /// <summary>
     /// The currently held tile of the player represented as a color character
@@ -79,6 +82,8 @@ public class PlayerSwap : NetworkBehaviour
         // Check for key press every frame
         ListenForSwapInput();
 
+        // Update LineRenderer vertex position
+        lineRenderer.SetPosition(0, HexIcon.transform.position);
     }
 
     #region Swap
@@ -108,6 +113,10 @@ public class PlayerSwap : NetworkBehaviour
         if (Physics.Raycast(tileRay, out tileHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
         {
             GameObject modelHit = tileHit.transform.gameObject;
+
+            // Update LineRenderer vertex positions
+            // lineRenderer.SetPosition(0, HexIcon.transform.position);
+            lineRenderer.SetPosition(1, modelHit.transform.position);
 
             // Get the key of the hex cell underneath, this is the new key for the player
             char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
