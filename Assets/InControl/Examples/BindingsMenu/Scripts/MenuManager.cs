@@ -46,8 +46,11 @@ public class MenuManager : MonoBehaviour
 			inputModule.SubmitAction = MenuActions.Submit;
 			inputModule.CancelAction = MenuActions.Cancel;
 		}
+	}
 
-		// Jump straight to the bindings menu.
+	public void ShowGameActions()
+	{
+		BindingsMenu.Hide();
 		BindingsMenu.Show( GameActions );
 	}
 

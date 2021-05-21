@@ -7,7 +7,6 @@ public class GlobalSettings : MonoBehaviour
     [Header("Canvas")]
     [SerializeField] private Canvas mainCanvas;
     [SerializeField] private Canvas keyBindings;
-    [SerializeField] private Canvas keyBindings2;
     
     [Header("Others")]
     [SerializeField] private TMP_Text textFullscreen;
@@ -66,15 +65,6 @@ public class GlobalSettings : MonoBehaviour
         keyBindings.enabled = !keyBindings.enabled;
     }
     
-    public void ToggleKeyBindings2Canvas()
-    {
-        mainCanvas.enabled = !mainCanvas.enabled;
-        keyBindings2.enabled = !keyBindings2.enabled;
-        
-        MenuManager menuManager = FindObjectOfType<MenuManager>();
-        menuManager.BindingsMenu.Hide();
-        menuManager.BindingsMenu.Show(menuManager.GameActions);
-    }
     public void OnClickQuitToMenu()
     {
         NetworkRoomManagerExt networkManager = NetworkManager.singleton as NetworkRoomManagerExt;
