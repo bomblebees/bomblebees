@@ -8,7 +8,6 @@ public static class Helper
     {
         var trim = index % length;
         var nonNegative = trim + length;
-        Debug.Log(nonNegative);
         return nonNegative % length;
     }
 }

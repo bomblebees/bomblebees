@@ -138,7 +138,7 @@ public class PlayerInventory : NetworkBehaviour
         // Start at current slot
         int nextSlot = selectedSlot;
 
-        for (int i = 1; i < inventoryList.Count; i++)
+        for (int i = 1; i < inventoryList.Count + 1; i++)
         {
             // get next slot ( right )
             nextSlot = Helper.GetIndexInArray(selectedSlot + i, inventoryList.Count);
@@ -148,6 +148,9 @@ public class PlayerInventory : NetworkBehaviour
 
             if (inventoryList[nextSlot] > 0) break; // If this slot has bombs, leave loop
         }
+
+        //if (nextSlot == selectedSlot) nextSlot = left ? Helper.GetIndexInArray(selectedSlot - 1, inventoryList.Count)
+        //                                              : Helper.GetIndexInArray(selectedSlot + 1, inventoryList.Count);
 
         // Increment selected slot, if at the last slot rotate back to the beginning
         if (nextSlot >= INVEN_BOMB_TYPES.Length) return 0;
