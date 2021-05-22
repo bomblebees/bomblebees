@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using InControl;
+using TMPro;
 
 
 public class BindingButton : MonoBehaviour
@@ -20,7 +21,7 @@ public class BindingButton : MonoBehaviour
 	// This will be a reference to the text on the right side of the button
 	// that displays the binding name. We also animate some ellipses on it
 	// while listening to provide some UI feedback.
-	Text bindingText;
+	TMP_Text bindingText;
 
 
 	public void Setup( PlayerAction action, CanvasGroup canvasGroup )
@@ -32,12 +33,12 @@ public class BindingButton : MonoBehaviour
 		button.onClick.AddListener( OnClick );
 
 		// Find the control text and set it to the action name, e.g. "Attack"
-		var controlText = transform.Find( "Control" ).GetComponent<Text>();
+		var controlText = transform.Find( "Control" ).GetComponent<TMP_Text>();
 		controlText.text = action.Name;
 
 		// Find the current control binding text, set it to the current binding
 		// name and hold onto the field so we can update it later.
-		bindingText = transform.Find( "Binding" ).GetComponent<Text>();
+		bindingText = transform.Find( "Binding" ).GetComponent<TMP_Text>();
 		bindingText.text = GetBindingName();
 
 		// Set up the listen options for this action. For this example, we limit
