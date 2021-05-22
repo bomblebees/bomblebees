@@ -29,7 +29,7 @@ public class GameActions : PlayerActionSet
 		// Down = CreatePlayerAction("Move Down");
 		// Left = CreatePlayerAction("Move Left");
 		// Right = CreatePlayerAction("Move Right");
-		// Move = CreateTwoAxisPlayerAction( Left, Right, Down, Up );
+		// Move = CreateTwoAxisPlayerAction(Left, Right, Down, Up);
 
 		Swap = CreatePlayerAction("Swap");
 		Place = CreatePlayerAction("Place");
@@ -48,10 +48,10 @@ public class GameActions : PlayerActionSet
 	{
 		var actions = new GameActions();
 
-		// actions.Up.AddDefaultBinding( Key.UpArrow );
-		// actions.Down.AddDefaultBinding( Key.DownArrow );
-		// actions.Left.AddDefaultBinding( Key.LeftArrow );
-		// actions.Right.AddDefaultBinding( Key.RightArrow );
+		// actions.Up.AddDefaultBinding(Key.UpArrow);
+		// actions.Down.AddDefaultBinding(Key.DownArrow);
+		// actions.Left.AddDefaultBinding(Key.LeftArrow);
+		// actions.Right.AddDefaultBinding(Key.RightArrow);
 
 		actions.Swap.AddDefaultBinding(Key.Space);
 		actions.Place.AddDefaultBinding(Key.J);
