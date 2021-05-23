@@ -30,6 +30,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     private NetworkManager _networkManager;
     private CharacterSelectionInfo _characterSelectionInfo;
     private LobbySettings _lobbySettings;
+	private MenuAudioManager _audioManager;
 
     /// <summary>
     /// The player lobby card UI of this player. A value of null means it is uninitialized.
@@ -53,6 +54,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         _networkManager = FindObjectOfType<NetworkManager>();
         _pingDisplay = FindObjectOfType<PingDisplay>();
         _lobbySettings = FindObjectOfType<LobbySettings>();
+		_audioManager = FindObjectOfType<MenuAudioManager>();
     }
 
     #region Joining/Leaving Lobby
@@ -470,6 +472,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     // Called by the local player when ready button is clicked
     [Client] public void OnReadyButtonClick()
     {
+		if (!readyToBegin)
+		{
+			_audioManager.PlayReady();
+		}
         CmdChangeReadyState(!readyToBegin);
     }
 
