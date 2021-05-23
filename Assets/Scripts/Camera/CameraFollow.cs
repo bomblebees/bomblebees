@@ -16,12 +16,20 @@ public class CameraFollow : MonoBehaviour
     public float zoomLimiter = 50f;
 
     private Camera cam;
+    private GlobalSettings settings;
+
+    private Vector3 originalPos;
+    private float originalFOV;
 
     private Vector3 velocity;
 
     private void Start()
     {
         cam = GetComponent<Camera>();
+        settings = FindObjectOfType<GlobalSettings>();
+
+        originalPos = cam.transform.position;
+        originalFOV = cam.fieldOfView;
     }
 
     public void InitCameraFollow()
@@ -33,6 +41,14 @@ public class CameraFollow : MonoBehaviour
     private void LateUpdate()
     {
         if (targets.Count == 0) return;
+
+        // If settings are turned off, return to original position
+        if (!settings.cameraEffects)
+        {
+            transform.position = Vector3.SmoothDamp(transform.position, originalPos, ref velocity, smoothTime);
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, originalFOV, Time.deltaTime);
+            return;
+        }
 
         MoveCamera();
         ZoomCamera();

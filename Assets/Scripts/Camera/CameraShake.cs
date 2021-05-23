@@ -14,9 +14,21 @@ public class CameraShake : MonoBehaviour
     [Tooltip("Maximum translation that the gameobject can receive when applying the shake effect.")]
     public Vector3 MaximumTranslationShake = Vector3.one * .75f;
 
+    private GlobalSettings settings;
+
+    private void Start()
+    {
+        settings = FindObjectOfType<GlobalSettings>();
+    }
+
     private void Update()
     {
-        //if (Input.GetMouseButtonDown(0)) InduceStress(0.2f);
+        // If settings are turned off, do not do the shake
+        if (!settings.cameraEffects)
+        {
+            _trauma = 0;
+            return;
+        }
 
         float shake = Mathf.Pow(_trauma, TraumaExponent);
         /* Only apply this when there is active trauma */
