@@ -53,7 +53,7 @@ public class GameUIManager : NetworkBehaviour
 
         eventManager.EventPlayerTookDamage += ServerOnKillEvent;
 		eventManager.EventMultikill += RpcOnMultikillEvent;
-        // eventManager.EventPlayerSwap += ServerOnSwapEvent;
+        eventManager.EventPlayerSwap += ServerOnSwapEvent;
         eventManager.EventPlayerSpin += ServerOnSpinEvent;
     }
 
@@ -149,6 +149,15 @@ public class GameUIManager : NetworkBehaviour
         messageFeed.OnKillEvent(bomb, player);
         livesUI.UpdateLives(newLives, player.GetComponent<Player>());
         livesUI.UpdateOrdering(order);
+
+
+        GameObject killer = bomb.GetComponent<ComboObject>().triggeringPlayer;
+
+        // if it was a valid kill
+        if (killer != null && !ReferenceEquals(killer, player))
+        {
+            livesUI.UpdateEliminations(killer.GetComponent<Player>());
+        }
     }
 
 	[ClientRpc]
@@ -162,17 +171,18 @@ public class GameUIManager : NetworkBehaviour
     {
         if (combo)
         {
-            RpcOnSwapComboEvent(oldKey, player, numBombsAwarded);
-        }
+            // Recalculate the winning order
+            GameObject[] orderedList = lobbySettings.GetGamemode().GetWinningOrder(roundManager.playerList.ToArray());
 
-        TargetOnSwapEvent(player.GetComponent<NetworkIdentity>().connectionToClient, newKey);
+            RpcOnSwapComboEvent(oldKey, player, numBombsAwarded, orderedList);
+        }
     }
 
     [ClientRpc]
-    public void RpcOnSwapComboEvent(char comboKey, GameObject player, int numBombsAwarded)
+    public void RpcOnSwapComboEvent(char comboKey, GameObject player, int numBombsAwarded, GameObject[] order)
     {
-        messageFeed.OnSwapEvent(comboKey, player, numBombsAwarded);
-
+        livesUI.UpdateOrdering(order);
+        livesUI.UpdateCombos(numBombsAwarded, player.GetComponent<Player>());
     }
 
     #endregion

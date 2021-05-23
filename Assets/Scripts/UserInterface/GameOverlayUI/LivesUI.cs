@@ -19,6 +19,13 @@ public class LivesUI : MonoBehaviour
     private LivesUIElement[] livesUIs = new LivesUIElement[4];
     private List<GameObject> playerList = new List<GameObject>();
 
+    private LobbySettings _lobbySettings;
+    private void Awake()
+    {
+        _lobbySettings = FindObjectOfType<LobbySettings>();
+        if (_lobbySettings == null) Debug.LogError("LobbySettings not found!");
+    }
+
     public void EnableLivesUI(Player p)
     {
         // create the player card
@@ -62,6 +69,10 @@ public class LivesUI : MonoBehaviour
 
         // add player to player list
         playerList.Add(p.gameObject);
+
+        
+
+        if (
     }
 
     public void UpdateLives(int currentLives, Player player)
@@ -84,6 +95,16 @@ public class LivesUI : MonoBehaviour
                     break;
             }
         }
+    }
+
+    public void UpdateCombos(int combos, Player player)
+    {
+
+    }
+
+    public void UpdateEliminations(Player player)
+    {
+
     }
 
     public void UpdateOrdering(GameObject[] orderedList)
