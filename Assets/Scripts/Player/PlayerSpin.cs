@@ -19,7 +19,7 @@ public class PlayerSpin : NetworkBehaviour
     /// Whether the spin charging is currently held.
     /// Also used to sync charge bars
     /// </summary>
-    [HideInInspector] [SyncVar(hook = nameof(OnChangeSpinHeld)] public bool spinHeld = false;
+    [HideInInspector] [SyncVar(hook = nameof(OnChangeSpinHeld))] public bool spinHeld = false;
     [Command] public void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [Header("Spin Charge")]
