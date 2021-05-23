@@ -180,8 +180,16 @@ public class RoundManager : NetworkBehaviour
             c.StartWinCondition();
         }
 
+        // Start round on client
+        ClientStartRound();
 
         UpdateGridsAliveCount(0, aliveCount);
+    }
+
+    [ClientRpc] public void ClientStartRound()
+    {
+        // Start camera follow
+        FindObjectOfType<CameraFollow>().InitCameraFollow();
     }
 
     [Server]
