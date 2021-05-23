@@ -31,8 +31,8 @@ public class RoundStartEnd : MonoBehaviour
     public IEnumerator EndRoundFreezetime(int freezetime)
     {
         titleText.text = "<size=400%>Game!</size>";
-        titleText.gameObject.transform.localPosition = new Vector3(0, 60, 0);
-        titleText.color = new Color32(255, 255, 255, 220);
+        //titleText.gameObject.transform.localPosition = new Vector3(0, 60, 0);
+        //titleText.color = new Color32(255, 255, 255, 220);
 
         yield return new WaitForSeconds(freezetime);
 

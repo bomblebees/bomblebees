@@ -9,8 +9,8 @@ public class PlayerStatTracker : NetworkBehaviour
 
 	[SyncVar] public GameObject player;
 
-	[SyncVar] public int kills = 0;
-	[SyncVar] public int deaths = 0;
+	[SyncVar(hook = nameof(OnChangeKills))] public int kills = 0;
+	[SyncVar(hook = nameof(OnChangeDeaths))] public int deaths = 0;
 	[SyncVar] public int assists = 0;
 
 	// placement from 1st to 4th at end game so stats screen can display in order
@@ -28,7 +28,7 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SyncVar] public int selfDestructs = 0;
 
 	// number of combos made
-	[SyncVar] public int totalCombosMade = 0;
+	[SyncVar(hook = nameof(OnChangeCombos))] public int totalCombosMade = 0;
 
 	// individual combo objects made from combos
 	[SyncVar] public int bombsMade = 0;
@@ -43,12 +43,12 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
 
 	private EventManager eventManager;
+	private PlayerEventDispatcher dispatcher;
 
 	private void InitSingletons()
 	{
 		eventManager = EventManager.Singleton;
 		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
-
 	}
 
 	public override void OnStartServer()
@@ -67,6 +67,9 @@ public class PlayerStatTracker : NetworkBehaviour
 	public override void OnStartClient()
 	{
 		InitSingletons();
+
+		dispatcher = GetComponent<PlayerEventDispatcher>();
+		if (dispatcher == null) Debug.LogError("Cannot find component: ClientPlayerDispatcher");
 	}
 
 	[Server]
@@ -136,12 +139,30 @@ public class PlayerStatTracker : NetworkBehaviour
 	}
 
 
-	
+	[ClientCallback]
+	public void OnChangeKills(int prevKills, int newKills)
+    {
+		dispatcher.OnChangeKills(prevKills, newKills);
+    }
+
+	[ClientCallback]
+	public void OnChangeDeaths(int prevDeaths, int newDeaths)
+	{
+		dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
+	}
+
+	[ClientCallback]
+	public void OnChangeCombos(int prevCombos, int newCombos)
+	{
+		dispatcher.OnChangeCombos(prevCombos, newCombos);
+	}
+
+
 	#region UI/Display
 	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
 
 	// populate stat block with the necessary stats
-	
+
 	public void CreateStatsUIElement(GameObject anchorObject)
 	{
 		GameObject obj = Instantiate(

@@ -162,6 +162,8 @@ public class PlayerSwap : NetworkBehaviour
     {
         // Update hex tile on the HUD for this player for every observer
         this.GetComponent<PlayerInterface>().UpdateHexHud(newHeldKey);
+
+        this.GetComponent<PlayerEventDispatcher>().OnChangeHeldKey(oldHeldKey, newHeldKey);
     }
 
     #endregion

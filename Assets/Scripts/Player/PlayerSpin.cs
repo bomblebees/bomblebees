@@ -227,6 +227,8 @@ public class PlayerSpin : NetworkBehaviour
             spinParticles.SetParticles(currentParticles);
             spinParticles.Stop();
         }
+
+        this.GetComponent<PlayerEventDispatcher>().OnChangeSpinHeld(oldHeld, newHeld);
     }
 
     [Client] public void ResetSpinCharge()

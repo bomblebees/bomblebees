@@ -303,7 +303,7 @@ public class PlayerInventory : NetworkBehaviour
         // Update the player interface when selected slot changes
         this.GetComponent<PlayerInterface>().UpdateInventorySelected();
 
-        if (isLocalPlayer) gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
+        this.GetComponent<PlayerEventDispatcher>().OnInventorySelectChange(newSlot, INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
     }
 
 
@@ -315,12 +315,7 @@ public class PlayerInventory : NetworkBehaviour
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
 
-		Debug.Log("OnInventoryChange on " + gameObject.name);
-
-        if (idx == selectedSlot && isLocalPlayer)
-        {
-            gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[idx], inventoryList[idx]);
-        }
+        this.GetComponent<PlayerEventDispatcher>().OnInventoryQuantityChange(idx, INVEN_BOMB_TYPES[idx], inventoryList[idx]);
     }
 
 	/// <summary>
