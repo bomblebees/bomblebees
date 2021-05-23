@@ -203,6 +203,21 @@ public class PlayerInterface : NetworkBehaviour
         playerName.text = this.GetComponent<Player>().steamName;
     }
 
+	[Client] public void ToggleNameToSludged()
+	{
+		if (GetComponent<Player>().isSludged)
+		{
+			playerName.text = "Sludged!";
+			playerName.color = new Color32(255, 216, 25, 255);
+			playerName.fontSize = 29;
+		}
+		else
+		{
+			UpdatePlayerName();
+			playerName.fontSize = 25;
+		}
+	}
+
     public void UpdateHexHud(char key)
     {
         hexUI.color = BombHelper.GetKeyColor(key);

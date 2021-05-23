@@ -221,6 +221,7 @@ public class Player : NetworkBehaviour
     /// </summary>
     [ClientCallback] private void OnChangeSludged(bool prevEffect, bool newEffect)
     {
+		this.GetComponent<PlayerInterface>().ToggleNameToSludged();
 		Debug.Log("isSludge changed");
         if (newEffect) // If the player is now sludged
         {
@@ -230,7 +231,7 @@ public class Player : NetworkBehaviour
             // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -3);
 
 			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(true);
-
+			
 			// Play random sludge sound effect
 			FindObjectOfType<AudioManager>().PlaySound("playerEw" + UnityEngine.Random.Range(1, 4));
         } else // If the player is not sludged anymore
@@ -238,7 +239,6 @@ public class Player : NetworkBehaviour
 			Debug.Log("Sludge ending/stopped");
 			// Reset speed to normal
 			this.GetComponent<PlayerMovement>().sludgedScalar = 1;
-
 			// Slowly tween the VFX down until it is gone
 			LeanTween.value(gameObject, UpdateSludgeVFXCallback, -3f, -40f, 1f);
 			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(false);
