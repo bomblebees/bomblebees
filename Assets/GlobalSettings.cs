@@ -7,7 +7,10 @@ public class GlobalSettings : MonoBehaviour
     [Header("Canvas")]
     [SerializeField] private Canvas mainCanvas;
     [SerializeField] private Canvas keyBindings;
-    
+
+    [Header("Settings")]
+    public bool cameraEffects = true;
+
     [Header("Others")]
     [SerializeField] private TMP_Text textFullscreen;
     
@@ -64,7 +67,12 @@ public class GlobalSettings : MonoBehaviour
         mainCanvas.enabled = !mainCanvas.enabled;
         keyBindings.enabled = !keyBindings.enabled;
     }
-    
+
+    public void ToggleCameraEffects()
+    {
+        cameraEffects = !cameraEffects;
+    }
+
     public void OnClickQuitToMenu()
     {
         NetworkRoomManagerExt networkManager = NetworkManager.singleton as NetworkRoomManagerExt;
