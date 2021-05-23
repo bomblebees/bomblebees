@@ -146,7 +146,7 @@ public class GameUIManager : NetworkBehaviour
         }
 
 
-        if (player.transform.name == "LocalPlayer")
+        if (player.transform.name == "LocalPlayer" && lobbySettings.GetGamemode() is StandardGamemode)
         {
             if (newLives == 0)
             {

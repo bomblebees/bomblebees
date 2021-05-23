@@ -16,14 +16,27 @@ public class LivesUI : MonoBehaviour
 
     [SerializeField] GameUIManager gameUIManager = null;
 
+    [SerializeField] TMP_Text conditionText;
+
     private LivesUIElement[] livesUIs = new LivesUIElement[4];
     private List<GameObject> playerList = new List<GameObject>();
 
     private LobbySettings _lobbySettings;
+    private Gamemode selectedGamemode;
+
     private void Awake()
     {
         _lobbySettings = FindObjectOfType<LobbySettings>();
         if (_lobbySettings == null) Debug.LogError("LobbySettings not found!");
+
+        selectedGamemode = _lobbySettings.GetGamemode();
+
+        if (selectedGamemode is StandardGamemode)
+            conditionText.text = "Last bee standing wins!";
+        else if (selectedGamemode is TeamsGamemode)
+            conditionText.text = "Last team standing wins!";
+        else if (selectedGamemode is EliminationGamemode)
+            conditionText.text = "First to " + (selectedGamemode as EliminationGamemode).eliminations + " kills win!";
     }
 
     public void EnableLivesUI(Player p)
