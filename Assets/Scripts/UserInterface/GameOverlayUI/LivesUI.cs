@@ -70,9 +70,11 @@ public class LivesUI : MonoBehaviour
         // add player to player list
         playerList.Add(p.gameObject);
 
-        
 
-        //if (
+
+        if (_lobbySettings.GetGamemode() is StandardGamemode) elem.heartsObject.SetActive(true);
+        if (_lobbySettings.GetGamemode() is EliminationGamemode) elem.eliminationsObject.SetActive(true);
+        //if (_lobbySettings.GetGamemode() is StandardGamemode) elem.heartsObject.SetActive(true);
     }
 
     public void UpdateLives(int currentLives, Player player)
@@ -104,7 +106,9 @@ public class LivesUI : MonoBehaviour
 
     public void UpdateEliminations(Player player)
     {
+        int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
+        livesUIs[i].elimsText.text = player.GetComponent<PlayerStatTracker>().kills.ToString();
     }
 
     public void UpdateOrdering(GameObject[] orderedList)
