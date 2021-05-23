@@ -36,6 +36,9 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SyncVar] public int lasersMade = 0;
 	[SyncVar] public int plasmasMade = 0;
 
+	// the time the player was eliminated
+	[SyncVar] public double timeOfElimination = 0f;
+
 
 	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
 
@@ -56,6 +59,7 @@ public class PlayerStatTracker : NetworkBehaviour
 		// functions are subscribed on server, playerstats syncvar will always update from server
 		eventManager.EventPlayerTookDamage += PlayerDeathUpdate;
 		eventManager.EventPlayerSwap += PlayerSwapUpdate;
+		eventManager.EventPlayerEliminated += PlayerEliminatedUpdate;
 
 		player = gameObject;
 	}
@@ -65,6 +69,15 @@ public class PlayerStatTracker : NetworkBehaviour
 		InitSingletons();
 	}
 
+	[Server]
+	public void PlayerEliminatedUpdate(double timeOfElim, GameObject player)
+	{
+		// if this was not the player that was eliminated, return
+		if (!ReferenceEquals(player, gameObject)) return;
+
+		// set the time of elim
+		timeOfElimination = timeOfElim;
+	}
 
 	[Server]
 	public void PlayerDeathUpdate(int _, GameObject bomb, GameObject playerThatDied)

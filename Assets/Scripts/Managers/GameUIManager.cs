@@ -51,7 +51,7 @@ public class GameUIManager : NetworkBehaviour
         eventManager.EventStartRound += ServerStartRound;
         eventManager.EventEndRound += ServerEndRound;
 
-        eventManager.EventPlayerTookDamage += RpcOnKillEvent;
+        eventManager.EventPlayerTookDamage += ServerOnKillEvent;
 		eventManager.EventMultikill += RpcOnMultikillEvent;
         // eventManager.EventPlayerSwap += ServerOnSwapEvent;
         eventManager.EventPlayerSpin += ServerOnSpinEvent;
@@ -132,11 +132,23 @@ public class GameUIManager : NetworkBehaviour
 
     #region MessageFeed
 
+    [Server]
+    public void ServerOnKillEvent(int newLives, GameObject bomb, GameObject player)
+    {
+        // Recalculate the winning order
+        GameObject[] orderedList = lobbySettings.GetGamemode().GetWinningOrder(roundManager.playerList.ToArray());
+
+
+        RpcOnKillEvent(newLives, bomb, player, orderedList); 
+    }
+
+
     [ClientRpc]
-    public void RpcOnKillEvent(int newLives, GameObject bomb, GameObject player)
+    public void RpcOnKillEvent(int newLives, GameObject bomb, GameObject player, GameObject[] order)
     {
         messageFeed.OnKillEvent(bomb, player);
         livesUI.UpdateLives(newLives, player.GetComponent<Player>());
+        livesUI.UpdateOrdering(order);
     }
 
 	[ClientRpc]

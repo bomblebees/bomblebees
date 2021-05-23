@@ -13,4 +13,5 @@ public class LivesUIElement : MonoBehaviour
     [SerializeField] public GameObject[] hearts;
     [SerializeField] public TMP_Text playerName;
     [SerializeField] public TMP_Text livesCounter;
+    public GameObject player; // the player gameobject that owns this lives elem
 }

@@ -55,7 +55,6 @@ public class PlayerInterface : NetworkBehaviour
     {
         base.OnStartServer();
 
-        this.gameObject.GetComponent<Health>().EventLivesChanged += RpcOnPlayerTakeDamage;
     }
 
     public override void OnStartClient()
@@ -75,6 +74,9 @@ public class PlayerInterface : NetworkBehaviour
             playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
 
         }
+
+
+        this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
 
         // Spin charge bar invisible until held
         spinUI.GetComponent<CanvasGroup>().alpha = 0f;
@@ -165,7 +167,7 @@ public class PlayerInterface : NetworkBehaviour
         spinChargeBar.fillAmount = spinChargeTime / spinTimes[spinTimes.Length - 3];
     }
 
-    [ClientRpc] public void RpcOnPlayerTakeDamage(int currentHealth, int _, GameObject __)
+    [Client] public void OnPlayerTakeDamage(int currentHealth, int _, GameObject __)
     {
         if (!isLocalPlayer) return;
 

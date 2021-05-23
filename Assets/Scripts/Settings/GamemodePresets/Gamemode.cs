@@ -60,6 +60,6 @@ public abstract class Gamemode : MonoBehaviour
     /// </summary>
     /// <param name="playerList"> The unordered list of all players</param>
     /// <returns> The ordered array of player gameobjects</returns>
-    public abstract GameObject[] GetWinningOrder(List<RoundManager.PlayerInfo> playerList);
+    public abstract GameObject[] GetWinningOrder(GameObject[] playerList);
 
 }

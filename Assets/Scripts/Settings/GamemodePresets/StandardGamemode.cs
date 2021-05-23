@@ -25,25 +25,18 @@ public class StandardGamemode : Gamemode
         return desc;
     }
 
-    public override GameObject[] GetWinningOrder(List<RoundManager.PlayerInfo> playerList)
+    public override GameObject[] GetWinningOrder(GameObject[] playerList)
     {
-        List<RoundManager.PlayerInfo> orderedList = new List<RoundManager.PlayerInfo>();
+        GameObject[] orderedList = new GameObject[playerList.Length];
 
         // Order the player list by winning order
-        orderedList = playerList.OrderByDescending(p => p.health.currentLives) // order by most health first
-                    .ThenByDescending(p => p.timeOfElim) // then by latest time of death (if applicable)
-                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().kills) // then by most kills
-                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().totalCombosMade) // then by most combos
-                    .ThenByDescending(p => p.player.GetComponent<PlayerStatTracker>().doubleKills) // then by most double kills
-                    .ToList(); // turn into list
+        orderedList = playerList.OrderByDescending(p => p.GetComponent<Health>().currentLives) // order by most health first
+                    .ThenByDescending(p => p.GetComponent<PlayerStatTracker>().timeOfElimination) // then by latest time of death (if applicable)
+                    .ThenByDescending(p => p.GetComponent<PlayerStatTracker>().kills) // then by most kills
+                    .ThenByDescending(p => p.GetComponent<PlayerStatTracker>().totalCombosMade) // then by most combos
+                    .ThenByDescending(p => p.GetComponent<PlayerStatTracker>().doubleKills) // then by most double kills
+                    .ToArray(); // turn into list
 
-        // Convert orderedList into orderedArray
-        GameObject[] orderedArray = new GameObject[orderedList.Count];
-        for (int i = 0; i < orderedArray.Length; i++)
-        {
-            orderedArray[i] = orderedList[i].player.gameObject;
-        }
-
-        return orderedArray;
+        return orderedList;
     }
 }
