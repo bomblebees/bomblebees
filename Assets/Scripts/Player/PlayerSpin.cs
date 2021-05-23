@@ -60,6 +60,7 @@ public class PlayerSpin : NetworkBehaviour
     [Header("Animations")]
     [SerializeField] private GameObject spinAnim;
     [SerializeField] private float spinAnimDuration = 0.8f;
+	[SerializeField] private ParticleSystem spinParticles;
 
     [Header("Other")]
     [SerializeField] public float spinTotalCooldown = 0.8f;
@@ -134,10 +135,12 @@ public class PlayerSpin : NetworkBehaviour
 
             currentChargeLevel = 0;
 
-            // Bounce the charge bar right away
-            // here
-            // this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
-            // this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+			// Bounce the charge bar right away
+			// here
+			// this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
+			// this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+
+			spinParticles.Play();
 
             CmdSetSpinHeld(true);
         }
@@ -218,7 +221,17 @@ public class PlayerSpin : NetworkBehaviour
         // Reset the charge time and spinHeld vars
         spinChargeTime = 0f;
         currentChargeLevel = 0;
-        CmdSetSpinHeld(false);
+		ParticleSystem.Particle[] currentParticles = new ParticleSystem.Particle[spinParticles.particleCount];
+		spinParticles.GetParticles(currentParticles);
+
+		for (int i = 0; i < currentParticles.Length; i++)
+		{
+			currentParticles[i].remainingLifetime = 0;
+		}
+
+		spinParticles.SetParticles(currentParticles);
+		spinParticles.Stop();
+		CmdSetSpinHeld(false);
     }
 
     /// <summary>
