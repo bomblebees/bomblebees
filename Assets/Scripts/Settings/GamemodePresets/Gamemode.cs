@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Mirror;
 
-public abstract class Gamemode : MonoBehaviour
+public abstract class Gamemode : NetworkBehaviour
 {
     public abstract string GamemodeName { get; }
 
     // -- Game Settings -- //
     public virtual float RoundDuration { get; } = 180f; // default 3 minutes
     public virtual int PlayerLives { get; } = 3; // default 3 lives
+    public virtual int Eliminations { get; } = 5; // default 5 elims
     public virtual bool EndAfterFirstWinCondition { get; } = true; // default true
 
 
@@ -53,6 +55,15 @@ public abstract class Gamemode : MonoBehaviour
         settings.endAfterFirstWinCondition = EndAfterFirstWinCondition;
     }
 
+    /// <summary>
+    /// Called from client to show the gamemode settings
+    /// </summary>
+    [Client] public virtual void EnableGamemodeSettings() { }
+
+    /// <summary>
+    /// Called from client to unshow the gamemode settings
+    /// </summary>
+    [Client] public virtual void DisableGamemodeSettings() { }
 
 
     /// <summary>

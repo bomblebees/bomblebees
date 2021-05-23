@@ -244,8 +244,10 @@ public class PlayerInterface : NetworkBehaviour
     public void DisplayInventoryAdd(int slot, int amt)
     {
 
-        
-		//invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
+        invStackItems[slot].invAddText.text = "+" + amt.ToString();
+        //invAddTexts[slot].GetComponent<ScaleTween>().StartTween();
+        //invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();
+        invStackItems[slot].invAddText.GetComponent<MoveTween>().StartTween();
 
 		// Text/tween animation for 4 slot radial UI on combo made, reactivate later for separate UI settings
 		// invStackItems[slot].invAddText.GetComponent<AlphaTextTween>().StartTween();

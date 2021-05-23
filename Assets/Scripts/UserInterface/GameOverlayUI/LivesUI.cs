@@ -72,7 +72,7 @@ public class LivesUI : MonoBehaviour
 
         
 
-        if (
+        //if (
     }
 
     public void UpdateLives(int currentLives, Player player)
