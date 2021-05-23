@@ -19,7 +19,7 @@ public class PlayerSpin : NetworkBehaviour
     /// Whether the spin charging is currently held.
     /// Also used to sync charge bars
     /// </summary>
-    [HideInInspector] [SyncVar] public bool spinHeld = false;
+    [HideInInspector] [SyncVar(hook = nameof(OnChangeSpinHeld)] public bool spinHeld = false;
     [Command] public void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [Header("Spin Charge")]
@@ -140,8 +140,6 @@ public class PlayerSpin : NetworkBehaviour
 			// this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
 			// this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
 
-			spinParticles.Play();
-
             CmdSetSpinHeld(true);
         }
 
@@ -211,6 +209,26 @@ public class PlayerSpin : NetworkBehaviour
         //playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmnts[newLevel]);
     }
 
+    [ClientCallback] public void OnChangeSpinHeld(bool oldHeld, bool newHeld)
+    {
+        if (newHeld)
+        {
+            spinParticles.Play();
+        } else
+        {
+            ParticleSystem.Particle[] currentParticles = new ParticleSystem.Particle[spinParticles.particleCount];
+            spinParticles.GetParticles(currentParticles);
+
+            for (int i = 0; i < currentParticles.Length; i++)
+            {
+                currentParticles[i].remainingLifetime = 0;
+            }
+
+            spinParticles.SetParticles(currentParticles);
+            spinParticles.Stop();
+        }
+    }
+
     [Client] public void ResetSpinCharge()
     {
         SetChargeEffectLevel(0);
@@ -221,16 +239,7 @@ public class PlayerSpin : NetworkBehaviour
         // Reset the charge time and spinHeld vars
         spinChargeTime = 0f;
         currentChargeLevel = 0;
-		ParticleSystem.Particle[] currentParticles = new ParticleSystem.Particle[spinParticles.particleCount];
-		spinParticles.GetParticles(currentParticles);
 
-		for (int i = 0; i < currentParticles.Length; i++)
-		{
-			currentParticles[i].remainingLifetime = 0;
-		}
-
-		spinParticles.SetParticles(currentParticles);
-		spinParticles.Stop();
 		CmdSetSpinHeld(false);
     }
 
