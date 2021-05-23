@@ -5,21 +5,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Steamworks;
+using System.Linq;
 
 public class LivesUI : MonoBehaviour
 {
-    [Serializable]
-    public class LivesElem
-    {
-        public GameObject livesObject;
-        public Image avatar;
-        public RawImage background;
-        public GameObject[] hearts;
-        public TMP_Text playerName;
-        public TMP_Text livesCounter;
-    }
-
-    //[SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
 
     [SerializeField] private GameObject[] livesAnchors = new GameObject[4];
 
@@ -28,19 +17,19 @@ public class LivesUI : MonoBehaviour
     [SerializeField] GameUIManager gameUIManager = null;
 
     private LivesUIElement[] livesUIs = new LivesUIElement[4];
+    private List<GameObject> playerList = new List<GameObject>();
 
     public void EnableLivesUI(Player p)
     {
         // create the player card
         GameObject obj = Instantiate(
             livesUIElementPrefab,
-            new Vector3(0, 0, 0),
-            Quaternion.identity,
-            livesAnchors[p.playerRoomIndex].transform);
+            livesAnchors[p.playerRoomIndex].transform.position,
+            livesAnchors[p.playerRoomIndex].transform.rotation,
+            gameObject.transform);
 
-        // to make sure its positioned at 0 0 0 locally
-        obj.transform.localPosition = new Vector3(0, 0, 0);
-        obj.transform.localRotation = Quaternion.identity;
+        // resacle to anchor size
+        obj.transform.localScale = livesAnchors[p.playerRoomIndex].transform.localScale;
 
         LivesUIElement elem = obj.GetComponent<LivesUIElement>();
 
@@ -56,6 +45,8 @@ public class LivesUI : MonoBehaviour
         // initialize username
         //elem.playerName.text = p.steamName;
 
+        elem.player = p.gameObject;
+
         // Set the lives
         for (int j = 0; j < elem.hearts.Length; j++)
         {
@@ -67,43 +58,17 @@ public class LivesUI : MonoBehaviour
             {
                 elem.hearts[j].SetActive(false);
             }
-
         }
+
+        // add player to player list
+        playerList.Add(p.gameObject);
     }
 
     public void UpdateLives(int currentLives, Player player)
     {
-        int i = player.playerRoomIndex;
+        int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
-        Debug.Log("index in update lives: " + i);
-
-        //// If player name has not been updated, initialize it
-        //if (livesUIs[i].playerName.text.Length <= 0)
-        //{
-        //    ulong steamId = player.steamId;
-
-        //    string userName = "[Player Name]";
-
-        //    // Set steam user name and avatars
-        //    if (steamId != 0)
-        //    {
-        //        CSteamID steamID = new CSteamID(steamId);
-
-        //        userName = SteamFriends.GetFriendPersonaName(steamID);
-        //    }
-
-        //    // Update username
-        //    livesUIs[i].playerName.text = userName;
-        //}
-
-        // Update health
-        int lifeCount = currentLives;
-
-        Debug.Log("player " + i + " has " + lifeCount + " lives");
-
-        livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
-
-        switch (lifeCount)
+        switch (currentLives)
         {
             case 2: { livesUIs[i].hearts[2].SetActive(false); break; }
             case 1: {
@@ -121,26 +86,18 @@ public class LivesUI : MonoBehaviour
         }
     }
 
-    private Texture2D GetSteamImageAsTexture(int iImage)
+    public void UpdateOrdering(GameObject[] orderedList)
     {
-        Texture2D texture = null;
 
-        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
+        // Reorder livesUI based on new list 
+        livesUIs = livesUIs.OrderBy(e => e == null ? 4 : Array.IndexOf(orderedList, e.player)).ToArray();
 
-        if (isValid)
+
+        for (int i = 0; i < playerList.Count; i++)
         {
-            byte[] image = new byte[width * height * 4];
-
-            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
-
-            if (isValid)
-            {
-                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
-                texture.LoadRawTextureData(image);
-                texture.Apply();
-            }
+            // Move lives ui to the new positions
+            LeanTween.moveLocal(livesUIs[i].gameObject, livesAnchors[i].transform.localPosition, 1f)
+                .setEase(LeanTweenType.easeOutExpo);
         }
-
-        return texture;
     }
 }

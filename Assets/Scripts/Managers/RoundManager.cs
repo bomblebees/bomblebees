@@ -15,14 +15,13 @@ public class RoundManager : NetworkBehaviour
     {
         public Health health;
         public Player player;
-        public double timeOfElim;
     }
 
     // whether the round is over
 	private bool roundOver = false;
 
     // Lists
-    public List<PlayerInfo> playerList = new List<PlayerInfo>();
+    public List<GameObject> playerList = new List<GameObject>();
     public List<WinCondition> winConditions = new List<WinCondition>();
 
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
@@ -98,25 +97,13 @@ public class RoundManager : NetworkBehaviour
         InitRoundManager();
     }
 
-
-
     /// <summary>
     /// Called when the player finishes loading into the scene.
     /// </summary>
     [Server] public void OnPlayerLoadedIntoRound(GameObject playerObject, int remaining)
     {
-        // Add player to list
-        Player player = playerObject.GetComponent<Player>();
-        Health live = playerObject.gameObject.GetComponent<Health>();
-
-        // Init player info struct
-        PlayerInfo playerInfo = new PlayerInfo();
-        playerInfo.player = player;
-        playerInfo.health = live;
-        playerInfo.timeOfElim = 0;
-
         // Add the player to list of all players
-        playerList.Add(playerInfo);
+        playerList.Add(playerObject);
 
         // if no more players waiting to load, start the round
         if (remaining == 0) StartCoroutine(ServerStartRound());
@@ -205,7 +192,7 @@ public class RoundManager : NetworkBehaviour
 
         // Invoke end round event
         List<Player> players = new List<Player>();
-        playerList.ForEach(pi => { players.Add(pi.player); });
+        playerList.ForEach(pi => { players.Add(pi.GetComponent<Player>()); });
         eventManager.OnEndRound(players);
 
         // Stop and unsubscribe from all win conditions
@@ -239,7 +226,7 @@ public class RoundManager : NetworkBehaviour
     [Server] private GameObject[] CollectWinningOrder()
     {
         // Retrieve the winning order from the current gamemode
-        GameObject[] orderedArray = settings.gamemode.GetWinningOrder(playerList);
+        GameObject[] orderedArray = settings.gamemode.GetWinningOrder(playerList.ToArray());
 
         // Debugging the array
         for (int i = 0; i < orderedArray.Length; i++)
@@ -287,9 +274,6 @@ public class RoundManager : NetworkBehaviour
     {
         // Update alive count
         aliveCount--;
-
-        // Set the time of elimination for this player
-        playerList.Find(p => p.player.gameObject == player).timeOfElim = timeOfElim;
 
         IncreaseGlobalLivesAmt();
     }
