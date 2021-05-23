@@ -41,16 +41,6 @@ public class PlayerInterface : NetworkBehaviour
     [SerializeField] private InventoryStackItem[] invStackItems = new InventoryStackItem[4];
 	[SerializeField] private InventoryStackItem localPlayerSingleRadial; // assign the single radial so local player can use this one
 
-
- //   [SerializeField] private GameObject[] invSlotsContainers = new GameObject[4];
-	//[SerializeField] private Image[] invSlotsRadial = new Image[4];
-
-	//// Each game object in array holds either 3, 4, or 5 slot UI frames which change on inv size change
-	//[SerializeField] private GameObject[] slottedFrames = new GameObject[4];
-
-	//[SerializeField] private TMP_Text[] invCounters = new TMP_Text[4];
- //   [SerializeField] private TMP_Text[] invAddTexts = new TMP_Text[4];
-
     private Player player;
     private GameUIManager gameUIManager;
 
@@ -79,12 +69,15 @@ public class PlayerInterface : NetworkBehaviour
         if (!isLocalPlayer)
         {
             hexUI.gameObject.SetActive(false);
-            // inventoryUI.gameObject.SetActive(false);
-			inventoryUIRadial.gameObject.SetActive(false);
+            spinUI.gameObject.SetActive(false);
+            inventoryUIRadial.gameObject.SetActive(false);
 			localPlayerSingleRadial.gameObject.SetActive(false);
             playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
 
         }
+
+        // Spin charge bar invisible until held
+        spinUI.GetComponent<CanvasGroup>().alpha = 0f;
 
         gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
@@ -122,9 +115,10 @@ public class PlayerInterface : NetworkBehaviour
     /// </summary>
     [Client] private IEnumerator DelaySpinChargeExit()
     {
-        yield return new WaitForSeconds(spinExitDelay);
-        spinChargeTime = 0;
         spinUI.GetComponent<CanvasGroup>().alpha = 0.5f;
+        yield return new WaitForSeconds(spinExitDelay);
+        spinUI.GetComponent<CanvasGroup>().alpha = 0f;
+        spinChargeTime = 0;
         UpdateSpinChargeBar();
     }
 
@@ -134,7 +128,7 @@ public class PlayerInterface : NetworkBehaviour
 
         // Show full opacity charge bar if sludged
         if (player.GetComponent<Player>().isSludged == true) spinUI.GetComponent<CanvasGroup>().alpha = 1;
-        else spinUI.GetComponent<CanvasGroup>().alpha = .5f;
+        //else spinUI.GetComponent<CanvasGroup>().alpha = 0f;
 
         if (ps.spinHeld)
         {
