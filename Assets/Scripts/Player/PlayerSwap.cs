@@ -119,17 +119,14 @@ public class PlayerSwap : NetworkBehaviour
             // lineRenderer.SetPosition(0, HexIcon.transform.position);
             // lineRenderer.SetPosition(1, modelHit.transform.position);
 
-            //instantiate here
-            GameObject newParticle = Instantiate(swapParticle,
-                                                    modelHit.transform.position,
-                                                    Quaternion.identity);
-            newParticle.GetComponent<SwapTrailMover>().AssignTarget(hexIcon.transform);
 
             // Get the key of the hex cell underneath, this is the new key for the player
             char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
 
             // If key is not swappable, return
             if (HexCell.ignoreKeys.Contains(newKey)) return;
+
+            
 
             // Get the hex cell index of the hex cell we need to swap
             int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
@@ -142,6 +139,12 @@ public class PlayerSwap : NetworkBehaviour
             {
                 // Do the swap on the server
                 CmdSwap(cellIdx, this.heldKey, newKey);
+
+                // Start tile->icon swap particle
+                GameObject newParticle = Instantiate(swapParticle,
+                                                        modelHit.transform.position,
+                                                        Quaternion.identity);
+                newParticle.GetComponent<SwapTrailMover>().AssignTarget(hexIcon.transform);
             }
         }
     }

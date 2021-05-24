@@ -17,7 +17,7 @@ public class SwapTrailMover : MonoBehaviour
     [SerializeField] private float MAX_DIST = 1.5f;
     [SerializeField] private float DECAY_RATE = 0.5f;
 
-    private const float LINGER_TIME = 0.6f;//1.0f;
+    private const float LINGER_TIME = 1.5f;//1.0f;
 
 
     void Awake()

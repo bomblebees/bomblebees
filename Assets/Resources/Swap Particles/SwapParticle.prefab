@@ -115,7 +115,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.4
+      scalar: 0.8
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -284,7 +284,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 22
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1039,22 +1039,22 @@ ParticleSystem:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 3
-          time: 0
+          time: 0.2479063
           value: 0
-          inSlope: 2.501016
-          outSlope: 2.501016
+          inSlope: 5.523
+          outSlope: 5.523
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0.1476323
+          outWeight: 0.1497602
         - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: -0.21242511
-          outSlope: -0.21242511
+          time: 0.9442749
+          value: 0.523077
+          inSlope: -3.2114847
+          outSlope: -3.2114847
           tangentMode: 0
           weightedMode: 0
-          inWeight: 0.14484686
+          inWeight: 0.17198136
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -1377,7 +1377,7 @@ ParticleSystem:
         ctime5: 0
         ctime6: 0
         ctime7: 0
-        atime0: 0
+        atime0: 24479
         atime1: 65535
         atime2: 0
         atime3: 0
@@ -4837,7 +4837,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6646539095922461246}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 1.0918329, z: 8}
+  m_LocalPosition: {x: 0, y: 0, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1792461161623871550}
@@ -4862,7 +4862,7 @@ MonoBehaviour:
   trailRenderer: {fileID: 4632307523864164101}
   moveSpeed: 95
   particleSystem: {fileID: 8473292426888489709}
-  MAX_DIST: 1
+  MAX_DIST: 0.7
   DECAY_RATE: 0.3
 --- !u!1 &7552117201122637095
 GameObject:
