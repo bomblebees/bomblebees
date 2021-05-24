@@ -137,10 +137,10 @@ public class RoundManager : NetworkBehaviour
         if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());
         if (settings.GetGamemode() is TeamsGamemode) winConditions.Add(this.gameObject.AddComponent<TeamsCondition>());
         if (settings.GetGamemode() is EliminationGamemode) winConditions.Add(this.gameObject.AddComponent<EliminationCondition>());
+        if (settings.GetGamemode() is ComboGamemode) winConditions.Add(this.gameObject.AddComponent<ComboCondition>());
     }
 
-    [Server]
-    public IEnumerator ServerStartRound()
+    [Server] public IEnumerator ServerStartRound()
     {
         // -- Pre-game start behaviours can go here -- //
 

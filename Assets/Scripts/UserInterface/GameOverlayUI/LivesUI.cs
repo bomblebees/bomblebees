@@ -37,6 +37,8 @@ public class LivesUI : MonoBehaviour
             conditionText.text = "Last team standing wins!";
         else if (selectedGamemode is EliminationGamemode)
             conditionText.text = "First to " + (selectedGamemode as EliminationGamemode).eliminations + " kills win!";
+        else if (selectedGamemode is ComboGamemode)
+            conditionText.text = "First to " + (selectedGamemode as ComboGamemode).combos + " combos win!";
     }
 
     public void EnableLivesUI(Player p)
@@ -90,6 +92,7 @@ public class LivesUI : MonoBehaviour
         }
          
         if (_lobbySettings.GetGamemode() is EliminationGamemode) elem.eliminationsObject.SetActive(true);
+        if (_lobbySettings.GetGamemode() is ComboGamemode) elem.combosObject.SetActive(true);
     }
 
     public void UpdateLives(int currentLives, Player player)
@@ -118,7 +121,9 @@ public class LivesUI : MonoBehaviour
 
     public void UpdateCombos(int combos, Player player)
     {
+        int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
+        livesUIs[i].combosText.text = combos.ToString();
     }
 
     public void UpdateEliminations(int killAmt, Player player)
