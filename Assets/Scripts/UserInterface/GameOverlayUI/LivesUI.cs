@@ -16,14 +16,27 @@ public class LivesUI : MonoBehaviour
 
     [SerializeField] GameUIManager gameUIManager = null;
 
+    [SerializeField] TMP_Text conditionText;
+
     private LivesUIElement[] livesUIs = new LivesUIElement[4];
     private List<GameObject> playerList = new List<GameObject>();
 
     private LobbySettings _lobbySettings;
+    private Gamemode selectedGamemode;
+
     private void Awake()
     {
         _lobbySettings = FindObjectOfType<LobbySettings>();
         if (_lobbySettings == null) Debug.LogError("LobbySettings not found!");
+
+        selectedGamemode = _lobbySettings.GetGamemode();
+
+        if (selectedGamemode is StandardGamemode)
+            conditionText.text = "Last bee standing wins!";
+        else if (selectedGamemode is TeamsGamemode)
+            conditionText.text = "Last team standing wins!";
+        else if (selectedGamemode is EliminationGamemode)
+            conditionText.text = "First to " + (selectedGamemode as EliminationGamemode).eliminations + " kills win!";
     }
 
     public void EnableLivesUI(Player p)
@@ -54,32 +67,36 @@ public class LivesUI : MonoBehaviour
 
         elem.player = p.gameObject;
 
-        // Set the lives
-        for (int j = 0; j < elem.hearts.Length; j++)
-        {
-            if (j < p.GetComponent<Health>().maxLives)
-            {
-                elem.hearts[j].SetActive(true);
-                elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
-            } else
-            {
-                elem.hearts[j].SetActive(false);
-            }
-        }
-
         // add player to player list
         playerList.Add(p.gameObject);
 
 
+        if (_lobbySettings.GetGamemode() is StandardGamemode)
+        {
+            elem.heartsObject.SetActive(true);
 
-        if (_lobbySettings.GetGamemode() is StandardGamemode) elem.heartsObject.SetActive(true);
+            // Set the lives
+            for (int j = 0; j < elem.hearts.Length; j++)
+            {
+                if (j < p.GetComponent<Health>().maxLives)
+                {
+                    elem.hearts[j].SetActive(true);
+                    elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+                } else
+                {
+                    elem.hearts[j].SetActive(false);
+                }
+            }
+        }
+         
         if (_lobbySettings.GetGamemode() is EliminationGamemode) elem.eliminationsObject.SetActive(true);
-        //if (_lobbySettings.GetGamemode() is StandardGamemode) elem.heartsObject.SetActive(true);
     }
 
     public void UpdateLives(int currentLives, Player player)
     {
         int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
+
+        Debug.Log("update lives: " + currentLives);
 
         switch (currentLives)
         {
@@ -104,15 +121,17 @@ public class LivesUI : MonoBehaviour
 
     }
 
-    public void UpdateEliminations(Player player)
+    public void UpdateEliminations(int killAmt, Player player)
     {
         int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
-        livesUIs[i].elimsText.text = player.GetComponent<PlayerStatTracker>().kills.ToString();
+        livesUIs[i].elimsText.text = killAmt.ToString();
     }
 
-    public void UpdateOrdering(GameObject[] orderedList)
+    public void UpdateOrdering()
     {
+        // Recalculate the winning order
+        GameObject[] orderedList = _lobbySettings.GetGamemode().GetWinningOrder(playerList.ToArray());
 
         // Reorder livesUI based on new list 
         livesUIs = livesUIs.OrderBy(e => e == null ? 4 : Array.IndexOf(orderedList, e.player)).ToArray();

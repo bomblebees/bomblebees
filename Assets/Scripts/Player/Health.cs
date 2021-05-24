@@ -66,8 +66,6 @@ public class Health : NetworkBehaviour
     // Starts when Player starts existing on server
     public override void OnStartClient()
     {
-        // Enable lives for this player
-        FindObjectOfType<LivesUI>().EnableLivesUI(this.GetComponent<Player>());
     }
 
     private void Start()
@@ -102,7 +100,7 @@ public class Health : NetworkBehaviour
 
 		playerModel.SetActive(false);
 
-		// EventLivesChanged?.Invoke(newLives, maxLives, this.gameObject);
+        this.GetComponent<PlayerEventDispatcher>().OnChangeLives(oldLives, newLives);
 
 		switch (UnityEngine.Random.Range(1,4))
 		{
