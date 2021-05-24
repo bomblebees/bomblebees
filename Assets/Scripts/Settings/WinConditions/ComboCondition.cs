@@ -36,7 +36,7 @@ public class ComboCondition : WinCondition
         // Everytime a player is eliminated, check if total combos is reached
         foreach (Player p in players)
         {
-            if (p.GetComponent<PlayerStatTracker>().totalCombosMade >= toCombos)
+            if (p.GetComponent<PlayerStatTracker>().totalBombCombosMade >= toCombos)
             {
                 base.InvokeWinConditionSatisfied();
             }

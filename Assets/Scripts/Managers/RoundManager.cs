@@ -18,7 +18,7 @@ public class RoundManager : NetworkBehaviour
     }
 
     // whether the round is over
-	private bool roundOver = false;
+    [SyncVar] public bool roundOver = false;
 
     // Lists
     public List<GameObject> playerList = new List<GameObject>();

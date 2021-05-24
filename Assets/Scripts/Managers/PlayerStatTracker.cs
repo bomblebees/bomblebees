@@ -28,7 +28,10 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SyncVar] public int selfDestructs = 0;
 
 	// number of combos made
-	[SyncVar(hook = nameof(OnChangeCombos))] public int totalCombosMade = 0;
+	[SyncVar] public int totalCombosMade = 0;
+
+	// number of bomb's made from combos
+	[SyncVar(hook = nameof(OnChangeBombCombos))] public int totalBombCombosMade = 0;
 
 	// individual combo objects made from combos
 	[SyncVar] public int bombsMade = 0;
@@ -43,12 +46,16 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
 
 	private EventManager eventManager;
+	private RoundManager roundManager;
 	private PlayerEventDispatcher dispatcher;
 
 	private void InitSingletons()
 	{
 		eventManager = EventManager.Singleton;
 		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+
+		roundManager = RoundManager.Singleton;
+		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
 	}
 
 	public override void OnStartServer()
@@ -103,6 +110,8 @@ public class PlayerStatTracker : NetworkBehaviour
 	[Server]
 	public void PlayerSwapUpdate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
+
 		// if the player that made combo isn't this player, then return
 		if (!ReferenceEquals(player, gameObject))
 		{
@@ -114,6 +123,8 @@ public class PlayerStatTracker : NetworkBehaviour
 			if (numBombsAwarded > 0)
 			{
 				totalCombosMade++;
+				totalBombCombosMade += numBombsAwarded;
+
 				// this shit will be a problem when we rework colors unless we can go through the codebase and change all the hardcoded color values
 				switch (oldKey)
 				{
@@ -142,18 +153,21 @@ public class PlayerStatTracker : NetworkBehaviour
 	[ClientCallback]
 	public void OnChangeKills(int prevKills, int newKills)
     {
+		if (roundManager.roundOver) return; // if round over, do not update
 		dispatcher.OnChangeKills(prevKills, newKills);
     }
 
 	[ClientCallback]
 	public void OnChangeDeaths(int prevDeaths, int newDeaths)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
 		dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
 	}
 
 	[ClientCallback]
-	public void OnChangeCombos(int prevCombos, int newCombos)
+	public void OnChangeBombCombos(int prevCombos, int newCombos)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
 		dispatcher.OnChangeCombos(prevCombos, newCombos);
 	}
 
@@ -181,7 +195,7 @@ public class PlayerStatTracker : NetworkBehaviour
 
 		uiElement.killsText.text = kills.ToString();
 		uiElement.deathsText.text = deaths.ToString();
-		uiElement.combosMadeText.text = totalCombosMade.ToString();
+		uiElement.combosMadeText.text = totalBombCombosMade.ToString();
 
 	}
 	

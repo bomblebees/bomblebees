@@ -22,7 +22,7 @@ public class ComboGamemode : Gamemode
     public override string GetDescription()
     {
         string desc = "COMBO FREZY GAMEMODE!!!!" +
-            "\n\n <color=#DDEF1F>The first bee to reach the set number of combos wins!</color>";
+            "\n\n <color=#DDEF1F>The first bee to reach the set number of combos wins! Longer combos count extra</color>";
 
         return desc;
     }
