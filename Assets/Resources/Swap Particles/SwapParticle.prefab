@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  moveSpeed: 50
+  moveSpeed: 55
 --- !u!1 &7552117201122637095
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,7 +94,7 @@ TrailRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 33554433
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: b753c871550ae794c8e4d5b5dad8daf7, type: 2}
@@ -165,8 +165,8 @@ TrailRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 65535
-      atime2: 0
+      atime1: 31804
+      atime2: 31804
       atime3: 0
       atime4: 0
       atime5: 0

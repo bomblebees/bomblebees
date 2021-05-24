@@ -10,7 +10,7 @@ public class SwapTrailMover : MonoBehaviour
 
     // If distance is within this threshold, destroy self
     private const float MAX_DIST = 0.05f;
-    private const float LINGER_TIME = 1.0f;
+    private const float LINGER_TIME = 0.6f;//1.0f;
 
 
     // Using FixedUpdate so movement is framerate independent
