@@ -19,8 +19,9 @@ public class PlayerSwap : NetworkBehaviour
     /// </summary>
     [HideInInspector] public bool canSwap = true;
 	[SerializeField] public bool canSwapWhileGhost = false;
-    [SerializeField] private GameObject HexIcon;
+    [SerializeField] private GameObject hexIcon;
     [SerializeField] private LineRenderer lineRenderer; // test
+    [SerializeField] private GameObject swapParticle;
 
 
     /// <summary>
@@ -83,7 +84,7 @@ public class PlayerSwap : NetworkBehaviour
         ListenForSwapInput();
 
         // Update LineRenderer vertex position
-        lineRenderer.SetPosition(0, HexIcon.transform.position);
+        // lineRenderer.SetPosition(0, HexIcon.transform.position);
     }
 
     #region Swap
@@ -116,7 +117,13 @@ public class PlayerSwap : NetworkBehaviour
 
             // Update LineRenderer vertex positions
             // lineRenderer.SetPosition(0, HexIcon.transform.position);
-            lineRenderer.SetPosition(1, modelHit.transform.position);
+            // lineRenderer.SetPosition(1, modelHit.transform.position);
+
+            //instantiate here
+            GameObject newParticle = Instantiate(swapParticle,
+                                                    modelHit.transform.position,
+                                                    Quaternion.identity);
+            newParticle.GetComponent<SwapTrailMover>().AssignTarget(hexIcon.transform);
 
             // Get the key of the hex cell underneath, this is the new key for the player
             char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
