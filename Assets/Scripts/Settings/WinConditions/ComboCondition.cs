@@ -24,6 +24,7 @@ public class ComboCondition : WinCondition
 
         // Subscribe to the swap event
         FindObjectOfType<EventManager>().EventPlayerSwap += OnSwapEvent;
+        FindObjectOfType<EventManager>().EventPlayerTookDamage += OnLivesChanged;
     }
 
     #endregion
@@ -33,7 +34,18 @@ public class ComboCondition : WinCondition
         // If a combo was not made, return;
         if (!combo) return;
 
+        // Everytime a player swapped, check if total combos is reached
+        CheckWin();
+    }
+
+    private void OnLivesChanged(int newLives, GameObject bomb, GameObject player)
+    {
         // Everytime a player is eliminated, check if total combos is reached
+        CheckWin();
+    }
+
+    private void CheckWin()
+    {
         foreach (Player p in players)
         {
             if (p.GetComponent<PlayerStatTracker>().totalBombCombosMade >= toCombos)

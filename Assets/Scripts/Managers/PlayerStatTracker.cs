@@ -47,6 +47,7 @@ public class PlayerStatTracker : NetworkBehaviour
 
 	private EventManager eventManager;
 	private RoundManager roundManager;
+	private LobbySettings lobbySettings;
 	private PlayerEventDispatcher dispatcher;
 
 	private void InitSingletons()
@@ -56,6 +57,9 @@ public class PlayerStatTracker : NetworkBehaviour
 
 		roundManager = RoundManager.Singleton;
 		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
+		lobbySettings = FindObjectOfType<LobbySettings>();
+		if (lobbySettings == null) Debug.LogError("Cannot find Singleton: LobbySettings");
 	}
 
 	public override void OnStartServer()
@@ -82,6 +86,8 @@ public class PlayerStatTracker : NetworkBehaviour
 	[Server]
 	public void PlayerEliminatedUpdate(double timeOfElim, GameObject player)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
+
 		// if this was not the player that was eliminated, return
 		if (!ReferenceEquals(player, gameObject)) return;
 
@@ -92,18 +98,35 @@ public class PlayerStatTracker : NetworkBehaviour
 	[Server]
 	public void PlayerDeathUpdate(int _, GameObject bomb, GameObject playerThatDied)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
+
 		ComboObject bombComponent = bomb.GetComponent<ComboObject>();
 
 		if (ReferenceEquals(playerThatDied, gameObject))
 		{
 			// the player that died in the event is this player
 			deaths++;
+
+			// if combo gamemode and died, apply combo penalty
+			if (lobbySettings.GetGamemode() is ComboGamemode)
+            {
+				if (totalBombCombosMade > ComboGamemode.comboPenalty)
+					totalBombCombosMade -= ComboGamemode.comboPenalty;
+				else
+					totalBombCombosMade = 0;
+            }
 		}
 
 		if (ReferenceEquals(bombComponent.triggeringPlayer, gameObject) && !ReferenceEquals(gameObject, playerThatDied))
 		{
 			// if this player was owner of the bomb that killed, and also wasn't the one who died, then award kill to this player
 			kills++;
+
+			// if combo gamemode and died, apply combo bonus
+			if (lobbySettings.GetGamemode() is ComboGamemode)
+			{
+				totalBombCombosMade += ComboGamemode.comboBonus;
+			}
 		}
 	}
 
@@ -153,21 +176,18 @@ public class PlayerStatTracker : NetworkBehaviour
 	[ClientCallback]
 	public void OnChangeKills(int prevKills, int newKills)
     {
-		if (roundManager.roundOver) return; // if round over, do not update
 		dispatcher.OnChangeKills(prevKills, newKills);
     }
 
 	[ClientCallback]
 	public void OnChangeDeaths(int prevDeaths, int newDeaths)
 	{
-		if (roundManager.roundOver) return; // if round over, do not update
-		dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
+        dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
 	}
 
 	[ClientCallback]
 	public void OnChangeBombCombos(int prevCombos, int newCombos)
 	{
-		if (roundManager.roundOver) return; // if round over, do not update
 		dispatcher.OnChangeCombos(prevCombos, newCombos);
 	}
 
