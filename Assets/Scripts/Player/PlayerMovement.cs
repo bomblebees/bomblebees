@@ -92,7 +92,7 @@ public class PlayerMovement : NetworkBehaviour
                 rotation = Quaternion.Slerp(
                     playerModel.transform.rotation,
                     Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime);
+                    turnSpeed * sludgedScalar * Time.deltaTime);
 
                 playerModel.transform.rotation = rotation;
             } else if (ghostModel.activeSelf)
@@ -101,7 +101,7 @@ public class PlayerMovement : NetworkBehaviour
                 rotation = Quaternion.Slerp(
                     ghostModel.transform.rotation,
                     Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime);
+                    turnSpeed * sludgedScalar * Time.deltaTime);
 
                 ghostModel.transform.rotation = rotation;
             }

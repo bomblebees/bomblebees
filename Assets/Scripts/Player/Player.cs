@@ -49,9 +49,9 @@ public class Player : NetworkBehaviour
     [Tooltip("Selects color based on character chosen.")]
     [SerializeField] private Material[] playerColors = new Material[4];
 
-
-    // Added for easy referencing of local player from anywhere
-    public override void OnStartLocalPlayer()
+	[SerializeField] private ParticleSystem sludgeParticles;
+	// Added for easy referencing of local player from anywhere
+	public override void OnStartLocalPlayer()
     {
         gameObject.name = "LocalPlayer";
         base.OnStartLocalPlayer();
@@ -231,11 +231,23 @@ public class Player : NetworkBehaviour
             // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -3);
 
 			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(true);
-			
+			sludgeParticles.Play();
 			// Play random sludge sound effect
 			FindObjectOfType<AudioManager>().PlaySound("playerEw" + UnityEngine.Random.Range(1, 4));
         } else // If the player is not sludged anymore
         {
+			// Stop particles and delete current existing particles
+			sludgeParticles.Stop();
+			ParticleSystem.Particle[] currentParticles = new ParticleSystem.Particle[sludgeParticles.particleCount];
+			sludgeParticles.GetParticles(currentParticles);
+
+			for (int i = 0; i < currentParticles.Length; i++)
+			{
+				currentParticles[i].remainingLifetime = 0;
+			}
+			sludgeParticles.SetParticles(currentParticles);
+			sludgeParticles.Stop();
+
 			Debug.Log("Sludge ending/stopped");
 			// Reset speed to normal
 			this.GetComponent<PlayerMovement>().sludgedScalar = 1;
