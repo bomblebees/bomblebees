@@ -5,13 +5,25 @@ using UnityEngine;
 public class SwapTrailMover : MonoBehaviour
 {
     [SerializeField] private Transform target;
+    [SerializeField] private TrailRenderer trailRenderer;
     [SerializeField] private float moveSpeed = 100f;
 
 
+    [SerializeField] private ParticleSystem particleSystem;
+
+
     // If distance is within this threshold, destroy self
-    private const float MAX_DIST = 0.05f;
+    // private const float MAX_DIST = 0.7f;
+    [SerializeField] private float MAX_DIST = 1.5f;
+    [SerializeField] private float DECAY_RATE = 0.5f;
+
     private const float LINGER_TIME = 0.6f;//1.0f;
 
+
+    void Awake()
+    {
+        
+    }
 
     // Using FixedUpdate so movement is framerate independent
     void FixedUpdate()
@@ -21,7 +33,7 @@ public class SwapTrailMover : MonoBehaviour
         float dist = Vector3.Distance(transform.position, target.position);
 
         if (dist >= MAX_DIST)   MoveToTarget();
-        else                    DestroySelf();
+        else                    DestroySequence();
     }
 
     // <summary>
@@ -44,5 +56,11 @@ public class SwapTrailMover : MonoBehaviour
     // <summary>
     // Destroys the object
     // </summary>
-    void DestroySelf() { Destroy(gameObject, LINGER_TIME); }
+    void DestroySequence()
+    { 
+        // particleSystem.Play();
+        // trailRenderer.emitting = false; // disables trail generation
+        trailRenderer.time -= DECAY_RATE;
+        Destroy(gameObject, LINGER_TIME);
+    }
 }
