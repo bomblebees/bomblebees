@@ -131,20 +131,20 @@ public class PlayerSwap : NetworkBehaviour
             // Get the hex cell index of the hex cell we need to swap
             int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
 
-            // Play swap sound
-            FindObjectOfType<AudioManager>().PlaySound("playerSwap");
-
             // Only swap if it is a new key
             if (!this.heldKey.Equals(newKey))
             {
-                // Do the swap on the server
-                CmdSwap(cellIdx, this.heldKey, newKey);
+                // Play swap sound
+                FindObjectOfType<AudioManager>().PlaySound("playerSwap");
 
                 // Start tile->icon swap particle
                 GameObject newParticle = Instantiate(swapParticle,
                                                         modelHit.transform.position,
                                                         Quaternion.identity);
                 newParticle.GetComponent<SwapTrailMover>().AssignTarget(hexIcon.transform);
+
+                // Do the swap on the server
+                CmdSwap(cellIdx, this.heldKey, newKey);
             }
         }
     }
