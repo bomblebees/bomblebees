@@ -185,7 +185,11 @@ public class GameUIManager : NetworkBehaviour
     [Client]
     public void OnChangeCombos(int prevCombos, int newCombos, GameObject player)
     {
-        livesUI.UpdateCombos(newCombos, player.GetComponent<Player>());
+        if (lobbySettings.GetGamemode() is ComboGamemode)
+        {
+            livesUI.UpdateCombos(newCombos, player.GetComponent<Player>());
+            livesUI.UpdateOrdering();
+        }
     }
 
     #endregion
