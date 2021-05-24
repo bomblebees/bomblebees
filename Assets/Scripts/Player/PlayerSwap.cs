@@ -19,8 +19,9 @@ public class PlayerSwap : NetworkBehaviour
     /// </summary>
     [HideInInspector] public bool canSwap = true;
 	[SerializeField] public bool canSwapWhileGhost = false;
-    [SerializeField] private GameObject HexIcon;
+    [SerializeField] private GameObject hexIcon;
     [SerializeField] private LineRenderer lineRenderer; // test
+    [SerializeField] private GameObject swapParticle;
 
 
     /// <summary>
@@ -83,7 +84,7 @@ public class PlayerSwap : NetworkBehaviour
         ListenForSwapInput();
 
         // Update LineRenderer vertex position
-        lineRenderer.SetPosition(0, HexIcon.transform.position);
+        // lineRenderer.SetPosition(0, HexIcon.transform.position);
     }
 
     #region Swap
@@ -116,7 +117,8 @@ public class PlayerSwap : NetworkBehaviour
 
             // Update LineRenderer vertex positions
             // lineRenderer.SetPosition(0, HexIcon.transform.position);
-            lineRenderer.SetPosition(1, modelHit.transform.position);
+            // lineRenderer.SetPosition(1, modelHit.transform.position);
+
 
             // Get the key of the hex cell underneath, this is the new key for the player
             char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
@@ -124,15 +126,23 @@ public class PlayerSwap : NetworkBehaviour
             // If key is not swappable, return
             if (HexCell.ignoreKeys.Contains(newKey)) return;
 
+            
+
             // Get the hex cell index of the hex cell we need to swap
             int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
-
-            // Play swap sound
-            FindObjectOfType<AudioManager>().PlaySound("playerSwap");
 
             // Only swap if it is a new key
             if (!this.heldKey.Equals(newKey))
             {
+                // Play swap sound
+                FindObjectOfType<AudioManager>().PlaySound("playerSwap");
+
+                // Start tile->icon swap particle
+                GameObject newParticle = Instantiate(swapParticle,
+                                                        modelHit.transform.position,
+                                                        Quaternion.identity);
+                newParticle.GetComponent<SwapTrailMover>().AssignTarget(hexIcon.transform);
+
                 // Do the swap on the server
                 CmdSwap(cellIdx, this.heldKey, newKey);
             }
