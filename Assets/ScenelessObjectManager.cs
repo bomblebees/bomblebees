@@ -1,13 +1,12 @@
-﻿using System;
-using Mirror;
+﻿using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ScenelessObjectManager : MonoBehaviour
 {
     [Header("Scene")] 
-    [Scene] [SerializeField] private string roomScene;
-    [Scene] [SerializeField] private string gameScene;
+    [Scene] [SerializeField] public string roomScene;
+    [Scene] [SerializeField] public string gameScene;
     
     [Header("Misc.")]
     [SerializeField] private GameObject globalSettings;
@@ -26,12 +25,17 @@ public class ScenelessObjectManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.path == roomScene || scene.path == gameScene)
+        if (scene.path == gameScene)
+        {
+            settingsButton.SetActive(false);
+            pingDisplay.SetActive(true);
+        } 
+        else if (scene.path == roomScene)
         {
             settingsButton.SetActive(false);
             pingDisplay.SetActive(true);
         }
-        else
+        else // Preload/MainMenu Scene
         {
             settingsButton.SetActive(true);
             pingDisplay.SetActive(false);
