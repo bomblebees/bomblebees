@@ -73,7 +73,8 @@ public class LivesUI : MonoBehaviour
         playerList.Add(p.gameObject);
 
 
-        if (_lobbySettings.GetGamemode() is StandardGamemode)
+        if (_lobbySettings.GetGamemode() is StandardGamemode
+            || _lobbySettings.GetGamemode() is TeamsGamemode)
         {
             elem.heartsObject.SetActive(true);
 
