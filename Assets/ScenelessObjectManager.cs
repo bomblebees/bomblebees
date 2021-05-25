@@ -25,12 +25,12 @@ public class ScenelessObjectManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.path == gameScene)
+        if (scene.path.Equals(gameScene))
         {
             settingsButton.SetActive(false);
             pingDisplay.SetActive(true);
         } 
-        else if (scene.path == roomScene)
+        else if (scene.path.Equals(roomScene))
         {
             settingsButton.SetActive(false);
             pingDisplay.SetActive(true);
