@@ -5,6 +5,7 @@ public class PracticeButton : MonoBehaviour, IPointerClickHandler
 {
     public void OnPointerClick(PointerEventData eventData)
     {
+        FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = true;
         FindObjectOfType<Matchmaking>().CreateLobby();
         InvokeRepeating(nameof(TryToStartGame), float.Epsilon, 0.1f);
     }
