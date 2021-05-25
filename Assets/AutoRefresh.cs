@@ -13,7 +13,7 @@ public class AutoRefresh : MonoBehaviour
 
     private void OnEnable()
     {
-        InvokeRepeating(nameof(Refresh), 0f, autoUpdateInterval);
+        InvokeRepeating(nameof(Refresh), float.Epsilon, autoUpdateInterval);
     }
 
     private void OnDisable()

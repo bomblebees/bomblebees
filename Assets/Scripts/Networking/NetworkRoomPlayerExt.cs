@@ -1,7 +1,5 @@
-using System;
 using UnityEngine;
 using Mirror;
-using Steamworks;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -70,7 +68,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (isLocalPlayer)
         {
             SetPing();
-            InvokeRepeating(nameof(WaitForFirstPing), 0f, 0.1f);
+            InvokeRepeating(nameof(WaitForFirstPing), float.Epsilon, 0.1f);
         }
     }
 
@@ -383,7 +381,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (!_pingDisplay.isConnected) return;
 
         CancelInvoke(nameof(WaitForFirstPing));
-        InvokeRepeating(nameof(SetPing), 0, _pingDisplay.updateInterval);
+        InvokeRepeating(nameof(SetPing), float.Epsilon, _pingDisplay.updateInterval);
     }
 
     [Client] private void SetPing()
