@@ -23,7 +23,7 @@ public class PingDisplay : MonoBehaviour
     private void OnEnable()
     {
         ConnectingStatus();
-        InvokeRepeating(nameof(InitializePingDisplay), 0f, 0.1f);
+        InvokeRepeating(nameof(InitializePingDisplay), float.Epsilon, 0.1f);
     }
 
     private void InitializePingDisplay()
@@ -77,7 +77,16 @@ public class PingDisplay : MonoBehaviour
     {
         isConnected = true;
         CancelInvoke(nameof(InitializePingDisplay)); 
-        InvokeRepeating(nameof(UpdatePingDisplay), 0f, updateInterval);
+        InvokeRepeating(nameof(UpdatePingDisplay), float.Epsilon, updateInterval);
+    }
+
+    public void PracticeStatus()
+    {
+        CancelInvoke(nameof(InitializePingDisplay));
+        CancelInvoke(nameof(UpdatePingDisplay));
+        isConnected = true;
+        _text.text = "Practice Mode";
+        myPingDisplay = _text.text;
     }
     
     private void OnDisable()

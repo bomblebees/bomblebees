@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class PracticeButton : MonoBehaviour, IPointerClickHandler
@@ -7,7 +6,7 @@ public class PracticeButton : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         FindObjectOfType<Matchmaking>().CreateLobby();
-        InvokeRepeating(nameof(TryToStartGame), Single.Epsilon, 0.1f);
+        InvokeRepeating(nameof(TryToStartGame), float.Epsilon, 0.1f);
     }
 
     private void TryToStartGame()
@@ -26,6 +25,8 @@ public class PracticeButton : MonoBehaviour, IPointerClickHandler
 
     private void StartGame()
     {
+        FindObjectOfType<PingDisplay>().PracticeStatus();
+        
         var lobbySettings = FindObjectOfType<LobbySettings>();
         lobbySettings.roundDuration = 0f;
         lobbySettings.playerLives = 0;
