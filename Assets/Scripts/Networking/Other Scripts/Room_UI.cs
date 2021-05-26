@@ -23,7 +23,8 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private float activatedOpacity = 1f;
     [Header("Start Button")]
     [SerializeField] public GameObject buttonStart;
-    public Button buttonStartButton;
+
+    private Button _buttonStartButton;
     private ButtonHoverTween _buttonStartButtonHoverTween;
     private CanvasRenderer[] _buttonStartCanvasRenderer;
     [Header("Ready Button")]
@@ -31,6 +32,10 @@ public class Room_UI : MonoBehaviour
     private Button _buttonReadyButton;
     private ButtonHoverTween _buttonReadyButtonHoverTween;
     private CanvasRenderer[] _buttonReadyCanvasRenderer;
+
+    [Header("Helper Text")] [SerializeField]
+    private TMP_Text readyHelperText,startHelperText, gameModesHelperText;
+    private CanvasRenderer readyHelperTextCanvasRenderer, startHelperTextCanvasRenderer, gameModesHelperTextCanvasRenderer;
 
     //[SerializeField] private PlayerLobbyCard playerLobbyCardPrefab = null;
     [SerializeField] public GameObject playerCardsParent;
@@ -76,7 +81,7 @@ public class Room_UI : MonoBehaviour
         }
 
         // Cache start button components
-        buttonStartButton = buttonStart.GetComponent<Button>();
+        _buttonStartButton = buttonStart.GetComponent<Button>();
         _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
         _buttonStartCanvasRenderer = buttonStart.GetComponentsInChildren<CanvasRenderer>();
 
@@ -84,6 +89,11 @@ public class Room_UI : MonoBehaviour
         _buttonReadyButton = buttonReady.GetComponent<Button>();
         _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
         _buttonReadyCanvasRenderer = buttonReady.GetComponentsInChildren<CanvasRenderer>();
+        
+        // Cache button helper texts
+        readyHelperTextCanvasRenderer = readyHelperText.GetComponent<CanvasRenderer>();
+        startHelperTextCanvasRenderer = startHelperTextCanvasRenderer.GetComponent<CanvasRenderer>();
+        gameModesHelperTextCanvasRenderer = gameModesHelperText.GetComponent<CanvasRenderer>();
 
         // Initialize button states
         DeactivateStartButton();
@@ -157,7 +167,7 @@ public class Room_UI : MonoBehaviour
     public void ActivateStartButton()
     {
         // Update functionality
-        buttonStartButton.interactable = true;
+        _buttonStartButton.interactable = true;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
@@ -171,7 +181,7 @@ public class Room_UI : MonoBehaviour
     public void DeactivateStartButton()
     {
         // Update functionality
-        buttonStartButton.interactable = false;
+        _buttonStartButton.interactable = false;
         
         // Update appearance
         foreach (CanvasRenderer t in _buttonStartCanvasRenderer)
@@ -195,6 +205,8 @@ public class Room_UI : MonoBehaviour
         }
         buttonReady.transform.localScale.Set(1f,1f,1f);
         _buttonReadyButtonHoverTween.enabled = true;
+        
+        readyHelperTextCanvasRenderer.SetAlpha(float.Epsilon);
     }
 
     public void DeactivateReadyButton()
@@ -209,6 +221,13 @@ public class Room_UI : MonoBehaviour
         }
         _buttonReadyButtonHoverTween.enabled = false;
         buttonReady.transform.localScale.Set(1f,1f,1f);
+        
+        readyHelperTextCanvasRenderer.SetAlpha(1f);
+    }
+
+    public void OnSetGameModeText(string gameModes)
+    {
+        gameModesHelperText.text = $"current mode: {gameModes}";
     }
 
     public void OnSettingsButtonClick()
