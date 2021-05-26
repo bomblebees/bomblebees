@@ -8,6 +8,7 @@ using UnityEngine;
 // - TickDown() to not 
 public class TriggerObject : ComboObject
 {
+    [SerializeField] LineRenderer telegraphBeam;
     public float breakdownDuration = 3f;
     public bool wasHit = false;
     protected bool canBeTriggered = true; // to make sure it's only hit once.
@@ -68,6 +69,7 @@ public class TriggerObject : ComboObject
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
             this.bombRadialTimerImage.color = new Vector4(1,1,1,.75f);
+            if (telegraphBeam) this.telegraphBeam.gameObject.SetActive(true);
         }
     }
 
@@ -210,10 +212,9 @@ public class TriggerObject : ComboObject
             startAngle += 360f;  // reset
         }
 
-        // should we base rotate angle off edgeIndex here?
+        // TODO: Take another look at this, the model spin is bugging at a certain angle
+        // Debug.Log("Start angle: "+startAngle+", Target angle: "+targetAngle);
 
-        // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
-        // targetAngle = angle;
         isRotating = true;
         if (useBeam)
         {
