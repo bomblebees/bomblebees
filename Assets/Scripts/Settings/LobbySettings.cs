@@ -25,9 +25,6 @@ public class LobbySettings : NetworkBehaviour
     // local team index, client only
     public int localTeamIndex;
     
-    // Misc.
-    private Room_UI _roomUI;
-
     private void Awake()
     {
         // Persist this object across scenes
@@ -97,10 +94,8 @@ public class LobbySettings : NetworkBehaviour
     {
         gamemodeButtonText.text = gamemodes[gamemodeSelected].ToString();
         gamemodeDescriptionText.text = gamemodes[gamemodeSelected].GetDescription();
-
-        if (_roomUI is null) _roomUI = FindObjectOfType<Room_UI>();
-
-        _roomUI.SetGameModeHelperText($"current mode: {gamemodeButtonText.text.ToLower()}");
+        
+        FindObjectOfType<Room_UI>().SetGameModeHelperText($"current mode: {gamemodeButtonText.text.ToLower()}");
     }
 
     [Client] public Gamemode GetGamemode()
