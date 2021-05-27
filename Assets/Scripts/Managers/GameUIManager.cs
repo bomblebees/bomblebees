@@ -12,6 +12,7 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] public MessageFeed messageFeed;
     [SerializeField] public MessageFeed warningFeed;
     [SerializeField] public Hotbar hotbar;
+    [SerializeField] public Announcer announcer;
 
     private GameObject localPlayer;
 
@@ -200,5 +201,24 @@ public class GameUIManager : NetworkBehaviour
     {
         warningFeed.CreateMessage(message);
     }
+
+    public void Announce(string message)
+    {
+        if (isServer) RpcAnnounce(message);
+        else CmdAnnounce(message);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdAnnounce(string message)
+    {
+        RpcAnnounce(message);
+    }
+
+    [ClientRpc]
+    public void RpcAnnounce(string message)
+    {
+        announcer.Announce(message);
+    }
+
 }
 

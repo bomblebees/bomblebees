@@ -44,13 +44,23 @@ public class ComboCondition : WinCondition
         CheckWin();
     }
 
+    private bool announcePlayed = false;
+
     private void CheckWin()
     {
         foreach (Player p in players)
         {
-            if (p.GetComponent<PlayerStatTracker>().totalBombCombosMade >= toCombos)
+            int playerCombos = p.GetComponent<PlayerStatTracker>().totalBombCombosMade;
+
+            if (playerCombos >= toCombos)
             {
                 base.InvokeWinConditionSatisfied();
+            } else if (playerCombos >= toCombos - 10 && !announcePlayed)
+            {
+                announcePlayed = true;
+
+                FindObjectOfType<GameUIManager>().Announce(p.steamName + " has <size=150%>"
+                    + (toCombos - playerCombos) + "</size>  Combos remaining!");
             }
         }
     }
