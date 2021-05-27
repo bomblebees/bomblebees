@@ -1,9 +1,8 @@
-using UnityEngine;
-using Mirror;
 using System.Collections.Generic;
+using Mirror;
 using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
@@ -20,7 +19,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [SyncVar(hook = nameof(CharacterChanged))] public int characterCode;
 
     /// <summary>The selected team</summary>
-    [SyncVar(hook = nameof(TeamChanged))] public int teamIndex = 0;
+    [SyncVar(hook = nameof(TeamChanged))] public int teamIndex;
 
     [Header("Required")]
     [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab;
@@ -28,31 +27,30 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     private NetworkManager _networkManager;
     private CharacterSelectionInfo _characterSelectionInfo;
     private LobbySettings _lobbySettings;
-	private MenuAudioManager _audioManager;
+    private MenuAudioManager _audioManager;
 
     /// <summary>
     /// The player lobby card UI of this player. A value of null means it is uninitialized.
     /// </summary>
-    private PlayerLobbyCard playerCard = null;
+    private PlayerLobbyCard _playerCard;
 
     // Temp list of player colors
-    private List<Color> listColors = new List<Color> {
+    private readonly List<Color> _listColors = new List<Color> {
         Color.red,
         Color.blue,
         Color.yellow,
         Color.green,
     };
 
-    Room_UI roomUI;
-
-    NetworkRoomManagerExt room;
+    private Room_UI _roomUI;
+    private NetworkRoomManagerExt _room;
 
     private void Awake()
     {
         _networkManager = FindObjectOfType<NetworkManager>();
         _pingDisplay = FindObjectOfType<PingDisplay>();
         _lobbySettings = FindObjectOfType<LobbySettings>();
-		_audioManager = FindObjectOfType<MenuAudioManager>();
+        _audioManager = FindObjectOfType<MenuAudioManager>();
     }
 
     #region Joining/Leaving Lobby
@@ -107,7 +105,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     private void Update()
     {
         // Exit if required vars are not initialized
-        if (!_characterSelectionInfo || !room || !roomUI) return;
+        if (!_characterSelectionInfo || !_room || !_roomUI) return;
 
         UpdateLobby();
     }
@@ -122,17 +120,17 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (isLocalPlayer)
         {
             // Enable/disable the start game button (for host only)
-            if (room.allPlayersReady)
+            if (_room.allPlayersReady)
             {
-                if (room.showStartButton)
+                if (_room.showStartButton)
                 {
                     // Host: all players ready
-                    roomUI.ActivateStartButton();
-                    roomUI.SetStartHelperText(null);
+                    _roomUI.ActivateStartButton();
+                    _roomUI.SetStartHelperText(null);
                 }
                 else
                 {
-                    roomUI.DeactivateStartButton();
+                    _roomUI.DeactivateStartButton();
                 }
             }
             else
@@ -140,59 +138,55 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 if (_networkManager.networkAddress.Equals("localhost"))
                 {
                     // Host: not all players ready
-                    roomUI.DeactivateStartButton();
-                    roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
+                    _roomUI.DeactivateStartButton();
+                    _roomUI.SetStartHelperText($"ready ({_room.readyPlayers}/{_room.currentPlayers})");
                 }
                 else
                 {
-                    if (room.readyPlayers.Equals(room.currentPlayers))
+                    if (_room.readyPlayers.Equals(_room.currentPlayers))
                     {
                         // Client: all players ready
-                        roomUI.DeactivateStartButton();
-                        roomUI.SetStartHelperText("host only");
+                        _roomUI.DeactivateStartButton();
+                        _roomUI.SetStartHelperText("host only");
                     }
                     else
                     {
                         // Client: not all players ready
-                        roomUI.DeactivateStartButton();
-                        roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
+                        _roomUI.DeactivateStartButton();
+                        _roomUI.SetStartHelperText($"ready ({_room.readyPlayers}/{_room.currentPlayers})");
                     }
                 }
             }
-
-
+            
             // Enable/disable the ready button
-            if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[this.characterCode])
+            if (!readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
             {
-                roomUI.DeactivateReadyButton();
-                roomUI.SetReadyHelperText("choose an unselected character!");
+                _roomUI.DeactivateReadyButton();
+                _roomUI.SetReadyHelperText("choose an unselected character!");
             }
             else
             {
-                roomUI.ActivateReadyButton();
-                roomUI.SetReadyHelperText(null);
+                _roomUI.ActivateReadyButton();
+                _roomUI.SetReadyHelperText(null);
             }
         }
 
         // If not ready, and character portrait is unavailable, grey out the portrait
-        if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[this.characterCode])
+        if (!readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
         {
-            playerCard.characterPortrait.color = new Color(0.4f, 0.4f, 0.4f);
-            if (isLocalPlayer) playerCard.disabledText.gameObject.SetActive(true);
+            _playerCard.characterPortrait.color = new Color(0.4f, 0.4f, 0.4f);
+            if (isLocalPlayer) _playerCard.disabledText.gameObject.SetActive(true);
         }
         else
         {
-            playerCard.characterPortrait.color = new Color(1f, 1f, 1f);
-            if (isLocalPlayer) playerCard.disabledText.gameObject.SetActive(false);
+            _playerCard.characterPortrait.color = new Color(1f, 1f, 1f);
+            if (isLocalPlayer) _playerCard.disabledText.gameObject.SetActive(false);
         }
 
-        if (playerCard)
+        if (_playerCard)
         {
             // If using teams gamemode, enable the button
-            if (_lobbySettings.GetGamemode() is TeamsGamemode)
-                playerCard.changeTeamButton.gameObject.SetActive(true);
-            else
-                playerCard.changeTeamButton.gameObject.SetActive(false);
+            _playerCard.changeTeamButton.gameObject.SetActive(_lobbySettings.GetGamemode() is TeamsGamemode);
         }
     }
 
@@ -206,7 +200,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] private void SetupLobby()
     {
         // Exit if lobby is already setup
-        if (!playerCard)
+        if (!_playerCard)
         {
             InitRequiredVars();
             InitLobbyButtons();
@@ -214,7 +208,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             InitPlayerCard();
         }
         
-        room.ReadyStatusChanged();
+        _room.ReadyStatusChanged();
         _lobbySettings.SetGamemodeText();
     }
     
@@ -232,17 +226,17 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             if (!_characterSelectionInfo) Debug.LogError("_characterSelectionInfo not found");
         }
 
-        if (!room)
+        if (!_room)
         {
-            room = NetworkManager.singleton as SteamNetworkManager;
-            if (!room) room = NetworkManager.singleton as NetworkRoomManagerExt;
-            if (!room) Debug.LogError("room not found");
+            _room = NetworkManager.singleton as SteamNetworkManager;
+            if (!_room) _room = NetworkManager.singleton as NetworkRoomManagerExt;
+            if (!_room) Debug.LogError("room not found");
         }
 
-        if (!roomUI)
+        if (!_roomUI)
         {
-            roomUI = Room_UI.singleton;
-            if (!roomUI) Debug.LogError("room not found");
+            _roomUI = Room_UI.Singleton;
+            if (!_roomUI) Debug.LogError("room not found");
         }
     }
 
@@ -254,8 +248,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Exit if we are not the local player
         if (!isLocalPlayer) return;
 
-        roomUI.EventReadyButtonClicked += OnReadyButtonClick;
-        roomUI.EventStartButtonClicked += OnStartButtonClick;
+        _roomUI.EventReadyButtonClicked += OnReadyButtonClick;
+        _roomUI.EventStartButtonClicked += OnStartButtonClick;
     }
 
     /// <summary>
@@ -264,24 +258,23 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] private void CreatePlayerCard()
     {
         // if the card is already created, do not create again
-        if (playerCard) return;
+        if (_playerCard) return;
 
         // instantiate the player card
-        playerCard = Instantiate(
+        _playerCard = Instantiate(
             playerLobbyCardPrefab,
             new Vector3(0, 0, 0),
             Quaternion.identity,
-            roomUI.playerCardsParent.transform);
+            _roomUI.playerCardsParent.transform);
 
 
         // add button event listeners for the local player
         if (isLocalPlayer)
         {
-            playerCard.changeCharacterButton.onClick.AddListener(OnCharacterClicked);
-            playerCard.changeTeamButton.onClick.AddListener(OnTeamClicked);
+            _playerCard.changeCharacterButton.onClick.AddListener(OnCharacterClicked);
+            _playerCard.changeTeamButton.onClick.AddListener(OnTeamClicked);
         }
-
-
+        
         // set the transform of the card
         SetCardPosition();
     }
@@ -292,10 +285,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] private void InitPlayerCard()
     {
         // enable the character portrait
-        playerCard.characterPortrait.enabled = true;
+        _playerCard.characterPortrait.enabled = true;
 
         // set the player name
-        playerCard.username.text = this.steamUsername + " (" + this.ping + ")";
+        _playerCard.username.text = steamUsername + " (" + ping + ")";
 
         // set initial card variables
         SetCardPosition();
@@ -315,9 +308,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] private void DestroyPlayerCard()
     {
-        if (playerCard)
+        if (_playerCard)
         {
-            Destroy(playerCard.gameObject);
+            Destroy(_playerCard.gameObject);
         }
     }
 
@@ -335,9 +328,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] private void SetCardPosition()
     {
-        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardPosition()!"); return; }
+        if (!_playerCard)
+        {
+            Debug.LogWarning("Player Card not initialized in SetCardPosition()!"); 
+            return;
+        }
 
-        playerCard.transform.localPosition = new Vector3(cardStartPosX + (distBetweenCards * index), cardPosY);
+        _playerCard.transform.localPosition = new Vector3(cardStartPosX + (distBetweenCards * index), cardPosY);
     }
 
     /// <summary>
@@ -345,13 +342,17 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] private void SetCardReadyStatus()
     {
-        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardReadyStatus()!"); return; }
+        if (!_playerCard)
+        {
+            Debug.LogWarning("Player Card not initialized in SetCardReadyStatus()!"); 
+            return;
+        }
 
-        // Enable/Diable the ready status UI
-        playerCard.readyStatus.SetActive(this.readyToBegin);
+        // Enable/Disable the ready status UI
+        _playerCard.readyStatus.SetActive(readyToBegin);
 
         // Lock character code if player is readied
-        _characterSelectionInfo.characterAvailable[characterCode] = !this.readyToBegin;
+        _characterSelectionInfo.characterAvailable[characterCode] = !readyToBegin;
     }
 
     /// <summary>
@@ -359,15 +360,19 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] private void SetCardCharacterPortrait()
     {
-        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardCharacterPortrait()!"); return; }
+        if (!_playerCard)
+        {
+            Debug.LogWarning("Player Card not initialized in SetCardCharacterPortrait()!"); 
+            return;
+        }
 
         // Set the character portrait
-        playerCard.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[this.characterCode];
+        _playerCard.characterPortrait.texture = _characterSelectionInfo.characterPortraitList[characterCode];
 
         // Set colors of the color frames
-        foreach (Image elem in playerCard.colorFrames)
+        foreach (var image in _playerCard.colorFrames)
         {
-            elem.color = listColors[this.characterCode];
+            image.color = _listColors[characterCode];
         }
     }
 
@@ -377,10 +382,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client]
     private void SetCardTeamButton()
     {
-        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardTeamButton()!"); return; }
+        if (!_playerCard)
+        {
+            Debug.LogWarning("Player Card not initialized in SetCardTeamButton()!"); 
+            return;
+        }
 
         // Set the character portrait
-        playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = "Team " + teamIndex;
+        _playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = "Team " + teamIndex;
     }
 
     /// <summary>
@@ -389,30 +398,37 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [Client] private void SetCardButtons()
     {
-        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardButtons()!"); return; }
+        if (!_playerCard)
+        {
+            Debug.LogWarning("Player Card not initialized in SetCardButtons()!"); 
+            return;
+        }
 
         if (isLocalPlayer)
         {
             // Allow local player to change the portrait
-            playerCard.changeCharacterButton.enabled = !this.readyToBegin;
-            playerCard.changeCharacterButtonHoverTween.enabled = !this.readyToBegin;
+            _playerCard.changeCharacterButton.enabled = !readyToBegin;
+            _playerCard.changeCharacterButtonHoverTween.enabled = !readyToBegin;
 
-            roomUI.buttonReady.GetComponentInChildren<TMP_Text>().text = this.readyToBegin ? "Unready" : "Ready";
+            _roomUI.buttonReady.GetComponentInChildren<TMP_Text>().text = readyToBegin ? "Unready" : "Ready";
         }
         else
         {
-            playerCard.changeCharacterButton.enabled = false;
-            playerCard.changeCharacterButtonHoverTween.enabled = false;
+            _playerCard.changeCharacterButton.enabled = false;
+            _playerCard.changeCharacterButtonHoverTween.enabled = false;
         }
     }
 
     [Client] private void SetCardHostCrown()
     {
-        if (!playerCard) { Debug.LogWarning("Player Card not initialized in SetCardHostCrown()!"); return; }
+        if (!_playerCard)
+        {
+            Debug.LogWarning("Player Card not initialized in SetCardHostCrown()!"); 
+            return;
+        }
 
         // if this is the host, enable the crown icon
-        if (index == 0) playerCard.crown.SetActive(true);
-        else playerCard.crown.SetActive(false);
+        _playerCard.crown.SetActive(index.Equals(0));
     }
 
     #endregion
@@ -445,9 +461,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     [Client] private void UpdatePingDisplay()
     {
-        if (playerCard == null) return;
+        if (_playerCard.Equals(null)) return;
 
-        playerCard.username.text = this.steamUsername + " (" + this.ping + ")";
+        _playerCard.username.text = steamUsername + " (" + ping + ")";
     }
 
     #endregion
@@ -460,7 +476,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [ClientCallback] public override void IndexChanged(int prevIndex, int newIndex)
     {
         // Prevent updating card before it is created (this function is fired on join)
-        if (playerCard == null) return;
+        if (_playerCard.Equals(null)) return;
 
         // Propagate updates to the player card
         SetCardPosition();
@@ -476,7 +492,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SetCardReadyStatus();
         SetCardButtons();
         
-        room.ReadyStatusChanged();
+        _room.ReadyStatusChanged();
     }
 
     /// <summary>
@@ -502,36 +518,36 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     #region Button Click Events
 
     // Called by the local host player when the start button is clicked
-    [Client] public void OnStartButtonClick()
+    [Client] private void OnStartButtonClick()
     {
-        room.showStartButton = false;
+        _room.showStartButton = false;
 
         Matchmaking mm = FindObjectOfType<Matchmaking>();
         if (mm) mm.StartHost();
 
-        room.ServerChangeScene(room.GameplayScene);
+        _room.ServerChangeScene(_room.GameplayScene);
     }
 
     // Called by the local player when ready button is clicked
-    [Client] public void OnReadyButtonClick()
+    [Client] private void OnReadyButtonClick()
     {
-		if (!readyToBegin)
-		{
-			_audioManager.PlayReady();
-		}
+        if (!readyToBegin)
+        {
+            _audioManager.PlayReady();
+        }
         CmdChangeReadyState(!readyToBegin);
     }
 
     // Called by the local player when the character card is pressed
-    [Client] public void OnCharacterClicked()
+    [Client] private void OnCharacterClicked()
     {
         CmdChangeCharacterCode(GetNextAvailableCharacter());
     }
 
     // Called by the local player when the team button is pressed
-    [Client] public void OnTeamClicked()
+    [Client] private void OnTeamClicked()
     {
-        int newTeam = (teamIndex + 1) % FindObjectOfType<TeamsGamemode>().teams;
+        var newTeam = (teamIndex + 1) % FindObjectOfType<TeamsGamemode>().teams;
 
         _lobbySettings.localTeamIndex = newTeam;
         CmdChangeTeams(newTeam);
@@ -539,14 +555,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     #endregion
 
-    [Client] public int GetNextAvailableCharacter()
+    [Client] private int GetNextAvailableCharacter()
     {
-        int nextCode = -1;
+        var nextCode = -1;
 
-        int len = _characterSelectionInfo.characterAvailable.Length;
+        var len = _characterSelectionInfo.characterAvailable.Length;
 
         // Check the next available character
-        for (int i = characterCode + 1; i < characterCode + len + 1; i++)
+        for (var i = characterCode + 1; i < characterCode + len + 1; i++)
         {
             if (_characterSelectionInfo.characterAvailable[i % len])
             {
