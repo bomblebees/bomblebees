@@ -389,7 +389,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
 
         // Set the character portrait
-        _playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = $"Team {teamIndex}";
+        _playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = $"Team {teamIndex + 1}";
     }
 
     /// <summary>
