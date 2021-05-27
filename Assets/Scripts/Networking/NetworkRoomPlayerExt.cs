@@ -122,17 +122,42 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         if (isLocalPlayer)
         {
             // Enable/disable the start game button (for host only)
-            if (room.allPlayersReady && room.showStartButton)
-                roomUI.ActivateStartButton();
+            if (room.allPlayersReady)
+            {
+                if (room.showStartButton)
+                {
+                    roomUI.ActivateStartButton();
+                    roomUI.SetStartHelperText(null);
+                }
+                else
+                {
+                    roomUI.DeactivateStartButton();
+                    roomUI.SetStartHelperText("host only");
+                }
+
+            }
             else
+            {
                 roomUI.DeactivateStartButton();
+                
+                var currentPlayers = room.currentPlayers;
+                if (currentPlayers.Equals(0)) currentPlayers = 1;
+                
+                roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{currentPlayers})");
+            }
+
 
             // Enable/disable the ready button
             if (!this.readyToBegin && !_characterSelectionInfo.characterAvailable[this.characterCode])
+            {
                 roomUI.DeactivateReadyButton();
+                roomUI.SetReadyHelperText("choose an unselected character!");
+            }
             else
+            {
                 roomUI.ActivateReadyButton();
-
+                roomUI.SetReadyHelperText(null);
+            }
         }
 
         // If not ready, and character portrait is unavailable, grey out the portrait

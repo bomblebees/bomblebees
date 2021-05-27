@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using Mirror;
-using UnityEngine.SceneManagement;
-using System;
 
 /// <summary>
 /// Settings for a game, these values only have effect if they are
@@ -28,6 +24,9 @@ public class LobbySettings : NetworkBehaviour
 
     // local team index, client only
     public int localTeamIndex;
+    
+    // Misc.
+    private Room_UI _roomUI;
 
     private void Awake()
     {
@@ -98,6 +97,10 @@ public class LobbySettings : NetworkBehaviour
     {
         gamemodeButtonText.text = gamemodes[gamemodeSelected].ToString();
         gamemodeDescriptionText.text = gamemodes[gamemodeSelected].GetDescription();
+
+        if (_roomUI is null) _roomUI = FindObjectOfType<Room_UI>();
+
+        _roomUI.SetGameModeHelperText($"current mode: {gamemodeButtonText.text.ToLower()}");
     }
 
     [Client] public Gamemode GetGamemode()

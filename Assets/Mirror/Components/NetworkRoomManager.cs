@@ -122,22 +122,25 @@ namespace Mirror
             base.OnValidate();
         }
 
+        public int currentPlayers;
+        public int readyPlayers;
+        
         public void ReadyStatusChanged()
         {
-            int CurrentPlayers = 0;
-            int ReadyPlayers = 0;
+            currentPlayers = 0;
+            readyPlayers = 0;
 
             foreach (NetworkRoomPlayer item in roomSlots)
             {
                 if (item != null)
                 {
-                    CurrentPlayers++;
+                    currentPlayers++;
                     if (item.readyToBegin)
-                        ReadyPlayers++;
+                        readyPlayers++;
                 }
             }
 
-            if (CurrentPlayers == ReadyPlayers)
+            if (currentPlayers == readyPlayers)
                 CheckReadyToBegin();
             else
                 allPlayersReady = false;
