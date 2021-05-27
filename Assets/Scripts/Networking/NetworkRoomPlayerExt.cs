@@ -126,18 +126,20 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             {
                 if (room.showStartButton)
                 {
+                    // Host: All ready
                     roomUI.ActivateStartButton();
                     roomUI.SetStartHelperText(null);
                 }
                 else
                 {
+                    // Client: All ready
                     roomUI.DeactivateStartButton();
                     if (!_networkManager.networkAddress.Equals("localhost")) roomUI.SetStartHelperText("host only");
                 }
-
             }
             else
             {
+                // Not all ready
                 roomUI.DeactivateStartButton();
                 roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
             }
