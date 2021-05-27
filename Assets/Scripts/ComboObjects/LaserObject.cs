@@ -15,8 +15,8 @@ public class LaserObject : TriggerObject
 
     protected override void StartDangerAnim()
     {
-        this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
-        this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
+        // this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
+        // this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
     
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
