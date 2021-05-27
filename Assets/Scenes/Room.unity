@@ -3581,19 +3581,12 @@ MonoBehaviour:
   screenHowToPlay: {fileID: 711715748}
   screenControls: {fileID: 2137116034}
   screenLeavePopup: {fileID: 879786481}
-  deactivatedOpacity: 0.2
-  activatedOpacity: 1
   buttonStart: {fileID: 1845306631}
   buttonReady: {fileID: 253897653}
   readyHelperText: {fileID: 1506989272}
   startHelperText: {fileID: 1855424886}
   gameModeHelperText: {fileID: 100482239}
   playerCardsParent: {fileID: 784537919}
-  playerCardsList:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   lobbyName: {fileID: 324356051}
 --- !u!1 &1175199771
 GameObject:
@@ -4064,7 +4057,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Game
 
-    Settings'
+    Mode'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 605433b68313d491a8ab88bc03a41651, type: 2}
   m_sharedMaterial: {fileID: 2830636965969884548, guid: 605433b68313d491a8ab88bc03a41651,

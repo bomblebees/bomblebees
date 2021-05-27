@@ -21,8 +21,7 @@ public class TeamsGamemode : Gamemode
     // -- Methods -- //
     public override string GetDescription()
     {
-        string desc = "Standard teams versus teams mode. " +
-            "\n\n <color=#DDEF1F>The last team standing wins!</color>";
+        string desc = "Standard teams versus teams mode, the last team standing wins!";
 
         return desc;
     }

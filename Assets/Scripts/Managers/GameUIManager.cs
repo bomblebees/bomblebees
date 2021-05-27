@@ -165,7 +165,7 @@ public class GameUIManager : NetworkBehaviour
 
     [Client] public void OnChangeKills(int prevKills, int newKills, GameObject player)
     {
-        if (lobbySettings.GetGamemode() is EliminationGamemode)
+        if (lobbySettings.GetGamemode() is KillsGamemode)
         {
             livesUI.UpdateEliminations(newKills, player.GetComponent<Player>());
             livesUI.UpdateOrdering();

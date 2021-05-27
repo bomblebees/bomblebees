@@ -35,8 +35,8 @@ public class LivesUI : MonoBehaviour
             conditionText.text = "Last bee standing wins!";
         else if (selectedGamemode is TeamsGamemode)
             conditionText.text = "Last team standing wins!";
-        else if (selectedGamemode is EliminationGamemode)
-            conditionText.text = "First to " + (selectedGamemode as EliminationGamemode).eliminations + " kills win!";
+        else if (selectedGamemode is KillsGamemode)
+            conditionText.text = "First to " + (selectedGamemode as KillsGamemode).eliminations + " kills win!";
         else if (selectedGamemode is ComboGamemode)
             conditionText.text = "First to " + (selectedGamemode as ComboGamemode).combos + " combos win!";
     }
@@ -105,7 +105,7 @@ public class LivesUI : MonoBehaviour
             }
         }
         
-        if (_lobbySettings.GetGamemode() is EliminationGamemode) elem.eliminationsObject.SetActive(true);
+        if (_lobbySettings.GetGamemode() is KillsGamemode) elem.eliminationsObject.SetActive(true);
         if (_lobbySettings.GetGamemode() is ComboGamemode) elem.combosObject.SetActive(true);
     }
 

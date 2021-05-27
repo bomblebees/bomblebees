@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class StandardGamemode : Gamemode
 {
-    [SerializeField] private string gamemodeName = "Standard";
+    [SerializeField] private string gamemodeName = "Free for all";
 
     [Header("Defaults")]
     [SerializeField] private float roundDuration = 180f;
@@ -19,8 +19,10 @@ public class StandardGamemode : Gamemode
     // -- Methods -- //
     public override string GetDescription()
     {
-        string desc = "The classic free for all Bomblebees experience" +
-            "\n\n <color=#DDEF1F>The last bee standing wins!</color>";
+        string desc = "The Bomblebees battle royale experience, last bee standing wins!" +
+            "\n <color=#DDEF1F>" +
+            "\n Player lives limited to 3" +
+            "</color>";
 
         return desc;
     }

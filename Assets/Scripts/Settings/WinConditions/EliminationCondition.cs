@@ -14,7 +14,7 @@ public class EliminationCondition : WinCondition
     [Server]
     public override void InitWinCondition()
     {
-        toEliminations = FindObjectOfType<EliminationGamemode>().eliminations;
+        toEliminations = FindObjectOfType<KillsGamemode>().eliminations;
     }
 
     [Server]

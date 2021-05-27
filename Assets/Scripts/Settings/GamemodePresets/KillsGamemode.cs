@@ -5,9 +5,9 @@ using TMPro;
 using UnityEngine;
 using Mirror;
 
-public class EliminationGamemode : Gamemode
+public class KillsGamemode : Gamemode
 {
-    [SerializeField] private string gamemodeName = "Elimination";
+    [SerializeField] private string gamemodeName = "Elimination (Old)";
 
     [Header("Defaults")]
     [SerializeField] private float roundDuration = 0f;
