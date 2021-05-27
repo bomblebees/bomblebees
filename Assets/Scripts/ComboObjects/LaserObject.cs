@@ -15,24 +15,24 @@ public class LaserObject : TriggerObject
 
     protected override void StartDangerAnim()
     {
-        this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
-        this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
+        // this.model.GetComponent<Renderer>().materials[0].SetFloat("_WobbleToggle", 1f);
+        // this.model.GetComponent<Renderer>().materials[1].SetFloat("_WobbleToggle", 1f);
     }
     
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {		
+
+
+		if (isSpinnable && !isActivated) // boolean defined in TriggerObject; set to false when hitbox is activated
+		{
+			GetSpunDirection(edgeIndex, triggeringPlayer, true);
+		}
 		if (!isActivated)
 		{
 			isActivated = true;
 			chargeSFX.SetActive(true);
 		}
-
-		if (isSpinnable) // boolean defined in TriggerObject; set to false when hitbox is activated
-		{
-			GetSpunDirection(edgeIndex, triggeringPlayer, true);
-		}
-
-        return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
+		return base.Push(edgeIndex, triggeringPlayer);  // Uses TriggerObject.Push(). If a bug arises, switch order
     }
 
     // protected virtual void UpdateLaserDirection(int edgeIndex, GameObject triggeringPlayer)

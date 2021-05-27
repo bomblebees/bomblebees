@@ -56,6 +56,9 @@ public class PlayerBombPlace : NetworkBehaviour
         // Code after this point is run only on the local player
         if (!isLocalPlayer || this.GetComponent<Player>().isEliminated) return;
 
+        // If frozen dont allow bomb placing
+        if (this.GetComponent<Player>().isFrozen) return;
+
         // Check for key press every frame
         ListenForPlaceInput();
     }

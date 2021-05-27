@@ -77,6 +77,9 @@ public class PlayerSwap : NetworkBehaviour
         // Applies the tile selection highlight
         ApplyTileHighlight();
 
+        // If frozen dont allow swapping
+        if (this.GetComponent<Player>().isFrozen) return;
+
         // Only run the rest of update if the player is not eliminated
         if (this.GetComponent<Player>().isEliminated) return;
 
