@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 // To change
 // - Push() to spawn laser
 // - TickDown() to not 
@@ -68,11 +69,18 @@ public class TriggerObject : ComboObject
             // "Toggle on" radial timer
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
-            this.bombRadialTimerImage.color = new Vector4(1,1,1,.75f);
-            if (telegraphBeam) this.telegraphBeam.gameObject.SetActive(true);
+            this.bombRadialTimerImage.color = new Vector4(1,1,1,.75f);          // Enable radial timer
+            if (telegraphBeam)
+            {
+                this.telegraphBeam.gameObject.SetActive(true);   // Enable telegraph beam
+                LeanTween.value(telegraphBeam.gameObject, telegraphSizeCallback, 10f, 0.2f, 0.8f); // Size tween
+                LeanTween.value(telegraphBeam.gameObject, telegraphGlowCallback, 1f, 10f, 0.8f); // Glow tween
+            }
         }
     }
 
+    void telegraphSizeCallback(float val) { telegraphBeam.SetWidth(val, val); }
+    void telegraphGlowCallback(float val) { telegraphBeam.material.SetFloat("_GlowScalar", val); }//telegraphBeam.SetWidth(val, val); }
 
     protected virtual void StartDangerAnim()
     {
