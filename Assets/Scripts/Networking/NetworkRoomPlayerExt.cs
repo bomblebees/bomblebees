@@ -132,18 +132,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 else
                 {
                     roomUI.DeactivateStartButton();
-                    roomUI.SetStartHelperText("host only");
+                    if (!_networkManager.networkAddress.Equals("localhost")) roomUI.SetStartHelperText("host only");
                 }
 
             }
             else
             {
                 roomUI.DeactivateStartButton();
-                
-                var currentPlayers = room.currentPlayers;
-                if (currentPlayers.Equals(0)) currentPlayers = 1;
-                
-                roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{currentPlayers})");
+                roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
             }
 
 
@@ -192,12 +188,15 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [Client] private void SetupLobby()
     {
         // Exit if lobby is already setup
-        if (playerCard) return;
-
-        InitRequiredVars();
-        InitLobbyButtons();
-        CreatePlayerCard();
-        InitPlayerCard();
+        if (!playerCard)
+        {
+            InitRequiredVars();
+            InitLobbyButtons();
+            CreatePlayerCard();
+            InitPlayerCard();
+        }
+        
+        FindObjectOfType<NetworkRoomManagerExt>().ReadyStatusChanged();
     }
     
     /// <summary>
