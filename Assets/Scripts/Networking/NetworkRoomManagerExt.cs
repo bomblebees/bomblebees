@@ -21,7 +21,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnStartServer();
 
         spawnPrefabs.Clear();
-        spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
+        spawnPrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
     }
 
     public override void OnStartClient()
@@ -29,7 +29,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnStartClient();
 
         // Prefab Loading
-        var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs");
 
         NetworkClient.ClearSpawners();
 
