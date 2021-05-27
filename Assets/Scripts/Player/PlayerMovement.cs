@@ -7,9 +7,9 @@ using Mirror;
 public class PlayerMovement : NetworkBehaviour
 {
     [Header("Required")]
-    [SerializeField] private GameObject ghostModel;
-    [SerializeField] private GameObject playerModel;
     [SerializeField] private CharacterController controller;
+    private GameObject playerModel;
+    private GameObject ghostModel;
 
     private float horizontalAxis;
     private float verticalAxis;
@@ -28,6 +28,12 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Speeds")] 
     [SerializeField] private float movementSpeed = 50f;
     [SerializeField] private float turnSpeed = 17f;
+
+    private void Start()
+    {
+        playerModel = this.GetComponent<Player>().playerModel;
+        ghostModel = this.GetComponent<Player>().ghostModel;
+    }
 
     public override void OnStartClient()
     {
@@ -86,7 +92,7 @@ public class PlayerMovement : NetworkBehaviour
                 rotation = Quaternion.Slerp(
                     playerModel.transform.rotation,
                     Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime);
+                    turnSpeed * sludgedScalar * Time.deltaTime);
 
                 playerModel.transform.rotation = rotation;
             } else if (ghostModel.activeSelf)
@@ -95,10 +101,13 @@ public class PlayerMovement : NetworkBehaviour
                 rotation = Quaternion.Slerp(
                     ghostModel.transform.rotation,
                     Quaternion.LookRotation(direction),
-                    turnSpeed * Time.deltaTime);
+                    turnSpeed * sludgedScalar * Time.deltaTime);
 
                 ghostModel.transform.rotation = rotation;
             }
+
+            // Return here if the player is frozen, allow rotation but not movement
+            if (this.GetComponent<Player>().isFrozen) return; 
 
             // Move the player
             controller.Move(direction * movementSpeed * sludgedScalar * spinChargedScalar * Time.deltaTime);

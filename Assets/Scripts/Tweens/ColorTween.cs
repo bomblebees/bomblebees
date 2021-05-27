@@ -12,6 +12,9 @@ public class ColorTween : MonoBehaviour
     public float easeInTime;
     public float easeOutTime;
 
+    public float startDelay = 0f;
+    public float finishDelay = 0f;
+
     public float timeBetweenLoop;
 
     public LeanTweenType easeIn = LeanTweenType.linear;
@@ -25,23 +28,35 @@ public class ColorTween : MonoBehaviour
         if (startOnEnabled) StartTween();
     }
 
+    private int cur = 0;
+
     public void StartTween()
     {
+        // Cancel the tween if we are already playing
+        LeanTween.cancel(cur);
+
         if (endAfterFinish)
         {
-            LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
+            cur = LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
                 .setEase(easeIn)
-                .setOnComplete(EndTween);
+                .setDelay(startDelay)
+                .setOnComplete(EndTween)
+                .id;
         } else
         {
-            LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
-                .setEase(easeIn);
+            cur = LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
+                .setEase(easeIn)
+                .setDelay(startDelay)
+                .id;
         }
     }
 
     public void EndTween()
     {
-        LeanTween.value(gameObject, updateColorCallback, targetColor, endColor, easeOutTime).setEase(easeOut);
+        cur = LeanTween.value(gameObject, updateColorCallback, targetColor, endColor, easeOutTime)
+            .setEase(easeOut)
+            .setDelay(finishDelay)
+            .id;
     }
 
     private bool loopStarted = false;
@@ -57,9 +72,10 @@ public class ColorTween : MonoBehaviour
         LeanTween.delayedCall(gameObject, timeBetweenLoop, () => {
             if (loopEnd) return;
 
-            LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
+            cur = LeanTween.value(gameObject, updateColorCallback, endColor, targetColor, easeInTime)
                 .setEase(easeIn)
-                .setLoopPingPong(1);
+                .setLoopPingPong(1)
+                .id;
 
         }).setRepeat(-1);
 
@@ -67,6 +83,8 @@ public class ColorTween : MonoBehaviour
 
     public void EndLoopTween()
     {
+        // Cancel the tween if we are already playing
+        LeanTween.cancel(cur);
         loopEnd = true;
     }
 

@@ -7,6 +7,7 @@ using TMPro;
 using System;
 using Mirror;
 using Steamworks;
+using System.Linq;
 
 public class RoundManager : NetworkBehaviour
 {
@@ -14,20 +15,19 @@ public class RoundManager : NetworkBehaviour
     {
         public Health health;
         public Player player;
-        public ulong steamId;
     }
-	private bool roundOver;
 
-    public List<PlayerInfo> playerList = new List<PlayerInfo>();
-    public List<PlayerInfo> alivePlayers = new List<PlayerInfo>();
+    // whether the round is over
+    [SyncVar] public bool roundOver = false;
 
-	public int numPlayers = 0;
+    // Lists
+    public List<GameObject> playerList = new List<GameObject>();
+    public List<WinCondition> winConditions = new List<WinCondition>();
 
     [SyncVar(hook = nameof(UpdateGridsAliveCount))]
-    public int aliveCount = -1;
+    public int aliveCount;
 
-	[SyncVar]
-	public int currentGlobalInventorySize = 3;
+    [SyncVar] public int currentGlobalInventorySize = 3;
 
     [Header("Server End Selection")]
 	[SerializeField] private Canvas serverEndSelectionCanvas;
@@ -37,45 +37,26 @@ public class RoundManager : NetworkBehaviour
 	[Header("Stat Tracker")]
 	[SerializeField] public GameObject[] statsElementUIAnchorObjects;
 
-	// order of elimination so we can print out the placements in results screen in right order
-	public SyncList<GameObject> orderedPlayerList = new SyncList<GameObject>();
-
 	[Header("Round Settings")]
     [SerializeField] public int startGameFreezeDuration = 5;
     [SerializeField] public int endGameFreezeDuration = 5;
-	[SerializeField] public int playerMaxLives = 3;
-
-    [SerializeField] public bool useRoundTimer = true;
-    [SerializeField] public float roundDuration = 60.0f;
-
-    [NonSerialized] public int playersConnected;
-    [NonSerialized] public int totalRoomPlayers;
-
-    [NonSerialized]
-    public HexGrid hexGrid;
-
-
+    
     // events
-    public delegate void PlayerConnectedDelegate(PlayerInfo p);
-    public delegate void RoundStartDelegate();
-    public delegate void RoundEndDelegate(GameObject winner);
-	public delegate void PlayerEliminatedDelegate(GameObject eliminatedPlayer);
 	public delegate void GlobalInventorySizeChangeDelegate(int newSize);
-    public event PlayerConnectedDelegate EventPlayerConnected;
-    public event RoundStartDelegate EventRoundStart;
-    public event RoundEndDelegate EventRoundEnd;
-	public event PlayerEliminatedDelegate EventPlayerEliminated;
 	public event GlobalInventorySizeChangeDelegate EventInventorySizeChanged;
 
     // singletons
     public static RoundManager _instance;
     public static RoundManager Singleton { get { return _instance;  } }
 
+    // Required Variables
     private EventManager eventManager;
-	NetworkRoomManagerExt room;
+	private NetworkRoomManagerExt room;
+    private HexGrid hexGrid;
+    private LobbySettings settings;
 
 
-	private void Awake()
+    private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
         else _instance = this;
@@ -97,16 +78,12 @@ public class RoundManager : NetworkBehaviour
 
 	public override void OnStartServer()
     {
-        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
-        totalRoomPlayers = room.roomSlots.Count;
-        // Event manager singleton
-        eventManager = EventManager.Singleton;
-        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
-        hexGrid = GameObject.FindObjectOfType<HexGrid>();
+        InitRequiredVars();
 
-		numPlayers = FindObjectsOfType<NetworkRoomPlayerExt>().Length;
+        // Subscribe to relevant events
+        eventManager.EventPlayerLoaded += OnPlayerLoadedIntoRound;
 
-		Debug.Log("num players in round manager start: " + numPlayers);
+        int numPlayers = FindObjectsOfType<NetworkRoomPlayerExt>().Length;
 
 		if (numPlayers > 1)
 		{
@@ -116,244 +93,246 @@ public class RoundManager : NetworkBehaviour
 		{
 			currentGlobalInventorySize = 5;
 		}
-	}
 
-    public void UpdateGridsAliveCount(int oldAliveCount, int newAliveCount)
-    {
-        if(hexGrid)
-        hexGrid.SetAliveCount(newAliveCount);
-    }
-    
-    [Client]
-    public override void OnStartClient()
-    {
-        try
-        {
-            ulong steamId = SteamUser.GetSteamID().m_SteamID;
-            CmdAddPlayerToRound(steamId);
-        } catch
-        {
-            CmdAddPlayerToRound(0);
-        }
+        InitRoundManager();
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdAddPlayerToRound(ulong steamId, NetworkConnectionToClient sender = null)
+    /// <summary>
+    /// Called when the player finishes loading into the scene.
+    /// </summary>
+    [Server] public void OnPlayerLoadedIntoRound(GameObject playerObject, int remaining)
     {
-        playersConnected++;
+        // Add the player to list of all players
+        playerList.Add(playerObject);
 
-        // Add player to list
-        Player player = sender.identity.gameObject.GetComponent<Player>();
-        Health live = sender.identity.gameObject.GetComponent<Health>();
-
-        PlayerInfo playerInfo = new PlayerInfo();
-        playerInfo.player = player;
-        playerInfo.health = live;
-        playerInfo.steamId = steamId;
-
-        playerList.Add(playerInfo);
-		// player.GetComponent<PlayerInventory>().ChangeInventorySize(currentGlobalInventorySize);
-		
-		// add player to stat tracker list and store reference to the player gameobject
-		// statTracker.CreatePlayerStatObject(sender.identity.gameObject);
-
-        // invoke event after added to list
-        EventPlayerConnected?.Invoke(playerInfo);
-
-        // Subscribe to life change event
-        live.EventLivesChanged += OnLivesChanged;
-
-
-        if (totalRoomPlayers == playersConnected)
-        {
-			
-			StartRound();
-        }
+        // if no more players waiting to load, start the round
+        if (remaining == 0) StartCoroutine(ServerStartRound());
     }
 
     #endregion
 
-    [Server]
-    public void StartRound()
+    /// <summary>
+    /// Initializes the required variables for the round manager
+    /// </summary>
+    [Server] private void InitRequiredVars()
     {
+        // Event manager singleton
+        eventManager = EventManager.Singleton;
+        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+
+        eventManager.EventPlayerEliminated += OnPlayerEliminated;
+
+        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        hexGrid = FindObjectOfType<HexGrid>();
+        settings = FindObjectOfType<LobbySettings>();
+    }
+
+    /// <summary>
+    /// Initializes win conditions and etc.
+    /// </summary>
+    [Server] private void InitRoundManager()
+    {
+        // -- ALL WIN CONDITIONS INITALIZED HERE -- //
+        if (settings.byLastAlive) winConditions.Add(this.gameObject.AddComponent<LivesCondition>());
+        if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());
+        if (settings.GetGamemode() is TeamsGamemode) winConditions.Add(this.gameObject.AddComponent<TeamsCondition>());
+        if (settings.GetGamemode() is KillsGamemode) winConditions.Add(this.gameObject.AddComponent<EliminationCondition>());
+        if (settings.GetGamemode() is ComboGamemode) winConditions.Add(this.gameObject.AddComponent<ComboCondition>());
+    }
+
+    [Server] public IEnumerator ServerStartRound()
+    {
+        // -- Pre-game start behaviours can go here -- //
+
+        // Set alive count to number of players
+        aliveCount = playerList.Count;
+
+        // Initialize and subscribe to all win conditions
+        foreach (WinCondition c in winConditions)
+        {
+            c.InitWinCondition();
+            c.EventWinConditionSatisfied += OnWinConditionSatisfied;
+        }
+
+        // Wait for freeze duration
+        yield return new WaitForSeconds(startGameFreezeDuration + 1);
+
+        // -- Game Starts Here -- //
+
+        // Unfreeze all players
+        foreach (GameObject p in playerList)
+        {
+            p.GetComponent<Player>().isFrozen = false;
+        }
+
+        // Invoke start round event
         eventManager.OnStartRound();
-        RpcStartRound();
-        StartCoroutine(ServerStartRound());
 
-
-    }
-
-    [Server]
-    public IEnumerator StartRoundTimer()
-    {
-        // wait for round to end, - 1 second for start time delay
-        yield return new WaitForSeconds(roundDuration - 1);
-
-        if (!CheckRoundEnd())
+        // Start all win conditions
+        foreach (WinCondition c in winConditions)
         {
-
-            // Player with lowest lives win
-            Player winner = GetWinnerPlayerByLives();
-
-            //Debug.Log("winner: " + winner.gameObject.transform.name);
-
-            if (winner != null)
-            {
-                EndRound(winner.gameObject);
-            } else
-            {
-                // Else, some other way to determine winner here
-                // EndRound() ends the round as a tie
-                EndRound();
-            }
+            c.StartWinCondition();
         }
 
+        // Start round on client
+        ClientStartRound();
+
+        UpdateGridsAliveCount(0, aliveCount);
+    }
+
+    [ClientRpc] public void ClientStartRound()
+    {
+        // Start camera follow
+        FindObjectOfType<CameraFollow>().InitCameraFollow();
     }
 
     [Server]
-    public void EndRound(GameObject winner = null)
+    public IEnumerator ServerEndRound()
     {
-		// Append all player objects to player list for event manager
-		List<Player> players = new List<Player>();
-        playerList.ForEach(pi => 
-		{
-			players.Add(pi.player);
-		});
+        // -- Pre-game end behaviours can go here -- //
 
-		
+        // Round is over
+        roundOver = true;
 
-		if (winner != null)
-		{
-			for (int i = 1; i <= playerMaxLives; i++)
-			{
-				for (int j = 0; j < alivePlayers.Count; j++)
-				{
-					if (alivePlayers[j].health.currentLives == i)
-					{
-						// If two players tie in health, arbitrary rank order for now; how would we sort this by whoever has more kills or something? :/ 
-						orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
-					}
-				}
-			}
-		}
-		else // there is no winner, so tie match
-		{
-			if (alivePlayers.Count < 1)
-			{
-				// no winner but none alive either, single player game, player was already inserted into ordered list
-				Debug.Log("single player game");
-				// orderedPlayerList.Insert(0, playerList[0].player.gameObject);
-			}
-			else
-			{
-				Debug.Log("tie with more than one remaining");
-				// add the rest of the alive players to eliminated players list in order of health (still arbitrary)
-				for (int i = 1; i <= playerMaxLives; i++)
-				{
-					for (int j = 0; j < alivePlayers.Count; j++)
-					{
-						if (alivePlayers[j].health.currentLives == i)
-						{
-							orderedPlayerList.Insert(0, alivePlayers[j].player.gameObject);
-						}
-					}
-				}
-			}
-		}
+        // Collect the winning order of the players
+        GameObject[] winningOrder = CollectWinningOrder();
 
-
+        // Invoke end round event
+        List<Player> players = new List<Player>();
+        playerList.ForEach(pi => { players.Add(pi.GetComponent<Player>()); });
         eventManager.OnEndRound(players);
-        RpcEndRound(winner);
-        StartCoroutine(ServerEndRound(winner));
-    }
 
-    [ClientRpc]
-    public void RpcStartRound()
-    {
-        EventRoundStart?.Invoke();
-
-    }
-    [ClientRpc] public void RpcEndRound(GameObject winner) 
-    {
-        EventRoundEnd?.Invoke(winner);
-    }
-
-	// Call this event when player gets eliminated
-	[ClientRpc]
-	public void RpcPlayerEliminated(GameObject eliminatedPlayer)
-	{
-		EventPlayerEliminated?.Invoke(eliminatedPlayer);
-	}
-
-    [Server]
-    public IEnumerator ServerStartRound()
-    {
-		// EventInventorySizeChanged?.Invoke(currentGlobalInventorySize);
-		yield return new WaitForSeconds(startGameFreezeDuration + 1);
-
-        for (int i = 0; i < playerList.Count; i++)
+        // Stop and unsubscribe from all win conditions
+        foreach (WinCondition c in winConditions)
         {
-            alivePlayers.Add(playerList[i]);
-            Player p = playerList[i].player;
-			p.playerListIndex = i;
-            //p.SetCanPlaceBombs(true);
-            //p.SetCanSpin(true);
-            //p.SetCanSwap(true); 
-            //p.SetCanMove(true);
+            c.StopWinCondition();
+            c.EventWinConditionSatisfied -= OnWinConditionSatisfied;
         }
-        aliveCount = alivePlayers.Count;
 
-		
+        // Wait for freeze duration
+        yield return new WaitForSeconds(endGameFreezeDuration);
 
+        // -- Game Ends Here -- //
 
+        RpcPrintResultsAndShowEndCard(winningOrder,
+            (settings.GetGamemode() is TeamsGamemode) ?
+              "Team " + winningOrder[0].GetComponent<Player>().teamIndex + " won!":
+               winningOrder[0].GetComponent<Player>().steamName + " won!");
 
-		UpdateGridsAliveCount(0, aliveCount);
-        if (useRoundTimer) StartCoroutine(StartRoundTimer());
-    }
-
-    [Server]
-    public IEnumerator ServerEndRound(GameObject winner = null)
-    {
-
-		yield return new WaitForSeconds(endGameFreezeDuration);
-
-		RpcPrintResults();
-		RpcShowEndCard();
-
-		Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
+        Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
         {
-	        CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
-	        
-	        button.interactable = true;
+            CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
+
+            button.interactable = true;
             button.gameObject.GetComponent<ButtonHoverTween>().enabled = true;
             _globalButtonSettings.ActivateButtonOpacity(canvasRenderers);
         }
     }
 
-    [ClientRpc]
-    private void RpcShowEndCard()
+    [Server] private GameObject[] CollectWinningOrder()
+    {
+        // Retrieve the winning order from the current gamemode
+        GameObject[] orderedArray = settings.gamemode.GetWinningOrder(playerList.ToArray());
+
+        // Debugging the array
+        for (int i = 0; i < orderedArray.Length; i++)
+        {
+            Player player = orderedArray[i].GetComponent<Player>();
+            Health health = orderedArray[i].GetComponent<Health>();
+
+            Debug.Log("Pos " + i + " | Player " + player.playerRoomIndex + " with lives " + health.currentLives);
+        }
+
+        // Return the array
+        return orderedArray;
+    }
+
+    #region Subscriptions
+
+    /// <summary>
+    /// Called whenever a win condition is satisfied
+    /// </summary>
+    /// <param name="cond">The win condition that was satisfied</param>
+    [Server] public void OnWinConditionSatisfied()
+    {
+        if (settings.endAfterFirstWinCondition)
+        {
+            // End the round right after a win condition is satisfied
+            StartCoroutine(ServerEndRound());
+        }
+        else
+        {
+            bool notSatisfied = true;
+
+            // Check if all conditions are satisfied
+            foreach (WinCondition c in winConditions)
+            {
+                notSatisfied &= c.CheckWinCondition();
+            }
+
+            // If they are, end the round
+            if (!notSatisfied) StartCoroutine(ServerEndRound());
+        }
+    }
+
+    [Server]
+    public void OnPlayerEliminated(double timeOfElim, GameObject player)
+    {
+        // Update alive count
+        aliveCount--;
+
+        IncreaseGlobalLivesAmt();
+    }
+
+    [Client] public void UpdateGridsAliveCount(int _, int newAliveCount)
+    {
+        if (hexGrid) hexGrid.SetAliveCount(newAliveCount);
+    }
+
+    #endregion
+
+    [Server]
+    public void IncreaseGlobalLivesAmt()
+    {
+        if (aliveCount > 1)
+        {
+            // if there are still more than 1 person left after this death, increase global inv size
+            currentGlobalInventorySize++;
+            EventInventorySizeChanged?.Invoke(currentGlobalInventorySize);
+        }
+    }
+
+    #region End Game Results
+
+    [ClientRpc] private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder, string winText)
     {
         serverEndSelectionCanvas.enabled = true;
+
+        for (int i = 0; i < winningOrder.Length; i++)
+        {
+            PlayerStatTracker stat = winningOrder[i].GetComponent<PlayerStatTracker>();
+
+            stat.placement = i + 1;
+            stat.PrintStats();
+            stat.CreateStatsUIElement(statsElementUIAnchorObjects[i]);
+        }
+
+
+
+        FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(winText);
+
     }
-    
+
     [ClientRpc]
     private void RpcShowLoadingScreen()
     {
         FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = true;
     }
 
-	[ClientRpc]
-	private void RpcPrintResults()
-	{
-		for (int i = 0; i < orderedPlayerList.Count; i++)
-		{
-			orderedPlayerList[i].GetComponent<PlayerStatTracker>().placement = i + 1;
-			orderedPlayerList[i].GetComponent<PlayerStatTracker>().PrintStats();
-			orderedPlayerList[i].GetComponent<PlayerStatTracker>().CreateStatsUIElement(statsElementUIAnchorObjects[i]);
-		}
-		
-	}
+    #endregion
+
+    #region Cheats
 
     [Server]
     public void ChooseReturnToLobby()
@@ -375,103 +354,6 @@ public class RoundManager : NetworkBehaviour
         room.ServerChangeScene(room.GameplayScene);
     }
 
-    [Server]
-    public void OnLivesChanged(int currentHealth, int _, GameObject player)
-    {
-		if (roundOver) return;
-        if (currentHealth < 1)
-        {
-            // Remove players that are dead
-            for (int i = 0; i < playerList.Count; i++)
-            {
-                //Debug.Log("ROUND MANAGER: player " + i + " has lives: " + playerList[i].health.currentLives);
-                if (playerList[i].health.currentLives <= 0)
-                {
-                    alivePlayers.Remove(playerList[i]);
-                }
-            }
-
-			Debug.Log("inserting dead player to ordered elimination list");
-			orderedPlayerList.Insert(0, player);
-
-            // update alive count
-            aliveCount = alivePlayers.Count;
-
-			IncreaseGlobalLivesAmt();
-
-			// check if the round has ended
-			CheckRoundEnd();
-			EventPlayerEliminated?.Invoke(player);
-			
-        }
-    }
-
-	[Server]
-	public void IncreaseGlobalLivesAmt()
-	{
-		if (aliveCount > 1)
-		{
-			// if there are still more than 1 person left after this death, increase global inv size
-			currentGlobalInventorySize++;
-			EventInventorySizeChanged?.Invoke(currentGlobalInventorySize);
-			// RpcIncreaseGlobalLivesAmt(currentGlobalInventorySize);
-		}
-	}
-
-	/*
-	[ClientRpc]
-	public void RpcIncreaseGlobalLivesAmt(int size)
-	{
-		EventInventorySizeChanged?.Invoke(
-	}
-	*/
-
-    [Server] // returns true if the round ended successfully, false otherwise
-    public bool CheckRoundEnd()
-    {
-		// End the round if only one player alive
-		if (roundOver) return true;
-        if (aliveCount <= 1)
-        {
-            if (aliveCount == 0) EndRound(); // if round is over and nobody is alive, single player game
-            else EndRound(alivePlayers[0].player.gameObject);
-			roundOver = true;
-            return true;
-        }
-
-        return false;
-    }
-
-    // returns the player than won this round, null if there is a tie
-    public Player GetWinnerPlayerByLives()
-    {
-        int maxLife = -1;
-
-        foreach (PlayerInfo pi in alivePlayers)
-        {
-            int l = pi.health.currentLives;
-
-            // If any two players have same lives, then no winner
-            if (l == maxLife) { maxLife = -1; break; }
-
-            // First life becomes the minLife
-            if (maxLife == -1) maxLife = l;
-
-            // If player life is new max, set that as maxLife
-            if (l > maxLife) maxLife = l;
-        }
-
-        if (maxLife >= 0)
-        {
-            // There is a winner
-            return alivePlayers.Find(e => e.health.currentLives == maxLife).player;
-        } else 
-        {
-            // There was a tie (we can check further win conditions here, ex. player with most combos)
-            return null;
-        }
-    }
-
     private void Update()
     {
         // TODO: Delete later
@@ -488,18 +370,7 @@ public class RoundManager : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha7) && Input.GetKey(KeyCode.C))
         {
-	        if (CheckRoundEnd()) return;
-
-	        Player winner = GetWinnerPlayerByLives();
-
-	        if (winner != null)
-	        {
-		        EndRound(winner.gameObject);
-	        } 
-	        else
-	        {
-		        EndRound();
-	        }
+            StartCoroutine(ServerEndRound());
         }
 
 		// cheat for increasing inv size
@@ -508,4 +379,6 @@ public class RoundManager : NetworkBehaviour
 			IncreaseGlobalLivesAmt();
 		}
 	}
+
+    #endregion
 }

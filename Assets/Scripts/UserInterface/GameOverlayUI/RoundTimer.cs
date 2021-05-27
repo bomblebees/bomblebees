@@ -107,13 +107,11 @@ public class RoundTimer : MonoBehaviour
         timerStarted = true;
     }
 
-    public IEnumerator InitTimer(float duration, float freezeTime)
+    public void InitTimer(float duration)
     {
         int minutes = Mathf.FloorToInt(duration / 60F);
         int seconds = Mathf.FloorToInt(duration - minutes * 60);
 
         timerText.text = string.Format("{0:0}:{1:00}", minutes, seconds);
-        yield return new WaitForSeconds(freezeTime + 1);
-        StartTimer(duration);
     }
 }

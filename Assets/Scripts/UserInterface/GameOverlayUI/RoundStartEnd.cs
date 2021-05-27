@@ -28,14 +28,14 @@ public class RoundStartEnd : MonoBehaviour
         titleText.text = "";
     }
 
-    public IEnumerator EndRoundFreezetime(int freezetime, GameObject winner)
+    public IEnumerator EndRoundFreezetime(int freezetime)
     {
-        if (winner != null) titleText.text = winner.GetComponent<Player>().steamName + " won!";
-        else titleText.text = "Tied!";
-
-        FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(titleText.text);
+        titleText.text = "<size=400%>Game!</size>";
+        //titleText.gameObject.transform.localPosition = new Vector3(0, 60, 0);
+        //titleText.color = new Color32(255, 255, 255, 220);
 
         yield return new WaitForSeconds(freezetime);
+
         titleText.text = "";
     }
 

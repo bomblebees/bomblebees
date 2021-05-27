@@ -5,21 +5,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Steamworks;
+using System.Linq;
 
 public class LivesUI : MonoBehaviour
 {
-    [Serializable]
-    public class LivesElem
-    {
-        public GameObject livesObject;
-        public Image avatar;
-        public RawImage background;
-        public GameObject[] hearts;
-        public TMP_Text playerName;
-        public TMP_Text livesCounter;
-    }
-
-    //[SerializeField] private LivesElem[] livesUIs = new LivesElem[4];
 
     [SerializeField] private GameObject[] livesAnchors = new GameObject[4];
 
@@ -27,79 +16,106 @@ public class LivesUI : MonoBehaviour
 
     [SerializeField] GameUIManager gameUIManager = null;
 
-    private List<LivesUIElement> livesUIs = new List<LivesUIElement>();
+    [SerializeField] TMP_Text conditionText;
 
-    public void EnableLivesUI(GameObject[] players)
+    private LivesUIElement[] livesUIs = new LivesUIElement[4];
+    private List<GameObject> playerList = new List<GameObject>();
+
+    private LobbySettings _lobbySettings;
+    private Gamemode selectedGamemode;
+
+    private void Awake()
     {
-        for (int i = 0; i < players.Length; i++)
+        _lobbySettings = FindObjectOfType<LobbySettings>();
+        if (_lobbySettings == null) Debug.LogError("LobbySettings not found!");
+
+        selectedGamemode = _lobbySettings.GetGamemode();
+
+        if (selectedGamemode is StandardGamemode)
+            conditionText.text = "Last bee standing wins!";
+        else if (selectedGamemode is TeamsGamemode)
+            conditionText.text = "Last team standing wins!";
+        else if (selectedGamemode is KillsGamemode)
+            conditionText.text = "First to " + (selectedGamemode as KillsGamemode).eliminations + " kills win!";
+        else if (selectedGamemode is ComboGamemode)
+            conditionText.text = "First to " + (selectedGamemode as ComboGamemode).combos + " combos win!";
+    }
+
+    public void EnableLivesUI(Player p)
+    {
+        // create the player card
+        GameObject obj = Instantiate(
+            livesUIElementPrefab,
+            livesAnchors[p.playerRoomIndex].transform.position,
+            livesAnchors[p.playerRoomIndex].transform.rotation,
+            gameObject.transform);
+
+        // resacle to anchor size
+        obj.transform.localScale = livesAnchors[p.playerRoomIndex].transform.localScale;
+
+        LivesUIElement elem = obj.GetComponent<LivesUIElement>();
+
+        // add to list
+        livesUIs[p.playerRoomIndex] = elem;
+
+        // enable ui for player
+        elem.livesObject.SetActive(true);
+
+        // set the avatar
+        elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
+
+        // set the player
+        elem.player = p.gameObject;
+
+        // if it is the local player
+        if (p.transform.root.name == "LocalPlayer")
         {
-            Player p = players[i].GetComponent<Player>();
+            // set background to white
+            elem.background.color = Color.white;
 
-            // create the player card
-            GameObject obj = Instantiate(
-                livesUIElementPrefab,
-                new Vector3(0, 0, 0),
-                Quaternion.identity,
-                livesAnchors[i].transform);
-
-            // to make sure its positioned at 0 0 0 locally
-            obj.transform.localPosition = new Vector3(0, 0, 0);
-
-            LivesUIElement elem = obj.GetComponent<LivesUIElement>();
-
-            // add to a list
-            livesUIs.Add(elem);
-
-            // enable ui for players
-            elem.livesObject.SetActive(true);
-
-            // set the avatar
-            elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
-
-            // initialize username
-            //elem.playerName.text = p.steamName;
-
-            // Set the lives
-            for (int j = 0; j < elem.hearts.Length; j++)
-            {
-                elem.hearts[j].SetActive(true);
-                elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
-            }
+            // the flash color on the tween returns to white
+            elem.background.GetComponent<ColorTween>().endColor = Color.white;
         }
 
+        // enable the ranking text
+        livesAnchors[p.playerRoomIndex].transform.Find("RankText").gameObject.SetActive(true);
+
+        // add player to player list
+        playerList.Add(p.gameObject);
+
+
+
+        // Set the lives (if applicable)
+        if (_lobbySettings.GetGamemode() is StandardGamemode
+            || _lobbySettings.GetGamemode() is TeamsGamemode)
+        {
+            elem.heartsObject.SetActive(true);
+
+            
+            for (int j = 0; j < elem.hearts.Length; j++)
+            {
+                if (j < p.GetComponent<Health>().maxLives)
+                {
+                    elem.hearts[j].SetActive(true);
+                    elem.hearts[j].GetComponent<Image>().sprite = gameUIManager.GetComponent<CharacterHelper>().GetLivesImage(p.characterCode);
+                } else
+                {
+                    elem.hearts[j].SetActive(false);
+                }
+            }
+        }
+        
+        if (_lobbySettings.GetGamemode() is KillsGamemode) elem.eliminationsObject.SetActive(true);
+        if (_lobbySettings.GetGamemode() is ComboGamemode) elem.combosObject.SetActive(true);
     }
 
     public void UpdateLives(int currentLives, Player player)
     {
-        int i = player.playerListIndex;
+        int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
-        // If player name has not been updated, initialize it
-        if (livesUIs[i].playerName.text.Length <= 0)
-        {
-            ulong steamId = player.steamId;
+        Debug.Log("update lives: " + currentLives);
 
-            string userName = "[Player Name]";
-
-            // Set steam user name and avatars
-            if (steamId != 0)
-            {
-                CSteamID steamID = new CSteamID(steamId);
-
-                userName = SteamFriends.GetFriendPersonaName(steamID);
-            }
-
-            // Update username
-            livesUIs[i].playerName.text = userName;
-        }
-
-        // Update health
-        int lifeCount = currentLives;
-
-        Debug.Log("player " + i + " has " + lifeCount + " lives");
-
-        livesUIs[i].livesCounter.text = "Lives: " + lifeCount.ToString();
-
-        switch (lifeCount)
+        switch (currentLives)
         {
             case 2: { livesUIs[i].hearts[2].SetActive(false); break; }
             case 1: {
@@ -117,26 +133,34 @@ public class LivesUI : MonoBehaviour
         }
     }
 
-    private Texture2D GetSteamImageAsTexture(int iImage)
+    public void UpdateCombos(int combos, Player player)
     {
-        Texture2D texture = null;
+        int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
-        bool isValid = SteamUtils.GetImageSize(iImage, out uint width, out uint height);
+        livesUIs[i].combosText.text = combos.ToString();
+    }
 
-        if (isValid)
+    public void UpdateEliminations(int killAmt, Player player)
+    {
+        int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
+
+        livesUIs[i].elimsText.text = killAmt.ToString();
+    }
+
+    public void UpdateOrdering()
+    {
+        // Recalculate the winning order
+        GameObject[] orderedList = _lobbySettings.GetGamemode().GetWinningOrder(playerList.ToArray());
+
+        // Reorder livesUI based on new list 
+        livesUIs = livesUIs.OrderBy(e => e == null ? 4 : Array.IndexOf(orderedList, e.player)).ToArray();
+
+
+        for (int i = 0; i < playerList.Count; i++)
         {
-            byte[] image = new byte[width * height * 4];
-
-            isValid = SteamUtils.GetImageRGBA(iImage, image, (int)(width * height * 4));
-
-            if (isValid)
-            {
-                texture = new Texture2D((int)width, (int)height, TextureFormat.RGBA32, false, true);
-                texture.LoadRawTextureData(image);
-                texture.Apply();
-            }
+            // Move lives ui to the new positions
+            LeanTween.moveLocal(livesUIs[i].gameObject, livesAnchors[i].transform.localPosition, 1f)
+                .setEase(LeanTweenType.easeOutExpo);
         }
-
-        return texture;
     }
 }

@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 // To change
 // - Push() to spawn laser
 // - TickDown() to not 
 public class TriggerObject : ComboObject
 {
+    [SerializeField] LineRenderer telegraphBeam;
     public float breakdownDuration = 3f;
     public bool wasHit = false;
     protected bool canBeTriggered = true; // to make sure it's only hit once.
@@ -19,9 +21,10 @@ public class TriggerObject : ComboObject
     protected float targetAngle = 0f;
     protected float startAngle;
     protected bool isRotating = false;
+	public bool isSpinnable = true;
 
 
-    protected IEnumerator
+	protected IEnumerator
         procCoroutine =
             null; // when Proc coroutine starts, store to this null var so that we can reference and stop it in Breakdown() even after Proc happens
 
@@ -66,10 +69,18 @@ public class TriggerObject : ComboObject
             // "Toggle on" radial timer
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
-            this.bombRadialTimerImage.color = new Vector4(1,1,1,1);
+            this.bombRadialTimerImage.color = new Vector4(1,1,1,.75f);          // Enable radial timer
+            if (telegraphBeam)
+            {
+                this.telegraphBeam.gameObject.SetActive(true);   // Enable telegraph beam
+                LeanTween.value(telegraphBeam.gameObject, telegraphSizeCallback, 10f, 0.2f, 0.8f); // Size tween
+                LeanTween.value(telegraphBeam.gameObject, telegraphGlowCallback, 0.5f, 3f, 0.8f); // Glow tween
+            }
         }
     }
 
+    void telegraphSizeCallback(float val) { telegraphBeam.SetWidth(val, val); }
+    void telegraphGlowCallback(float val) { telegraphBeam.material.SetFloat("_GlowScalar", val); }//telegraphBeam.SetWidth(val, val); }
 
     protected virtual void StartDangerAnim()
     {
@@ -86,13 +97,16 @@ public class TriggerObject : ComboObject
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
 
+		Debug.Log("proccing triggerobject");
+		
         canBeTriggered = false; // To stop it from being triggered twice
         timeTriggered = timeAlive;
         StartCoroutine(EnableSFX());
         StartCoroutine(EnableVFX());
         StartCoroutine(EnableHitbox());
-        StartCoroutine(DisableObjectCollider());
-        StartCoroutine(DisableObjectModel());
+
+		// StartCoroutine(DisableObjectCollider());
+        // StartCoroutine(DisableObjectModel());
     }
 
     protected virtual void ListenForDespawn()
@@ -142,14 +156,17 @@ public class TriggerObject : ComboObject
     {
         var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
 
-        hitbox.SetActive(true);
+		// once hitbox is enabled, triggerobject cannot be spun anymore
+		isSpinnable = false;
+		hitbox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitbox.SetActive(false);
+		StartCoroutine(Breakdown());
     }
 
     protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
-        NotifyOccupiedTile(false); // prolly move this later
+        // NotifyOccupiedTile(false); // prolly move this later
         wasHit = true;
         return true;
     }
@@ -159,6 +176,8 @@ public class TriggerObject : ComboObject
         didEarlyEffects = true;
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
+
+		hitBox.SetActive(false);
 
         NotifyOccupiedTile(false);
 
@@ -201,10 +220,9 @@ public class TriggerObject : ComboObject
             startAngle += 360f;  // reset
         }
 
-        // should we base rotate angle off edgeIndex here?
+        // TODO: Take another look at this, the model spin is bugging at a certain angle
+        // Debug.Log("Start angle: "+startAngle+", Target angle: "+targetAngle);
 
-        // model.transform.eulerAngles = new Vector3(0f, angle, 0f);
-        // targetAngle = angle;
         isRotating = true;
         if (useBeam)
         {

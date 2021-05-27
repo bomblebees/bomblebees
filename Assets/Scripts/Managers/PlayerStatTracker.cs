@@ -9,8 +9,8 @@ public class PlayerStatTracker : NetworkBehaviour
 
 	[SyncVar] public GameObject player;
 
-	[SyncVar] public int kills = 0;
-	[SyncVar] public int deaths = 0;
+	[SyncVar(hook = nameof(OnChangeKills))] public int kills = 0;
+	[SyncVar(hook = nameof(OnChangeDeaths))] public int deaths = 0;
 	[SyncVar] public int assists = 0;
 
 	// placement from 1st to 4th at end game so stats screen can display in order
@@ -30,26 +30,36 @@ public class PlayerStatTracker : NetworkBehaviour
 	// number of combos made
 	[SyncVar] public int totalCombosMade = 0;
 
+	// number of bomb's made from combos
+	[SyncVar(hook = nameof(OnChangeBombCombos))] public int totalBombCombosMade = 0;
+
 	// individual combo objects made from combos
 	[SyncVar] public int bombsMade = 0;
 	[SyncVar] public int sludgesMade = 0;
 	[SyncVar] public int lasersMade = 0;
 	[SyncVar] public int plasmasMade = 0;
 
+	// the time the player was eliminated
+	[SyncVar] public double timeOfElimination = 0f;
+
 
 	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
 
-	private RoundManager roundManager;
 	private EventManager eventManager;
+	private RoundManager roundManager;
+	private LobbySettings lobbySettings;
+	private PlayerEventDispatcher dispatcher;
 
 	private void InitSingletons()
 	{
-		roundManager = RoundManager.Singleton;
-		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
-
 		eventManager = EventManager.Singleton;
 		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
+		roundManager = RoundManager.Singleton;
+		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
+		lobbySettings = FindObjectOfType<LobbySettings>();
+		if (lobbySettings == null) Debug.LogError("Cannot find Singleton: LobbySettings");
 	}
 
 	public override void OnStartServer()
@@ -60,6 +70,7 @@ public class PlayerStatTracker : NetworkBehaviour
 		// functions are subscribed on server, playerstats syncvar will always update from server
 		eventManager.EventPlayerTookDamage += PlayerDeathUpdate;
 		eventManager.EventPlayerSwap += PlayerSwapUpdate;
+		eventManager.EventPlayerEliminated += PlayerEliminatedUpdate;
 
 		player = gameObject;
 	}
@@ -67,31 +78,63 @@ public class PlayerStatTracker : NetworkBehaviour
 	public override void OnStartClient()
 	{
 		InitSingletons();
-		
+
+		dispatcher = GetComponent<PlayerEventDispatcher>();
+		if (dispatcher == null) Debug.LogError("Cannot find component: ClientPlayerDispatcher");
 	}
 
+	[Server]
+	public void PlayerEliminatedUpdate(double timeOfElim, GameObject player)
+	{
+		if (roundManager.roundOver) return; // if round over, do not update
+
+		// if this was not the player that was eliminated, return
+		if (!ReferenceEquals(player, gameObject)) return;
+
+		// set the time of elim
+		timeOfElimination = timeOfElim;
+	}
 
 	[Server]
 	public void PlayerDeathUpdate(int _, GameObject bomb, GameObject playerThatDied)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
+
 		ComboObject bombComponent = bomb.GetComponent<ComboObject>();
 
 		if (ReferenceEquals(playerThatDied, gameObject))
 		{
 			// the player that died in the event is this player
 			deaths++;
+
+			// if combo gamemode and died, apply combo penalty
+			if (lobbySettings.GetGamemode() is ComboGamemode)
+            {
+				if (totalBombCombosMade > ComboGamemode.comboPenalty)
+					totalBombCombosMade -= ComboGamemode.comboPenalty;
+				else
+					totalBombCombosMade = 0;
+            }
 		}
 
 		if (ReferenceEquals(bombComponent.triggeringPlayer, gameObject) && !ReferenceEquals(gameObject, playerThatDied))
 		{
 			// if this player was owner of the bomb that killed, and also wasn't the one who died, then award kill to this player
 			kills++;
+
+			// if combo gamemode and died, apply combo bonus
+			if (lobbySettings.GetGamemode() is ComboGamemode)
+			{
+				totalBombCombosMade += ComboGamemode.comboBonus;
+			}
 		}
 	}
 
 	[Server]
 	public void PlayerSwapUpdate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
 	{
+		if (roundManager.roundOver) return; // if round over, do not update
+
 		// if the player that made combo isn't this player, then return
 		if (!ReferenceEquals(player, gameObject))
 		{
@@ -103,6 +146,8 @@ public class PlayerStatTracker : NetworkBehaviour
 			if (numBombsAwarded > 0)
 			{
 				totalCombosMade++;
+				totalBombCombosMade += numBombsAwarded;
+
 				// this shit will be a problem when we rework colors unless we can go through the codebase and change all the hardcoded color values
 				switch (oldKey)
 				{
@@ -128,12 +173,30 @@ public class PlayerStatTracker : NetworkBehaviour
 	}
 
 
-	
+	[ClientCallback]
+	public void OnChangeKills(int prevKills, int newKills)
+    {
+		dispatcher.OnChangeKills(prevKills, newKills);
+    }
+
+	[ClientCallback]
+	public void OnChangeDeaths(int prevDeaths, int newDeaths)
+	{
+        dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
+	}
+
+	[ClientCallback]
+	public void OnChangeBombCombos(int prevCombos, int newCombos)
+	{
+		dispatcher.OnChangeCombos(prevCombos, newCombos);
+	}
+
+
 	#region UI/Display
 	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
 
 	// populate stat block with the necessary stats
-	
+
 	public void CreateStatsUIElement(GameObject anchorObject)
 	{
 		GameObject obj = Instantiate(
@@ -152,7 +215,7 @@ public class PlayerStatTracker : NetworkBehaviour
 
 		uiElement.killsText.text = kills.ToString();
 		uiElement.deathsText.text = deaths.ToString();
-		uiElement.combosMadeText.text = totalCombosMade.ToString();
+		uiElement.combosMadeText.text = totalBombCombosMade.ToString();
 
 	}
 	

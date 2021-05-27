@@ -7,6 +7,7 @@ public class AimHelper : MonoBehaviour
     public GameObject radialArrow;
     public GameObject target = null;
     public GameObject targetQuad = null;
+    public GameObject model = null;
 
     // caches
     float prevIndex = -1;
@@ -56,7 +57,21 @@ public class AimHelper : MonoBehaviour
 
             LeanTween.rotateLocal(radialArrow, ang.eulerAngles, 0.15f)
                 .setEase(LeanTweenType.easeOutExpo);
+
+            if (model != null)
+            {
+                // Quaternion modelAng = Quaternion.Euler(0, angles.Length - 1 - angles[newIndex], 0); // old one
+                Quaternion modelAng = Quaternion.Euler(0, HexMetrics.edgeAngles[newIndex] -90f, 0);
+
+                LeanTween.rotateLocal(model, modelAng.eulerAngles, 0.15f)
+                    .setEase(LeanTweenType.easeOutExpo);
+            }
         }
+
+
+
+
+
 
         // Target Location
         if (target != null)

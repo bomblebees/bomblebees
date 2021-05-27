@@ -6,12 +6,13 @@ using Mirror;
 public class GameUIManager : NetworkBehaviour
 {
     // Game UIs
-    [SerializeField] private RoundStartEnd roundStartEnd = null;
-    [SerializeField] private RoundTimer roundTimer = null;
-    [SerializeField] private LivesUI livesUI = null;
-    [SerializeField] private MessageFeed messageFeed = null;
-    [SerializeField] private MessageFeed warningFeed = null;
-    [SerializeField] public Hotbar hotbar = null;
+    [SerializeField] public RoundStartEnd roundStartEnd;
+    [SerializeField] public RoundTimer roundTimer;
+    [SerializeField] public LivesUI livesUI;
+    [SerializeField] public MessageFeed messageFeed;
+    [SerializeField] public MessageFeed warningFeed;
+    [SerializeField] public Hotbar hotbar;
+    [SerializeField] public Announcer announcer;
 
     private GameObject localPlayer;
 
@@ -22,6 +23,7 @@ public class GameUIManager : NetworkBehaviour
 
     private RoundManager roundManager;
     private EventManager eventManager;
+    private LobbySettings lobbySettings;
 
     private void Awake()
     {
@@ -36,30 +38,28 @@ public class GameUIManager : NetworkBehaviour
 
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+
+        lobbySettings = FindObjectOfType<LobbySettings>();
+        if (lobbySettings == null) Debug.LogError("Cannot find Singleton: LobbySettings");
     }
 
     public override void OnStartServer()
     {
         InitSingletons();
 
-        // Subscribe to server round events
-        roundManager.EventPlayerConnected += ServerPlayerConnected;
-        roundManager.EventRoundStart += ServerStartRound;
+        // Subscribe to relevant events
+        eventManager.EventPlayerLoaded += ServerPlayerConnected;
+        eventManager.EventStartRound += ServerStartRound;
+        eventManager.EventEndRound += ServerEndRound;
 
         eventManager.EventPlayerTookDamage += RpcOnKillEvent;
 		eventManager.EventMultikill += RpcOnMultikillEvent;
-        // eventManager.EventPlayerSwap += ServerOnSwapEvent;
-        eventManager.EventPlayerSpin += ServerOnSpinEvent;
     }
 
     [Client]
     public override void OnStartClient()
     {
         InitSingletons();
-
-        // Subscribe to client round events
-        roundManager.EventRoundStart += ClientStartRound;
-        roundManager.EventRoundEnd += ClientEndRound;
     }
 
     public override void OnStartLocalPlayer()
@@ -68,79 +68,48 @@ public class GameUIManager : NetworkBehaviour
         localPlayer = GameObject.Find("LocalPlayer");
     }
 
-    //private void Update()
-    //{
-    //    if (localPlayer == null)
-    //    {
-    //        localPlayer = GameObject.Find("LocalPlayer");
-            
-    //        if (localPlayer != null) localPlayer.GetComponent<Health>().EventLivesChanged += ClientOnDamage;
-    //    }
-        
-    //}
-
     // When a player loads into the game (on server)
-    [Server] public void ServerPlayerConnected(RoundManager.PlayerInfo p)
+    [Server] public void ServerPlayerConnected(GameObject player, int remaining)
     {
-        RpcPlayerConnected(roundManager.playersConnected, roundManager.totalRoomPlayers);
+        Debug.Log("player connected: " + player.GetComponent<Player>().playerRoomIndex);
+
+        //ServerEnableLivesUI(player);
+        RpcPlayerConnected(player, eventManager.playersLoaded, eventManager.totalPlayers);
     }
 
     // When a player loads into the game (on client)
-    [ClientRpc] public void RpcPlayerConnected(int connPlayers, int totalPlayers)
+    [ClientRpc] public void RpcPlayerConnected(GameObject player, int connPlayers, int totalPlayers)
     {
+        roundTimer.InitTimer(lobbySettings.roundDuration);
         roundStartEnd.UpdateRoundWaitUI(connPlayers, totalPlayers);
+
+        // If all players loaded, start freeze time
+        if (totalPlayers - connPlayers == 0)
+        {
+            StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
+        }
     }
 
     #region Round Start & End
 
-    [Client] public void ClientStartRound()
+    [Server] public void ServerStartRound()
     {
-        StartCoroutine(roundStartEnd.StartRoundFreezetime(roundManager.startGameFreezeDuration));
-        StartCoroutine(roundTimer.InitTimer(roundManager.roundDuration, roundManager.startGameFreezeDuration));
-
-    }
-    [Client] public void ClientEndRound(GameObject winner)
-    {
-        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.startGameFreezeDuration, winner));
+        ClientStartRound();
     }
 
-    #endregion
-
-    #region Lives
-
-    [Server] public void ServerStartRound() { ServerEnableLivesUI(); }
-
-    [Server]
-    public void ServerEnableLivesUI()
+    [Server] public void ServerEndRound(List<Player> players)
     {
-        // Convert playerinfo struct to network transportable gameObjects
-        List<RoundManager.PlayerInfo> playerList = roundManager.playerList;
-
-        GameObject[] playerObjects = new GameObject[playerList.Count];
-
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            playerObjects[i] = playerList[i].player.gameObject;
-			playerObjects[i].GetComponent<Health>().EventLivesChanged += RpcClientUpdateLives;
-		}
-
-        RpcEnableLivesUI(playerObjects);
+        ClientEndRound();
     }
 
-    [ClientRpc] public void RpcEnableLivesUI(GameObject[] players)
+    [ClientRpc] public void ClientStartRound()
     {
-        foreach (GameObject p in players)
-        {
-            // Subscribe to lives change event for specific player
-            // p.GetComponent<Health>().EventLivesChanged += ClientUpdateLives;
-        }
-
-        livesUI.EnableLivesUI(players);
+        roundTimer.StartTimer(lobbySettings.roundDuration);
     }
 
-    [ClientRpc] public void RpcClientUpdateLives(int currentHealth, int _, GameObject player)
+    [ClientRpc] public void ClientEndRound()
     {
-        livesUI.UpdateLives(currentHealth, player.GetComponent<Player>());
+        StartCoroutine(roundStartEnd.EndRoundFreezetime(roundManager.endGameFreezeDuration));
     }
 
     #endregion
@@ -148,7 +117,7 @@ public class GameUIManager : NetworkBehaviour
     #region MessageFeed
 
     [ClientRpc]
-    public void RpcOnKillEvent(int _, GameObject bomb, GameObject player)
+    public void RpcOnKillEvent(int newLives, GameObject bomb, GameObject player)
     {
         messageFeed.OnKillEvent(bomb, player);
     }
@@ -159,70 +128,97 @@ public class GameUIManager : NetworkBehaviour
 		messageFeed.OnMultikillEvent(player, multiKillAmount);
 	}
 
-	[Server]
-    public void ServerOnSwapEvent(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
-    {
-        if (combo)
-        {
-            RpcOnSwapComboEvent(oldKey, player, numBombsAwarded);
-        }
-
-        TargetOnSwapEvent(player.GetComponent<NetworkIdentity>().connectionToClient, newKey);
-    }
-
-    [ClientRpc]
-    public void RpcOnSwapComboEvent(char comboKey, GameObject player, int numBombsAwarded)
-    {
-        messageFeed.OnSwapEvent(comboKey, player, numBombsAwarded);
-
-    }
-
     #endregion
 
-    #region Hotbar
-
-    [Server]
-    public void ServerOnSpinEvent(GameObject player, GameObject bomb)
-    {
-        TargetOnSpinEvent(player.GetComponent<NetworkIdentity>().connectionToClient);
-    }
-
-    [TargetRpc]
-    public void TargetOnSpinEvent(NetworkConnection target)
-    {
-        hotbar.StartSpinCooldown();
-    }
-
-    [TargetRpc]
-    public void TargetOnSwapEvent(NetworkConnection target, char newKey)
-    {
-        hotbar.SwapHexes(newKey);
-    }
+    #region Client Events
 
     [Client]
-    public void ClientOnInventorySelectChanged(char key, int amt)
+    public void OnInventorySelectChanged(char key, int amt)
     {
         hotbar.UpdateInventoryUI(key, amt);
     }
 
+    [Client] public void OnChangeLives(int prevLives, int newLives, GameObject player)
+    {
+        if (lobbySettings.GetGamemode() is StandardGamemode ||
+            lobbySettings.GetGamemode() is TeamsGamemode)
+        {
+            livesUI.UpdateLives(newLives, player.GetComponent<Player>());
+            livesUI.UpdateOrdering();
+        }
+
+
+        if (player.transform.name == "LocalPlayer" && lobbySettings.GetGamemode() is StandardGamemode)
+        {
+            if (newLives == 0)
+            {
+                string errorMessage = "<color=#FF0000>You Died!</color>";
+                ClientCreateWarningMessage(errorMessage);
+            }
+            else
+            {
+                string errorMessage = "<color=#FF0000>-1   Life</color>";
+                ClientCreateWarningMessage(errorMessage);
+            }
+        }
+    }
+
+    [Client] public void OnChangeKills(int prevKills, int newKills, GameObject player)
+    {
+        if (lobbySettings.GetGamemode() is KillsGamemode)
+        {
+            livesUI.UpdateEliminations(newKills, player.GetComponent<Player>());
+            livesUI.UpdateOrdering();
+        }
+    }
+
+    [Client]
+    public void OnSpin(bool prevHeld, bool newHeld, GameObject player)
+    {
+        //hotbar.StartSpinCooldown();
+    }
+
+    [Client]
+    public void OnSwap(char oldSwapKey, char newSwapKey, GameObject player)
+    {
+        //hotbar.SwapHexes(newSwapKey);
+    }
+
+    [Client]
+    public void OnChangeCombos(int prevCombos, int newCombos, GameObject player)
+    {
+        if (lobbySettings.GetGamemode() is ComboGamemode)
+        {
+            livesUI.UpdateCombos(newCombos, player.GetComponent<Player>());
+            livesUI.UpdateOrdering();
+        }
+    }
+
     #endregion
 
-    [Client] public void ClientCreateWarningMessage(string message)
+    [Client]
+    public void ClientCreateWarningMessage(string message)
     {
         warningFeed.CreateMessage(message);
     }
 
-    [Client] public void ClientOnDamage(int currentHealth, int maxHealth, GameObject player)
+    public void Announce(string message)
     {
-        if (currentHealth == 0)
-        {
-            string errorMessage = "<color=#FF0000>You Died!</color>";
-            ClientCreateWarningMessage(errorMessage);
-        } else if (player == localPlayer)
-        {
-            string errorMessage = "<color=#FF0000>-1   Life</color>";
-            ClientCreateWarningMessage(errorMessage);
-        }
+        if (isServer) RpcAnnounce(message);
+        else CmdAnnounce(message);
     }
+
+    [Command(requiresAuthority = false)]
+    public void CmdAnnounce(string message)
+    {
+        RpcAnnounce(message);
+    }
+
+    [ClientRpc]
+    public void RpcAnnounce(string message)
+    {
+        announcer.Announce(message);
+    }
+
 }
 

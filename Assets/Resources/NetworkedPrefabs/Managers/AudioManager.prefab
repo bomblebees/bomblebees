@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7230157094182336862
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1672910520581558632}
+  - component: {fileID: 2808596004038266540}
+  - component: {fileID: -596352727795668667}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1672910520581558632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230157094182336862}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 50.86167, y: 22.346058, z: 195.10634}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2808596004038266540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230157094182336862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5394ed649d6f90942a9040c7885a0cb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  sounds:
+  - name: playerSwap
+    clip: {fileID: 8300000, guid: c0be3e51f111a8745bbc0d47c67001f5, type: 3}
+    volume: 0.86
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerDeath
+    clip: {fileID: 8300000, guid: 40fd7f284bbdb9349b4a75c01cba0064, type: 3}
+    volume: 0.65
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerSpin
+    clip: {fileID: 8300000, guid: 2a0454a2dbffd0f478a067b477686f6a, type: 3}
+    volume: 0.7
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerRespawn
+    clip: {fileID: 8300000, guid: 725d95cfb628efb409713a739574deb8, type: 3}
+    volume: 0.8
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: comboCreation1
+    clip: {fileID: 8300000, guid: b7b41b710997be346a881dc73f71457d, type: 3}
+    volume: 0.6
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: comboCreation2
+    clip: {fileID: 8300000, guid: d1bb416708d61db47b86423d567c94d8, type: 3}
+    volume: 0.7
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: comboCreation3
+    clip: {fileID: 8300000, guid: ef8d643b285cb864999f1fd0c7afa4d9, type: 3}
+    volume: 0.75
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: bombPlace
+    clip: {fileID: 8300000, guid: 38673dc6e01f7564eb9676816a8b89c9, type: 3}
+    volume: 0.65
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: deployablePlace
+    clip: {fileID: 8300000, guid: f90cba37747177c44afdda1a6e0a2297, type: 3}
+    volume: 0.7
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: endWhistle
+    clip: {fileID: 8300000, guid: 5892a90067e096542b86af45e840da77, type: 3}
+    volume: 0.75
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerEliminated
+    clip: {fileID: 8300000, guid: b2c3a5388b8b47442a3583106b4ddc47, type: 3}
+    volume: 0.6
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: laserCharge
+    clip: {fileID: 8300000, guid: 6a5e13b455798e74e9fd196bfd166c46, type: 3}
+    volume: 0.8
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: bombHit
+    clip: {fileID: 8300000, guid: 8ec51005e079b55419f8fd5ba1e31e97, type: 3}
+    volume: 0.75
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: spinCharge1
+    clip: {fileID: 8300000, guid: d8a29752271b6a7468280bf388ec00e9, type: 3}
+    volume: 0.9
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: spinCharge2
+    clip: {fileID: 8300000, guid: 06651819275005f4a9e2c21742665b22, type: 3}
+    volume: 0.9
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: spinCharge3
+    clip: {fileID: 8300000, guid: f447f9df2d74f1b4b9b4efd484aad3c6, type: 3}
+    volume: 0.9
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: error1
+    clip: {fileID: 8300000, guid: 4716672c8b455e143990b45f12560dd8, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerDeath2
+    clip: {fileID: 8300000, guid: 9c7fc6682d0b0d7408cb1b8bb38a5012, type: 3}
+    volume: 0.65
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerDeath3
+    clip: {fileID: 8300000, guid: 7fa8b2a9baf77a244b699555969d04b6, type: 3}
+    volume: 0.65
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: bombrotation
+    clip: {fileID: 8300000, guid: 00851c42565cf7a4087a38a08b78bf7f, type: 3}
+    volume: 0.65
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: startCountdown
+    clip: {fileID: 8300000, guid: 4ea711c2b6136844c814f955c5b3e537, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerEw1
+    clip: {fileID: 8300000, guid: 55936a0da6f5d684e8c485cbfbcc9c11, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerEw2
+    clip: {fileID: 8300000, guid: a61a6e7f10518f34584d1cb9402ab807, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: playerEw3
+    clip: {fileID: 8300000, guid: 91b01d5ceca83504f8e05bcb38a8104b, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: inventorypop
+    clip: {fileID: 8300000, guid: ab577ff59dc9d944f998e1b1b3bae396, type: 3}
+    volume: 0.45
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: timer_warning
+    clip: {fileID: 8300000, guid: d4d6486cc1bd022438729b9ac996b501, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  - name: timer_countdown
+    clip: {fileID: 8300000, guid: fae7dce3bca242c428de6ea559de40a9, type: 3}
+    volume: 0.5
+    pitch: 1
+    spatialBlend: 0
+    source: {fileID: 0}
+  audioMixerGroup: {fileID: 24300002, guid: 18ca679d8b5f0e54aa062b5e40b9afde, type: 2}
+--- !u!114 &-596352727795668667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7230157094182336862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 
+  hasSpawned: 0

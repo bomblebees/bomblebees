@@ -12,6 +12,32 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     [SerializeField] private GameObject roundManager;
     [SerializeField] private GameObject gameUIManager;
     [SerializeField] private GameObject audioManager;
+    [SerializeField] private GameObject lobbySettings;
+
+    private GameObject settings = null;
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        spawnPrefabs.Clear();
+        spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        // Prefab Loading
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
+
+        NetworkClient.ClearSpawners();
+
+        foreach (var prefab in spawnablePrefabs)
+        {
+            NetworkClient.RegisterPrefab(prefab);
+        }
+    }
 
     public override void OnRoomStopClient()
     {
@@ -19,12 +45,33 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         Matchmaking mm = Matchmaking.singleton;
         if (mm) mm.uiLeaveLobby();
 
+        // re-enable the main menu ui
+        MainMenu_UI mainMenuUI = MainMenu_UI.singleton;
+        if (mainMenuUI) mainMenuUI.gameObject.SetActive(true);
+
         base.OnRoomStopClient();
+    }
+
+    public override void OnRoomStartServer()
+    {
+        base.OnRoomStartServer();
+
+        if (settings == null)
+        {
+            settings = Instantiate(lobbySettings);
+            NetworkServer.Spawn(settings);
+        }
     }
 
     public override void OnRoomStopServer()
     {
         base.OnRoomStopServer();
+
+        if (settings != null)
+        {
+            NetworkServer.Destroy(settings);
+            settings = null;
+        }
     }
 
     // Temp list of player colors
@@ -40,23 +87,40 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
-        Debug.LogWarning("Steam id not found, generating unique ID for this session");
 
-        // generate unique ID based on the time in ms, for development
-        DateTimeOffset curDate = new DateTimeOffset(DateTime.UtcNow);
-        ulong timeId = (ulong)curDate.ToUnixTimeMilliseconds();
+        if (gamePlayer.GetComponent<Player>().steamId == 0)
+        {
+            Debug.LogWarning("Steam id not found, generating unique ID for this session");
 
-        // set the steamId temporarily to a timeId
-        gamePlayer.GetComponent<Player>().playerId = timeId;
+            // generate unique ID based on the time in ms, for development
+            DateTimeOffset curDate = new DateTimeOffset(DateTime.UtcNow);
+            ulong timeId = (ulong)curDate.ToUnixTimeMilliseconds();
 
+            // set the steamId temporarily to a timeId
+            gamePlayer.GetComponent<Player>().playerId = timeId;
+        }
+
+        // transfer steam id
+        gamePlayer.GetComponent<Player>().steamId = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId;
+
+        // transfer steam username
+        gamePlayer.GetComponent<Player>().steamName = roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamUsername;
+
+        // transfer the index
+        gamePlayer.GetComponent<Player>().playerRoomIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().index;
+        
         // transfer the color over
         gamePlayer.GetComponent<Player>().playerColor = listColors[roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode];
-
+        
         // transfer the character chosen
         gamePlayer.GetComponent<Player>().characterCode = roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode;
 
         // transfer the team chosen
         gamePlayer.GetComponent<Player>().teamIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().teamIndex;
+
+        // let the event manager know that the player has finished loading
+        EventManager eventManager = FindObjectOfType<EventManager>();
+        eventManager.OnPlayerLoadedIntoGame(gamePlayer);
 
         return true;
     }
@@ -82,42 +146,15 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 #endif
     }
 
-    /// <summary>
-    /// This is called on the server when a networked scene finishes loading.
-    /// </summary>
-    /// <param name="sceneName">Name of the new scene.</param>
     public override void OnRoomServerSceneChanged(string sceneName)
     {
         if (sceneName == GameplayScene)
         {
-            Debug.Log("OnRoomServerSceneChanged");
             NetworkServer.Spawn(Instantiate(eventManager));
             NetworkServer.Spawn(Instantiate(hexGrid));
             NetworkServer.Spawn(Instantiate(roundManager));
             NetworkServer.Spawn(Instantiate(gameUIManager));
             NetworkServer.Spawn(Instantiate(audioManager));
-        }
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-
-        spawnPrefabs.Clear();
-        spawnPrefabs = Resources.LoadAll<GameObject>("Prefabs").ToList();
-    }
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-
-        var spawnablePrefabs = Resources.LoadAll<GameObject>("Prefabs");
-
-        NetworkClient.ClearSpawners();
-
-        foreach (var prefab in spawnablePrefabs)
-        {
-            NetworkClient.RegisterPrefab(prefab);
         }
     }
 

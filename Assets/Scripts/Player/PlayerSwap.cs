@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -6,6 +7,7 @@ using System.Linq;
 
 public class PlayerSwap : NetworkBehaviour
 {
+    private GameActions _gameActions;
 
     /// <summary>
     /// The reference to the hex board
@@ -16,6 +18,11 @@ public class PlayerSwap : NetworkBehaviour
     /// Whether the player can swap.
     /// </summary>
     [HideInInspector] public bool canSwap = true;
+	[SerializeField] public bool canSwapWhileGhost = false;
+    [SerializeField] private GameObject hexIcon;
+    [SerializeField] private LineRenderer lineRenderer; // test
+    [SerializeField] private GameObject swapParticle;
+
 
     /// <summary>
     /// The currently held tile of the player represented as a color character
@@ -25,6 +32,11 @@ public class PlayerSwap : NetworkBehaviour
     // Raycast caches for SwapHexes()
     private Ray tileRay;
     private RaycastHit tileHit;
+
+    private void Awake()
+    {
+        _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
 
     public override void OnStartServer()
     {
@@ -54,7 +66,7 @@ public class PlayerSwap : NetworkBehaviour
     }
 
     // Cannot swap in ghost mode
-    private void OnGhostEnter(bool _) { canSwap = false; }
+    private void OnGhostEnter(bool _) { canSwap = canSwapWhileGhost; }
     private void OnGhostExit(bool _) { canSwap = true; }
 
     void Update()
@@ -65,12 +77,17 @@ public class PlayerSwap : NetworkBehaviour
         // Applies the tile selection highlight
         ApplyTileHighlight();
 
+        // If frozen dont allow swapping
+        if (this.GetComponent<Player>().isFrozen) return;
+
         // Only run the rest of update if the player is not eliminated
         if (this.GetComponent<Player>().isEliminated) return;
 
         // Check for key press every frame
         ListenForSwapInput();
 
+        // Update LineRenderer vertex position
+        // lineRenderer.SetPosition(0, HexIcon.transform.position);
     }
 
     #region Swap
@@ -83,7 +100,7 @@ public class PlayerSwap : NetworkBehaviour
         if (!canSwap) return;
 
         // When swap key is pressed down
-        if (KeyBindingManager.GetKeyDown(KeyAction.Swap))
+        if (_gameActions.Swap.WasPressed)
         {
             SwapHexes();
         }
@@ -101,21 +118,34 @@ public class PlayerSwap : NetworkBehaviour
         {
             GameObject modelHit = tileHit.transform.gameObject;
 
+            // Update LineRenderer vertex positions
+            // lineRenderer.SetPosition(0, HexIcon.transform.position);
+            // lineRenderer.SetPosition(1, modelHit.transform.position);
+
+
             // Get the key of the hex cell underneath, this is the new key for the player
             char newKey = modelHit.GetComponentInParent<HexCell>().GetKey();
 
             // If key is not swappable, return
             if (HexCell.ignoreKeys.Contains(newKey)) return;
 
+            
+
             // Get the hex cell index of the hex cell we need to swap
             int cellIdx = modelHit.GetComponentInParent<HexCell>().GetThis().getListIndex();
-
-            // Play swap sound
-            FindObjectOfType<AudioManager>().PlaySound("playerSwap");
 
             // Only swap if it is a new key
             if (!this.heldKey.Equals(newKey))
             {
+                // Play swap sound
+                FindObjectOfType<AudioManager>().PlaySound("playerSwap");
+
+                // Start tile->icon swap particle
+                GameObject newParticle = Instantiate(swapParticle,
+                                                        modelHit.transform.position,
+                                                        Quaternion.identity);
+                newParticle.GetComponent<SwapTrailMover>().AssignTarget(hexIcon.transform);
+
                 // Do the swap on the server
                 CmdSwap(cellIdx, this.heldKey, newKey);
             }
@@ -145,6 +175,8 @@ public class PlayerSwap : NetworkBehaviour
     {
         // Update hex tile on the HUD for this player for every observer
         this.GetComponent<PlayerInterface>().UpdateHexHud(newHeldKey);
+
+        this.GetComponent<PlayerEventDispatcher>().OnChangeHeldKey(oldHeldKey, newHeldKey);
     }
 
     #endregion

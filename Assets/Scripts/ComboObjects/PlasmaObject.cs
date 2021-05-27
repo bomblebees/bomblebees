@@ -70,11 +70,13 @@ public class PlasmaObject : TriggerObject
 		PlayFireSFX();
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
+		StartCoroutine(EnableSFX());
 		// this.hitBox.SetActive(true);
 		// do we need to do the same for particles?
 		this.plasmaSphereModel.SetActive(true);
         base.Push(edgeIndex, triggeringPlayer); // This shoulda been at the top lol
-    }
+		StartCoroutine(Breakdown());
+	}
 
     public Vector3 lastPosition;
 

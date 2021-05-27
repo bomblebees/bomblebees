@@ -8,7 +8,9 @@ using UnityEngine;
 // No generics in Mirror
 public class Health : NetworkBehaviour
 {
-    [Header("Settings")] [SerializeField] public int maxLives = 3;
+    [Header("Settings")] 
+    
+    [SyncVar] public int maxLives = 3;
 
     [SyncVar(hook = nameof(OnLivesChanged))]
     public int currentLives;
@@ -27,8 +29,8 @@ public class Health : NetworkBehaviour
     public delegate void InvincibleExitDelegate();
 
     [Header("Required")]
-    public GameObject playerModel;
-    public GameObject ghostModel;
+    private GameObject playerModel;
+    private GameObject ghostModel;
     public GameObject revivingModel;
     public GameObject playerInv;
 
@@ -49,10 +51,30 @@ public class Health : NetworkBehaviour
     // Event manager singleton
     private EventManager eventManager;
 
+
+    // Starts when Player starts existing on server
+    public override void OnStartServer()
+    {
+        LobbySettings settings = FindObjectOfType<LobbySettings>();
+
+        if (settings.playerLives == 0) maxLives = 1000; // simulate inf life
+        else maxLives = settings.playerLives;
+
+        SetHealth(maxLives);
+    }
+
+    // Starts when Player starts existing on server
+    public override void OnStartClient()
+    {
+    }
+
     private void Start()
     {
         eventManager = EventManager.Singleton;
         if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+
+        playerModel = this.GetComponent<Player>().playerModel;
+        ghostModel = this.GetComponent<Player>().ghostModel;
     }
 
 	[Client]
@@ -70,11 +92,15 @@ public class Health : NetworkBehaviour
     [Client]
     private void OnLivesChanged(int oldLives, int newLives)
     {
+        if (newLives == maxLives) return;
+
+        Debug.Log("lives changed from " + oldLives + " to " + newLives);
+
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
 
 		playerModel.SetActive(false);
 
-		// EventLivesChanged?.Invoke(newLives, maxLives, this.gameObject);
+        this.GetComponent<PlayerEventDispatcher>().OnChangeLives(oldLives, newLives);
 
 		switch (UnityEngine.Random.Range(1,4))
 		{
@@ -102,12 +128,6 @@ public class Health : NetworkBehaviour
     private void SetHealth(int value)
     {
         currentLives = value;
-    }
-
-    // Starts when Player starts existing on server
-    public override void OnStartServer()
-    {
-        SetHealth(maxLives);
     }
 
     [Command(requiresAuthority = false)]

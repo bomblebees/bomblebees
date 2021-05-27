@@ -12,20 +12,23 @@ public class Player : NetworkBehaviour
     [SyncVar] public string steamName = "[Steam Name]"; // steam username
     [SyncVar] public int characterCode;
     [SyncVar] public Color playerColor;
-    [SyncVar] public int playerListIndex;
+    [SyncVar] public int playerRoomIndex; // index of the player in the lobby
 
     /// <summary>
     /// Variable representing the team that the player is on.
     /// A value of -1 represents no team chosen
     /// </summary>
     [SyncVar] public int teamIndex;
-
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
 
+    [SyncVar] public bool isFrozen = true;
+
     // Game Objects
     [Header("Required", order = 2)]
-    [SerializeField] private GameObject playerMesh;
+    public GameObject playerMesh;
+    public GameObject playerModel;
+    public GameObject ghostModel;
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
@@ -38,19 +41,31 @@ public class Player : NetworkBehaviour
 
 	private EventManager eventManager;
 
-	// Added for easy referencing of local player from anywhere
-	public override void OnStartLocalPlayer()
-    {
-        gameObject.name = "LocalPlayer";
-        base.OnStartLocalPlayer();
-    }
+
+    [Header("Custom Player Meshes")]
+    [Tooltip("Selects mesh based on character chosen.")]
+    [SerializeField] private Mesh[] playerMeshes = new Mesh[4];
+
+    [Header("Custom Player Colors")]
+    [Tooltip("Selects color based on character chosen.")]
+    [SerializeField] private Material[] playerColors = new Material[4];
+
+	[SerializeField] private ParticleSystem sludgeParticles;
 
     public override void OnStartClient()
     {
+        // Added for easy referencing of local player from anywhere
+        if (isLocalPlayer) gameObject.name = "LocalPlayer";
+
         base.OnStartClient();
 
+        // Set player mesh
+        playerMesh.GetComponent<SkinnedMeshRenderer>().sharedMesh = playerMeshes[characterCode];
+
         // Set player color
-        playerMesh.GetComponent<Renderer>().materials[0].SetColor("_BaseColor", playerColor);
+        Material[] mats = playerMesh.GetComponent<SkinnedMeshRenderer>().materials;
+        mats[3] = playerColors[characterCode];
+        playerMesh.GetComponent<SkinnedMeshRenderer>().materials = mats;
     }
 
     public override void OnStartServer()
@@ -115,15 +130,15 @@ public class Player : NetworkBehaviour
 
     public void SetInvincibilityVFX(bool enabled)
     {
-        if (enabled)
-        {
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.5f);
-        } else
-        {
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
-            playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
-        }
+        //if (enabled)
+        //{
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 10f);
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0.5f);
+        //} else
+        //{
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", 0f);
+        //    playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", 0f);
+        //}
     }
 
     public void ExitInvincibility()
@@ -189,7 +204,6 @@ public class Player : NetworkBehaviour
 
         // Reset spin charge and disallow player to spin while sludged
         this.GetComponent<PlayerSpin>().StopSpin();
-
 		
         // Wait for the sludge effect to end
         yield return new WaitForSeconds(duration);
@@ -205,6 +219,7 @@ public class Player : NetworkBehaviour
     /// </summary>
     [ClientCallback] private void OnChangeSludged(bool prevEffect, bool newEffect)
     {
+		this.GetComponent<PlayerInterface>().ToggleNameToSludged();
 		Debug.Log("isSludge changed");
         if (newEffect) // If the player is now sludged
         {
@@ -214,15 +229,26 @@ public class Player : NetworkBehaviour
             // playerMesh.GetComponent<Renderer>().materials[2].SetFloat("_CoverAmount", -3);
 
 			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(true);
-
+			sludgeParticles.Play();
 			// Play random sludge sound effect
 			FindObjectOfType<AudioManager>().PlaySound("playerEw" + UnityEngine.Random.Range(1, 4));
         } else // If the player is not sludged anymore
         {
+			// Stop particles and delete current existing particles
+			sludgeParticles.Stop();
+			ParticleSystem.Particle[] currentParticles = new ParticleSystem.Particle[sludgeParticles.particleCount];
+			sludgeParticles.GetParticles(currentParticles);
+
+			for (int i = 0; i < currentParticles.Length; i++)
+			{
+				currentParticles[i].remainingLifetime = 0;
+			}
+			sludgeParticles.SetParticles(currentParticles);
+			sludgeParticles.Stop();
+
 			Debug.Log("Sludge ending/stopped");
 			// Reset speed to normal
 			this.GetComponent<PlayerMovement>().sludgedScalar = 1;
-
 			// Slowly tween the VFX down until it is gone
 			LeanTween.value(gameObject, UpdateSludgeVFXCallback, -3f, -40f, 1f);
 			this.GetComponent<PlayerInterface>().sludgedSpinBarUI.SetActive(false);

@@ -5,12 +5,14 @@ using Mirror;
 
 public class PlayerInventory : NetworkBehaviour
 {
+	private GameActions _gameActions;
+	
     [Tooltip("Controls the order of bombs as shown in the player HUD")]
-    [SerializeField] private static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
+    [SerializeField] public static char[] INVEN_BOMB_TYPES = { 'r', 'p', 'y', 'g' };
 
     [Tooltip("Controls the max and starting amount of bombs a player can carry for each bomb type")]
-    [SerializeField] private static int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
-	[SerializeField] private static int INVEN_START_VALUE = 3;
+    [SerializeField] public static int[] INVEN_MAX_VALUES = { 5, 5, 5, 5 };
+	[SerializeField] public static int INVEN_START_VALUE = 3;
 
 	[Tooltip("Ground item prefabs for spawning bombs on ground")]
 	[SerializeField] private GameObject groundItem_r;
@@ -19,9 +21,9 @@ public class PlayerInventory : NetworkBehaviour
 	[SerializeField] private GameObject groundItem_g;
 
 
-	public readonly SyncList<int> inventorySize = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	public readonly SyncList<int> inventorySize = new SyncList<int>();
 	// A list of ints corresponding to how many of INVEN_BOMB_TYPES the player is carrying, initialized to zero
-	public SyncList<int> inventoryList = new SyncList<int>(new int[] { 0, 0, 0, 0 });
+	public readonly SyncList<int> inventoryList = new SyncList<int>();
 	
 
 	// The currently selected slot of the inventory (i.e. the bomb slot to be placed next)
@@ -31,24 +33,32 @@ public class PlayerInventory : NetworkBehaviour
     private GameUIManager gameUIManager;
 	private RoundManager roundManager;
 
-    public override void OnStartServer()
+
+	private void Awake()
+	{
+		_gameActions = FindObjectOfType<MenuManager>().GameActions;
+	}
+	
+	public override void OnStartServer()
     {
-        base.OnStartServer();
+		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventorySize.Add(0);
+		for (int i = 0; i < INVEN_BOMB_TYPES.Length; i++) inventoryList.Add(1);
 
-
+		base.OnStartServer();
 		// Subscribe to the damage event on the server
 		this.GetComponent<Health>().EventLivesLowered += OnGhostEnter;
 
 		roundManager = RoundManager.Singleton;
 		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+
 		roundManager.EventInventorySizeChanged += ChangeInventorySize;
 
+		//Debug.Log("iterating through inventorysize refreshing with roundmanager value, current roundmanager inv size: " + roundManager.currentGlobalInventorySize);
 		for (int i = 0; i < inventorySize.Count; i++)
 		{
 			inventorySize[i] = roundManager.currentGlobalInventorySize;
 		}
-		GetComponent<PlayerInterface>().UpdateInventorySize();
-		// inventorySize.Callback += OnInventorySizeChange;
+
 	}
 
     // When player enters ghost mode, reset the inventroy
@@ -56,12 +66,19 @@ public class PlayerInventory : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        gameUIManager = GameUIManager.Singleton;
+		inventoryList.Callback += OnInventoryChange;
+		inventorySize.Callback += OnInventorySizeChange;
+
+		gameUIManager = GameUIManager.Singleton;
         if (gameUIManager == null) Debug.LogError("Cannot find Singleton: GameUIManager");
 
-        // Subscribe to the synclist hook
-        inventoryList.Callback += OnInventoryChange;
-		inventorySize.Callback += OnInventorySizeChange;
+		//Debug.Log("Client PlayerInventory starting for: " + gameObject.name);
+
+		this.GetComponent<PlayerInterface>().UpdateInventorySize();
+		this.GetComponent<PlayerInterface>().UpdateInventorySelected();
+		// Subscribe to the synclist hook
+		// inventoryList.Callback += OnInventoryChange;
+		// inventorySize.Callback += OnInventorySizeChange;
 	}
 
     private void Update()
@@ -79,50 +96,61 @@ public class PlayerInventory : NetworkBehaviour
     [Client] void ListenForSelectInput()
     {
         // If the "next bomb" key is pressed
-        if (KeyBindingManager.GetKeyDown(KeyAction.RotateNext)) SelectItemStack();
+        if (_gameActions.ChooseNextBomb.WasPressed) SelectNextItem();
+        
+        // If the "next bomb" key is pressed
+        if (_gameActions.ChoosePreviousBomb.WasPressed) SelectNextItem(true);
 
         // If the individual bombs are pressed
-        if (KeyBindingManager.GetKeyDown(KeyAction.BigBomb)) SelectItemStack(0);
-        if (KeyBindingManager.GetKeyDown(KeyAction.SludgeBomb)) SelectItemStack(1);
-        if (KeyBindingManager.GetKeyDown(KeyAction.LaserBeem)) SelectItemStack(2);
-        if (KeyBindingManager.GetKeyDown(KeyAction.PlasmaBall)) SelectItemStack(3);
+        if (_gameActions.ChooseBombleBomb.WasPressed) SelectItemStack(0);
+        if (_gameActions.ChooseHoneyBomb.WasPressed) SelectItemStack(1);
+        if (_gameActions.ChooseLaserBeem.WasPressed) SelectItemStack(2);
+        if (_gameActions.ChoosePlasmaBall.WasPressed) SelectItemStack(3);
     }
 
     /// <summary>
     /// Selects the slot at the given index.
     /// </summary>
-    /// <param name="idx"> The index of the slot to switch to. -1 means to rotate the selection instead </param>
-    [Client] private void SelectItemStack(int idx = -1)
+    /// <param name="idx"> The index of the slot to switch to.</param>
+    [Client] private void SelectItemStack(int idx)
     {
         // Play the bomb selection sound
         FindObjectOfType<AudioManager>().PlaySound("bombrotation");
 
-        // If -1, then get the next index
-        if (idx == -1) CmdSetSelectedSlot(GetNextAvailableBomb());
-        else CmdSetSelectedSlot(idx);
+        CmdSetSelectedSlot(idx);
+    }
+
+    [Client] private void SelectNextItem(bool left = false)
+    {
+        // Play the bomb selection sound
+        FindObjectOfType<AudioManager>().PlaySound("bombrotation");
+
+        SelectItemStack(GetNextAvailableBomb(left));
     }
 
     /// <summary>
     /// Gets the next available slot. If no slots are available, the currently selected slot is returned
     /// </summary>
-    /// <returns> The index of the slot </returns>
-    [Client] private int GetNextAvailableBomb()
+    /// <param name="left"> Whether it will get the next bomb on the right or left</param>
+    /// <returns>The index of the slot</returns>
+    [Client] private int GetNextAvailableBomb(bool left)
     {
         // Start at current slot
         int nextSlot = selectedSlot;
 
-        // Set it to the next available slot
-        for (int i = 1; i <= inventoryList.Count; i++)
+        for (int i = 1; i < inventoryList.Count + 1; i++)
         {
-            // Set to next slot
-            nextSlot = selectedSlot + i;
+            // get next slot ( right )
+            nextSlot = Helper.GetIndexInArray(selectedSlot + i, inventoryList.Count);
 
-            // If past the last slot rotate back to the beginning
-            if (nextSlot >= inventoryList.Count) nextSlot = nextSlot - inventoryList.Count;
+            // get next slot ( left )
+            if (left) nextSlot = Helper.GetIndexInArray(selectedSlot - i, inventoryList.Count);
 
-            // If this slot has bombs, leave loop
-            if (inventoryList[nextSlot] > 0) break;
+            if (inventoryList[nextSlot] > 0) break; // If this slot has bombs, leave loop
         }
+
+        //if (nextSlot == selectedSlot) nextSlot = left ? Helper.GetIndexInArray(selectedSlot - 1, inventoryList.Count)
+        //                                              : Helper.GetIndexInArray(selectedSlot + 1, inventoryList.Count);
 
         // Increment selected slot, if at the last slot rotate back to the beginning
         if (nextSlot >= INVEN_BOMB_TYPES.Length) return 0;
@@ -195,7 +223,8 @@ public class PlayerInventory : NetworkBehaviour
             ////
         }
 
-        // if inventory is full, nothing gets added.
+        // automatically switch to this slot if our previously selected slot was empty
+        if (inventoryList[selectedSlot] == 0) selectedSlot = idx;
     }
 
 	/// <summary>
@@ -208,7 +237,6 @@ public class PlayerInventory : NetworkBehaviour
 		{
 			inventorySize[i] = size;
 		}
-		Debug.Log("Changing inventory size on " + gameObject.name);
 	}
 
     public char[] GetBombTypes()
@@ -236,6 +264,10 @@ public class PlayerInventory : NetworkBehaviour
         {
             // Decrement the bomb quantity by one
             inventoryList[idx]--;
+			GetComponent<PlayerInterface>().DisplayInventoryUse();
+			// If its now empty, automatically get the next selected bomb
+			if (inventoryList[idx] == 0) selectedSlot = GetNextAvailableBomb(false);
+			 
         } else
         {
             // This function should not be called if bomb type has zero quantity
@@ -271,7 +303,7 @@ public class PlayerInventory : NetworkBehaviour
         // Update the player interface when selected slot changes
         this.GetComponent<PlayerInterface>().UpdateInventorySelected();
 
-        if (isLocalPlayer) gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
+        this.GetComponent<PlayerEventDispatcher>().OnInventorySelectChange(newSlot, INVEN_BOMB_TYPES[newSlot], inventoryList[newSlot]);
     }
 
 
@@ -283,12 +315,7 @@ public class PlayerInventory : NetworkBehaviour
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
 
-		Debug.Log("OnInventoryChange on " + gameObject.name);
-
-        if (idx == selectedSlot && isLocalPlayer)
-        {
-            gameUIManager.ClientOnInventorySelectChanged(INVEN_BOMB_TYPES[idx], inventoryList[idx]);
-        }
+        this.GetComponent<PlayerEventDispatcher>().OnInventoryQuantityChange(idx, INVEN_BOMB_TYPES[idx], inventoryList[idx]);
     }
 
 	/// <summary>
@@ -298,7 +325,6 @@ public class PlayerInventory : NetworkBehaviour
 	{
 		// Refresh the inventory UI so it shows the new frame and updated fill amount comparative to the inventory size change
 		this.GetComponent<PlayerInterface>().UpdateInventorySize();
-		Debug.Log("Inventory size change synclist callback for " + gameObject.name);
 
 	}
 

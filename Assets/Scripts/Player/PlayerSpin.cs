@@ -5,6 +5,8 @@ using Mirror;
 
 public class PlayerSpin : NetworkBehaviour
 {
+    private GameActions _gameActions;
+    
     [Header("Required")]
     [SerializeField] private GameObject playerMesh;
 
@@ -17,7 +19,7 @@ public class PlayerSpin : NetworkBehaviour
     /// Whether the spin charging is currently held.
     /// Also used to sync charge bars
     /// </summary>
-    [HideInInspector] [SyncVar] public bool spinHeld = false;
+    [HideInInspector] [SyncVar(hook = nameof(OnChangeSpinHeld))] public bool spinHeld = false;
     [Command] public void CmdSetSpinHeld(bool held) { spinHeld = held; }
 
     [Header("Spin Charge")]
@@ -58,10 +60,16 @@ public class PlayerSpin : NetworkBehaviour
     [Header("Animations")]
     [SerializeField] private GameObject spinAnim;
     [SerializeField] private float spinAnimDuration = 0.8f;
+	[SerializeField] private ParticleSystem spinParticles;
 
     [Header("Other")]
     [SerializeField] public float spinTotalCooldown = 0.8f;
 
+    private void Awake()
+    {
+        _gameActions = FindObjectOfType<MenuManager>().GameActions;
+    }
+    
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -102,13 +110,13 @@ public class PlayerSpin : NetworkBehaviour
         if (!canSpin) return;
 
         // When spin key is pressed down
-        if (KeyBindingManager.GetKey(KeyAction.Spin) && spinChargeTime < spinTimings[spinTimings.Length - 1])
+        if (_gameActions.Spin.IsPressed && spinChargeTime < spinTimings[spinTimings.Length - 1])
         {
             SpinHeldUpdate();
         }
 
         // When key is let go (this should only be called once)
-        if (KeyBindingManager.GetKeyUp(KeyAction.Spin))
+        if (_gameActions.Spin.WasReleased)
         {
             SpinRelease();
         }
@@ -127,10 +135,10 @@ public class PlayerSpin : NetworkBehaviour
 
             currentChargeLevel = 0;
 
-            // Bounce the charge bar right away
-            // here
-            // this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
-            // this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
+			// Bounce the charge bar right away
+			// here
+			// this.GetComponent<PlayerInterface>().spinChargeBar.color = new Vector4(1f,1f,1f,1f);
+			// this.GetComponent<PlayerInterface>().spinChargeBar.transform.parent.gameObject.GetComponent<ScaleTween>().StartTween();
 
             CmdSetSpinHeld(true);
         }
@@ -197,8 +205,30 @@ public class PlayerSpin : NetworkBehaviour
     /// </summary>
     [ClientCallback] public void OnChangeChargeEffectLevel(int oldLevel, int newLevel)
     {
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeeds[newLevel]);
-        playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmnts[newLevel]);
+        //playerMesh.GetComponent<Renderer>().material.SetFloat("_FlashSpeed", flashSpeeds[newLevel]);
+        //playerMesh.GetComponent<Renderer>().material.SetFloat("_GlowAmount", glowAmnts[newLevel]);
+    }
+
+    [ClientCallback] public void OnChangeSpinHeld(bool oldHeld, bool newHeld)
+    {
+        if (newHeld)
+        {
+            spinParticles.Play();
+        } else
+        {
+            ParticleSystem.Particle[] currentParticles = new ParticleSystem.Particle[spinParticles.particleCount];
+            spinParticles.GetParticles(currentParticles);
+
+            for (int i = 0; i < currentParticles.Length; i++)
+            {
+                currentParticles[i].remainingLifetime = 0;
+            }
+
+            spinParticles.SetParticles(currentParticles);
+            spinParticles.Stop();
+        }
+
+        this.GetComponent<PlayerEventDispatcher>().OnChangeSpinHeld(oldHeld, newHeld);
     }
 
     [Client] public void ResetSpinCharge()
@@ -211,7 +241,8 @@ public class PlayerSpin : NetworkBehaviour
         // Reset the charge time and spinHeld vars
         spinChargeTime = 0f;
         currentChargeLevel = 0;
-        CmdSetSpinHeld(false);
+
+		CmdSetSpinHeld(false);
     }
 
     /// <summary>
@@ -245,6 +276,24 @@ public class PlayerSpin : NetworkBehaviour
 
     #region Spin
 
+    [Client] public IEnumerator Spin()
+    {
+        if (canSpin)
+        {
+            // Play spin animation
+            StartCoroutine(HandleSpinAnim());
+
+            // Notify all players that you are spinning
+            CmdSpin(spinPower);
+
+            // The player cannot spin until spinTotalCooldown is up
+            canSpin = false;
+            yield return new WaitForSeconds(spinTotalCooldown);
+            canSpin = true;
+            //@@ if (sludgeEffectEnded) canSpin = true;
+        }
+    }
+
     [Command] void CmdSpin(int spinPower)
     {
         // Invoke spin event
@@ -258,27 +307,11 @@ public class PlayerSpin : NetworkBehaviour
     {
         this.spinPower = spinPower;
 
-        // Play sfx and vfx feedback for spin
-        PlayFeedback();
+        // Play spin sound
+        FindObjectOfType<AudioManager>().PlaySound("playerSpin");
 
         // Enable hitbox
         StartCoroutine(HandleSpinHitbox());
-    }
-
-    [Client] public IEnumerator Spin()
-    {
-        if (canSpin)
-        {
-
-            // Notify all players that you are spinning
-            CmdSpin(spinPower);
-
-            // The player cannot spin until spinTotalCooldown is up
-            canSpin = false;
-            yield return new WaitForSeconds(spinTotalCooldown);
-            canSpin = true;
-            //@@ if (sludgeEffectEnded) canSpin = true;
-        }
     }
 
     /// <summary>
@@ -311,18 +344,7 @@ public class PlayerSpin : NetworkBehaviour
     //    }
     //}
 
-    #region VFX/SFX Feedback
-
-    /// <summary>
-    /// Plays all SFX and VFX for spin
-    /// </summary>
-    [Client] private void PlayFeedback()
-    {
-        StartCoroutine(HandleSpinAnim());
-
-        // Play spin sound
-        FindObjectOfType<AudioManager>().PlaySound("playerSpin");
-    }
+    #region Animations
 
     /// <summary>
     /// Enables the spin animations for spinAnimDuration seconds

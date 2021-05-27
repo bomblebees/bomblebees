@@ -93,12 +93,24 @@ public class ComboObject : NetworkBehaviour
         ListenForMoving();
     }
 
+    float MapDist(float start, float end, float point)
+    {
+        // 
+        // float percent = end - start 
+        return 0f;
+    }
+
     protected void ListenForMoving()
     {
         if (this.isMoving)
         {
-            
-            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
+
+            // // decrease start speed, increase at end
+            // float deltaLerp = lerpRate * 0.1f;
+            // float mapDist = Math.
+            // lerpRate = Mathf.Clamp()
+            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, 1-Mathf.Pow(lerpRate, Time.deltaTime));  // move object
+            // this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
                 if (isServer)
@@ -258,6 +270,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableSFX()
     {
+		Debug.Log("starting sound");
         if (SFX) {
             SFX.SetActive(true);
             yield return new WaitForSeconds(sfxDuration);
@@ -275,6 +288,9 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableHitbox()
     {
+        // Play shake anim
+        FindObjectOfType<CameraShake>().InduceStress(0.2f);
+
         hitBox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);
         hitBox.SetActive(false);
@@ -392,7 +408,7 @@ public class ComboObject : NetworkBehaviour
 
             int newTravelDistanceInHexes = power + 1;
 
-            NotifyOccupiedTile(false); // Update occupation status of tile
+            // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
             RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
 

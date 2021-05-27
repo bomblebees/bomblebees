@@ -1064,10 +1064,13 @@ MonoBehaviour:
   endColor: {r: 1, g: 1, b: 1, a: 1}
   easeInTime: 0
   easeOutTime: 0.35
+  startDelay: 0
+  finishDelay: 0
   timeBetweenLoop: 0
   easeIn: 1
   easeOut: 6
   startOnEnabled: 1
+  endAfterFinish: 1
 --- !u!1 &7354671514439417099
 GameObject:
   m_ObjectHideFlags: 0
@@ -1790,6 +1793,8 @@ GameObject:
   - component: {fileID: 7354671514561191545}
   - component: {fileID: 7354671514561191544}
   - component: {fileID: 7354671514561191547}
+  - component: {fileID: 1373349946825539538}
+  - component: {fileID: 5280890038777779482}
   m_Layer: 5
   m_Name: Button_Ok
   m_TagString: Untagged
@@ -1908,6 +1913,35 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1373349946825539538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7354671514561191541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonClickSound: {fileID: 3637776056640555746, guid: 64051d822ed2e5a49978df1d0d78e444,
+    type: 3}
+  buttonHoverSound: {fileID: 3970279880192477142, guid: 19f079b5d3b1c064ab2bd18279519683,
+    type: 3}
+--- !u!114 &5280890038777779482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7354671514561191541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates: []
 --- !u!1 &7354671514593995414
 GameObject:
   m_ObjectHideFlags: 0

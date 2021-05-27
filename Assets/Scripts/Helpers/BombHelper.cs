@@ -24,30 +24,29 @@ public class BombHelper : MonoBehaviour
         }
     }
 
-    public Color GetKeyColor(char key)
+    public static Color GetKeyColor(char key)
     {
         switch (key)
         {
-            case 'b': return new Color32(0, 217, 255, 255);
-            case 'g': return new Color32(23, 229, 117, 255);
-            case 'y': return new Color32(249, 255, 35, 255);
-            case 'r': return Color.red;
-            case 'p': return new Color32(241, 83, 255, 255);
+            case 'g': return new Color32(101, 231, 0, 255);
+            case 'y': return new Color32(97, 189, 255, 255); // ** for blue hex tile in game
+            case 'r': return new Color32(255, 88, 88, 255);  
+            case 'p': return new Color32(255, 216, 88, 255); // ** for yellow hex tile in game
             case 'w': return new Color32(178, 178, 178, 255);
             case 'e': return Color.white;
             default: return Color.white;
         }
     }
 
-    public string GetBombTextByKey(char key)
+    public static string GetBombTextByKey(char key)
     {
         switch (key)
         {
             case 'b': return "Blink";
             case 'g': return "Plasma";
             case 'y': return "Laser";
-            case 'r': return "Big";
-            case 'p': return "Sludge";
+            case 'r': return "Bomble";
+            case 'p': return "Honey";
             case 'w': return "Queen Bee";
             default: return "None";
         }

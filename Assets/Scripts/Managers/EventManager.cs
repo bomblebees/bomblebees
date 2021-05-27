@@ -13,25 +13,26 @@ public class EventManager : NetworkBehaviour
 {
     public float roundStartTime;
 
-    private GameObject missSpinPlayer;
-    private float missSpinTime;
-    private bool voidSpin = false;
-
-    // events
+    // delegates
+    public delegate void PlayerLoadedDelegate(GameObject player, int remainingPlayers);
     public delegate void StartRoundDelegate();
     public delegate void EndRoundDelegate(List<Player> players);
     public delegate void ReturnToLobbyDelegate();
     public delegate void BombPlacedDelegate(GameObject bomb, GameObject player);
     public delegate void PlayerTookDamageDelegate(int newLives, GameObject bomb, GameObject player);
+    public delegate void PlayerEliminatedDelegate(double timeOfElim, GameObject player);
     public delegate void PlayerSwapDelegate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded);
     public delegate void PlayerSpinDelegate(GameObject player, GameObject bomb);
 	public delegate void PlayerMultikillDelegate(GameObject player, int killNumber);
 
+    // events
+    public event PlayerLoadedDelegate EventPlayerLoaded;
     public event StartRoundDelegate EventStartRound;
     public event EndRoundDelegate EventEndRound;
     public event ReturnToLobbyDelegate EventReturnToLobby;
     public event BombPlacedDelegate EventBombPlaced;
     public event PlayerTookDamageDelegate EventPlayerTookDamage;
+    public event PlayerEliminatedDelegate EventPlayerEliminated;
     public event PlayerSwapDelegate EventPlayerSwap;
     public event PlayerSpinDelegate EventPlayerSpin;
 	public event PlayerMultikillDelegate EventMultikill;
@@ -41,6 +42,9 @@ public class EventManager : NetworkBehaviour
     public static EventManager Singleton { get { return _instance; } }
 
     private SessionLogger sessionLogger;
+    private NetworkRoomManagerExt room;
+
+
     private void Awake()
     {
         if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: EventManager");
@@ -53,12 +57,31 @@ public class EventManager : NetworkBehaviour
 
         sessionLogger = SessionLogger.Singleton;
         if (sessionLogger == null) Debug.LogError("Cannot find Singleton: SessionLogger");
+
+        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
+        if (room == null) Debug.LogError("Cannot find Singleton: NetworkRoomManagerExt");
+
+        totalPlayers = room.roomSlots.Count;
     }
 
     #region Events
 
+    [NonSerialized] public int playersLoaded;
+    [NonSerialized] public int totalPlayers;
+
     /// <summary>
-    /// Called when the round starts
+    /// Called when a player has loaded into the game scene
+    /// </summary>
+    /// <param name="player">The player object that was loaded.</param>
+    [Server]
+    public void OnPlayerLoadedIntoGame(GameObject player)
+    {
+        playersLoaded++;
+        EventPlayerLoaded?.Invoke(player, totalPlayers - playersLoaded);
+    }
+
+    /// <summary>
+    /// Called when the round starts, after freeze time
     /// </summary>
     [Server]
     public void OnStartRound()
@@ -95,7 +118,6 @@ public class EventManager : NetworkBehaviour
     /// <summary>
     /// Called when a player has placed a bomb.
     /// </summary>
-    /// <param name="code">Code of the bomb that was placed, refer to list of bomb codes above</param>
     /// <param name="bomb">The bomb object that was placed</param>
     /// <param name="player">The player object who placed the bomb</param>
     [Server]
@@ -126,6 +148,12 @@ public class EventManager : NetworkBehaviour
                 bomb.GetComponent<ComboObject>().GetOwnerPlayer(),
                 Time.time - roundStartTime);
             EventPlayerTookDamage?.Invoke(newLives, bomb, player);
+        }
+
+        // The player was eliminated
+        if (newLives <= 0)
+        {
+            EventPlayerEliminated?.Invoke(NetworkTime.time, player);
         }
 
 		// Take the NetworkTime.time and pass it into a method on Player for detecting multi kills
