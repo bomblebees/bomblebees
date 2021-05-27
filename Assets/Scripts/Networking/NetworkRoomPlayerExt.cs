@@ -133,18 +133,31 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                 else
                 {
                     roomUI.DeactivateStartButton();
-                    if (!_networkManager.networkAddress.Equals("localhost"))
-                    {
-                        // Client: all players ready
-                        roomUI.SetStartHelperText("host only");
-                    }
                 }
             }
             else
             {
-                // Host/Client: not all players ready
-                roomUI.DeactivateStartButton();
-                roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
+                if (_networkManager.networkAddress.Equals("localhost"))
+                {
+                    // Host: not all players ready
+                    roomUI.DeactivateStartButton();
+                    roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
+                }
+                else
+                {
+                    if (room.readyPlayers.Equals(room.currentPlayers))
+                    {
+                        // Client: all players ready
+                        roomUI.DeactivateStartButton();
+                        roomUI.SetStartHelperText("host only");
+                    }
+                    else
+                    {
+                        // Client: not all players ready
+                        roomUI.DeactivateStartButton();
+                        roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
+                    }
+                }
             }
 
 
