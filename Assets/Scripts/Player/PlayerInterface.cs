@@ -73,8 +73,10 @@ public class PlayerInterface : NetworkBehaviour
 			localPlayerSingleRadial.gameObject.SetActive(false);
             playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
 
+        } else
+        {
+            inventoryUIRadial.transform.localPosition = new Vector3(0f, 36.4f, 0f);
         }
-
 
         this.gameObject.GetComponent<Health>().EventLivesChanged += OnPlayerTakeDamage;
 
@@ -101,7 +103,7 @@ public class PlayerInterface : NetworkBehaviour
         UpdateSpinCharge();
 
         // Show other player infos when the key is pressed
-        if (_gameActions.ShowInfo.IsPressed)
+        if (_gameActions.ShowInfo.IsPressed || this.GetComponent<Player>().isEliminated)
         {
             ShowPlayerInfo();
         } else if (!this.GetComponent<Player>().isEliminated)
@@ -171,8 +173,6 @@ public class PlayerInterface : NetworkBehaviour
     [Client] public void OnPlayerTakeDamage(int currentHealth, int _, GameObject __)
     {
         if (!isLocalPlayer) return;
-
-        ShowPlayerInfo();
 
         damageIndicator.GetComponent<ColorTween>().StartTween();
 
@@ -442,41 +442,48 @@ public class PlayerInterface : NetworkBehaviour
 		}
     }
 
+    // cache show player info
+    private bool playerInfoEnabled = false;
+
     [Client] private void ShowPlayerInfo()
     {
+        // if already enabled, return
+        if (playerInfoEnabled) return;
+        playerInfoEnabled = true;
+
         if (playerList == null) playerList = FindObjectsOfType<PlayerInterface>();
 
         foreach (PlayerInterface p in playerList)
         {
             if (p.GetComponent<Player>().isEliminated) continue;
 
-            if (p == this) continue;
-
             if (!p.inventoryUIRadial.gameObject.activeSelf)
             {
-                //p.hexUI.gameObject.SetActive(true);
-                // p.inventoryUI.gameObject.SetActive(true);
-				p.inventoryUIRadial.gameObject.SetActive(true);
-                p.playerName.transform.localPosition = new Vector3(0f, 12.2f, 0f);
+                p.inventoryUIRadial.gameObject.SetActive(true);
+
+                if (p == this) p.playerName.transform.localPosition = new Vector3(0f, 47.6f, 0f);
+                else p.playerName.transform.localPosition = new Vector3(0f, 12.2f, 0f);
+
             }
         }
     }
 
     [Client] private void UnshowPlayerInfo()
     {
+        // if already disabled, return
+        if (!playerInfoEnabled) return;
+        playerInfoEnabled = false;
+
         if (playerList == null) return;
 
         foreach (PlayerInterface p in playerList)
         {
-            if (p == this) continue;
-
-			// if (p.inventoryUI.gameObject.activeSelf)
 			if (p.inventoryUIRadial.gameObject.activeSelf)
             {
-                p.hexUI.gameObject.SetActive(false);
-                // p.inventoryUI.gameObject.SetActive(false);
 				p.inventoryUIRadial.gameObject.SetActive(false);
-				p.playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
+
+                if (p == this) p.playerName.transform.localPosition = new Vector3(0f, 18.5f, 0f);
+                else p.playerName.transform.localPosition = new Vector3(0f, -11.6f, 0f);
             }
         }
     }
