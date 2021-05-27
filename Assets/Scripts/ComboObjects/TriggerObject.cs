@@ -74,7 +74,7 @@ public class TriggerObject : ComboObject
             {
                 this.telegraphBeam.gameObject.SetActive(true);   // Enable telegraph beam
                 LeanTween.value(telegraphBeam.gameObject, telegraphSizeCallback, 10f, 0.2f, 0.8f); // Size tween
-                LeanTween.value(telegraphBeam.gameObject, telegraphGlowCallback, 1f, 10f, 0.8f); // Glow tween
+                LeanTween.value(telegraphBeam.gameObject, telegraphGlowCallback, 0.5f, 3f, 0.8f); // Glow tween
             }
         }
     }
