@@ -215,6 +215,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
         
         room.ReadyStatusChanged();
+        _lobbySettings.SetGamemodeText();
     }
     
     /// <summary>

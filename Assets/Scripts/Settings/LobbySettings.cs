@@ -90,7 +90,7 @@ public class LobbySettings : NetworkBehaviour
         SetGamemodeText();
     }
 
-    [Client] private void SetGamemodeText()
+    [Client] public void SetGamemodeText()
     {
         gamemodeButtonText.text = gamemodes[gamemodeSelected].ToString();
         gamemodeDescriptionText.text = gamemodes[gamemodeSelected].GetDescription();

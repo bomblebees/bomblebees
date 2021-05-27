@@ -35,7 +35,7 @@ public class Room_UI : MonoBehaviour
     [Header("Helper Text")] 
     [SerializeField] private TMP_Text readyHelperText;
     [SerializeField] private TMP_Text startHelperText;
-    [SerializeField] private TMP_Text gameModesHelperText;
+    [SerializeField] private TMP_Text gameModeHelperText;
     private CanvasRenderer _readyHelperTextCanvasRenderer;
     private CanvasRenderer _startHelperTextCanvasRenderer;
     // private CanvasRenderer gameModesHelperTextCanvasRenderer;
@@ -244,7 +244,7 @@ public class Room_UI : MonoBehaviour
     
     public void SetGameModeHelperText(string helperText)
     {
-        gameModesHelperText.text = helperText;
+        gameModeHelperText.text = helperText;
     }
 
     public void OnSettingsButtonClick()
