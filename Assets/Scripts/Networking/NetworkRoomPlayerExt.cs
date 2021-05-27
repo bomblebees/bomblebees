@@ -126,20 +126,23 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             {
                 if (room.showStartButton)
                 {
-                    // Host: All ready
+                    // Host: all players ready
                     roomUI.ActivateStartButton();
                     roomUI.SetStartHelperText(null);
                 }
                 else
                 {
-                    // Client: All ready
                     roomUI.DeactivateStartButton();
-                    if (!_networkManager.networkAddress.Equals("localhost")) roomUI.SetStartHelperText("host only");
+                    if (!_networkManager.networkAddress.Equals("localhost"))
+                    {
+                        // Client: all players ready
+                        roomUI.SetStartHelperText("host only");
+                    }
                 }
             }
             else
             {
-                // Not all ready
+                // Host/Client: not all players ready
                 roomUI.DeactivateStartButton();
                 roomUI.SetStartHelperText($"ready ({room.readyPlayers}/{room.currentPlayers})");
             }
@@ -198,7 +201,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             InitPlayerCard();
         }
         
-        FindObjectOfType<NetworkRoomManagerExt>().ReadyStatusChanged();
+        room.ReadyStatusChanged();
     }
     
     /// <summary>
@@ -458,6 +461,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Propagate updates to the player card
         SetCardReadyStatus();
         SetCardButtons();
+        
+        room.ReadyStatusChanged();
     }
 
     /// <summary>
