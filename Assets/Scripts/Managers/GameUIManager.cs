@@ -139,7 +139,8 @@ public class GameUIManager : NetworkBehaviour
 
     [Client] public void OnChangeLives(int prevLives, int newLives, GameObject player)
     {
-        if (lobbySettings.GetGamemode() is StandardGamemode)
+        if (lobbySettings.GetGamemode() is StandardGamemode ||
+            lobbySettings.GetGamemode() is TeamsGamemode)
         {
             livesUI.UpdateLives(newLives, player.GetComponent<Player>());
             livesUI.UpdateOrdering();
