@@ -19,9 +19,10 @@ public class Player : NetworkBehaviour
     /// A value of -1 represents no team chosen
     /// </summary>
     [SyncVar] public int teamIndex;
-
     [SyncVar] public bool canExitInvincibility = false;
     [SyncVar] public bool canBeHit = true;
+
+    [SyncVar] public bool isFrozen = true;
 
     // Game Objects
     [Header("Required", order = 2)]

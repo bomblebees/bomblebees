@@ -159,6 +159,12 @@ public class RoundManager : NetworkBehaviour
 
         // -- Game Starts Here -- //
 
+        // Unfreeze all players
+        foreach (GameObject p in playerList)
+        {
+            p.GetComponent<Player>().isFrozen = false;
+        }
+
         // Invoke start round event
         eventManager.OnStartRound();
 

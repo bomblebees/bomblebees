@@ -106,6 +106,9 @@ public class PlayerMovement : NetworkBehaviour
                 ghostModel.transform.rotation = rotation;
             }
 
+            // Return here if the player is frozen, allow rotation but not movement
+            if (this.GetComponent<Player>().isFrozen) return; 
+
             // Move the player
             controller.Move(direction * movementSpeed * sludgedScalar * spinChargedScalar * Time.deltaTime);
         }
