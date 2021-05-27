@@ -51,15 +51,12 @@ public class Player : NetworkBehaviour
     [SerializeField] private Material[] playerColors = new Material[4];
 
 	[SerializeField] private ParticleSystem sludgeParticles;
-	// Added for easy referencing of local player from anywhere
-	public override void OnStartLocalPlayer()
-    {
-        gameObject.name = "LocalPlayer";
-        base.OnStartLocalPlayer();
-    }
 
     public override void OnStartClient()
     {
+        // Added for easy referencing of local player from anywhere
+        if (isLocalPlayer) gameObject.name = "LocalPlayer";
+
         base.OnStartClient();
 
         // Set player mesh

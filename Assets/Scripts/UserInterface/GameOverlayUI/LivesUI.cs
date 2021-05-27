@@ -55,30 +55,43 @@ public class LivesUI : MonoBehaviour
 
         LivesUIElement elem = obj.GetComponent<LivesUIElement>();
 
-        // add to a list
+        // add to list
         livesUIs[p.playerRoomIndex] = elem;
 
-        // enable ui for players
+        // enable ui for player
         elem.livesObject.SetActive(true);
 
         // set the avatar
         elem.avatar.sprite = gameUIManager.GetComponent<CharacterHelper>().GetCharImage(p.characterCode);
 
-        // initialize username
-        //elem.playerName.text = p.steamName;
-
+        // set the player
         elem.player = p.gameObject;
+
+        // if it is the local player
+        if (p.transform.root.name == "LocalPlayer")
+        {
+            // set background to white
+            elem.background.color = Color.white;
+
+            // the flash color on the tween returns to white
+            elem.background.GetComponent<ColorTween>().endColor = Color.white;
+        }
+
+        // enable the ranking text
+        livesAnchors[p.playerRoomIndex].transform.Find("RankText").gameObject.SetActive(true);
 
         // add player to player list
         playerList.Add(p.gameObject);
 
 
+
+        // Set the lives (if applicable)
         if (_lobbySettings.GetGamemode() is StandardGamemode
             || _lobbySettings.GetGamemode() is TeamsGamemode)
         {
             elem.heartsObject.SetActive(true);
 
-            // Set the lives
+            
             for (int j = 0; j < elem.hearts.Length; j++)
             {
                 if (j < p.GetComponent<Health>().maxLives)
@@ -91,7 +104,7 @@ public class LivesUI : MonoBehaviour
                 }
             }
         }
-         
+        
         if (_lobbySettings.GetGamemode() is EliminationGamemode) elem.eliminationsObject.SetActive(true);
         if (_lobbySettings.GetGamemode() is ComboGamemode) elem.combosObject.SetActive(true);
     }
