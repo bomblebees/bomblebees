@@ -972,7 +972,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3681459879588219469}
   m_Layer: 5
-  m_Name: Pop-up
+  m_Name: Pop-up Position
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4610,7 +4610,7 @@ GameObject:
   - component: {fileID: 6057126014261924049}
   - component: {fileID: 3635984203758390497}
   m_Layer: 5
-  m_Name: Text_Kill_5 Kills or more
+  m_Name: 5 Kills or more
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4648,8 +4648,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad8869dbd13f1146a664b9cef881af5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scaleBefore: 0
+  scaleAfter: 1
   scaleDuration: 1
-  scaleDelay: 1e-45
+  scaleDelay: 0
   scaleEase: 30
   scaleCustomCurve:
     serializedVersion: 2
@@ -4676,6 +4678,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   scaleUseCustomCurve: 0
+  fadeBefore: 1
+  fadeAfter: 0
   fadeDuration: 4
   fadeDelay: 1
   fadeEase: 17
@@ -5524,7 +5528,7 @@ GameObject:
   - component: {fileID: 6916906650669331707}
   - component: {fileID: 6259194070260897404}
   m_Layer: 5
-  m_Name: Text_Kill_4 Kills
+  m_Name: 4 Kills
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5562,8 +5566,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad8869dbd13f1146a664b9cef881af5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scaleBefore: 0
+  scaleAfter: 1
   scaleDuration: 1
-  scaleDelay: 1e-45
+  scaleDelay: 0
   scaleEase: 30
   scaleCustomCurve:
     serializedVersion: 2
@@ -5590,6 +5596,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   scaleUseCustomCurve: 0
+  fadeBefore: 1
+  fadeAfter: 0
   fadeDuration: 4
   fadeDelay: 1
   fadeEase: 17
@@ -6001,7 +6009,7 @@ GameObject:
   - component: {fileID: 716077044106033586}
   - component: {fileID: 5235798161724881002}
   m_Layer: 5
-  m_Name: Text_Kill_3 Kills
+  m_Name: 3 Kills
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6039,8 +6047,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad8869dbd13f1146a664b9cef881af5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scaleBefore: 0
+  scaleAfter: 1
   scaleDuration: 1
-  scaleDelay: 1e-45
+  scaleDelay: 0
   scaleEase: 30
   scaleCustomCurve:
     serializedVersion: 2
@@ -6067,6 +6077,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   scaleUseCustomCurve: 0
+  fadeBefore: 1
+  fadeAfter: 0
   fadeDuration: 4
   fadeDelay: 1
   fadeEase: 17
@@ -6439,7 +6451,7 @@ GameObject:
   - component: {fileID: 386195720307259465}
   - component: {fileID: 9169241495240357647}
   m_Layer: 5
-  m_Name: Text_Kill_2 Kills
+  m_Name: 2 Kills
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6477,8 +6489,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad8869dbd13f1146a664b9cef881af5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scaleBefore: 0
+  scaleAfter: 1
   scaleDuration: 1
-  scaleDelay: 1e-45
+  scaleDelay: 0
   scaleEase: 30
   scaleCustomCurve:
     serializedVersion: 2
@@ -6505,6 +6519,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   scaleUseCustomCurve: 0
+  fadeBefore: 1
+  fadeAfter: 0
   fadeDuration: 4
   fadeDelay: 1
   fadeEase: 17
