@@ -38,6 +38,9 @@ public class MultiKillAnnouncerTween : MonoBehaviour
         _transform.localScale = new Vector3(scaleBefore, scaleBefore, scaleBefore);
         _canvasGroup.alpha = fadeBefore;
         
+        _transform.DORestart();
+        _canvasGroup.DORestart();
+        
         if (scaleUseCustomCurve)
         {
             _transform.DOScale(new Vector3(scaleAfter, scaleAfter, scaleAfter), scaleDuration).SetDelay(scaleDelay).SetEase(scaleCustomCurve);

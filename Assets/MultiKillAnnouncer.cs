@@ -15,8 +15,6 @@ public class MultiKillAnnouncer : MonoBehaviour
 
     public void Show(int numberOfKills)
     {
-        HideAll();
-        
         switch (numberOfKills)
         {
             case 0:
@@ -24,15 +22,19 @@ public class MultiKillAnnouncer : MonoBehaviour
             case 1:
                 break;
             case 2:
+                HideAll();
                 doubleKill.SetActive(true);
                 break;
             case 3:
+                HideAll();
                 tripleKill.SetActive(true);
                 break;
             case 4:
+                HideAll();
                 quadrupleKill.SetActive(true);
                 break;
             default:
+                HideAll();
                 multiKill.SetActive(true);
                 break;
         }
