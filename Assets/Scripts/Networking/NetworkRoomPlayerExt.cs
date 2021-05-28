@@ -288,7 +288,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         _playerCard.characterPortrait.enabled = true;
 
         // set the player name
-        _playerCard.username.text = steamUsername + " (" + ping + ")";
+        _playerCard.username.text = $"{steamUsername} ({ping})";
 
         // set initial card variables
         SetCardPosition();
@@ -389,7 +389,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
 
         // Set the character portrait
-        _playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = "Team " + teamIndex;
+        _playerCard.changeTeamButton.GetComponentInChildren<TMP_Text>().text = $"Team {teamIndex + 1}";
     }
 
     /// <summary>
@@ -463,7 +463,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (_playerCard.Equals(null)) return;
 
-        _playerCard.username.text = steamUsername + " (" + ping + ")";
+        _playerCard.username.text = $"{steamUsername} ({ping})";
     }
 
     #endregion

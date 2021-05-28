@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -211,13 +211,17 @@ public class TriggerObject : ComboObject
         // float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         // angle += 90f;
         // targetAngle = RoundAngleToHex(angle);
+
         targetAngle = HexMetrics.edgeAngles[edgeIndex] -90f;
 
+
+
+        // Smooth rotate, try without?
         startAngle = model.transform.eulerAngles.y;
         if (Math.Abs(startAngle - targetAngle) >= 180) // if angle diff is > 180, rotate in opp direction
         {
             if (startAngle >= targetAngle) targetAngle += 360f;  // wraparound
-            startAngle += 360f;  // reset
+            // startAngle += 360f;  // reset
         }
 
         // TODO: Take another look at this, the model spin is bugging at a certain angle
@@ -230,7 +234,7 @@ public class TriggerObject : ComboObject
                 new Vector3(90f, 0f, -HexMetrics.edgeAngles[edgeIndex]);
         }
 
-        this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles =
-            new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex] + 270f);
+        // this.gameObject.GetComponent<Transform>().transform.Find("VFX").transform.eulerAngles =
+        //     new Vector3(-90f, 0f, HexMetrics.edgeAngles[edgeIndex] + 270f);
     }
 }
