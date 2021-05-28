@@ -1816,6 +1816,7 @@ MonoBehaviour:
   - {fileID: -3242469202653107659}
   m_AtlasTextureIndex: 0
   m_IsMultiAtlasTexturesEnabled: 0
+  m_ClearDynamicDataOnBuild: 0
   m_UsedGlyphRects:
   - m_X: 0
     m_Y: 0
@@ -2630,6 +2631,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _ColorMask: 15
+    - _CullMode: 0
     - _MaskSoftnessX: 0
     - _MaskSoftnessY: 0
     - _Padding: 10
