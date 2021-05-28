@@ -5,19 +5,12 @@ public class FatalErrorScreen : MonoBehaviour
 {
     [SerializeField] private GameObject popup;
     [SerializeField] private TMP_Text title;
-    [SerializeField] private TMP_Text reason;
+    [SerializeField] private TMP_Text description;
 
-    public void Show(string titleText, string reasonText)
+    public void Show(string errorTitle, string errorDescription)
     {
-        title.text = titleText;
-        reason.text = reasonText;
-        popup.SetActive(true);
-    }
-    
-    public void Show(string reasonText)
-    {
-        title.text = "Fatal Error";
-        reason.text = reasonText;
+        title.text = errorTitle;
+        description.text = errorDescription;
         popup.SetActive(true);
     }
 

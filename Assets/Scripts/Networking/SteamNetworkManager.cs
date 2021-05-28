@@ -1,12 +1,22 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using Steamworks;
 
 public class SteamNetworkManager : NetworkRoomManagerExt
 {
+    public override void Start()
+    {
+        base.Start();
+        
+        if (SteamAPI.Init().Equals(false))
+        {
+            FindObjectOfType<FatalErrorScreen>().Show(
+                "Steam API was not found", 
+                "Please make sure steam is running and you are logged in to an account.");
+        }
+    }
+
     // Temp list of player colors
     private Color[] listColors = { Color.red, Color.blue, Color.yellow, Color.green };
 
