@@ -1,8 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
-using Mirror;
 
-public class Announcer : NetworkBehaviour
+public class Announcer : MonoBehaviour
 {
     [SerializeField] private TMP_Text announcerText;
 

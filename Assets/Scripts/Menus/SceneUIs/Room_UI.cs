@@ -14,17 +14,11 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private GameObject screenControls;
     [SerializeField] private GameObject screenLeavePopup;
 
-    [Header("Start Button")]
+    [Header("Buttons")]
     [SerializeField] public GameObject buttonStart;
-    private Button _buttonStartButton;
-    private ButtonHoverTween _buttonStartButtonHoverTween;
-    private CanvasRenderer[] _buttonStartCanvasRenderers;
-    
-    [Header("Ready Button")]
     [SerializeField] public GameObject buttonReady;
-    private Button _buttonReadyButton;
-    private ButtonHoverTween _buttonReadyButtonHoverTween;
-    private CanvasRenderer[] _buttonReadyCanvasRenderers;
+    [SerializeField] public GameObject buttonLeave;
+    [SerializeField] public GameObject buttonSettings;
 
     [Header("Helper Text")] 
     [SerializeField] private TMP_Text readyHelperText;
@@ -36,7 +30,6 @@ public class Room_UI : MonoBehaviour
     [Header("Misc.")]
     [SerializeField] public GameObject playerCardsParent;
     [SerializeField] public TMP_Text lobbyName;
-    private GlobalButtonSettings _globalButtonSettings;
 
     // events
     public delegate void ReadyClickDelegate();
@@ -49,15 +42,6 @@ public class Room_UI : MonoBehaviour
     {
         Singleton = this;
         
-        _globalButtonSettings = FindObjectOfType<GlobalButtonSettings>();
-        // Start button
-        _buttonStartButton = buttonStart.GetComponent<Button>();
-        _buttonStartButtonHoverTween = buttonStart.GetComponent<ButtonHoverTween>();
-        _buttonStartCanvasRenderers = buttonStart.GetComponentsInChildren<CanvasRenderer>();
-        // Ready button
-        _buttonReadyButton = buttonReady.GetComponent<Button>();
-        _buttonReadyButtonHoverTween = buttonReady.GetComponent<ButtonHoverTween>();
-        _buttonReadyCanvasRenderers = buttonReady.GetComponentsInChildren<CanvasRenderer>();
         // Helper texts
         _readyHelperTextCanvasRenderer = readyHelperText.gameObject.GetComponent<CanvasRenderer>();
         _startHelperTextCanvasRenderer = startHelperText.gameObject.GetComponent<CanvasRenderer>();
@@ -129,49 +113,29 @@ public class Room_UI : MonoBehaviour
 
     public void ActivateStartButton()
     {
-        // Update functionality
-        _buttonStartButton.interactable = true;
-        
-        // Update appearance
-        _globalButtonSettings.ActivateButtonOpacity(_buttonStartCanvasRenderers);
-        buttonStart.transform.localScale.Set(1f,1f,1f);
-        _buttonStartButtonHoverTween.enabled = true;
+        buttonStart.GetComponent<ButtonDisable>().EnableButton();
+
         _startHelperTextCanvasRenderer.SetAlpha(float.Epsilon);
     }
 
     public void DeactivateStartButton()
     {
-        // Update functionality
-        _buttonStartButton.interactable = false;
-        
-        // Update appearance
-        _globalButtonSettings.DeactivateButtonOpacity(_buttonStartCanvasRenderers);
-        _buttonStartButtonHoverTween.enabled = false;
-        buttonStart.transform.localScale.Set(1f,1f,1f);
+        buttonStart.GetComponent<ButtonDisable>().DisableButton();
+
         _startHelperTextCanvasRenderer.SetAlpha(1f);
     }
     
     public void ActivateReadyButton()
     {
-        // Update functionality
-        _buttonReadyButton.interactable = true;
-        
-        // Update appearance
-        _globalButtonSettings.ActivateButtonOpacity(_buttonReadyCanvasRenderers);
-        buttonReady.transform.localScale.Set(1f,1f,1f);
-        _buttonReadyButtonHoverTween.enabled = true;
+        buttonReady.GetComponent<ButtonDisable>().EnableButton();
+
         _readyHelperTextCanvasRenderer.SetAlpha(float.Epsilon);
     }
 
     public void DeactivateReadyButton()
     {
-        // Update functionality
-        _buttonReadyButton.interactable = false;
-        
-        // Update appearance
-        _globalButtonSettings.DeactivateButtonOpacity(_buttonReadyCanvasRenderers);
-        _buttonReadyButtonHoverTween.enabled = false;
-        buttonReady.transform.localScale.Set(1f,1f,1f);
+        buttonReady.GetComponent<ButtonDisable>().DisableButton();
+
         _readyHelperTextCanvasRenderer.SetAlpha(1f);
     }
 
