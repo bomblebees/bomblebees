@@ -5,12 +5,18 @@ using UnityEngine.EventSystems;
 
 public class AudioEvents : MonoBehaviour
 {
-	public AudioSource buttonClickSound;
-	public AudioSource buttonHoverSound;
+	private MenuAudioManager menuAudioManager;
 
-	private void Start()
+    private void Awake()
+    {
+		menuAudioManager = FindObjectOfType<MenuAudioManager>();
+		if (!menuAudioManager) Debug.LogError("Could not find component: MenuAudioManager");
+	}
+
+    private void Start()
 	{
 		EventTrigger trigger = GetComponent<EventTrigger>();
+		if (!trigger) trigger = this.gameObject.AddComponent<EventTrigger>();
 
 		EventTrigger.Entry buttonClickEvent = new EventTrigger.Entry();
 		EventTrigger.Entry buttonHoverEvent = new EventTrigger.Entry();
@@ -27,10 +33,11 @@ public class AudioEvents : MonoBehaviour
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		buttonClickSound.Play();
+		// Subscribed callback may not be disabled entirely, check again here
+		if (enabled) menuAudioManager.menuConfirm.Play();
 	}
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		buttonHoverSound.Play();
+		if (enabled) menuAudioManager.menuHover.Play();
 	}
 }

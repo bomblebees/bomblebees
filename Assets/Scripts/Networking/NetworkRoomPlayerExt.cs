@@ -167,7 +167,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             else
             {
                 _roomUI.ActivateReadyButton();
-                _roomUI.SetReadyHelperText(null);
+                _roomUI.SetReadyHelperText("");
             }
         }
 
@@ -493,6 +493,18 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         SetCardButtons();
         
         _room.ReadyStatusChanged();
+
+        // Disable buttons when readied
+        if (newReadyState)
+        {
+            _roomUI.buttonLeave.GetComponent<ButtonDisable>().DisableButton();
+            _roomUI.buttonSettings.GetComponent<ButtonDisable>().DisableButton();
+        }
+        else
+        {
+            _roomUI.buttonLeave.GetComponent<ButtonDisable>().EnableButton();
+            _roomUI.buttonSettings.GetComponent<ButtonDisable>().EnableButton();
+        }
     }
 
     /// <summary>

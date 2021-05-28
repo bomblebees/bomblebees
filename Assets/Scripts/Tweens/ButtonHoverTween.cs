@@ -18,6 +18,8 @@ public class ButtonHoverTween : MonoBehaviour, IPointerEnterHandler, IPointerExi
         originalScale = this.gameObject.transform.localScale;
     }
 
+    private int cur = 0;
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Prevents tween anim from running multiple times
@@ -25,21 +27,21 @@ public class ButtonHoverTween : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         tweenStarted = true;
 
-        LeanTween.scale(this.gameObject, originalScale * scaleMultipler, 0.2f).setEase(easeIn);
+        cur = LeanTween.scale(this.gameObject, originalScale * scaleMultipler, 0.2f).setEase(easeIn).id;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        LeanTween.scale(this.gameObject, originalScale, 0.2f)
+        cur = LeanTween.scale(this.gameObject, originalScale, 0.2f)
             .setEase(easeOut)
-            .setOnComplete(OnTweenExitComplete);
+            .setOnComplete(OnTweenExitComplete).id;
     }
 
     public void OnDisable()
     {
-        LeanTween.scale(this.gameObject, originalScale, 0.2f)
-            .setEase(easeOut)
-            .setOnComplete(OnTweenExitComplete);
+        LeanTween.cancel(cur);
+
+        this.gameObject.transform.localScale = originalScale;
     }
 
     public void OnTweenExitComplete()
@@ -51,4 +53,5 @@ public class ButtonHoverTween : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         OnPointerExit(eventData);
     }
+
 }
