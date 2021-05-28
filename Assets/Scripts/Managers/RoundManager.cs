@@ -132,6 +132,8 @@ public class RoundManager : NetworkBehaviour
     /// </summary>
     [Server] private void InitRoundManager()
     {
+        if (settings.practiceMode) startGameFreezeDuration = -1;
+
         // -- ALL WIN CONDITIONS INITALIZED HERE -- //
         if (settings.byLastAlive) winConditions.Add(this.gameObject.AddComponent<LivesCondition>());
         if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());

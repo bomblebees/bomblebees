@@ -10,22 +10,28 @@ public class RoundStartEnd : MonoBehaviour
 
     public IEnumerator StartRoundFreezetime(int freezetime)
     {
-        titleText.text = "All players loaded!";
-        yield return new WaitForSeconds(1);
-        FindObjectOfType<AudioManager>().PlaySound("startCountdown");
-        titleText.text = "Game Starting in";
-        timerText.gameObject.SetActive(true);
-
-        for (int i = freezetime; i > 0; i--)
+        if (freezetime == -1)
         {
-            timerText.text = i.ToString();
+            titleText.text = "";
+        } else
+        {
+            titleText.text = "All players loaded!";
             yield return new WaitForSeconds(1);
-        }
-        timerText.gameObject.SetActive(false);
+            FindObjectOfType<AudioManager>().PlaySound("startCountdown");
+            titleText.text = "Game Starting in";
+            timerText.gameObject.SetActive(true);
 
-        titleText.text = "Fight!";
-        yield return new WaitForSeconds(1);
-        titleText.text = "";
+            for (int i = freezetime; i > 0; i--)
+            {
+                timerText.text = i.ToString();
+                yield return new WaitForSeconds(1);
+            }
+            timerText.gameObject.SetActive(false);
+
+            titleText.text = "Fight!";
+            yield return new WaitForSeconds(1);
+            titleText.text = "";
+        }
     }
 
     public IEnumerator EndRoundFreezetime(int freezetime)

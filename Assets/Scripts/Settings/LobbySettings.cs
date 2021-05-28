@@ -24,6 +24,8 @@ public class LobbySettings : NetworkBehaviour
 
     // local team index, client only
     public int localTeamIndex;
+
+    public bool practiceMode = false;
     
     private void Awake()
     {

@@ -4038,7 +4038,6 @@ GameObject:
   - component: {fileID: 7902624618716854098}
   - component: {fileID: 3037570589699662068}
   - component: {fileID: 8400676120025421089}
-  - component: {fileID: 2571414835740817801}
   - component: {fileID: 4194710596932988677}
   m_Layer: 0
   m_Name: LobbySettings
@@ -4155,27 +4154,6 @@ MonoBehaviour:
   gamemodeName: Free for all
   roundDuration: 180
   playerLives: 3
---- !u!114 &2571414835740817801
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5476808900698637262}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83df9d0512c1ea4784af6b61d4dd123, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  gamemodeName: Eliminations(Old)
-  roundDuration: 180
-  playerLives: 3
-  eliminations: 0
-  eliminationContainer: {fileID: 0}
-  eliminationsText: {fileID: 0}
-  eliminationsList: 050000000a0000000f00000014000000
 --- !u!114 &4194710596932988677
 MonoBehaviour:
   m_ObjectHideFlags: 0

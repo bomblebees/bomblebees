@@ -459,6 +459,7 @@ GameObject:
   - component: {fileID: 253897658}
   - component: {fileID: 253897660}
   - component: {fileID: 253897659}
+  - component: {fileID: 253897661}
   m_Layer: 5
   m_Name: Button_Ready
   m_TagString: Untagged
@@ -618,8 +619,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
+--- !u!114 &253897661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253897653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6125420686b8344e851763f520577f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivatedOpacity: 0.2
+  activatedOpacity: 1
 --- !u!1 &262812094
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,6 +648,7 @@ GameObject:
   - component: {fileID: 262812096}
   - component: {fileID: 262812101}
   - component: {fileID: 262812100}
+  - component: {fileID: 262812102}
   m_Layer: 5
   m_Name: Button_Leave Lobby
   m_TagString: Untagged
@@ -793,8 +807,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
+--- !u!114 &262812102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262812094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6125420686b8344e851763f520577f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivatedOpacity: 0.2
+  activatedOpacity: 1
 --- !u!21 &284059156
 Material:
   serializedVersion: 6
@@ -1761,8 +1787,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
 --- !u!1001 &441803029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2050,8 +2074,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
 --- !u!1 &457277149
 GameObject:
   m_ObjectHideFlags: 0
@@ -2456,8 +2478,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 546765606}
-  buttonHoverSound: {fileID: 1773411561}
 --- !u!114 &489829467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3583,6 +3603,8 @@ MonoBehaviour:
   screenLeavePopup: {fileID: 879786481}
   buttonStart: {fileID: 1845306631}
   buttonReady: {fileID: 253897653}
+  buttonLeave: {fileID: 262812094}
+  buttonSettings: {fileID: 1703093049}
   readyHelperText: {fileID: 1506989272}
   startHelperText: {fileID: 1855424886}
   gameModeHelperText: {fileID: 100482239}
@@ -3946,8 +3968,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 546765606}
-  buttonHoverSound: {fileID: 1773411561}
 --- !u!1 &1278185687
 GameObject:
   m_ObjectHideFlags: 0
@@ -4564,6 +4584,7 @@ GameObject:
   - component: {fileID: 1703093051}
   - component: {fileID: 1703093056}
   - component: {fileID: 1703093055}
+  - component: {fileID: 1703093057}
   m_Layer: 5
   m_Name: Button_Settings
   m_TagString: Untagged
@@ -4723,8 +4744,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
+--- !u!114 &1703093057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1703093049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6125420686b8344e851763f520577f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivatedOpacity: 0.2
+  activatedOpacity: 1
 --- !u!1 &1737527078
 GameObject:
   m_ObjectHideFlags: 0
@@ -5059,6 +5092,7 @@ GameObject:
   - component: {fileID: 1845306636}
   - component: {fileID: 1845306638}
   - component: {fileID: 1845306637}
+  - component: {fileID: 1845306639}
   m_Layer: 5
   m_Name: Button_Start
   m_TagString: Untagged
@@ -5218,8 +5252,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
+--- !u!114 &1845306639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845306631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6125420686b8344e851763f520577f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivatedOpacity: 0.2
+  activatedOpacity: 1
 --- !u!1 &1855424884
 GameObject:
   m_ObjectHideFlags: 0
@@ -6072,8 +6118,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195d790f663935f45b5e3c902cc6ee6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonClickSound: {fileID: 1205838978}
-  buttonHoverSound: {fileID: 1773411561}
 --- !u!114 &4585450081042450652
 MonoBehaviour:
   m_ObjectHideFlags: 0

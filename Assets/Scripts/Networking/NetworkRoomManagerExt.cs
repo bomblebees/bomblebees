@@ -87,6 +87,8 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
+        // turn off loading screen
+        FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = false;
 
         if (gamePlayer.GetComponent<Player>().steamId == 0)
         {
