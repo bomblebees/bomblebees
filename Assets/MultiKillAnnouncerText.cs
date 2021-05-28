@@ -26,13 +26,13 @@ public class MultiKillAnnouncerText : MonoBehaviour
     {
         _transform = GetComponent<Transform>();
         _canvasGroup = GetComponent<CanvasGroup>();
-        
-        _transform.localScale = new Vector3(float.Epsilon, float.Epsilon, float.Epsilon);
-        _canvasGroup.alpha = 1f;
     }
 
     private void OnEnable()
     {
+        _transform.localScale = new Vector3(float.Epsilon, float.Epsilon, float.Epsilon);
+        _canvasGroup.alpha = 1f;
+        
         if (scaleUseCustomCurve)
         {
             _transform.DOScale(new Vector3(1f, 1f, 1f), scaleDuration).SetDelay(scaleDelay).SetEase(scaleCustomCurve);
@@ -50,11 +50,5 @@ public class MultiKillAnnouncerText : MonoBehaviour
         {
             _canvasGroup.DOFade(float.Epsilon, fadeDuration).SetDelay(fadeDelay).SetEase(fadeEase);
         }
-    }
-
-    private void OnDisable()
-    {
-        _transform.localScale = new Vector3(float.Epsilon, float.Epsilon, float.Epsilon);
-        _canvasGroup.alpha = 1f;
     }
 }

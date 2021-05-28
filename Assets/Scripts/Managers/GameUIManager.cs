@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
@@ -13,6 +12,7 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] public MessageFeed warningFeed;
     [SerializeField] public Hotbar hotbar;
     [SerializeField] public Announcer announcer;
+    [SerializeField] public MultiKillAnnouncer multiKillAnnouncer;
 
     private GameObject localPlayer;
 
@@ -126,7 +126,8 @@ public class GameUIManager : NetworkBehaviour
 	public void RpcOnMultikillEvent(GameObject player, int multiKillAmount)
 	{
 		messageFeed.OnMultikillEvent(player, multiKillAmount);
-	}
+        multiKillAnnouncer.Show(multiKillAmount);
+    }
 
     #endregion
 

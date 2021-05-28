@@ -2,6 +2,7 @@
 
 public class MultiKillAnnouncer : MonoBehaviour
 {
+    [Header("GameObject")]
     [SerializeField] private GameObject doubleKill;
     [SerializeField] private GameObject tripleKill;
     [SerializeField] private GameObject quadrupleKill;
