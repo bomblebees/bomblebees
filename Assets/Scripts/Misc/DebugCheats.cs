@@ -8,14 +8,22 @@ public class DebugCheats : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            Debug.Log("Log");
-            Debug.LogWarning("LogWarning");
-            Debug.LogAssertion("LogAssertion");
-            Debug.LogError("LogError");
-            Debug.LogFormat("LogFormat");
-            Debug.LogAssertionFormat("LogAssertionFormat");
-            Debug.LogErrorFormat("LogErrorFormat");
-            Debug.LogWarningFormat("LogWarningFormat");
+            FindObjectOfType<MultiKillAnnouncer>().Show(2);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            FindObjectOfType<MultiKillAnnouncer>().Show(3);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            FindObjectOfType<MultiKillAnnouncer>().Show(4);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            FindObjectOfType<MultiKillAnnouncer>().Show(5);
         }
     }
 }
