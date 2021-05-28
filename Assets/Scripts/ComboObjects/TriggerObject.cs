@@ -10,6 +10,7 @@ using UnityEngine;
 public class TriggerObject : ComboObject
 {
     [SerializeField] LineRenderer telegraphBeam;
+    [SerializeField] GameObject telegraphBall;
     public float breakdownDuration = 3f;
     public bool wasHit = false;
     protected bool canBeTriggered = true; // to make sure it's only hit once.
@@ -75,6 +76,10 @@ public class TriggerObject : ComboObject
                 this.telegraphBeam.gameObject.SetActive(true);   // Enable telegraph beam
                 LeanTween.value(telegraphBeam.gameObject, telegraphSizeCallback, 10f, 0.2f, 0.8f); // Size tween
                 LeanTween.value(telegraphBeam.gameObject, telegraphGlowCallback, 0.5f, 3f, 0.8f); // Glow tween
+            }
+            if (telegraphBall)
+            {
+                this.telegraphBall.SetActive(true);
             }
         }
     }
