@@ -102,12 +102,25 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     #region Update Loop
 
+    private bool gameStarted = false;
+
     private void Update()
     {
         // Exit if required vars are not initialized
         if (!_characterSelectionInfo || !_room || !_roomUI) return;
 
         UpdateLobby();
+
+        // If practice mode, immediately start game
+        if (isServer && !gameStarted && _lobbySettings.practiceMode)
+        {
+            Debug.Log("entering practice mode");
+            gameStarted = true;
+            _lobbySettings.roundDuration = 0f; // set inf time
+            _lobbySettings.playerLives = 0; // set inf lives
+            FindObjectOfType<PingDisplay>().PracticeStatus(); // set ping status
+            _room.ServerChangeScene(_room.GameplayScene); // change 
+        }
     }
 
     /// <summary>
