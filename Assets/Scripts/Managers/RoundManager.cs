@@ -184,11 +184,8 @@ public class RoundManager : NetworkBehaviour
 
     [ClientRpc] public void ClientStartRound()
     {
-        if (!settings.practiceMode)
-        {
-            // Start camera follow
-            FindObjectOfType<CameraFollow>().InitCameraFollow();
-        }
+        // Start camera follow
+        FindObjectOfType<CameraFollow>().InitCameraFollow();
     }
 
     [Server]
