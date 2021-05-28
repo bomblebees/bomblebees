@@ -515,8 +515,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
         else
         {
-            _roomUI.buttonLeave.GetComponent<ButtonDisable>().EnableButton();
-            _roomUI.buttonSettings.GetComponent<ButtonDisable>().EnableButton();
+            if (_roomUI.buttonLeave)
+                _roomUI.buttonLeave.GetComponent<ButtonDisable>().EnableButton();
+            if (_roomUI.buttonSettings)
+                _roomUI.buttonSettings.GetComponent<ButtonDisable>().EnableButton();
         }
     }
 
