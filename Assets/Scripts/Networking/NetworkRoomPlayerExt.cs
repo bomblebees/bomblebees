@@ -119,7 +119,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             _lobbySettings.roundDuration = 0f; // set inf time
             _lobbySettings.playerLives = 0; // set inf lives
             FindObjectOfType<PingDisplay>().PracticeStatus(); // set ping status
-            _room.ServerChangeScene(_room.GameplayScene); // change 
+            _room.ServerChangeScene(_room.GameplayScene); // start game
+            FindObjectOfType<TutorialScreen>().ShowTutorialScreen(); // show tutorial screen
         }
     }
 

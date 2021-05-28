@@ -157,7 +157,12 @@ public class PlayerSpin : NetworkBehaviour
         // Get the spin power
         spinPower = spinPowerDist[CalculateSpinLevel(spinChargeTime)];
 
-        //@@ ExitInvincibility();
+        if (spinPower == 5)
+        {
+            // Tutorial
+            TutorialDialog tutorial = FindObjectOfType<TutorialDialog>();
+            if (tutorial) tutorial.curChargeSpins++;
+        }
 
         // Do the spin
         StartCoroutine(Spin());
