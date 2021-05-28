@@ -10,6 +10,7 @@ public class TutorialDialog : MonoBehaviour
     [SerializeField] public RPGTalk dialog;
     [SerializeField] public GameObject canvas;
 
+    [SerializeField] private TMP_Text nextText;
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private Image progressBar;
 
@@ -32,6 +33,7 @@ public class TutorialDialog : MonoBehaviour
             if (dialog.cutscenePosition == 4 && dialog.enablePass)
             {
                 dialog.enablePass = false;
+                nextText.enabled = false;
             }
 
             // Assess when paused
@@ -43,6 +45,7 @@ public class TutorialDialog : MonoBehaviour
                 // Reset the value for assessment
                 curCombos = 0;
                 dialog.enablePass = false;
+                nextText.enabled = false;
             }
 
             // Assess when paused
@@ -54,6 +57,7 @@ public class TutorialDialog : MonoBehaviour
                 // Reset the value for assessment
                 curPlaces = 0;
                 dialog.enablePass = false;
+                nextText.enabled = false;
             }
 
             // Assess when paused
@@ -65,6 +69,7 @@ public class TutorialDialog : MonoBehaviour
                 // Reset the value for assessment
                 curSpins = 0;
                 dialog.enablePass = false;
+                nextText.enabled = false;
             }
 
             // Assess when paused
@@ -76,6 +81,7 @@ public class TutorialDialog : MonoBehaviour
                 // Reset the value for assessment
                 curChargeSpins = 0;
                 dialog.enablePass = false;
+                nextText.enabled = false;
             }
 
             // Assess when paused
@@ -127,6 +133,7 @@ public class TutorialDialog : MonoBehaviour
                 section++; 
                 dialog.NewTalk("swap_begin", "swap_end");
                 dialog.enablePass = true;
+                nextText.enabled = true;
             }
 
         }
@@ -148,6 +155,7 @@ public class TutorialDialog : MonoBehaviour
             section++;
             dialog.NewTalk("place_begin", "place_end");
             dialog.enablePass = true;
+            nextText.enabled = true;
         }
     }
 
@@ -167,6 +175,7 @@ public class TutorialDialog : MonoBehaviour
             section++;
             dialog.NewTalk("spin_begin", "spin_end");
             dialog.enablePass = true;
+            nextText.enabled = true;
         }
     }
 
@@ -186,6 +195,7 @@ public class TutorialDialog : MonoBehaviour
             section++;
             dialog.NewTalk("charge_begin", "charge_end");
             dialog.enablePass = true;
+            nextText.enabled = true;
         }
     }
 
@@ -205,6 +215,7 @@ public class TutorialDialog : MonoBehaviour
             section++;
             dialog.NewTalk("outro_begin", "outro_end");
             dialog.enablePass = true;
+            nextText.enabled = true;
         }
     }
 }
