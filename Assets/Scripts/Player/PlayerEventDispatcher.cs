@@ -40,7 +40,13 @@ public class PlayerEventDispatcher : NetworkBehaviour
 	public void OnChangeSpinHeld(bool prevHeld, bool newHeld)
 	{
 		// if spin was held, then released (i.e. spin was launched)
-		if (prevHeld && !newHeld) gameUIManager.OnSpin(prevHeld, newHeld, this.gameObject);
+		if (prevHeld && !newHeld)
+		{
+			gameUIManager.OnSpin(prevHeld, newHeld, this.gameObject);
+
+			TutorialDialog tutorial = FindObjectOfType<TutorialDialog>();
+			if (tutorial) tutorial.curSpins++;
+		}
 	}
 
 	[Client]
@@ -51,12 +57,20 @@ public class PlayerEventDispatcher : NetworkBehaviour
 	}
 
 	[Client]
-	public void OnInventoryQuantityChange(int slot, char type, int quantity)
+	public void OnInventoryQuantityChange(int slot, char type, int quantity, int oldAmt, int newAmt)
 	{
 		if (slot == this.GetComponent<PlayerInventory>().selectedSlot)
 		{
 			gameUIManager.OnInventorySelectChanged(type, quantity);
 		}
+
+		// If placed a bomb
+		if (newAmt < oldAmt)
+        {
+			TutorialDialog tutorial = FindObjectOfType<TutorialDialog>();
+			if (tutorial) tutorial.curPlaces++;
+		}
+		
 	}
 
 	[Client]
@@ -75,6 +89,9 @@ public class PlayerEventDispatcher : NetworkBehaviour
 	public void OnChangeCombos(int prevCombos, int newCombos)
 	{
 		gameUIManager.OnChangeCombos(prevCombos, newCombos, this.gameObject);
+
+		TutorialDialog tutorial = FindObjectOfType<TutorialDialog>();
+		if (tutorial) tutorial.curCombos++;
 	}
 
 	[Client]

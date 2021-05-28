@@ -90,7 +90,11 @@ public class MessageFeed : MonoBehaviour
 
 		GameObject killer = bomb.GetComponent<ComboObject>().triggeringPlayer;
 
-		string killtext = GetPlayerText(killer) + " " + GetBombIcon(bomb) + " " + GetPlayerText(killedPlayer);
+		string killtext;
+        if (killer == killedPlayer)
+            killtext = GetBombIcon(bomb) + " " + GetPlayerText(killedPlayer);
+        else
+            killtext = GetPlayerText(killer) + " " + GetBombIcon(bomb) + " " + GetPlayerText(killedPlayer);
 
 		// No portraits for kills
         CreateMessage(killtext, -1);

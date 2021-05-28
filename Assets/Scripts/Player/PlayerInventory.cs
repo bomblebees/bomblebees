@@ -315,7 +315,7 @@ public class PlayerInventory : NetworkBehaviour
         // Update the player interface everytime the inventory changes
         this.GetComponent<PlayerInterface>().UpdateInventoryQuantity();
 
-        this.GetComponent<PlayerEventDispatcher>().OnInventoryQuantityChange(idx, INVEN_BOMB_TYPES[idx], inventoryList[idx]);
+        this.GetComponent<PlayerEventDispatcher>().OnInventoryQuantityChange(idx, INVEN_BOMB_TYPES[idx], inventoryList[idx], oldAmt, newAmt);
     }
 
 	/// <summary>
