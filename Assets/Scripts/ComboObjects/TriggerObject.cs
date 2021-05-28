@@ -23,6 +23,7 @@ public class TriggerObject : ComboObject
     protected float startAngle;
     protected bool isRotating = false;
 	public bool isSpinnable = true;
+    public float traumaAmount; //temp
 
 
 	protected IEnumerator
@@ -159,6 +160,9 @@ public class TriggerObject : ComboObject
 
     protected override IEnumerator EnableHitbox()
     {
+        // Play shake anim
+        FindObjectOfType<CameraShake>().InduceStress(traumaAmount);
+        
         var hitbox = this.gameObject.transform.Find("Hitbox").gameObject;
 
 		// once hitbox is enabled, triggerobject cannot be spun anymore

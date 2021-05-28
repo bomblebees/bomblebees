@@ -67,6 +67,9 @@ public class PlasmaObject : TriggerObject
             yield return new WaitForSeconds(startupDelay);
         }
 
+        // Play shake anim
+        FindObjectOfType<CameraShake>().InduceStress(0.35f);
+
 		PlayFireSFX();
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
         this.hitboxEnabled = true;
