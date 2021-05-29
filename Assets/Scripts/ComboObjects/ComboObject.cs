@@ -289,7 +289,7 @@ public class ComboObject : NetworkBehaviour
     protected virtual IEnumerator EnableHitbox()
     {
         // Play shake anim
-        FindObjectOfType<CameraShake>().InduceStress(0.2f);
+        FindObjectOfType<CameraShake>().InduceStress(0.22f);
 
         hitBox.SetActive(true);
         yield return new WaitForSeconds(hitboxDuration);

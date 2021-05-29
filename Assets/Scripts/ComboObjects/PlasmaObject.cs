@@ -68,7 +68,7 @@ public class PlasmaObject : TriggerObject
         }
 
         // Play shake anim
-        FindObjectOfType<CameraShake>().InduceStress(0.35f);
+        FindObjectOfType<CameraShake>().InduceStress(0.25f);
 
 		PlayFireSFX();
         // StartCoroutine(IgnoreTriggeringPlayer(ignoreTriggererDuration)); // removed, no triggerer iframes
