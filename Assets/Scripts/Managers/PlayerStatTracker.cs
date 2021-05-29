@@ -266,27 +266,36 @@ public class PlayerStatTracker : NetworkBehaviour
 			deathsArray[i] = playerStatsUIElements[i].totalDeathPenalty;
 			bombCombosMadeArray[i] = playerStatsUIElements[i].totalBombCombosMade;
 		}
+
+		// Highlight colors. Source: https://www.colorhexa.com/color-names
+		var pastelGreen = new Color(0.47f, 0.87f, 0.47f);
+		var pastelRed = new Color(1f, 0.41f, 0.38f);
 		
+		// Set highlights
 		for (var i = 0; i < playerStatsUIElements.Length; i++)
 		{
 			if (totalPointsArray[i].Equals(totalPointsArray.Max()) && !totalPointsArray[i].Equals(0))
 			{
-				playerStatsUIElements[i].totalPointsText.color = Color.green;
+				// Most total points
+				playerStatsUIElements[i].totalPointsText.color = pastelGreen;
 			}
 
 			if (killsArray[i].Equals(killsArray.Max()) && !killsArray[i].Equals(0))
 			{
-				playerStatsUIElements[i].killsText.color = Color.green;
+				// Most kills
+				playerStatsUIElements[i].killsText.color = pastelGreen;
 			}
 			
 			if (deathsArray[i].Equals(deathsArray.Max()) && !deathsArray[i].Equals(0))
 			{
-				playerStatsUIElements[i].deathsText.color = Color.red;
+				// Most deaths
+				playerStatsUIElements[i].deathsText.color = pastelRed;
 			}
 			
 			if (bombCombosMadeArray[i].Equals(bombCombosMadeArray.Max()) && !bombCombosMadeArray[i].Equals(0))
 			{
-				playerStatsUIElements[i].bombComboMadeText.color = Color.green;
+				// Most combos
+				playerStatsUIElements[i].bombComboMadeText.color = pastelGreen;
 			}
 		}
 	}
