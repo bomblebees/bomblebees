@@ -42,7 +42,7 @@ public class ComboGamemode : Gamemode
         GameObject[] orderedList = new GameObject[playerList.Length];
 
         // Order the player list by most combos
-        orderedList = playerList.OrderByDescending(p => p.GetComponent<PlayerStatTracker>().totalBombCombosMade).ToArray();
+        orderedList = playerList.OrderByDescending(p => p.GetComponent<PlayerStatTracker>().totalPoints).ToArray();
 
         return orderedList;
     }

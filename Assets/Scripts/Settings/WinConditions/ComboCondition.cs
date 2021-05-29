@@ -50,7 +50,7 @@ public class ComboCondition : WinCondition
     {
         foreach (Player p in players)
         {
-            int playerCombos = p.GetComponent<PlayerStatTracker>().totalBombCombosMade;
+            int playerCombos = p.GetComponent<PlayerStatTracker>().totalPoints;
 
             if (playerCombos >= toCombos)
             {

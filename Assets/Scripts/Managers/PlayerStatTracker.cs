@@ -30,7 +30,8 @@ public class PlayerStatTracker : NetworkBehaviour
 	[SyncVar] public int totalCombosMade = 0;
 
 	// number of bomb's made from combos
-	[SyncVar(hook = nameof(OnChangeBombCombos))] public int totalBombCombosMade = 0;
+	[SyncVar(hook = nameof(OnChangeBombCombos))] public int totalPoints = 0;
+	[SyncVar] public int totalBombCombosMade = 0;
 
 	// individual combo objects made from combos
 	[SyncVar] public int bombsMade = 0;
@@ -109,10 +110,10 @@ public class PlayerStatTracker : NetworkBehaviour
 			// if combo gamemode and died, apply combo penalty
 			if (lobbySettings.GetGamemode() is ComboGamemode)
             {
-				if (totalBombCombosMade > ComboGamemode.comboPenalty)
-					totalBombCombosMade -= ComboGamemode.comboPenalty;
+				if (totalPoints > ComboGamemode.comboPenalty)
+					totalPoints -= ComboGamemode.comboPenalty;
 				else
-					totalBombCombosMade = 0;
+					totalPoints = 0;
             }
 		}
 
@@ -124,7 +125,7 @@ public class PlayerStatTracker : NetworkBehaviour
 			// if combo gamemode and died, apply combo bonus
 			if (lobbySettings.GetGamemode() is ComboGamemode)
 			{
-				totalBombCombosMade += ComboGamemode.comboBonus;
+				totalPoints += ComboGamemode.comboBonus;
 			}
 		}
 	}
@@ -146,6 +147,7 @@ public class PlayerStatTracker : NetworkBehaviour
 			{
 				totalCombosMade++;
 				totalBombCombosMade += numBombsAwarded;
+				totalPoints += numBombsAwarded;
 
 				// this shit will be a problem when we rework colors unless we can go through the codebase and change all the hardcoded color values
 				switch (oldKey)
@@ -203,7 +205,7 @@ public class PlayerStatTracker : NetworkBehaviour
 	private void GetPointSystemData()
 	{
 		_comboReward = 1;
-		_killReward = 10;
+		_killReward = ComboGamemode.comboBonus;
 	}
 
 	public void CreateStatsUIElement(GameObject anchorObject)
@@ -225,13 +227,13 @@ public class PlayerStatTracker : NetworkBehaviour
 		GetPointSystemData();
 		
 		// Total death penalty math
-		var totalDeathPenalty = Math.Abs(kills * _killReward) + Math.Abs(totalCombosMade * _comboReward) - totalBombCombosMade;
+		var totalDeathPenalty = Math.Abs(kills * _killReward) + Math.Abs(totalBombCombosMade * _comboReward) - totalPoints;
 		totalDeathPenalty = Math.Abs(totalDeathPenalty);
 		
-		uiElement.totalPointsText.text = $"{totalBombCombosMade}";
+		uiElement.totalPointsText.text = $"{totalPoints}";
 		uiElement.killsText.text = $"{kills} (+{Math.Abs(kills * _killReward)})";
 		uiElement.deathsText.text = $"{deaths} (-{totalDeathPenalty})";
-		uiElement.comboMadeText.text = $"{totalCombosMade} (+{Math.Abs(totalCombosMade * _comboReward)})";
+		uiElement.comboMadeText.text = $"{totalBombCombosMade} (+{Math.Abs(totalBombCombosMade * _comboReward)})";
 	}
 	
 
