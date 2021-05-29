@@ -11,6 +11,7 @@ public class PlayerStatsUIElement : MonoBehaviour
 	[SerializeField] public TMP_Text bombComboMadeText;
 	[SerializeField] public TMP_Text totalPointsText;
 
+	// Only updated after the round ends
 	public int kills;
 	public int totalDeathPenalty;
 	public int totalBombCombosMade;

@@ -5,62 +5,60 @@ using UnityEngine;
 
 public class PlayerStatTracker : NetworkBehaviour
 {
-
-
 	[SyncVar] public GameObject player;
 
-	[SyncVar(hook = nameof(OnChangeKills))] public int kills = 0;
-	[SyncVar(hook = nameof(OnChangeDeaths))] public int deaths = 0;
-	[SyncVar] public int assists = 0;
+	[SyncVar(hook = nameof(OnChangeKills))] public int kills;
+	[SyncVar(hook = nameof(OnChangeDeaths))] public int deaths;
+	[SyncVar] public int assists;
 
 	// placement from 1st to 4th at end game so stats screen can display in order
 	[SyncVar] public int placement = -1;
 
-	[SyncVar] public int doubleKills = 0;
-	[SyncVar] public int tripleKills = 0;
-	// temp - what happens when u get a multikill greater than 3? (theoretically impossible)
-	[SyncVar] public int superKill = 0;
+	[SyncVar] public int doubleKills;
+	[SyncVar] public int tripleKills;
+	
+	// temp - what happens when u get a multi kill greater than 3? (theoretically impossible)
+	[SyncVar] public int superKill;
 
 	// number of bombs used
-	[SyncVar] public int comboObjectsDropped = 0;
+	[SyncVar] public int comboObjectsDropped;
 
 	// number of self destructs
-	[SyncVar] public int selfDestructs = 0;
+	[SyncVar] public int selfDestructs;
 
 	// number of combos made
-	[SyncVar] public int totalCombosMade = 0;
+	[SyncVar] public int totalCombosMade;
 
 	// number of bomb's made from combos
-	[SyncVar(hook = nameof(OnChangeBombCombos))] public int totalPoints = 0;
-	[SyncVar] public int totalBombCombosMade = 0;
+	[SyncVar(hook = nameof(OnChangeBombCombos))] public int totalPoints;
+	[SyncVar] public int totalBombCombosMade;
 
 	// individual combo objects made from combos
-	[SyncVar] public int bombsMade = 0;
-	[SyncVar] public int sludgesMade = 0;
-	[SyncVar] public int lasersMade = 0;
-	[SyncVar] public int plasmasMade = 0;
+	[SyncVar] public int bombsMade;
+	[SyncVar] public int sludgesMade;
+	[SyncVar] public int lasersMade;
+	[SyncVar] public int plasmasMade;
 
 	// the time the player was eliminated
-	[SyncVar] public double timeOfElimination = 0f;
-
+	[SyncVar] public double timeOfElimination;
 
 	[SerializeField] public GameObject PlayerStatsUIElementPrefab;
 
-	private EventManager eventManager;
-	private RoundManager roundManager;
-	private LobbySettings lobbySettings;
-	private PlayerEventDispatcher dispatcher;
+	private EventManager _eventManager;
+	private RoundManager _roundManager;
+	private LobbySettings _lobbySettings;
+	private PlayerEventDispatcher _dispatcher;
 
 	private void InitSingletons()
 	{
-		eventManager = EventManager.Singleton;
-		if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+		_eventManager = EventManager.Singleton;
+		if (_eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
 
-		roundManager = RoundManager.Singleton;
-		if (roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
+		_roundManager = RoundManager.Singleton;
+		if (_roundManager == null) Debug.LogError("Cannot find Singleton: RoundManager");
 
-		lobbySettings = FindObjectOfType<LobbySettings>();
-		if (lobbySettings == null) Debug.LogError("Cannot find Singleton: LobbySettings");
+		_lobbySettings = FindObjectOfType<LobbySettings>();
+		if (_lobbySettings == null) Debug.LogError("Cannot find Singleton: LobbySettings");
 	}
 
 	public override void OnStartServer()
@@ -68,10 +66,10 @@ public class PlayerStatTracker : NetworkBehaviour
 		InitSingletons();
 		Debug.Log("Starting PlayerStatTracker on server");
 
-		// functions are subscribed on server, playerstats syncvar will always update from server
-		eventManager.EventPlayerTookDamage += PlayerDeathUpdate;
-		eventManager.EventPlayerSwap += PlayerSwapUpdate;
-		eventManager.EventPlayerEliminated += PlayerEliminatedUpdate;
+		// functions are subscribed on server, player stats sync var will always update from server
+		_eventManager.EventPlayerTookDamage += PlayerDeathUpdate;
+		_eventManager.EventPlayerSwap += PlayerSwapUpdate;
+		_eventManager.EventPlayerEliminated += PlayerEliminatedUpdate;
 
 		player = gameObject;
 	}
@@ -80,26 +78,26 @@ public class PlayerStatTracker : NetworkBehaviour
 	{
 		InitSingletons();
 
-		dispatcher = GetComponent<PlayerEventDispatcher>();
-		if (dispatcher == null) Debug.LogError("Cannot find component: ClientPlayerDispatcher");
+		_dispatcher = GetComponent<PlayerEventDispatcher>();
+		if (_dispatcher == null) Debug.LogError("Cannot find component: ClientPlayerDispatcher");
 	}
 
 	[Server]
 	public void PlayerEliminatedUpdate(double timeOfElim, GameObject player)
 	{
-		if (roundManager.roundOver) return; // if round over, do not update
+		if (_roundManager.roundOver) return; // if round over, do not update
 
 		// if this was not the player that was eliminated, return
 		if (!ReferenceEquals(player, gameObject)) return;
 
-		// set the time of elim
+		// set the time of elimination
 		timeOfElimination = timeOfElim;
 	}
 
 	[Server]
-	public void PlayerDeathUpdate(int _, GameObject bomb, GameObject playerThatDied)
+	private void PlayerDeathUpdate(int _, GameObject bomb, GameObject playerThatDied)
 	{
-		if (roundManager.roundOver) return; // if round over, do not update
+		if (_roundManager.roundOver) return; // if round over, do not update
 
 		ComboObject bombComponent = bomb.GetComponent<ComboObject>();
 
@@ -108,8 +106,8 @@ public class PlayerStatTracker : NetworkBehaviour
 			// the player that died in the event is this player
 			deaths++;
 
-			// if combo gamemode and died, apply combo penalty
-			if (lobbySettings.GetGamemode() is ComboGamemode)
+			// if combo game mode and died, apply combo penalty
+			if (_lobbySettings.GetGamemode() is ComboGamemode)
             {
 				if (totalPoints > ComboGamemode.comboPenalty)
 					totalPoints -= ComboGamemode.comboPenalty;
@@ -123,8 +121,8 @@ public class PlayerStatTracker : NetworkBehaviour
 			// if this player was owner of the bomb that killed, and also wasn't the one who died, then award kill to this player
 			kills++;
 
-			// if combo gamemode and died, apply combo bonus
-			if (lobbySettings.GetGamemode() is ComboGamemode)
+			// if combo game mode and died, apply combo bonus
+			if (_lobbySettings.GetGamemode() is ComboGamemode)
 			{
 				totalPoints += ComboGamemode.comboBonus;
 			}
@@ -132,9 +130,9 @@ public class PlayerStatTracker : NetworkBehaviour
 	}
 
 	[Server]
-	public void PlayerSwapUpdate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
+	private void PlayerSwapUpdate(char oldKey, char newKey, bool combo, GameObject player, int numBombsAwarded)
 	{
-		if (roundManager.roundOver) return; // if round over, do not update
+		if (_roundManager.roundOver) return; // if round over, do not update
 
 		// if the player that made combo isn't this player, then return
 		if (!ReferenceEquals(player, gameObject))
@@ -174,31 +172,28 @@ public class PlayerStatTracker : NetworkBehaviour
 		}
 	}
 
-
 	[ClientCallback]
 	public void OnChangeKills(int prevKills, int newKills)
     {
-		dispatcher.OnChangeKills(prevKills, newKills);
+		_dispatcher.OnChangeKills(prevKills, newKills);
     }
 
 	[ClientCallback]
 	public void OnChangeDeaths(int prevDeaths, int newDeaths)
 	{
-        dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
+        _dispatcher.OnChangeDeaths(prevDeaths, newDeaths);
 	}
 
 	[ClientCallback]
 	public void OnChangeBombCombos(int prevCombos, int newCombos)
 	{
-		dispatcher.OnChangeCombos(prevCombos, newCombos);
+		_dispatcher.OnChangeCombos(prevCombos, newCombos);
 	}
 
-
 	#region UI/Display
-	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
-
-	// populate stat block with the necessary stats
 	
+	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
+	// populate stat block with the necessary stats
 	private int _comboReward;
 	private int _killReward;
 	private int _deathPenalty;
