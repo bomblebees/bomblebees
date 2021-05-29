@@ -5326,6 +5326,7 @@ MonoBehaviour:
   minimumLifeDuration: 4
   rotateLerpRate: 0.15
   isSpinnable: 1
+  traumaAmount: 0
   stayPermanent: 1
   projectileSpeed: 2.5
   startOffset: 9
@@ -17074,7 +17075,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4637851376988482411}
   serializedVersion: 6
-  lengthInSec: 1
+  lengthInSec: 0.8
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
@@ -18078,7 +18079,7 @@ ParticleSystem:
           outWeight: 0.122807
         - serializedVersion: 3
           time: 1
-          value: 0.8050308
+          value: 1
           inSlope: 0.0796658
           outSlope: 0.0796658
           tangentMode: 0

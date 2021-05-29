@@ -17,6 +17,7 @@ public class ComboObject : NetworkBehaviour
     public GameObject blockerHandler;
     public GameObject hitBox;
     public Collider collider;
+    public GameObject telegraphVFX;
     [SerializeField] public GameObject SFX;
     [SerializeField] public GameObject BeepSFX;
     public Image bombRadialTimerImage;
@@ -32,7 +33,6 @@ public class ComboObject : NetworkBehaviour
     public Vector3 nearestCenter;
     public HexCell tileUnderneath;
     public int edgeIndexCached = 0;
-
     public float vfxDuration = 4f;
     public float sfxDuration = 4f;
     public float hitboxDuration = 4f;
@@ -464,11 +464,12 @@ public class ComboObject : NetworkBehaviour
             fillShaderRate = 1 / (queenStartupDelay * fillShaderRatio);
         else
             fillShaderRate = 1 / (startupDelay * fillShaderRatio);
-        this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
+        // this.model.GetComponent<Renderer>().material.SetFloat("_FillRate", fillShaderVal);
         // "Toggle on" radial timer
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
         // bombRadialTimerImage.color = new Vector4(1,1,1,1);
+        telegraphVFX.SetActive(true);
     }
 
     protected virtual void StepFillShader()
