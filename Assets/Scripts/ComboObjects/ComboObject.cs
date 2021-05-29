@@ -469,7 +469,7 @@ public class ComboObject : NetworkBehaviour
             // bombRadialTimerImage.transform.localScale = new Vector3(0.26f,0.26f,0.26f);
             // bombRadialTimerImage.transform.localScale *= 1.25f;
         // bombRadialTimerImage.color = new Vector4(1,1,1,1);
-        telegraphVFX.SetActive(true);
+        if (telegraphVFX) telegraphVFX.SetActive(true);
     }
 
     protected virtual void StepFillShader()
