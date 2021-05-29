@@ -226,25 +226,10 @@ public class PlayerStatTracker : NetworkBehaviour
 
 		GetPointSystemData();
 		
+		uiElement.totalPointsText.text = $"{totalBombCombosMade}";
 		uiElement.killsText.text = $"{kills} (+{kills * _killReward})";
 		uiElement.deathsText.text = $"{deaths} (-{Math.Abs(deaths * _deathPenalty)})";
-		uiElement.combosMadeText.text = $"{totalBombCombosMade} (+{totalBombCombosMade * _comboReward})";
-		
-		// TODO: I can't find these objects on Unity, so I modify them here.
-		uiElement.killsText.enableAutoSizing = true;
-		uiElement.killsText.fontSizeMin = float.Epsilon;
-		uiElement.killsText.verticalAlignment = VerticalAlignmentOptions.Middle;
-		uiElement.killsText.horizontalAlignment = HorizontalAlignmentOptions.Center;
-		
-		uiElement.deathsText.enableAutoSizing = true;
-		uiElement.deathsText.fontSizeMin = float.Epsilon;
-		uiElement.deathsText.verticalAlignment = VerticalAlignmentOptions.Middle;
-		uiElement.deathsText.horizontalAlignment = HorizontalAlignmentOptions.Center;
-		
-		uiElement.combosMadeText.enableAutoSizing = true;
-		uiElement.combosMadeText.fontSizeMin = float.Epsilon;
-		uiElement.combosMadeText.verticalAlignment = VerticalAlignmentOptions.Middle;
-		uiElement.combosMadeText.horizontalAlignment = HorizontalAlignmentOptions.Center;
+		uiElement.comboMadeText.text = $"{totalCombosMade} (+{totalCombosMade * _comboReward})";
 	}
 	
 
