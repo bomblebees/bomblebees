@@ -183,6 +183,7 @@ public class TriggerObject : ComboObject
     public virtual IEnumerator Breakdown()
     {
         didEarlyEffects = true;
+        SFX.SetActive(false);
         StartCoroutine(DisableObjectCollider());
         StartCoroutine(DisableObjectModel());
 
