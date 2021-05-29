@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using Mirror;
+using TMPro;
 using UnityEngine;
 
 public class PlayerStatTracker : NetworkBehaviour
@@ -196,6 +196,17 @@ public class PlayerStatTracker : NetworkBehaviour
 	// ideally stat tracker script purely tracks stats and we leave UI stuff up to a different script
 
 	// populate stat block with the necessary stats
+	
+	private int _comboReward;
+	private int _killReward;
+	private int _deathPenalty;
+	
+	private void GetPointSystemData()
+	{
+		_comboReward = 1;
+		_killReward = 10;
+		_deathPenalty = -10;
+	}
 
 	public void CreateStatsUIElement(GameObject anchorObject)
 	{
@@ -213,10 +224,27 @@ public class PlayerStatTracker : NetworkBehaviour
 		uiElement.avatar.sprite = uiElement.GetComponent<CharacterHelper>().GetCharImage(gameObject.GetComponent<Player>().characterCode);
 		uiElement.playerName.text = gameObject.GetComponent<Player>().steamName;
 
-		uiElement.killsText.text = kills.ToString();
-		uiElement.deathsText.text = deaths.ToString();
-		uiElement.combosMadeText.text = totalBombCombosMade.ToString();
-
+		GetPointSystemData();
+		
+		uiElement.killsText.text = $"{kills} (+{kills * _killReward})";
+		uiElement.deathsText.text = $"{deaths} (-{Math.Abs(deaths * _deathPenalty)})";
+		uiElement.combosMadeText.text = $"{totalBombCombosMade} (+{totalBombCombosMade * _comboReward})";
+		
+		// TODO: I can't find these objects on Unity, so I modify them here.
+		uiElement.killsText.enableAutoSizing = true;
+		uiElement.killsText.fontSizeMin = float.Epsilon;
+		uiElement.killsText.verticalAlignment = VerticalAlignmentOptions.Middle;
+		uiElement.killsText.horizontalAlignment = HorizontalAlignmentOptions.Center;
+		
+		uiElement.deathsText.enableAutoSizing = true;
+		uiElement.deathsText.fontSizeMin = float.Epsilon;
+		uiElement.deathsText.verticalAlignment = VerticalAlignmentOptions.Middle;
+		uiElement.deathsText.horizontalAlignment = HorizontalAlignmentOptions.Center;
+		
+		uiElement.combosMadeText.enableAutoSizing = true;
+		uiElement.combosMadeText.fontSizeMin = float.Epsilon;
+		uiElement.combosMadeText.verticalAlignment = VerticalAlignmentOptions.Middle;
+		uiElement.combosMadeText.horizontalAlignment = HorizontalAlignmentOptions.Center;
 	}
 	
 
