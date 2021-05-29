@@ -51,7 +51,7 @@ public class Room_UI : MonoBehaviour
     {
         _networkManager = NetworkManager.singleton;
         _mainMenuUI = MainMenu_UI.singleton;
-        _matchmaker = Matchmaking.singleton;
+        _matchmaker = Matchmaking.Singleton;
 
         if (_mainMenuUI.screenLoading.activeSelf)
         {
@@ -102,7 +102,7 @@ public class Room_UI : MonoBehaviour
     {
         EventStartButtonClicked?.Invoke();
 
-        if (!_matchmaker) _matchmaker = Matchmaking.singleton;
+        if (!_matchmaker) _matchmaker = Matchmaking.Singleton;
         if (_matchmaker) _matchmaker.OnMirrorSetStatus("In Game");
     }
 

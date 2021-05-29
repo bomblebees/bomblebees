@@ -42,7 +42,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     public override void OnRoomStopClient()
     {
         // Enable lobby list
-        Matchmaking mm = Matchmaking.singleton;
+        Matchmaking mm = Matchmaking.Singleton;
         if (mm) mm.uiLeaveLobby();
 
         // re-enable the main menu ui
@@ -162,7 +162,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
     public override void OnGUI()
     {
-        Matchmaking mm = Matchmaking.singleton;
+        Matchmaking mm = Matchmaking.Singleton;
         if (mm) return;
 
         base.OnGUI();

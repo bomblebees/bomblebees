@@ -192,7 +192,7 @@ public class Matchmaking : MonoBehaviour
     }
 
     #region EasySteamLobby
-    public static Matchmaking singleton;
+    public static Matchmaking Singleton;
 
     public string lobbyVersion;
 
@@ -247,9 +247,14 @@ public class Matchmaking : MonoBehaviour
         OnGameLobbyJoinRequestedCallResult = CallResult<GameLobbyJoinRequested_t>.Create(OnGameLobbyJoinRequested);
     }
 
+    private void OnDisable()
+    {
+        CloseCreateLobbyWindow();
+    }
+
     private void Awake()
     {
-        singleton = this;
+        Singleton = this;
 
         LobbyCanvas = GameObject.Find("LobbyCanvas");
 
