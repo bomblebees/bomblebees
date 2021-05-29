@@ -1,6 +1,5 @@
 ﻿using System;
 using Mirror;
-using TMPro;
 using UnityEngine;
 
 public class PlayerStatTracker : NetworkBehaviour
@@ -205,7 +204,6 @@ public class PlayerStatTracker : NetworkBehaviour
 	{
 		_comboReward = 1;
 		_killReward = 10;
-		_deathPenalty = -10;
 	}
 
 	public void CreateStatsUIElement(GameObject anchorObject)
@@ -226,10 +224,14 @@ public class PlayerStatTracker : NetworkBehaviour
 
 		GetPointSystemData();
 		
+		// Total death penalty math
+		var totalDeathPenalty = Math.Abs(kills * _killReward) + Math.Abs(totalCombosMade * _comboReward) - totalBombCombosMade;
+		totalDeathPenalty = Math.Abs(totalDeathPenalty);
+		
 		uiElement.totalPointsText.text = $"{totalBombCombosMade}";
-		uiElement.killsText.text = $"{kills} (+{kills * _killReward})";
-		uiElement.deathsText.text = $"{deaths} (-{Math.Abs(deaths * _deathPenalty)})";
-		uiElement.comboMadeText.text = $"{totalCombosMade} (+{totalCombosMade * _comboReward})";
+		uiElement.killsText.text = $"{kills} (+{Math.Abs(kills * _killReward)})";
+		uiElement.deathsText.text = $"{deaths} (-{totalDeathPenalty})";
+		uiElement.comboMadeText.text = $"{totalCombosMade} (+{Math.Abs(totalCombosMade * _comboReward)})";
 	}
 	
 
