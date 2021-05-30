@@ -238,24 +238,13 @@ public class PlayerStatTracker : NetworkBehaviour
 		uiElement.totalDeathPenalty = totalDeathPenalty;
 		uiElement.totalBombCombosMade = totalBombCombosMade;
 		
-		CmdOnPlayerStatsReadied();
+		CmdHighlightStats();
 	}
 
-	private int _playerStatsReadyCount;
-	
 	[Command]
-	private void CmdOnPlayerStatsReadied()
+	private void CmdHighlightStats()
 	{
-		_playerStatsReadyCount++;
-		
-		var currentPlayers = FindObjectOfType<NetworkRoomManagerExt>().currentPlayers;
-		Debug.Log($"Player stats ready! ({_playerStatsReadyCount}/{currentPlayers})");
-		
-		if (_playerStatsReadyCount.Equals(currentPlayers))
-		{
-			// When all player stats are ready
-			RpcHighlightStats();
-		}
+		RpcHighlightStats();
 	}
 
 	[ClientRpc]
