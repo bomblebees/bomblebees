@@ -159,7 +159,8 @@ public class LivesUI : MonoBehaviour
         for (int i = 0; i < playerList.Count; i++)
         {
             // Enable/disable crown model
-            GameObject crownObj = orderedList[i].transform.Find("crown_v1").gameObject;
+            // GameObject crownObj = orderedList[i].transform.Find("crown_v1").gameObject;
+            GameObject crownObj = orderedList[i].GetComponent<Player>().crownModel.gameObject;
             if (i == 0) crownObj.SetActive(true);
             else        crownObj.SetActive(false);
 

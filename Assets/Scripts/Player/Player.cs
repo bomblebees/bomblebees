@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -29,6 +29,7 @@ public class Player : NetworkBehaviour
     public GameObject playerMesh;
     public GameObject playerModel;
     public GameObject ghostModel;
+    public GameObject crownModel;
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 
@@ -66,8 +67,10 @@ public class Player : NetworkBehaviour
         // Set player color
         Material[] mats = playerMesh.GetComponent<SkinnedMeshRenderer>().materials;
         mats[3] = playerColors[characterCode];
+
         foreach (Material material in mats)
             material.SetColor("_FresnelEmission", fresnelColors[characterCode]);
+            
         playerMesh.GetComponent<SkinnedMeshRenderer>().materials = mats;
     }
 
