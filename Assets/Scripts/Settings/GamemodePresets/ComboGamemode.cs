@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using TMPro;
 using UnityEngine;
 using Mirror;
@@ -14,10 +12,10 @@ public class ComboGamemode : Gamemode
     [SerializeField] private int playerLives = 0;
 
     [Tooltip("Number of combos to subtract from the player when they die")]
-    [SerializeField] public static int comboPenalty = 10;
+    [SerializeField] public static int comboPenalty = 20;
 
     [Tooltip("Number of combos to add to the player when they kill someone")]
-    [SerializeField] public static int comboBonus = 10;
+    [SerializeField] public static int comboBonus = 20;
 
     // -- Fields -- //
     public override string GamemodeName { get { return gamemodeName; } }
