@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: dark_grey_lambert_fresnel
+  m_Name: yellow_phong_fresnel
   m_Shader: {fileID: -6465566751694194690, guid: 84013ddf84620224da007dbb8451dcad,
     type: 3}
   m_ShaderKeywords: 
@@ -25,4 +25,5 @@ Material:
     - Vector1_52039B3C: 3.15
     m_Colors:
     - Color_B67DA811: {r: 2, g: 0, b: 0, a: 0}
-    - Color_FAE3484A: {r: 0.07450981, g: 0.09411765, b: 0.078431375, a: 0}
+    - Color_FAE3484A: {r: 0.7490196, g: 0.47058824, b: 0, a: 0}
+    - _FresnelEmission: {r: 1, g: 0, b: 0, a: 0}
