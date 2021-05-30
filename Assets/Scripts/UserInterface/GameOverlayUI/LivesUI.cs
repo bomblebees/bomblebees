@@ -1,20 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Steamworks;
 using System.Linq;
 
 public class LivesUI : MonoBehaviour
 {
-
     [SerializeField] private GameObject[] livesAnchors = new GameObject[4];
 
     [SerializeField] private GameObject livesUIElementPrefab;
 
-    [SerializeField] GameUIManager gameUIManager = null;
+    [SerializeField] GameUIManager gameUIManager;
 
     [SerializeField] TMP_Text conditionText;
 
@@ -38,7 +35,7 @@ public class LivesUI : MonoBehaviour
         else if (selectedGamemode is KillsGamemode)
             conditionText.text = "First to " + (selectedGamemode as KillsGamemode).eliminations + " kills win!";
         else if (selectedGamemode is ComboGamemode)
-            conditionText.text = "First to " + (selectedGamemode as ComboGamemode).points + " combos win!";
+            conditionText.text = "First to " + (selectedGamemode as ComboGamemode).points + " points win!";
     }
 
     public void EnableLivesUI(Player p)

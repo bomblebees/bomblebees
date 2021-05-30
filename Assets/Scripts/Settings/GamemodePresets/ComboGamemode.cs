@@ -37,10 +37,8 @@ public class ComboGamemode : Gamemode
 
     public override GameObject[] GetWinningOrder(GameObject[] playerList)
     {
-        GameObject[] orderedList = new GameObject[playerList.Length];
-
         // Order the player list by most combos
-        orderedList = playerList.OrderByDescending(p => p.GetComponent<PlayerStatTracker>().totalPoints).ToArray();
+        var orderedList = playerList.OrderByDescending(p => p.GetComponent<PlayerStatTracker>().totalPoints).ToArray();
 
         return orderedList;
     }
@@ -96,7 +94,7 @@ public class ComboGamemode : Gamemode
     [Client]
     private void SetCombosText()
     {
-        combosText.text = "First to " + points;
+        combosText.text = $"First to {points} points";
     }
 
     #endregion

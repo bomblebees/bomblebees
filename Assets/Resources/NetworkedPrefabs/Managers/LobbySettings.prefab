@@ -4081,6 +4081,7 @@ MonoBehaviour:
   byLastAlive: 1
   byTimerFinished: 1
   localTeamIndex: 0
+  practiceMode: 0
   gamemodeButtonText: {fileID: 3579841835062456627}
   gamemodeDescriptionText: {fileID: 3311784330089273500}
   gamemodes:
@@ -4133,10 +4134,10 @@ MonoBehaviour:
   gamemodeName: Combo Frenzy
   roundDuration: 0
   playerLives: 0
-  combos: 0
+  points: 0
   comboContainer: {fileID: 2203110033089476266}
   combosText: {fileID: 7637271115287057917}
-  combosList: 3c000000500000006400000028000000
+  winPointList: 7800000096000000b40000005a000000
 --- !u!114 &8400676120025421089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4313,7 +4314,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Combos
+  m_text: Points
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c1482dbce654844b9ba1c753cbea5d80, type: 2}
   m_sharedMaterial: {fileID: 7374927986402738804, guid: c1482dbce654844b9ba1c753cbea5d80,
@@ -5061,8 +5062,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 45
+  m_fontSizeBase: 45
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -230,7 +230,7 @@ public class PlayerStatTracker : NetworkBehaviour
 		uiElement.totalPointsText.text = $"{totalPoints}";
 		uiElement.killsText.text = $"{kills} (+{Math.Abs(kills * _killReward)})";
 		uiElement.deathsText.text = $"{deaths} (-{totalDeathPenalty})";
-		uiElement.bombComboMadeText.text = $"{totalBombCombosMade} (+{Math.Abs(totalBombCombosMade * _comboReward)})";
+		uiElement.bombComboMadeText.text = $"+{Math.Abs(totalBombCombosMade * _comboReward)}";
 
 		uiElement.totalPoints = totalPoints;
 		uiElement.kills = kills;
