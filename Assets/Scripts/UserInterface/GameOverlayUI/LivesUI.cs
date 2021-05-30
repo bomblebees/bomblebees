@@ -152,12 +152,20 @@ public class LivesUI : MonoBehaviour
         // Recalculate the winning order
         GameObject[] orderedList = _lobbySettings.GetGamemode().GetWinningOrder(playerList.ToArray());
 
+        // Enable crown for top player
+        // orderedList[0].transform.Find("")
+
         // Reorder livesUI based on new list 
         livesUIs = livesUIs.OrderBy(e => e == null ? 4 : Array.IndexOf(orderedList, e.player)).ToArray();
 
 
         for (int i = 0; i < playerList.Count; i++)
         {
+            // Enable/disable crown model
+            GameObject crownObj = orderedList[i].transform.Find("crown_v1").gameObject;
+            if (i == 0) crownObj.SetActive(true);
+            else        crownObj.SetActive(false);
+
             // Move lives ui to the new positions
             LeanTween.moveLocal(livesUIs[i].gameObject, livesAnchors[i].transform.localPosition, 1f)
                 .setEase(LeanTweenType.easeOutExpo);
