@@ -281,7 +281,8 @@ GameObject:
   - component: {fileID: 114930011465216934}
   - component: {fileID: 114264749534941620}
   - component: {fileID: 114636173098345086}
-  - component: {fileID: 1526011774276110581}
+  - component: {fileID: 1315952915350738913}
+  - component: {fileID: -6790913455136411570}
   m_Layer: 5
   m_Name: BindingButton
   m_TagString: Untagged
@@ -402,7 +403,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13d3698de517d438a96790fc135fae72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1526011774276110581
+--- !u!225 &1315952915350738913
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500705064893830}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &-6790913455136411570
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
