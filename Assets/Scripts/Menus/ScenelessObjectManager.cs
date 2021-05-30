@@ -27,17 +27,17 @@ public class ScenelessObjectManager : MonoBehaviour
     {
         if (scene.path.Equals(gameScene))
         {
-            settingsButton.SetActive(false);
+            // settingsButton.SetActive(false);
             pingDisplay.SetActive(true);
         } 
         else if (scene.path.Equals(roomScene))
         {
-            settingsButton.SetActive(false);
+            // settingsButton.SetActive(false);
             pingDisplay.SetActive(true);
         }
         else // Preload/MainMenu Scene
         {
-            settingsButton.SetActive(true);
+            // settingsButton.SetActive(true);
             pingDisplay.SetActive(false);
         }
     }
