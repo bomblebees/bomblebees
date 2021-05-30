@@ -111,8 +111,8 @@ public class PlayerStatTracker : NetworkBehaviour
 			// if combo game mode and died, apply combo penalty
 			if (_lobbySettings.GetGamemode() is ComboGamemode)
             {
-				if (totalPoints > ComboGamemode.comboPenalty)
-					totalPoints -= ComboGamemode.comboPenalty;
+				if (totalPoints > ComboGamemode.DeathPenaltyPoint)
+					totalPoints -= ComboGamemode.DeathPenaltyPoint;
 				else
 					totalPoints = 0;
             }
@@ -126,7 +126,7 @@ public class PlayerStatTracker : NetworkBehaviour
 			// if combo game mode and died, apply combo bonus
 			if (_lobbySettings.GetGamemode() is ComboGamemode)
 			{
-				totalPoints += ComboGamemode.comboBonus;
+				totalPoints += ComboGamemode.KillRewardPoint;
 			}
 		}
 	}
@@ -202,7 +202,7 @@ public class PlayerStatTracker : NetworkBehaviour
 	private void GetPointSystemData()
 	{
 		_comboReward = 1;
-		_killReward = ComboGamemode.comboBonus;
+		_killReward = ComboGamemode.KillRewardPoint;
 	}
 
 	public void CreateStatsUIElement(GameObject anchorObject)

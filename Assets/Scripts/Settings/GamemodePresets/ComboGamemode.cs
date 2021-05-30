@@ -12,10 +12,10 @@ public class ComboGamemode : Gamemode
     [SerializeField] private int playerLives;
 
     [Tooltip("Number of combos to add to the player when they kill someone")]
-    public static int comboBonus = 20;
+    public static int KillRewardPoint = 20;
     
     [Tooltip("Number of combos to subtract from the player when they die")]
-    public static int comboPenalty = 20;
+    public static int DeathPenaltyPoint = 20;
 
     // -- Fields -- //
     public override string GamemodeName { get { return gamemodeName; } }
@@ -28,8 +28,8 @@ public class ComboGamemode : Gamemode
         string desc = "The first bee to reach the set number of combos wins!" +
                       "\n <color=#DDEF1F>" +
                       "\nLonger combos count extra" +
-                      "\nKills award " + comboBonus + " points" +
-                      "\nDeaths takes away " + comboPenalty + " points" +
+                      "\nKills award " + KillRewardPoint + " points" +
+                      "\nDeaths takes away " + DeathPenaltyPoint + " points" +
                       "</color>";
 
         return desc;
@@ -59,17 +59,17 @@ public class ComboGamemode : Gamemode
 
     [Header("Settings")]
     [SyncVar(hook = nameof(OnChangeCombos))]
-    public int points;
+    public int winPoints;
 
     [SerializeField] private GameObject comboContainer;
     [SerializeField] private TMP_Text combosText;
 
     [SerializeField] private int[] winPointList = { 120, 150, 180, 90 };
-    private int _comboSelected;
+    private int _winPointSelected;
 
     public override void OnStartClient()
     {
-        points = winPointList[_comboSelected];
+        winPoints = winPointList[_winPointSelected];
         SetCombosText();
     }
 
@@ -79,10 +79,10 @@ public class ComboGamemode : Gamemode
         if (!isServer) return; // Only host can change settings
 
         // Get next selected lives
-        _comboSelected = (_comboSelected + 1) % winPointList.Length;
+        _winPointSelected = (_winPointSelected + 1) % winPointList.Length;
 
         // New lives is now that
-        points = winPointList[_comboSelected];
+        winPoints = winPointList[_winPointSelected];
     }
 
     [ClientCallback]
@@ -94,7 +94,7 @@ public class ComboGamemode : Gamemode
     [Client]
     private void SetCombosText()
     {
-        combosText.text = $"First to {points} points";
+        combosText.text = $"First to {winPoints} points";
     }
 
     #endregion
