@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mirror;
+using TMPro;
 using UnityEngine;
 
 public class PlayerStatTracker : NetworkBehaviour
@@ -236,35 +238,41 @@ public class PlayerStatTracker : NetworkBehaviour
 		uiElement.totalDeathPenalty = totalDeathPenalty;
 		uiElement.totalBombCombosMade = totalBombCombosMade;
 		
-		CmdHighlightStats();
+		CmdOnPlayerStatsReadied();
 	}
 
+	private int _playerStatsReadyCount;
+	
 	[Command]
-	private void CmdHighlightStats()
+	private void CmdOnPlayerStatsReadied()
 	{
-		RpcHighlightStats();
+		_playerStatsReadyCount++;
+		
+		var currentPlayers = FindObjectOfType<NetworkRoomManagerExt>().currentPlayers;
+		Debug.Log($"Player stats ready! ({_playerStatsReadyCount}/{currentPlayers})");
+		
+		if (_playerStatsReadyCount.Equals(currentPlayers))
+		{
+			// When all player stats are ready
+			RpcHighlightStats();
+		}
 	}
 
 	[ClientRpc]
 	private void RpcHighlightStats()
 	{
-		HighlightStats();
-	}
+		var playerStatsUIElementList = new List<PlayerStatsUIElement>(FindObjectsOfType<PlayerStatsUIElement>());
+		var totalPointsList = new List<int>(new int[playerStatsUIElementList.Count]);
+		var killsList = new List<int>(new int[playerStatsUIElementList.Count]);
+		var deathsList = new List<int>(new int[playerStatsUIElementList.Count]);
+		var bombCombosMadeList = new List<int>(new int[playerStatsUIElementList.Count]);
 
-	private void HighlightStats()
-	{
-		var playerStatsUIElements = FindObjectsOfType<PlayerStatsUIElement>();
-		var totalPointsArray = new int[playerStatsUIElements.Length];
-		var killsArray = new int[playerStatsUIElements.Length];
-		var deathsArray = new int[playerStatsUIElements.Length];
-		var bombCombosMadeArray = new int[playerStatsUIElements.Length];
-
-		for (var i = 0; i < playerStatsUIElements.Length; i++)
+		for (var i = 0; i < playerStatsUIElementList.Count; i++)
 		{
-			totalPointsArray[i] = playerStatsUIElements[i].totalPoints;
-			killsArray[i] = playerStatsUIElements[i].kills;
-			deathsArray[i] = playerStatsUIElements[i].totalDeathPenalty;
-			bombCombosMadeArray[i] = playerStatsUIElements[i].totalBombCombosMade;
+			totalPointsList[i] = playerStatsUIElementList[i].totalPoints;
+			killsList[i] = playerStatsUIElementList[i].kills;
+			deathsList[i] = playerStatsUIElementList[i].totalDeathPenalty;
+			bombCombosMadeList[i] = playerStatsUIElementList[i].totalBombCombosMade;
 		}
 
 		// Highlight colors. Source: https://www.colorhexa.com/color-names
@@ -273,46 +281,46 @@ public class PlayerStatTracker : NetworkBehaviour
 		var defaultColor = Color.white;
 		
 		// Set highlights
-		for (var i = 0; i < playerStatsUIElements.Length; i++)
+		for (var i = 0; i < playerStatsUIElementList.Count; i++)
 		{
-			if (totalPointsArray[i].Equals(totalPointsArray.Max()) && !totalPointsArray[i].Equals(0))
+			if (totalPointsList[i].Equals(totalPointsList.Max()) && !totalPointsList[i].Equals(0))
 			{
 				// Most total points
-				playerStatsUIElements[i].totalPointsText.color = pastelGreen;
+				playerStatsUIElementList[i].totalPointsText.color = pastelGreen;
 			}
 			else
 			{
-				playerStatsUIElements[i].totalPointsText.color = defaultColor;
+				playerStatsUIElementList[i].totalPointsText.color = defaultColor;
 			}
 
-			if (killsArray[i].Equals(killsArray.Max()) && !killsArray[i].Equals(0))
+			if (killsList[i].Equals(killsList.Max()) && !killsList[i].Equals(0))
 			{
 				// Most kills
-				playerStatsUIElements[i].killsText.color = pastelGreen;
+				playerStatsUIElementList[i].killsText.color = pastelGreen;
 			}
 			else
 			{
-				playerStatsUIElements[i].killsText.color = defaultColor;
+				playerStatsUIElementList[i].killsText.color = defaultColor;
 			}
 			
-			if (deathsArray[i].Equals(deathsArray.Max()) && !deathsArray[i].Equals(0))
+			if (deathsList[i].Equals(deathsList.Max()) && !deathsList[i].Equals(0))
 			{
 				// Most deaths
-				playerStatsUIElements[i].deathsText.color = pastelRed;
+				playerStatsUIElementList[i].deathsText.color = pastelRed;
 			}
 			else
 			{
-				playerStatsUIElements[i].deathsText.color = defaultColor;
+				playerStatsUIElementList[i].deathsText.color = defaultColor;
 			}
 			
-			if (bombCombosMadeArray[i].Equals(bombCombosMadeArray.Max()) && !bombCombosMadeArray[i].Equals(0))
+			if (bombCombosMadeList[i].Equals(bombCombosMadeList.Max()) && !bombCombosMadeList[i].Equals(0))
 			{
 				// Most combos
-				playerStatsUIElements[i].bombComboMadeText.color = pastelGreen;
+				playerStatsUIElementList[i].bombComboMadeText.color = pastelGreen;
 			}
 			else
 			{
-				playerStatsUIElements[i].bombComboMadeText.color = defaultColor;
+				playerStatsUIElementList[i].bombComboMadeText.color = defaultColor;
 			}
 		}
 	}
