@@ -11,9 +11,6 @@ public class ComboGamemode : Gamemode
     [SerializeField] private float roundDuration = 0f;
     [SerializeField] private int playerLives = 0;
 
-    [Tooltip("Number of combos to subtract from the player when they die")]
-    [SerializeField] public static int comboPenalty = 20;
-
     [Tooltip("Number of combos to add to the player when they kill someone")]
     [SerializeField] public static int comboBonus = 15;
     
