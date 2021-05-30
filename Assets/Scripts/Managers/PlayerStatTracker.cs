@@ -248,6 +248,11 @@ public class PlayerStatTracker : NetworkBehaviour
 	[ClientRpc]
 	private void RpcHighlightStats()
 	{
+		HighlightStats();
+	}
+
+	private void HighlightStats()
+	{
 		var playerStatsUIElements = FindObjectsOfType<PlayerStatsUIElement>();
 		var totalPointsArray = new int[playerStatsUIElements.Length];
 		var killsArray = new int[playerStatsUIElements.Length];
@@ -265,6 +270,7 @@ public class PlayerStatTracker : NetworkBehaviour
 		// Highlight colors. Source: https://www.colorhexa.com/color-names
 		var pastelGreen = new Color(0.47f, 0.87f, 0.47f);
 		var pastelRed = new Color(1f, 0.41f, 0.38f);
+		var defaultColor = Color.white;
 		
 		// Set highlights
 		for (var i = 0; i < playerStatsUIElements.Length; i++)
@@ -274,11 +280,19 @@ public class PlayerStatTracker : NetworkBehaviour
 				// Most total points
 				playerStatsUIElements[i].totalPointsText.color = pastelGreen;
 			}
+			else
+			{
+				playerStatsUIElements[i].totalPointsText.color = defaultColor;
+			}
 
 			if (killsArray[i].Equals(killsArray.Max()) && !killsArray[i].Equals(0))
 			{
 				// Most kills
 				playerStatsUIElements[i].killsText.color = pastelGreen;
+			}
+			else
+			{
+				playerStatsUIElements[i].killsText.color = defaultColor;
 			}
 			
 			if (deathsArray[i].Equals(deathsArray.Max()) && !deathsArray[i].Equals(0))
@@ -286,11 +300,19 @@ public class PlayerStatTracker : NetworkBehaviour
 				// Most deaths
 				playerStatsUIElements[i].deathsText.color = pastelRed;
 			}
+			else
+			{
+				playerStatsUIElements[i].deathsText.color = defaultColor;
+			}
 			
 			if (bombCombosMadeArray[i].Equals(bombCombosMadeArray.Max()) && !bombCombosMadeArray[i].Equals(0))
 			{
 				// Most combos
 				playerStatsUIElements[i].bombComboMadeText.color = pastelGreen;
+			}
+			else
+			{
+				playerStatsUIElements[i].bombComboMadeText.color = defaultColor;
 			}
 		}
 	}
