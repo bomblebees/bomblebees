@@ -8,14 +8,14 @@ public class ComboGamemode : Gamemode
     [SerializeField] private string gamemodeName = "Combo Frenzy";
 
     [Header("Defaults")]
-    [SerializeField] private float roundDuration = 0f;
-    [SerializeField] private int playerLives = 0;
+    [SerializeField] private float roundDuration;
+    [SerializeField] private int playerLives;
 
     [Tooltip("Number of combos to add to the player when they kill someone")]
-    [SerializeField] public static int comboBonus = 15;
+    public static int comboBonus = 20;
     
     [Tooltip("Number of combos to subtract from the player when they die")]
-    [SerializeField] public static int comboPenalty = 10;
+    public static int comboPenalty = 20;
 
     // -- Fields -- //
     public override string GamemodeName { get { return gamemodeName; } }
@@ -26,11 +26,11 @@ public class ComboGamemode : Gamemode
     public override string GetDescription()
     {
         string desc = "The first bee to reach the set number of combos wins!" +
-            "\n <color=#DDEF1F>" +
-            "\nLonger combos count extra" +
-            "\nKills award " + comboBonus + " points" +
-            "\nDeaths takes away " + comboPenalty + " points" +
-            "</color>";
+                      "\n <color=#DDEF1F>" +
+                      "\nLonger combos count extra" +
+                      "\nKills award " + comboBonus + " points" +
+                      "\nDeaths takes away " + comboPenalty + " points" +
+                      "</color>";
 
         return desc;
     }
@@ -61,17 +61,17 @@ public class ComboGamemode : Gamemode
 
     [Header("Settings")]
     [SyncVar(hook = nameof(OnChangeCombos))]
-    public int combos;
+    public int points;
 
     [SerializeField] private GameObject comboContainer;
     [SerializeField] private TMP_Text combosText;
 
-    [SerializeField] private int[] combosList = { 10, 20, 30, 40 };
-    private int comboSelected = 0;
+    [SerializeField] private int[] winPointList = { 120, 150, 180, 90 };
+    private int _comboSelected;
 
     public override void OnStartClient()
     {
-        combos = combosList[comboSelected];
+        points = winPointList[_comboSelected];
         SetCombosText();
     }
 
@@ -81,10 +81,10 @@ public class ComboGamemode : Gamemode
         if (!isServer) return; // Only host can change settings
 
         // Get next selected lives
-        comboSelected = (comboSelected + 1) % combosList.Length;
+        _comboSelected = (_comboSelected + 1) % winPointList.Length;
 
         // New lives is now that
-        combos = combosList[comboSelected];
+        points = winPointList[_comboSelected];
     }
 
     [ClientCallback]
@@ -96,7 +96,7 @@ public class ComboGamemode : Gamemode
     [Client]
     private void SetCombosText()
     {
-        combosText.text = "First to " + combos.ToString();
+        combosText.text = "First to " + points;
     }
 
     #endregion

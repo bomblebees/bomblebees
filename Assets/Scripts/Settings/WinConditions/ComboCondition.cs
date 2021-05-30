@@ -14,7 +14,7 @@ public class ComboCondition : WinCondition
     [Server]
     public override void InitWinCondition()
     {
-        toCombos = FindObjectOfType<ComboGamemode>().combos;
+        toCombos = FindObjectOfType<ComboGamemode>().points;
     }
 
     [Server]

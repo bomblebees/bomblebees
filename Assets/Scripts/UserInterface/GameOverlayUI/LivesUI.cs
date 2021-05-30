@@ -38,7 +38,7 @@ public class LivesUI : MonoBehaviour
         else if (selectedGamemode is KillsGamemode)
             conditionText.text = "First to " + (selectedGamemode as KillsGamemode).eliminations + " kills win!";
         else if (selectedGamemode is ComboGamemode)
-            conditionText.text = "First to " + (selectedGamemode as ComboGamemode).combos + " combos win!";
+            conditionText.text = "First to " + (selectedGamemode as ComboGamemode).points + " combos win!";
     }
 
     public void EnableLivesUI(Player p)
