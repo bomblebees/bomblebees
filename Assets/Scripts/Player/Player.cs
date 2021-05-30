@@ -49,6 +49,7 @@ public class Player : NetworkBehaviour
     [Header("Custom Player Colors")]
     [Tooltip("Selects color based on character chosen.")]
     [SerializeField] private Material[] playerColors = new Material[4];
+    [SerializeField] private Color[] fresnelColors = new Color[4];
 
 	[SerializeField] private ParticleSystem sludgeParticles;
 
@@ -65,6 +66,8 @@ public class Player : NetworkBehaviour
         // Set player color
         Material[] mats = playerMesh.GetComponent<SkinnedMeshRenderer>().materials;
         mats[3] = playerColors[characterCode];
+        foreach (Material material in mats)
+            material.SetColor("_FresnelEmission", fresnelColors[characterCode]);
         playerMesh.GetComponent<SkinnedMeshRenderer>().materials = mats;
     }
 

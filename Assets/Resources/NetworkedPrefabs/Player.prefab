@@ -5155,6 +5155,11 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 36d709724ae434e45b791b16dad9601c, type: 2}
   - {fileID: 2100000, guid: bb9a5ad3effbd9e4b891c9a870dd1a32, type: 2}
   - {fileID: 2100000, guid: 3ba3fad92badc2d45bf32dc8598ac425, type: 2}
+  fresnelColors:
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 0, g: 0, b: 1, a: 0}
+  - {r: 1, g: 1, b: 0, a: 0}
+  - {r: 0, g: 1, b: 0, a: 0}
   sludgeParticles: {fileID: 2768441798302757408}
   debugMode: 1
   debugSpawnBomble: 6
@@ -47301,8 +47306,32 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[4]
       value: 
-      objectReference: {fileID: 9071694383816352189, guid: ca362991e0518d149bd299ee903abe2a,
+      objectReference: {fileID: 2100000, guid: ee88b33857c58864fbd0e62efcaab31b, type: 2}
+    - target: {fileID: -3807599984486545106, guid: ca362991e0518d149bd299ee903abe2a,
         type: 3}
+      propertyPath: m_Materials.Array.data[2]
+      value: 
+      objectReference: {fileID: 2100000, guid: ee88b33857c58864fbd0e62efcaab31b, type: 2}
+    - target: {fileID: -3807599984486545106, guid: ca362991e0518d149bd299ee903abe2a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: ee88b33857c58864fbd0e62efcaab31b, type: 2}
+    - target: {fileID: -3807599984486545106, guid: ca362991e0518d149bd299ee903abe2a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 97dbfba4886006647a6e1eb602f3a3d5, type: 2}
+    - target: {fileID: -3807599984486545106, guid: ca362991e0518d149bd299ee903abe2a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[5]
+      value: 
+      objectReference: {fileID: 2100000, guid: ee88b33857c58864fbd0e62efcaab31b, type: 2}
+    - target: {fileID: -3807599984486545106, guid: ca362991e0518d149bd299ee903abe2a,
+        type: 3}
+      propertyPath: m_Materials.Array.data[3]
+      value: 
+      objectReference: {fileID: 2100000, guid: ee88b33857c58864fbd0e62efcaab31b, type: 2}
     - target: {fileID: 919132149155446097, guid: ca362991e0518d149bd299ee903abe2a,
         type: 3}
       propertyPath: m_Name
