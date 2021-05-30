@@ -6,7 +6,42 @@ ModelImporter:
   - first:
       74: 1827226128182048838
     second: Take 001
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: character_model_v12__antennae_export__dark_grey_lambert
+    second: {fileID: 2100000, guid: 72890b98cf6f3d44aa428435b1a9483c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: character_model_v12__antennae_export__light_grey_lambert
+    second: {fileID: 2100000, guid: adfc6507f65c27e498ff022e40049fb2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: character_model_v12__antennae_export__phong4
+    second: {fileID: 2100000, guid: e3c2ea8f5807115458a26f582d359036, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: character_model_v12__antennae_export__phong6
+    second: {fileID: 2100000, guid: 9ceda920e1e05ee4a9c3ea58e750fdbf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: character_model_v12__antennae_export__skinq
+    second: {fileID: 2100000, guid: 643d8a2e0c2a0204e8b315673a18c7c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: character_model_v12__antennae_export__yellow_phong
+    second: {fileID: 2100000, guid: 77e2d169e7c7b004db55bc5278fc7ddb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert1
+    second: {fileID: 2100000, guid: b032742f49e92ce41b987905356c47e3, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -87,7 +122,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.099999994
+    globalScale: 10
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
