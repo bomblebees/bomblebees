@@ -198,7 +198,6 @@ public class PlayerStatTracker : NetworkBehaviour
 	// populate stat block with the necessary stats
 	private int _comboReward;
 	private int _killReward;
-	private int _deathPenalty;
 	
 	private void GetPointSystemData()
 	{
