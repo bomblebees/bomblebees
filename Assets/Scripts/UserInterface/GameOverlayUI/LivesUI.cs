@@ -161,8 +161,15 @@ public class LivesUI : MonoBehaviour
             // Enable/disable crown model
             // GameObject crownObj = orderedList[i].transform.Find("crown_v1").gameObject;
             GameObject crownObj = orderedList[i].GetComponent<Player>().crownModel.gameObject;
-            if (i == 0) crownObj.SetActive(true);
-            else        crownObj.SetActive(false);
+            if (i == 0 && !crownObj.active)
+            {
+                crownObj.SetActive(true);
+                crownObj.GetComponent<ScaleTween>().StartTween();
+            }
+            else if (i > 0 && crownObj.active)
+            {
+                crownObj.SetActive(false);
+            }
 
             // Move lives ui to the new positions
             LeanTween.moveLocal(livesUIs[i].gameObject, livesAnchors[i].transform.localPosition, 1f)
