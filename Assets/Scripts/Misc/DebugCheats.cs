@@ -2,6 +2,13 @@
 
 public class DebugCheats : MonoBehaviour
 {
+    [SerializeField] private bool enableCheats;
+
+    private void Start()
+    {
+        if (enableCheats.Equals(false)) Destroy(gameObject);
+    }
+
     private void Update()
     {
         if (Input.GetKey(KeyCode.B)) BCheats();
