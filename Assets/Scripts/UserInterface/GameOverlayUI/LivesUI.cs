@@ -162,16 +162,21 @@ public class LivesUI : MonoBehaviour
             LeanTween.moveLocal(livesUIs[i].gameObject, livesAnchors[i].transform.localPosition, 1f)
                 .setEase(LeanTweenType.easeOutExpo);
 
-            // Enable/disable crown model
-            GameObject crownObj = orderedList[i].GetComponent<Player>().crownModel.gameObject;
-            if (i == 0 && !crownObj.active)
-            {
-                crownObj.GetComponent<CrownAnimator>().EnableCrown();
-            }
-            if (i > 0 && crownObj.active)
-            {
-                crownObj.GetComponent<CrownAnimator>().EnableCrown();
-            }
+            // Enable/disable player crown model
+            GameObject defaultCrown = orderedList[i].GetComponent<Player>().crownModelDefault.gameObject;
+            if (i == 0 && !defaultCrown.activeSelf)
+                defaultCrown.GetComponent<CrownAnimator>().EnableCrown();
+            if (i > 0 && defaultCrown.activeSelf)
+                defaultCrown.GetComponent<CrownAnimator>().DisableCrown();
+            defaultCrown.transform.localScale = Vector3.one;
+
+            // Enable/disable ghost crown model
+            GameObject ghostCrown = orderedList[i].GetComponent<Player>().crownModelGhost.gameObject;
+            if (i == 0 && !ghostCrown.activeSelf)
+                ghostCrown.GetComponent<CrownAnimator>().EnableCrown();
+            if (i > 0 && ghostCrown.activeSelf)
+                ghostCrown.GetComponent<CrownAnimator>().DisableCrown();
+            ghostCrown.transform.localScale = Vector3.one;
         }
     }
 }

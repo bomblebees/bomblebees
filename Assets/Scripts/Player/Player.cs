@@ -29,7 +29,8 @@ public class Player : NetworkBehaviour
     public GameObject playerMesh;
     public GameObject playerModel;
     public GameObject ghostModel;
-    public GameObject crownModel;
+    public GameObject crownModelDefault;
+    public GameObject crownModelGhost;
     public GameObject groundItemPickupHitbox;
     public GameObject sludgeVFX; //unused
 

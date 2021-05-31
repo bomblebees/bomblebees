@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class CrownAnimator : MonoBehaviour
 {
+    // public Vector3 currLocalScale;
+
     // <summary>
     // Activates crown object and applies bounce animation
     // </summary>
     public void EnableCrown()
     {
         gameObject.SetActive(true);
-        transform.localScale = Vector3.one;
         GetComponent<ScaleTween>().StartTween();
     }
 
@@ -21,6 +22,4 @@ public class CrownAnimator : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-
-
 }
