@@ -10,7 +10,7 @@ public class ScenelessObjectManager : MonoBehaviour
     
     [Header("Misc.")]
     [SerializeField] private GameObject globalSettings;
-    [SerializeField] private GameObject settingsButton;
+    // [SerializeField] private GameObject settingsButton;
     [SerializeField] private GameObject pingDisplay;
 
     private void OnEnable()
