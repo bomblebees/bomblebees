@@ -238,7 +238,7 @@ MonoBehaviour:
   m_text: 'Would you like to send us your user experience data so that we can better
     improve our game?
 
-    
+
 
     This data helps us identify usage of game mechanics
     and improve user experience in the future. We only collect data about game events,
@@ -655,6 +655,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneId: 0
   serverOnly: 1
+  visible: 0
   m_AssetId: 
   hasSpawned: 0
 --- !u!1 &3200635180182375104
@@ -796,7 +797,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5702461051446808292}
-  - component: {fileID: 5288942262470611622}
   m_Layer: 5
   m_Name: Title_Popup_Checking
   m_TagString: Untagged
@@ -825,19 +825,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1820, y: 980}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5288942262470611622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3611861671171600485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a00128818eda43dfaa959b83527b255, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  otherPanels: []
 --- !u!1 &4833493954819707833
 GameObject:
   m_ObjectHideFlags: 0
