@@ -10,17 +10,17 @@ public class DebugCheats : MonoBehaviour
         {
             FindObjectOfType<MultiKillAnnouncer>().Show(2);
         }
-        
+
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             FindObjectOfType<MultiKillAnnouncer>().Show(3);
         }
-        
+
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             FindObjectOfType<MultiKillAnnouncer>().Show(4);
         }
-        
+
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             FindObjectOfType<MultiKillAnnouncer>().Show(5);

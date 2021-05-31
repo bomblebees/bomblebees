@@ -10,7 +10,7 @@ public class PingDisplay : MonoBehaviour
     public string myPingDisplay = "connecting...";
     public bool isConnected;
     public int lastSessionPing;
-    
+
     private NetworkManager _networkManager;
     private TMP_Text _text;
 
@@ -29,13 +29,13 @@ public class PingDisplay : MonoBehaviour
     private void InitializePingDisplay()
     {
         myPingValue = (int) (NetworkTime.rtt * 1000);
-        
+
         if (_networkManager.networkAddress.Equals("localhost"))
         {
             HostStatus();
         }
-        else if (myPingValue.Equals(0) || myPingValue.Equals(lastSessionPing)) 
-        { 
+        else if (myPingValue.Equals(0) || myPingValue.Equals(lastSessionPing))
+        {
             ConnectingStatus();
         }
         else
@@ -76,7 +76,7 @@ public class PingDisplay : MonoBehaviour
     private void ConnectedStatus()
     {
         isConnected = true;
-        CancelInvoke(nameof(InitializePingDisplay)); 
+        CancelInvoke(nameof(InitializePingDisplay));
         InvokeRepeating(nameof(UpdatePingDisplay), float.Epsilon, updateInterval);
     }
 
@@ -88,7 +88,7 @@ public class PingDisplay : MonoBehaviour
         _text.text = "Practice Mode";
         myPingDisplay = _text.text;
     }
-    
+
     private void OnDisable()
     {
         CancelInvoke(nameof(InitializePingDisplay));
