@@ -1,8 +1,6 @@
 using System.Linq;
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using Mirror;
 
 public class NetworkRoomManagerExt : NetworkRoomManager
@@ -14,7 +12,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     [SerializeField] private GameObject audioManager;
     [SerializeField] private GameObject lobbySettings;
 
-    private GameObject settings = null;
+    private GameObject _settings;
 
     public override void OnStartServer()
     {
@@ -56,10 +54,10 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStartServer();
 
-        if (settings == null)
+        if (_settings is null)
         {
-            settings = Instantiate(lobbySettings);
-            NetworkServer.Spawn(settings);
+            _settings = Instantiate(lobbySettings);
+            NetworkServer.Spawn(_settings);
         }
     }
 
@@ -67,15 +65,15 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStopServer();
 
-        if (settings != null)
+        if (!(_settings is null))
         {
-            NetworkServer.Destroy(settings);
-            settings = null;
+            NetworkServer.Destroy(_settings);
+            _settings = null;
         }
     }
 
     // Temp list of player colors
-    private Color[] listColors = { Color.red, Color.blue, Color.yellow, Color.green };
+    private readonly Color[] _listColors = {Color.red, Color.blue, Color.yellow, Color.green};
 
     /// <summary>
     /// Called just after GamePlayer object is instantiated and just before it replaces RoomPlayer object.
@@ -85,18 +83,19 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     /// <param name="roomPlayer"></param>
     /// <param name="gamePlayer"></param>
     /// <returns>true unless some code in here decides it needs to abort the replacement</returns>
-    public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
+    public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer,
+        GameObject gamePlayer)
     {
         // turn off loading screen
         FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = false;
 
-        if (gamePlayer.GetComponent<Player>().steamId == 0)
+        if (gamePlayer.GetComponent<Player>().steamId.Equals(0))
         {
             Debug.LogWarning("Steam id not found, generating unique ID for this session");
 
             // generate unique ID based on the time in ms, for development
             DateTimeOffset curDate = new DateTimeOffset(DateTime.UtcNow);
-            ulong timeId = (ulong)curDate.ToUnixTimeMilliseconds();
+            ulong timeId = (ulong) curDate.ToUnixTimeMilliseconds();
 
             // set the steamId temporarily to a timeId
             gamePlayer.GetComponent<Player>().playerId = timeId;
@@ -110,10 +109,11 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
         // transfer the index
         gamePlayer.GetComponent<Player>().playerRoomIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().index;
-        
+
         // transfer the color over
-        gamePlayer.GetComponent<Player>().playerColor = listColors[roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode];
-        
+        gamePlayer.GetComponent<Player>().playerColor =
+            _listColors[roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode];
+
         // transfer the character chosen
         gamePlayer.GetComponent<Player>().characterCode = roomPlayer.GetComponent<NetworkRoomPlayerExt>().characterCode;
 
@@ -121,8 +121,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         gamePlayer.GetComponent<Player>().teamIndex = roomPlayer.GetComponent<NetworkRoomPlayerExt>().teamIndex;
 
         // let the event manager know that the player has finished loading
-        EventManager eventManager = FindObjectOfType<EventManager>();
-        eventManager.OnPlayerLoadedIntoGame(gamePlayer);
+        FindObjectOfType<EventManager>().OnPlayerLoadedIntoGame(gamePlayer);
 
         return true;
     }
@@ -150,7 +149,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
     public override void OnRoomServerSceneChanged(string sceneName)
     {
-        if (sceneName == GameplayScene)
+        if (sceneName.Equals(GameplayScene))
         {
             NetworkServer.Spawn(Instantiate(eventManager));
             NetworkServer.Spawn(Instantiate(hexGrid));
