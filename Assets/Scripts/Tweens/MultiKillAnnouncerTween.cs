@@ -20,7 +20,7 @@ public class MultiKillAnnouncerTween : MonoBehaviour
     [SerializeField] private float fadeAfter;
     [SerializeField] private float fadeDuration = 4f;
     [SerializeField] private float fadeDelay = 1f;
-    [SerializeField] private Ease fadeEase = Ease.InExpo;
+    [SerializeField] private Ease fadeEase = Ease.Linear;
     [SerializeField] private AnimationCurve fadeCustomCurve = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
     [SerializeField] private bool fadeUseCustomCurve;
     
