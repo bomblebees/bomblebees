@@ -378,31 +378,7 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
-    private void Update()
-    {
-        // TODO: Delete later
-        // Cheats
-        if (Input.GetKeyDown(KeyCode.Alpha5) && Input.GetKey(KeyCode.C))
-        {
-            ChooseRematch();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha6) && Input.GetKey(KeyCode.C))
-        {
-            ChooseReturnToLobby();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha7) && Input.GetKey(KeyCode.C))
-        {
-            StartCoroutine(ServerEndRound());
-        }
-
-        // cheat for increasing inv size
-        if (Input.GetKeyDown(KeyCode.Alpha1) && Input.GetKey(KeyCode.B))
-        {
-            IncreaseGlobalLivesAmt();
-        }
-    }
+    // Move all cheats to DebugCheats.cs
 
     #endregion
 }
