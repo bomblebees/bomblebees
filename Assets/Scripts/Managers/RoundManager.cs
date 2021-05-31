@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using TMPro;
-using System;
 using Mirror;
-using Steamworks;
-using System.Linq;
 
 public class RoundManager : NetworkBehaviour
 {
@@ -18,7 +14,7 @@ public class RoundManager : NetworkBehaviour
     }
 
     // whether the round is over
-    [SyncVar] public bool roundOver = false;
+    [SyncVar] public bool roundOver;
 
     // Lists
     public List<GameObject> playerList = new List<GameObject>();
@@ -29,70 +25,81 @@ public class RoundManager : NetworkBehaviour
 
     [SyncVar] public int currentGlobalInventorySize = 3;
 
-    [Header("Server End Selection")]
-	[SerializeField] private Canvas serverEndSelectionCanvas;
+    [Header("Server End Selection")] [SerializeField]
+    private Canvas serverEndSelectionCanvas;
+
     private GlobalButtonSettings _globalButtonSettings;
 
-	// potential to-do: separate stat tracker UI stuff into separate script away from round manager
-	[Header("Stat Tracker")]
-	[SerializeField] public GameObject[] statsElementUIAnchorObjects;
+    // potential to-do: separate stat tracker UI stuff into separate script away from round manager
+    [Header("Stat Tracker")] [SerializeField]
+    public GameObject[] statsElementUIAnchorObjects;
 
-	[Header("Round Settings")]
-    [SerializeField] public int startGameFreezeDuration = 5;
+    [Header("Round Settings")] [SerializeField]
+    public int startGameFreezeDuration = 5;
+
     [SerializeField] public int endGameFreezeDuration = 5;
-    
+
     // events
-	public delegate void GlobalInventorySizeChangeDelegate(int newSize);
-	public event GlobalInventorySizeChangeDelegate EventInventorySizeChanged;
+    public delegate void GlobalInventorySizeChangeDelegate(int newSize);
+
+    public event GlobalInventorySizeChangeDelegate EventInventorySizeChanged;
 
     // singletons
-    public static RoundManager _instance;
-    public static RoundManager Singleton { get { return _instance;  } }
+    private static RoundManager _instance;
+
+    public static RoundManager Singleton
+    {
+        get { return _instance; }
+    }
 
     // Required Variables
-    private EventManager eventManager;
-	private NetworkRoomManagerExt room;
-    private HexGrid hexGrid;
-    private LobbySettings settings;
-
+    private EventManager _eventManager;
+    private NetworkRoomManagerExt _room;
+    private HexGrid _hexGrid;
+    private LobbySettings _settings;
 
     private void Awake()
     {
-        if (_instance != null && _instance != this) Debug.LogError("Multiple instances of singleton: RoundManager");
-        else _instance = this;
+        if (_instance is null || _instance == this)
+        {
+            _instance = this;
+        }
+        else
+        {
+            Debug.LogError("Multiple instances of singleton: RoundManager");
+        }
 
         // Setup buttons
         _globalButtonSettings = FindObjectOfType<GlobalButtonSettings>();
         Button[] buttons = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (var button in buttons)
         {
-	        button.interactable = false;
-	        button.gameObject.GetComponent<ButtonHoverTween>().enabled = false;
-	        CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
-	        _globalButtonSettings.DeactivateButtonOpacity(canvasRenderers);
+            button.interactable = false;
+            button.gameObject.GetComponent<ButtonHoverTween>().enabled = false;
+            CanvasRenderer[] canvasRenderers = button.GetComponentsInChildren<CanvasRenderer>();
+            _globalButtonSettings.DeactivateButtonOpacity(canvasRenderers);
         }
     }
 
+    #region Setup
 
-	#region Setup
-
-	public override void OnStartServer()
+    public override void OnStartServer()
     {
         InitRequiredVars();
 
         // Subscribe to relevant events
-        eventManager.EventPlayerLoaded += OnPlayerLoadedIntoRound;
+        _eventManager.EventPlayerLoaded += OnPlayerLoadedIntoRound;
 
         int numPlayers = FindObjectsOfType<NetworkRoomPlayerExt>().Length;
 
-		if (numPlayers > 1)
-		{
-			currentGlobalInventorySize = (numPlayers - 7) * -1;
-		}
-		else
-		{
-			currentGlobalInventorySize = 5;
-		}
+        if (numPlayers > 1)
+        {
+            currentGlobalInventorySize = (numPlayers - 7) * -1;
+        }
+        else
+        {
+            currentGlobalInventorySize = 5;
+        }
 
         InitRoundManager();
     }
@@ -100,7 +107,8 @@ public class RoundManager : NetworkBehaviour
     /// <summary>
     /// Called when the player finishes loading into the scene.
     /// </summary>
-    [Server] public void OnPlayerLoadedIntoRound(GameObject playerObject, int remaining)
+    [Server]
+    private void OnPlayerLoadedIntoRound(GameObject playerObject, int remaining)
     {
         // Add the player to list of all players
         playerList.Add(playerObject);
@@ -114,35 +122,45 @@ public class RoundManager : NetworkBehaviour
     /// <summary>
     /// Initializes the required variables for the round manager
     /// </summary>
-    [Server] private void InitRequiredVars()
+    [Server]
+    private void InitRequiredVars()
     {
         // Event manager singleton
-        eventManager = EventManager.Singleton;
-        if (eventManager == null) Debug.LogError("Cannot find Singleton: EventManager");
+        _eventManager = EventManager.Singleton;
 
-        eventManager.EventPlayerEliminated += OnPlayerEliminated;
+        if (_eventManager is null)
+        {
+            Debug.LogError("Cannot find Singleton: EventManager");
+        }
+        else
+        {
+            _eventManager.EventPlayerEliminated += OnPlayerEliminated;
+        }
 
-        room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
-        hexGrid = FindObjectOfType<HexGrid>();
-        settings = FindObjectOfType<LobbySettings>();
+        _room = NetworkManager.singleton as NetworkRoomManagerExt;
+        _hexGrid = FindObjectOfType<HexGrid>();
+        _settings = FindObjectOfType<LobbySettings>();
     }
 
     /// <summary>
     /// Initializes win conditions and etc.
     /// </summary>
-    [Server] private void InitRoundManager()
+    [Server]
+    private void InitRoundManager()
     {
-        if (settings.practiceMode) startGameFreezeDuration = -1;
+        if (_settings.practiceMode) startGameFreezeDuration = -1;
 
-        // -- ALL WIN CONDITIONS INITALIZED HERE -- //
-        if (settings.byLastAlive) winConditions.Add(this.gameObject.AddComponent<LivesCondition>());
-        if (settings.byTimerFinished) winConditions.Add(this.gameObject.AddComponent<TimerCondition>());
-        if (settings.GetGamemode() is TeamsGamemode) winConditions.Add(this.gameObject.AddComponent<TeamsCondition>());
-        if (settings.GetGamemode() is KillsGamemode) winConditions.Add(this.gameObject.AddComponent<EliminationCondition>());
-        if (settings.GetGamemode() is ComboGamemode) winConditions.Add(this.gameObject.AddComponent<ComboCondition>());
+        // -- ALL WIN CONDITIONS INITIALIZED HERE -- //
+        if (_settings.byLastAlive) winConditions.Add(gameObject.AddComponent<LivesCondition>());
+        if (_settings.byTimerFinished) winConditions.Add(gameObject.AddComponent<TimerCondition>());
+        if (_settings.GetGamemode() is TeamsGamemode) winConditions.Add(gameObject.AddComponent<TeamsCondition>());
+        if (_settings.GetGamemode() is KillsGamemode)
+            winConditions.Add(gameObject.AddComponent<EliminationCondition>());
+        if (_settings.GetGamemode() is ComboGamemode) winConditions.Add(gameObject.AddComponent<ComboCondition>());
     }
 
-    [Server] public IEnumerator ServerStartRound()
+    [Server]
+    public IEnumerator ServerStartRound()
     {
         // -- Pre-game start behaviours can go here -- //
 
@@ -168,7 +186,7 @@ public class RoundManager : NetworkBehaviour
         }
 
         // Invoke start round event
-        eventManager.OnStartRound();
+        _eventManager.OnStartRound();
 
         // Start all win conditions
         foreach (WinCondition c in winConditions)
@@ -182,7 +200,8 @@ public class RoundManager : NetworkBehaviour
         UpdateGridsAliveCount(0, aliveCount);
     }
 
-    [ClientRpc] public void ClientStartRound()
+    [ClientRpc]
+    public void ClientStartRound()
     {
         // Start camera follow
         FindObjectOfType<CameraFollow>().InitCameraFollow();
@@ -202,7 +221,7 @@ public class RoundManager : NetworkBehaviour
         // Invoke end round event
         List<Player> players = new List<Player>();
         playerList.ForEach(pi => { players.Add(pi.GetComponent<Player>()); });
-        eventManager.OnEndRound(players);
+        _eventManager.OnEndRound(players);
 
         // Stop and unsubscribe from all win conditions
         foreach (WinCondition c in winConditions)
@@ -217,9 +236,9 @@ public class RoundManager : NetworkBehaviour
         // -- Game Ends Here -- //
 
         RpcPrintResultsAndShowEndCard(winningOrder,
-            (settings.GetGamemode() is TeamsGamemode) ?
-              "Team " + winningOrder[0].GetComponent<Player>().teamIndex + " won!":
-               winningOrder[0].GetComponent<Player>().steamName + " won!");
+            (_settings.GetGamemode() is TeamsGamemode)
+                ? "Team " + winningOrder[0].GetComponent<Player>().teamIndex + " won!"
+                : winningOrder[0].GetComponent<Player>().steamName + " won!");
 
         Button[] buttonList = serverEndSelectionCanvas.GetComponentsInChildren<Button>();
         foreach (Button button in buttonList)
@@ -232,10 +251,11 @@ public class RoundManager : NetworkBehaviour
         }
     }
 
-    [Server] private GameObject[] CollectWinningOrder()
+    [Server]
+    private GameObject[] CollectWinningOrder()
     {
         // Retrieve the winning order from the current gamemode
-        GameObject[] orderedArray = settings.gamemode.GetWinningOrder(playerList.ToArray());
+        GameObject[] orderedArray = _settings.gamemode.GetWinningOrder(playerList.ToArray());
 
         // Debugging the array
         for (int i = 0; i < orderedArray.Length; i++)
@@ -256,9 +276,10 @@ public class RoundManager : NetworkBehaviour
     /// Called whenever a win condition is satisfied
     /// </summary>
     /// <param name="cond">The win condition that was satisfied</param>
-    [Server] public void OnWinConditionSatisfied()
+    [Server]
+    private void OnWinConditionSatisfied()
     {
-        if (settings.endAfterFirstWinCondition)
+        if (_settings.endAfterFirstWinCondition)
         {
             // End the round right after a win condition is satisfied
             StartCoroutine(ServerEndRound());
@@ -287,9 +308,10 @@ public class RoundManager : NetworkBehaviour
         IncreaseGlobalLivesAmt();
     }
 
-    [Client] public void UpdateGridsAliveCount(int _, int newAliveCount)
+    [Client]
+    public void UpdateGridsAliveCount(int _, int newAliveCount)
     {
-        if (hexGrid) hexGrid.SetAliveCount(newAliveCount);
+        if (_hexGrid) _hexGrid.SetAliveCount(newAliveCount);
     }
 
     #endregion
@@ -307,7 +329,8 @@ public class RoundManager : NetworkBehaviour
 
     #region End Game Results
 
-    [ClientRpc] private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder, string winText)
+    [ClientRpc]
+    private void RpcPrintResultsAndShowEndCard(GameObject[] winningOrder, string winText)
     {
         serverEndSelectionCanvas.enabled = true;
 
@@ -320,10 +343,7 @@ public class RoundManager : NetworkBehaviour
             stat.CreateStatsUIElement(statsElementUIAnchorObjects[i]);
         }
 
-
-
         FindObjectOfType<ServerEndSelectionTitle>().GetComponent<TMP_Text>().SetText(winText);
-
     }
 
     [ClientRpc]
@@ -340,10 +360,9 @@ public class RoundManager : NetworkBehaviour
     public void ChooseReturnToLobby()
     {
         serverEndSelectionCanvas.enabled = false;
-        eventManager.OnReturnToLobby(); // invoke event
+        _eventManager.OnReturnToLobby(); // invoke event
 
-        NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
-        room.ServerChangeScene(room.RoomScene);
+        if (NetworkManager.singleton is NetworkRoomManagerExt room) room.ServerChangeScene(room.RoomScene);
     }
 
     [Server]
@@ -351,9 +370,12 @@ public class RoundManager : NetworkBehaviour
     {
         RpcShowLoadingScreen();
         serverEndSelectionCanvas.enabled = true;
-        NetworkRoomManagerExt room = NetworkRoomManager.singleton as NetworkRoomManagerExt;
-        room.ServerChangeScene(room.RoomScene);
-        room.ServerChangeScene(room.GameplayScene);
+
+        if (NetworkManager.singleton is NetworkRoomManagerExt room)
+        {
+            room.ServerChangeScene(room.RoomScene);
+            room.ServerChangeScene(room.GameplayScene);
+        }
     }
 
     private void Update()
@@ -364,7 +386,7 @@ public class RoundManager : NetworkBehaviour
         {
             ChooseRematch();
         }
-        
+
         if (Input.GetKeyDown(KeyCode.Alpha6) && Input.GetKey(KeyCode.C))
         {
             ChooseReturnToLobby();
@@ -375,12 +397,12 @@ public class RoundManager : NetworkBehaviour
             StartCoroutine(ServerEndRound());
         }
 
-		// cheat for increasing inv size
-		if (Input.GetKeyDown(KeyCode.Alpha1) && Input.GetKey(KeyCode.B))
-		{
-			IncreaseGlobalLivesAmt();
-		}
-	}
+        // cheat for increasing inv size
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Input.GetKey(KeyCode.B))
+        {
+            IncreaseGlobalLivesAmt();
+        }
+    }
 
     #endregion
 }
