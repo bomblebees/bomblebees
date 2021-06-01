@@ -317,6 +317,9 @@ public class PlayerSpin : NetworkBehaviour
 
         // Enable hitbox
         StartCoroutine(HandleSpinHitbox());
+
+        // Enable vfx
+        StartCoroutine(HandleSpinVFX());
     }
 
     /// <summary>
@@ -356,13 +359,10 @@ public class PlayerSpin : NetworkBehaviour
     /// </summary>
     [Client] private IEnumerator HandleSpinAnim()
     {
-        spinAnim.gameObject.SetActive(true);
-
         // trigger character spin animation
         this.GetComponent<NetworkAnimator>().SetTrigger("anim_SpinTrigger");
 
         yield return new WaitForSeconds(spinAnimDuration);
-        spinAnim.gameObject.SetActive(false);
 
         // reset character spin animation
         this.GetComponent<NetworkAnimator>().ResetTrigger("anim_SpinTrigger");
@@ -370,6 +370,17 @@ public class PlayerSpin : NetworkBehaviour
         // reset run and idle anims to make sure we dont get stuck in spin anim
         this.GetComponent<PlayerMovement>().playingRunAnim = false;
         this.GetComponent<PlayerMovement>().playingIdleAnim = false;
+    }
+
+    /// <summary>
+    /// Enables the spin vfx for spinAnimDuration seconds
+    /// </summary>
+    [Client]
+    private IEnumerator HandleSpinVFX()
+    {
+        spinAnim.gameObject.SetActive(true);
+        yield return new WaitForSeconds(spinAnimDuration);
+        spinAnim.gameObject.SetActive(false);
     }
 
     #endregion
