@@ -21,6 +21,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         spawnPrefabs.Clear();
         spawnPrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
 
+        // Server already has reference to game player and room player, remove it
         spawnPrefabs.Remove(playerPrefab);
         spawnPrefabs.Remove(roomPlayerPrefab.gameObject);
     }
@@ -31,9 +32,6 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
         // Prefab Loading
         var spawnablePrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
-
-        spawnablePrefabs.Remove(playerPrefab);
-        spawnablePrefabs.Remove(roomPlayerPrefab.gameObject);
 
         NetworkClient.ClearSpawners();
 

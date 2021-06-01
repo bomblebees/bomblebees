@@ -65,6 +65,7 @@ public class LobbySettings : NetworkBehaviour
 
     [Client] private void InitGamemode()
     {
+        gamemodes[gamemodeSelected].EnableGamemodeSettings();
         SetGamemodeText();
     }
 

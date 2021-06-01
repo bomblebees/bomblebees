@@ -494,7 +494,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     [ClientCallback] public override void IndexChanged(int prevIndex, int newIndex)
     {
         // Prevent updating card before it is created (this function is fired on join)
-        if (_playerCard.Equals(null)) return;
+        if (_playerCard == null) return;
 
         // Propagate updates to the player card
         SetCardPosition();
@@ -512,19 +512,23 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         
         _room.ReadyStatusChanged();
 
-        // Disable buttons when readied
-        if (newReadyState)
+        if (isLocalPlayer)
         {
-            _roomUI.buttonLeave.GetComponent<ButtonDisable>().DisableButton();
-            _roomUI.buttonSettings.GetComponent<ButtonDisable>().DisableButton();
+            // Disable buttons when readied
+            if (newReadyState)
+            {
+                _roomUI.buttonLeave.GetComponent<ButtonDisable>().DisableButton();
+                _roomUI.buttonSettings.GetComponent<ButtonDisable>().DisableButton();
+            }
+            else
+            {
+                if (_roomUI.buttonLeave)
+                    _roomUI.buttonLeave.GetComponent<ButtonDisable>().EnableButton();
+                if (_roomUI.buttonSettings)
+                    _roomUI.buttonSettings.GetComponent<ButtonDisable>().EnableButton();
+            }
         }
-        else
-        {
-            if (_roomUI.buttonLeave)
-                _roomUI.buttonLeave.GetComponent<ButtonDisable>().EnableButton();
-            if (_roomUI.buttonSettings)
-                _roomUI.buttonSettings.GetComponent<ButtonDisable>().EnableButton();
-        }
+
     }
 
     /// <summary>
