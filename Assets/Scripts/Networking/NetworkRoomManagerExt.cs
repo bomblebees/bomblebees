@@ -54,15 +54,6 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnRoomStopClient();
     }
 
-    public override void OnRoomServerDisconnect(NetworkConnection conn)
-    {
-        // Return back to lobby if player d/c during game
-        if (IsSceneActive(GameplayScene))
-        {
-            ServerChangeScene(RoomScene);
-        }
-    }
-
     public override void OnRoomStartServer()
     {
         base.OnRoomStartServer();
