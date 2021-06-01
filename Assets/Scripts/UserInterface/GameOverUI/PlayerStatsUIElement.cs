@@ -13,6 +13,7 @@ public class PlayerStatsUIElement : MonoBehaviour
 
 	// Only updated after the round ends
 	public int kills;
+	public int deaths;
 	public int totalDeathPenalty;
 	public int totalBombCombosMade;
 	public int totalPoints;

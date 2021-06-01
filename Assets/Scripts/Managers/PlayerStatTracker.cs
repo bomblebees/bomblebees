@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
-using TMPro;
 using UnityEngine;
 
 public class PlayerStatTracker : NetworkBehaviour
@@ -226,18 +225,39 @@ public class PlayerStatTracker : NetworkBehaviour
 		// Total death penalty math
 		var totalDeathPenalty = Math.Abs(kills * _killReward) + Math.Abs(totalBombCombosMade * _comboReward) - totalPoints;
 		totalDeathPenalty = Math.Abs(totalDeathPenalty);
-		
-		uiElement.totalPointsText.text = $"{totalPoints}";
-		uiElement.killsText.text = $"{kills} (+{Math.Abs(kills * _killReward)})";
-		uiElement.deathsText.text = $"{deaths} (-{totalDeathPenalty})";
-		uiElement.bombComboMadeText.text = $"+{Math.Abs(totalBombCombosMade * _comboReward)}";
 
+		// Set variables for highlightings
 		uiElement.totalPoints = totalPoints;
 		uiElement.kills = kills;
+		uiElement.deaths = deaths;
 		uiElement.totalDeathPenalty = totalDeathPenalty;
 		uiElement.totalBombCombosMade = totalBombCombosMade;
 		
-		CmdHighlightStats();
+		if (_lobbySettings.GetGamemode() is ComboGamemode)
+		{
+			uiElement.killsText.text = Math.Abs(kills * _killReward).Equals(0)
+				? "0 <color=#cfcfc4>(+0)</color>"
+				: $"{kills} <color=#77dd77>(+{Math.Abs(kills * _killReward)})</color>";
+			
+			uiElement.deathsText.text = totalDeathPenalty.Equals(0)
+				? "0 <color=#cfcfc4>(-0)</color>"
+				: $"{deaths} <color=#ff6961>(-{totalDeathPenalty})</color>";
+			
+			uiElement.bombComboMadeText.text = Math.Abs(totalBombCombosMade * _comboReward).Equals(0)
+				? "<color=#cfcfc4>+0</color>"
+				: $"<color=#77dd77>+{Math.Abs(totalBombCombosMade * _comboReward)}</color>";
+			
+			uiElement.totalPointsText.text = $"{totalPoints}";
+		}
+		else if (_lobbySettings.GetGamemode() is StandardGamemode)
+		{
+			uiElement.killsText.text = $"{kills}";
+			uiElement.deathsText.text = $"{deaths}";
+			uiElement.bombComboMadeText.text = $"{totalBombCombosMade}";
+			uiElement.totalPointsText.text = null;
+		}
+
+		// CmdHighlightStats();
 	}
 
 	[Command]
@@ -250,65 +270,87 @@ public class PlayerStatTracker : NetworkBehaviour
 	private void RpcHighlightStats()
 	{
 		var playerStatsUIElementList = new List<PlayerStatsUIElement>(FindObjectsOfType<PlayerStatsUIElement>());
-		var totalPointsList = new List<int>(new int[playerStatsUIElementList.Count]);
 		var killsList = new List<int>(new int[playerStatsUIElementList.Count]);
-		var deathsList = new List<int>(new int[playerStatsUIElementList.Count]);
+		var deathList = new List<int>(new int[playerStatsUIElementList.Count]);
+		var totalDeathPenaltyList = new List<int>(new int[playerStatsUIElementList.Count]);
 		var bombCombosMadeList = new List<int>(new int[playerStatsUIElementList.Count]);
+		var totalPointsList = new List<int>(new int[playerStatsUIElementList.Count]);
 
 		for (var i = 0; i < playerStatsUIElementList.Count; i++)
 		{
-			totalPointsList[i] = playerStatsUIElementList[i].totalPoints;
 			killsList[i] = playerStatsUIElementList[i].kills;
-			deathsList[i] = playerStatsUIElementList[i].totalDeathPenalty;
+			deathList[i] = playerStatsUIElementList[i].deaths;
+			totalDeathPenaltyList[i] = playerStatsUIElementList[i].totalDeathPenalty;
 			bombCombosMadeList[i] = playerStatsUIElementList[i].totalBombCombosMade;
+			totalPointsList[i] = playerStatsUIElementList[i].totalPoints;
 		}
 
 		// Highlight colors. Source: https://www.colorhexa.com/color-names
 		var pastelGreen = new Color(0.47f, 0.87f, 0.47f);
 		var pastelRed = new Color(1f, 0.41f, 0.38f);
 		var defaultColor = Color.white;
-		
+
 		// Set highlights
 		for (var i = 0; i < playerStatsUIElementList.Count; i++)
 		{
-			if (totalPointsList[i].Equals(totalPointsList.Max()) && !totalPointsList[i].Equals(0))
+			// Kills
+			if (_lobbySettings.GetGamemode() is ComboGamemode || _lobbySettings.GetGamemode() is StandardGamemode)
 			{
-				// Most total points
-				playerStatsUIElementList[i].totalPointsText.color = pastelGreen;
-			}
-			else
-			{
-				playerStatsUIElementList[i].totalPointsText.color = defaultColor;
+				if (killsList[i].Equals(killsList.Max()) && !killsList[i].Equals(0))
+				{
+					// playerStatsUIElementList[i].killsText.color = pastelGreen;
+				}
+				else
+				{
+					// playerStatsUIElementList[i].killsText.color = defaultColor;
+				}
 			}
 
-			if (killsList[i].Equals(killsList.Max()) && !killsList[i].Equals(0))
+			// Deaths
+			if (_lobbySettings.GetGamemode() is ComboGamemode)
 			{
-				// Most kills
-				playerStatsUIElementList[i].killsText.color = pastelGreen;
+				if (totalDeathPenaltyList[i].Equals(totalDeathPenaltyList.Max()) && !totalDeathPenaltyList[i].Equals(0))
+				{
+					// playerStatsUIElementList[i].deathsText.color = pastelRed;
+				}
+				else
+				{
+					// playerStatsUIElementList[i].deathsText.color = defaultColor;
+				}
 			}
-			else
+			else if (_lobbySettings.GetGamemode() is StandardGamemode)
 			{
-				playerStatsUIElementList[i].killsText.color = defaultColor;
+				if (deathList[i].Equals(deathList.Max()) && !deathList[i].Equals(0))
+				{
+					// playerStatsUIElementList[i].deathsText.color = pastelRed;
+				}
+				else
+				{
+					// playerStatsUIElementList[i].deathsText.color = defaultColor;
+				}
+			}
+
+			// Combos
+			if (_lobbySettings.GetGamemode() is ComboGamemode || _lobbySettings.GetGamemode() is StandardGamemode)
+			{
+				if (bombCombosMadeList[i].Equals(bombCombosMadeList.Max()) && !bombCombosMadeList[i].Equals(0))
+				{
+					// playerStatsUIElementList[i].bombComboMadeText.color = pastelGreen;
+				}
+				else
+				{
+					// playerStatsUIElementList[i].bombComboMadeText.color = defaultColor;
+				}
 			}
 			
-			if (deathsList[i].Equals(deathsList.Max()) && !deathsList[i].Equals(0))
+			// Total points
+			if (totalPointsList[i].Equals(totalPointsList.Max()) && !totalPointsList[i].Equals(0))
 			{
-				// Most deaths
-				playerStatsUIElementList[i].deathsText.color = pastelRed;
+				// playerStatsUIElementList[i].totalPointsText.color = pastelGreen;
 			}
 			else
 			{
-				playerStatsUIElementList[i].deathsText.color = defaultColor;
-			}
-			
-			if (bombCombosMadeList[i].Equals(bombCombosMadeList.Max()) && !bombCombosMadeList[i].Equals(0))
-			{
-				// Most combos
-				playerStatsUIElementList[i].bombComboMadeText.color = pastelGreen;
-			}
-			else
-			{
-				playerStatsUIElementList[i].bombComboMadeText.color = defaultColor;
+				// playerStatsUIElementList[i].totalPointsText.color = defaultColor;
 			}
 		}
 	}
