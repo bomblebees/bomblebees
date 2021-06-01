@@ -54,7 +54,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStartServer();
 
-        if (_settings is null)
+        if (_settings == null)
         {
             _settings = Instantiate(lobbySettings);
             NetworkServer.Spawn(_settings);
@@ -65,7 +65,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStopServer();
 
-        if (!(_settings is null))
+        if (!(_settings == null))
         {
             NetworkServer.Destroy(_settings);
             _settings = null;

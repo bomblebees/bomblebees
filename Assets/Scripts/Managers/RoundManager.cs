@@ -60,7 +60,7 @@ public class RoundManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (_instance is null || _instance == this)
+        if (_instance == null || _instance == this)
         {
             _instance = this;
         }
