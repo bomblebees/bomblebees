@@ -5331,7 +5331,7 @@ MonoBehaviour:
   stayPermanent: 1
   projectileSpeed: 2.5
   startOffset: 9
-  hitboxIterationDuration: 0.2
+  hitboxIterationDuration: 15
   FireSFX: {fileID: 1935200310931157549}
   plasmaSphereModel: {fileID: 4085552186968079639}
   particleSystem: {fileID: 7751750280610379946}
@@ -37574,6 +37574,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7624084671803026054}
     m_Modifications:
+    - target: {fileID: 2877997116617332508, guid: 22e55748bfbe50548b2e502b71221370,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3606904737211022008, guid: 22e55748bfbe50548b2e502b71221370,
         type: 3}
       propertyPath: m_AssetId
@@ -38779,6 +38784,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 557565722564973074}
     m_Modifications:
+    - target: {fileID: -8344238109209956183, guid: ed732b57b8578904aa58a96511a923a4,
+        type: 3}
+      propertyPath: m_AssetId
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6841035304812072512, guid: ed732b57b8578904aa58a96511a923a4,
         type: 3}
       propertyPath: m_LocalPosition.x
