@@ -58,7 +58,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Called when the client first connects to the lobby.
     /// </summary>
-    [Client] public override void OnStartClient()
+    public override void OnStartClient()
     {
         SetupLobby();
 
@@ -74,7 +74,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Called when the client disconnects from the lobby
     /// </summary>
-    [Client] public override void OnStopClient()
+    public override void OnStopClient()
     {
         _characterSelectionInfo.ResetAll();
         DestroyPlayerCard();
@@ -85,7 +85,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <para>We should only use this for when the client re-enters the lobby from the game scene.
     /// For when the client first joins the lobby, use OnStartClient instead</para>
     /// </summary>
-    [Client] public override void OnClientEnterRoom()
+    public override void OnClientEnterRoom()
     {
         SetupLobby();
     }
@@ -233,10 +233,10 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Initializes lobby room variables
     /// </summary>
-    [Client] private void InitRequiredVars()
+    [Client] private bool InitRequiredVars()
     {
         // Only init if we are in the room scene
-        if (SceneManager.GetActiveScene().name != "Room") return;
+        if (SceneManager.GetActiveScene().name != "Room") return false;
 
         if (!_characterSelectionInfo)
         {
@@ -256,6 +256,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             _roomUI = Room_UI.Singleton;
             if (!_roomUI) Debug.LogError("room not found");
         }
+
+        if (_characterSelectionInfo && _room && _roomUI) return true;
+        else return false;
     }
 
     /// <summary>
@@ -324,7 +327,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Destroys the lobby player card of this player
     /// </summary>
-    [Client] private void DestroyPlayerCard()
+    private void DestroyPlayerCard()
     {
         if (_playerCard)
         {
@@ -479,7 +482,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     [Client] private void UpdatePingDisplay()
     {
-        if (_playerCard.Equals(null)) return;
+        if (_playerCard == null) return;
 
         _playerCard.username.text = $"{steamUsername} ({ping})";
     }
@@ -493,8 +496,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [ClientCallback] public override void IndexChanged(int prevIndex, int newIndex)
     {
-        // Prevent updating card before it is created (this function is fired on join)
-        if (_playerCard == null) return;
+        // Prevent updating card before it is created (this function may be fired on join)
+        if (!InitRequiredVars() || _playerCard == null) return;
 
         // Propagate updates to the player card
         SetCardPosition();
@@ -506,6 +509,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [ClientCallback] public override void ReadyStateChanged(bool prevReadyState, bool newReadyState)
     {
+        // Prevent updating card before it is created (this function may be fired on join)
+        if (!InitRequiredVars() || _playerCard == null) return;
+
         // Propagate updates to the player card
         SetCardReadyStatus();
         SetCardButtons();
@@ -536,6 +542,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [ClientCallback] private void CharacterChanged(int prevCharCode, int newCharCode)
     {
+        // Prevent updating card before it is created (this function may be fired on join)
+        if (!InitRequiredVars() || _playerCard == null) return;
+
         // Propagate updates to the player card
         SetCardCharacterPortrait();
     }
@@ -545,6 +554,9 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// </summary>
     [ClientCallback] private void TeamChanged(int prevTeamIdx, int newTeamIdx)
     {
+        // Prevent updating card before it is created (this function may be fired on join)
+        if (!InitRequiredVars() || _playerCard == null) return;
+
         // Propagate updates to the player card
         SetCardTeamButton();
     }
