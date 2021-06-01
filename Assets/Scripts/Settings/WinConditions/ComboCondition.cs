@@ -44,20 +44,45 @@ public class ComboCondition : WinCondition
         CheckWin();
     }
 
-    private bool announcePlayed = false;
+    private Player leader;
+
+    private bool thirtyPlayed = false;
+    private bool tenPlayed = false;
 
     private void CheckWin()
     {
-        foreach (Player p in players)
+        
+        if (leader == null) leader = players[0]; // Initialize a leader if needed
+
+        for (int i = 0; i < players.Length; i++)
         {
+            Player p = players[i];
+
             int playerCombos = p.GetComponent<PlayerStatTracker>().totalPoints;
 
+            // If leader has been overtaken
+            if (p != leader && playerCombos > leader.GetComponent<PlayerStatTracker>().totalPoints)
+            {
+                Debug.Log(p.playerRoomIndex + " overtook " + leader.playerRoomIndex);
+
+                leader = p; // leader is now that top player
+
+                FindObjectOfType<GameUIManager>().Announce(leader.steamName + " has taken the lead!");
+            }
+
+            // Check if player has reached the combos
             if (playerCombos >= toCombos)
             {
                 base.InvokeWinConditionSatisfied();
-            } else if (playerCombos >= toCombos - 10 && !announcePlayed)
+            } else if (playerCombos >= toCombos - 10 && !tenPlayed)
             {
-                announcePlayed = true;
+                tenPlayed = true;
+
+                FindObjectOfType<GameUIManager>().Announce(p.steamName + " has <size=150%>"
+                    + (toCombos - playerCombos) + "</size>  Combos remaining!");
+            } else if (playerCombos >= toCombos - 30 && !thirtyPlayed)
+            {
+                thirtyPlayed = true;
 
                 FindObjectOfType<GameUIManager>().Announce(p.steamName + " has <size=150%>"
                     + (toCombos - playerCombos) + "</size>  Combos remaining!");
