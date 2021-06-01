@@ -196,9 +196,13 @@ public class Health : NetworkBehaviour
 
 		EventLivesLowered?.Invoke(false); // keep
 
+        this.GetComponent<PlayerSwap>().canSwap = false;
+
         // Debug.Log("begin ghost mode");
         yield return new WaitForSeconds(ghostDuration);
         EventGhostExit?.Invoke(true); // keep, turn on canExitInvincibility
+
+        this.GetComponent<PlayerSwap>().canSwap = true;
         StartCoroutine(BeginInvincibility());
     }
 
