@@ -75,6 +75,9 @@ public class GlobalSettings : MonoBehaviour
 
     public void OnClickQuitToMenu()
     {
+        CameraFollow camFollow = FindObjectOfType<CameraFollow>();
+        if (camFollow) camFollow.targets.Clear();
+
         NetworkRoomManagerExt networkManager = NetworkManager.singleton as NetworkRoomManagerExt;
 
         if (networkManager)
