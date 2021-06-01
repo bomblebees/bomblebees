@@ -197,7 +197,7 @@ public class HexGrid : NetworkBehaviour
         }
 
         if (r_Hex == null || g_Hex == null || b_Hex == null || y_Hex == null || p_Hex == null
-            || w_Hex == null || default_Hex == null)
+            || w_Hex == null)
             Debug.LogError("HexGrid.cs: a Hex is not assigned.");
 
         if (minTilesForGlow >= minTilesForCombo)

@@ -71,7 +71,7 @@ public class GameUIManager : NetworkBehaviour
     // When a player loads into the game (on server)
     [Server] public void ServerPlayerConnected(GameObject player, int remaining)
     {
-        Debug.Log("player connected: " + player.GetComponent<Player>().playerRoomIndex);
+        //Debug.Log("player connected: " + player.GetComponent<Player>().playerRoomIndex);
 
         //ServerEnableLivesUI(player);
         RpcPlayerConnected(player, eventManager.playersLoaded, eventManager.totalPlayers);

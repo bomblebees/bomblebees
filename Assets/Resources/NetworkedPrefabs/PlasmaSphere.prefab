@@ -10063,6 +10063,7 @@ GameObject:
   - component: {fileID: 6841035304812072515}
   - component: {fileID: 6841035304812072514}
   - component: {fileID: 6841035304812072517}
+  - component: {fileID: -8344238109209956183}
   m_Layer: 2
   m_Name: PlasmaSphere
   m_TagString: Untagged
@@ -10149,6 +10150,23 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-8344238109209956183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6841035304812072516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &8500433226743822413
 GameObject:
   m_ObjectHideFlags: 0
