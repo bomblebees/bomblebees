@@ -9,12 +9,15 @@ public class ComboCondition : WinCondition
 
     private Player[] players;
 
+    private LobbySettings settings;
+
     #region Virtuals
 
     [Server]
     public override void InitWinCondition()
     {
         toCombos = FindObjectOfType<ComboGamemode>().winPoints;
+        settings = FindObjectOfType<LobbySettings>();
     }
 
     [Server]
@@ -51,7 +54,8 @@ public class ComboCondition : WinCondition
 
     private void CheckWin()
     {
-        
+        if (settings && settings.practiceMode) return; // Return if practice mode
+
         if (leader == null) leader = players[0]; // Initialize a leader if needed
 
         for (int i = 0; i < players.Length; i++)
