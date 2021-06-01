@@ -162,21 +162,31 @@ public class LivesUI : MonoBehaviour
             LeanTween.moveLocal(livesUIs[i].gameObject, livesAnchors[i].transform.localPosition, 1f)
                 .setEase(LeanTweenType.easeOutExpo);
 
-            // Enable/disable player crown model
+            // Crown enabling/disabling
             GameObject defaultCrown = orderedList[i].GetComponent<Player>().crownModelDefault.gameObject;
-            if (i == 0 && !defaultCrown.activeSelf)
-                defaultCrown.GetComponent<CrownAnimator>().EnableCrown();
-            if (i > 0 && defaultCrown.activeSelf)
-                defaultCrown.GetComponent<CrownAnimator>().DisableCrown();
-            defaultCrown.transform.localScale = Vector3.one;
-
-            // Enable/disable ghost crown model
             GameObject ghostCrown = orderedList[i].GetComponent<Player>().crownModelGhost.gameObject;
-            if (i == 0 && !ghostCrown.activeSelf)
-                ghostCrown.GetComponent<CrownAnimator>().EnableCrown();
-            if (i > 0 && ghostCrown.activeSelf)
+
+            if (_lobbySettings.practiceMode) {
+                // If practice mode, disable both
+                defaultCrown.GetComponent<CrownAnimator>().DisableCrown();
                 ghostCrown.GetComponent<CrownAnimator>().DisableCrown();
-            ghostCrown.transform.localScale = Vector3.one;
+            } else
+            {
+                // Enable/disable player crown model if first
+                if (i == 0 && !defaultCrown.activeSelf)
+                    defaultCrown.GetComponent<CrownAnimator>().EnableCrown();
+                if (i > 0 && defaultCrown.activeSelf)
+                    defaultCrown.GetComponent<CrownAnimator>().DisableCrown();
+                defaultCrown.transform.localScale = Vector3.one;
+
+                // Enable/disable ghost crown model if first
+                if (i == 0 && !ghostCrown.activeSelf)
+                    ghostCrown.GetComponent<CrownAnimator>().EnableCrown();
+                if (i > 0 && ghostCrown.activeSelf)
+                    ghostCrown.GetComponent<CrownAnimator>().DisableCrown();
+                ghostCrown.transform.localScale = Vector3.one;
+            }
+
         }
     }
 }
