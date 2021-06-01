@@ -20,6 +20,9 @@ public class NetworkRoomManagerExt : NetworkRoomManager
 
         spawnPrefabs.Clear();
         spawnPrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
+
+        spawnPrefabs.Remove(playerPrefab);
+        spawnPrefabs.Remove(roomPlayerPrefab.gameObject);
     }
 
     public override void OnStartClient()
@@ -27,7 +30,10 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         base.OnStartClient();
 
         // Prefab Loading
-        var spawnablePrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs");
+        var spawnablePrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
+
+        spawnablePrefabs.Remove(playerPrefab);
+        spawnablePrefabs.Remove(roomPlayerPrefab.gameObject);
 
         NetworkClient.ClearSpawners();
 
@@ -54,7 +60,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStartServer();
 
-        if (_settings is null)
+        if (_settings == null)
         {
             _settings = Instantiate(lobbySettings);
             NetworkServer.Spawn(_settings);
@@ -65,7 +71,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
     {
         base.OnRoomStopServer();
 
-        if (!(_settings is null))
+        if (!(_settings == null))
         {
             NetworkServer.Destroy(_settings);
             _settings = null;
@@ -89,7 +95,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         // turn off loading screen
         FindObjectOfType<GlobalLoadingScreen>().gameObject.GetComponent<Canvas>().enabled = false;
 
-        if (gamePlayer.GetComponent<Player>().steamId.Equals(0))
+        if (roomPlayer.GetComponent<NetworkRoomPlayerExt>().steamId.Equals(0))
         {
             Debug.LogWarning("Steam id not found, generating unique ID for this session");
 

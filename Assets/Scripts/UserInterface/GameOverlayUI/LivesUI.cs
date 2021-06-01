@@ -110,7 +110,7 @@ public class LivesUI : MonoBehaviour
     {
         int i = Array.FindIndex(livesUIs, e => e.player.GetComponent<Player>().playerRoomIndex == player.playerRoomIndex);
 
-        Debug.Log("update lives: " + currentLives);
+        //Debug.Log("update lives: " + currentLives);
 
         switch (currentLives)
         {

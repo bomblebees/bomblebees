@@ -31,7 +31,7 @@ public class AmmoDisplay : MonoBehaviour
 		SyncList<int> list = inv.inventoryList;
 		int selected = inv.selectedSlot;
 
-		Debug.Log("updating inventory size UI on " + gameObject.name + ", current inventory size in index 0: " + playerInventorySizes[0]);
+		//Debug.Log("updating inventory size UI on " + gameObject.name + ", current inventory size in index 0: " + playerInventorySizes[0]);
 
 		// for each radial frame container, deactivate each frame inside, and reactivate the correct one
 		for (int i = 0; i < invStackItems.Length; i++)
