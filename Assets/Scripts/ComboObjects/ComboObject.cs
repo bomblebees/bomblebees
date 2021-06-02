@@ -47,7 +47,12 @@ public class ComboObject : NetworkBehaviour
 	[SyncVar]
     public GameObject triggeringPlayer;
     protected bool canHitTriggeringPlayer = true;
-    
+
+    // the player who last interacted with the proccing bomb that blew this bomb up
+    public GameObject proccingPlayer;
+    public bool wasProcced = false;
+    public bool wasMovingWhenProcced = false;
+
     [FormerlySerializedAs("objectMat")] public GameObject model;
     [FormerlySerializedAs("timeBtwnFillFinishAndFuse")] public float fillShaderRatio = 0;  // set this in the inspector;
     
@@ -57,7 +62,20 @@ public class ComboObject : NetworkBehaviour
     // player who placed the bomb (set in Player.cs, SERVER only variable)
     [SyncVar] public GameObject ownerPlayer;
 
+    public AnimationCurve movementCurve;
+    public int moveTweenId;
+
     public GameObject GetOwnerPlayer() { return ownerPlayer; }
+
+    
+    /// <summary>
+    /// Returns the player who is responsible for any kills that this bomb acquires
+    /// </summary>
+    public virtual GameObject GetKillerPlayer(GameObject playerThatWasKilled)
+    {
+        Debug.Log("GetKillerPlayer(): was this bomb moving? ans = " + wasMovingWhenProcced);
+        return triggeringPlayer;
+    }
 
     public override void OnStartClient()
     {
@@ -90,7 +108,8 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual void Update()
     {
-        ListenForMoving();
+        //Debug.Log("is this bomb moving? - " + isMoving);
+        //ListenForMoving();
     }
 
     float MapDist(float start, float end, float point)
@@ -102,17 +121,21 @@ public class ComboObject : NetworkBehaviour
 
     protected void ListenForMoving()
     {
+        snapToCenterThreshold = float.Epsilon;
+
         if (this.isMoving)
         {
+            Debug.Log("distance to target: " + GetDistanceFrom(targetPosition) + " | threshold = " + snapToCenterThreshold);
+            //Debug.Log("distance to target: " + snapToCenterThreshold);
 
             // // decrease start speed, increase at end
             // float deltaLerp = lerpRate * 0.1f;
             // float mapDist = Math.
             // lerpRate = Mathf.Clamp()
-            this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, 1-Mathf.Pow(lerpRate, Time.deltaTime));  // move object
-            // this.gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, lerpRate);  // move object
+
             if (GetDistanceFrom(targetPosition) < snapToCenterThreshold)
             {
+                Debug.Log("center threshold exceeded");
                 if (isServer)
                 {
                     // The server should calculate these values to make sure
@@ -120,9 +143,10 @@ public class ComboObject : NetworkBehaviour
                     FindCenter();
                     GoToCenter();
                     NotifyOccupiedTile(true);
-                    isMoving = false;
+                    //isMoving = false;
                     RpcStopMoving();
                 }
+                Debug.Log("snapped to center, moving should be false: " + isMoving);
             }
             else  // check if next tile is empty
             {
@@ -235,6 +259,7 @@ public class ComboObject : NetworkBehaviour
     [Server]
     protected virtual void GoToCenter()
     {
+        isMoving = false;
         this.gameObject.transform.position = nearestCenter;
         RpcGoToCenter(nearestCenter);
     }
@@ -243,6 +268,7 @@ public class ComboObject : NetworkBehaviour
     [ClientRpc]
     protected virtual void RpcGoToCenter(Vector3 centerPos)
     {
+        isMoving = false;
         this.gameObject.transform.position = centerPos;
     }
 
@@ -361,6 +387,12 @@ public class ComboObject : NetworkBehaviour
 
             if (result == true)
             {
+
+                moveTweenId = LeanTween.move(this.gameObject, targetPosition, 0.25f)
+                    .setEase(movementCurve)
+                    .setOnComplete(() => isMoving = false)
+                    .id;
+
                 this.isMoving = true; 
             }
             return result;

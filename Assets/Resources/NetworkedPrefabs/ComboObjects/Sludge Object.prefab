@@ -21699,9 +21699,35 @@ MonoBehaviour:
   ownerIsQueen: 0
   hasStarted: 0
   triggeringPlayer: {fileID: 0}
+  proccingPlayer: {fileID: 0}
+  wasProcced: 0
   model: {fileID: 1203407218020262036}
   fillShaderRatio: 0.9
   ownerPlayer: {fileID: 0}
+  movementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   slowRate: 0.9
   slowDuration: 3.2
 --- !u!114 &5783496561789443700

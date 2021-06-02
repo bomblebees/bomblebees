@@ -86,11 +86,11 @@ public class MessageFeed : MonoBehaviour
 
     public void OnKillEvent(GameObject bomb, GameObject killedPlayer)
     {
-		// string killtext = " died to " + GetBombText(bomb) + "!";
+        // string killtext = " died to " + GetBombText(bomb) + "!";
 
-		GameObject killer = bomb.GetComponent<ComboObject>().triggeringPlayer;
+		GameObject killer = bomb.GetComponent<ComboObject>().GetKillerPlayer(killedPlayer);
 
-		string killtext;
+        string killtext;
         if (killer == killedPlayer)
             killtext = GetBombIcon(bomb) + " " + GetPlayerText(killedPlayer);
         else

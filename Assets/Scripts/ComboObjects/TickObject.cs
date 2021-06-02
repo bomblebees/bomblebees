@@ -82,6 +82,9 @@ public class TickObject : ComboObject
 
     public void ProcEffects()
     {
+        wasProcced = true;
+        LeanTween.cancel(moveTweenId);
+
         // yield return new WaitForSeconds(0.01f);
         StopVelocity();
         StartCoroutine(EnableSFX());
@@ -93,13 +96,33 @@ public class TickObject : ComboObject
     }
 
 
-    public virtual void EarlyProc()
+    public virtual void EarlyProc(GameObject proccingBomb)
     {
-        if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep"); // TODO do something like "StopPlaying(objectSound)"
-		if (didEarlyEffects)
-		{
-			return;
-		}
+
+        if (wasProcced) return; // Once procced, cannot proc again
+        //Debug.Log("is this bomb moving? - " + isMoving);
+
+        wasMovingWhenProcced = isMoving;
+
+        ComboObject parentBomb = proccingBomb.GetComponent<ComboObject>();
+
+        if (parentBomb.proccingPlayer != null)
+        {
+            // Inherit the proccing player from the parent
+            this.proccingPlayer = parentBomb.proccingPlayer;
+
+            Debug.Log("EarlyProc - inherited proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
+        }
+        else
+        {
+            // The trigger player of the parent (root) bomb is the proccing player
+            this.proccingPlayer = parentBomb.triggeringPlayer;
+
+            Debug.Log("EarlyProc - set proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
+        }
+
+        if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
+        if (didEarlyEffects) return;
         didEarlyEffects = true;
         FindCenter();
         GoToCenter();
@@ -116,7 +139,7 @@ public class TickObject : ComboObject
 	}
 
 
-	protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
+    protected override bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         if (!tickStarted) StartCoroutine(TickDown());
         bool result = base.Push(edgeIndex, triggeringPlayer);
@@ -127,5 +150,32 @@ public class TickObject : ComboObject
         this.blockerHandler.SetActive(false); // in order to stop blocking players while moving
         return result;
     }
-    
+
+
+    /// <summary>
+    /// Returns the player who is responsible for any kills that this bomb acquires
+    /// </summary>
+    public override GameObject GetKillerPlayer(GameObject playerThatWasKilled)
+    {
+
+        // If regular bomb kill, just get last interactor
+        if (!didEarlyEffects)
+        {
+            Debug.Log("regular bomb kill");
+            return triggeringPlayer;
+        }
+
+        // If bomb was moving, award the kill to the triggering player of this bomb
+        if (wasMovingWhenProcced && triggeringPlayer != playerThatWasKilled)
+        {
+            Debug.Log("moving bomb kill");
+            return triggeringPlayer;
+        }
+
+        Debug.Log("proc bias kill");
+
+        // else the killer must be the proccer
+        return proccingPlayer;
+    }
+
 }

@@ -24,19 +24,19 @@ public class BombObject : TickObject
             var _root = gameObjHit.transform.root.name;
             if (_root.Equals("Bomb Object(Clone)"))
             {
-                this.EarlyProc();
+                this.EarlyProc(gameObjHit.transform.root.gameObject);
             }
             else if (_root.Equals("Laser Object(Clone)"))
             { 
-                this.EarlyProc();
+                this.EarlyProc(gameObjHit.transform.root.gameObject);
             }
             else if (_root.Equals("Blink Object(Clone)"))
             { 
-                this.EarlyProc();
+                this.EarlyProc(gameObjHit.transform.root.gameObject);
             }
             else if (_root.Equals("Plasma Object(Clone)"))
             { 
-                this.EarlyProc();
+                this.EarlyProc(gameObjHit.transform.root.gameObject);
             }
         }
     }

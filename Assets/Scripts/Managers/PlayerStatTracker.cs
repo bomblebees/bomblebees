@@ -106,34 +106,45 @@ public class PlayerStatTracker : NetworkBehaviour
     {
         if (_roundManager.roundOver) return; // if round over, do not update
 
-        ComboObject bombComponent = bomb.GetComponent<ComboObject>();
+        GameObject killer = bomb.GetComponent<ComboObject>().GetKillerPlayer(playerThatDied);
 
-        if (ReferenceEquals(playerThatDied, gameObject))
+        if (playerThatDied != killer)
         {
-            // the player that died in the event is this player
-            deaths++;
-
-            // if combo game mode and died, apply combo penalty
-            if (_lobbySettings.GetGamemode() is ComboGamemode)
-            {
-                if (totalPoints > ComboGamemode.DeathPenaltyPoint)
-                    totalPoints -= ComboGamemode.DeathPenaltyPoint;
-                else
-                    totalPoints = 0;
-            }
+            playerThatDied.GetComponent<PlayerStatTracker>().deaths++;
+            killer.GetComponent<PlayerStatTracker>().deaths++;
+        } else
+        {
+            playerThatDied.GetComponent<PlayerStatTracker>().deaths++;
         }
 
-        if (ReferenceEquals(bombComponent.triggeringPlayer, gameObject) && !ReferenceEquals(gameObject, playerThatDied))
-        {
-            // if this player was owner of the bomb that killed, and also wasn't the one who died, then award kill to this player
-            kills++;
+        //ComboObject bombComponent = bomb.GetComponent<ComboObject>();
 
-            // if combo game mode and died, apply combo bonus
-            if (_lobbySettings.GetGamemode() is ComboGamemode)
-            {
-                totalPoints += ComboGamemode.KillRewardPoint;
-            }
-        }
+        //if (ReferenceEquals(playerThatDied, gameObject))
+        //{
+        //    // the player that died in the event is this player
+        //    deaths++;
+
+        //    // if combo game mode and died, apply combo penalty
+        //    if (_lobbySettings.GetGamemode() is ComboGamemode)
+        //    {
+        //        if (totalPoints > ComboGamemode.DeathPenaltyPoint)
+        //            totalPoints -= ComboGamemode.DeathPenaltyPoint;
+        //        else
+        //            totalPoints = 0;
+        //    }
+        //}
+
+        //if (ReferenceEquals(bombComponent.triggeringPlayer, gameObject) && !ReferenceEquals(gameObject, playerThatDied))
+        //{
+        //    // if this player was owner of the bomb that killed, and also wasn't the one who died, then award kill to this player
+        //    kills++;
+
+        //    // if combo game mode and died, apply combo bonus
+        //    if (_lobbySettings.GetGamemode() is ComboGamemode)
+        //    {
+        //        totalPoints += ComboGamemode.KillRewardPoint;
+        //    }
+        //}
     }
 
     [Server]
