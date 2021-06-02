@@ -350,6 +350,8 @@ public class ComboObject : NetworkBehaviour
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
         LeanTween.cancel(moveTweenId);
+        FindCenter();
+        GoToCenter();
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
