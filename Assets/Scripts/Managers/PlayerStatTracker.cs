@@ -110,11 +110,24 @@ public class PlayerStatTracker : NetworkBehaviour
 
         if (playerThatDied != killer)
         {
-            playerThatDied.GetComponent<PlayerStatTracker>().deaths++;
-            killer.GetComponent<PlayerStatTracker>().deaths++;
-        } else
+            killer.GetComponent<PlayerStatTracker>().kills++;
+
+            // if combo game mode and died, apply combo bonus
+            if (_lobbySettings.GetGamemode() is ComboGamemode)
+            {
+                killer.GetComponent<PlayerStatTracker>().totalPoints += ComboGamemode.KillRewardPoint;
+            }
+        }
+
+        playerThatDied.GetComponent<PlayerStatTracker>().deaths++;
+
+        // if combo game mode and died, apply combo penalty
+        if (_lobbySettings.GetGamemode() is ComboGamemode)
         {
-            playerThatDied.GetComponent<PlayerStatTracker>().deaths++;
+            if (totalPoints > ComboGamemode.DeathPenaltyPoint)
+                totalPoints -= ComboGamemode.DeathPenaltyPoint;
+            else
+                totalPoints = 0;
         }
 
         //ComboObject bombComponent = bomb.GetComponent<ComboObject>();

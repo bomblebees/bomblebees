@@ -106,6 +106,7 @@ public class TickObject : ComboObject
 
         ComboObject parentBomb = proccingBomb.GetComponent<ComboObject>();
 
+        // If parent bomb has proc
         if (parentBomb.proccingPlayer != null)
         {
             // Inherit the proccing player from the parent
@@ -113,12 +114,17 @@ public class TickObject : ComboObject
 
             Debug.Log("EarlyProc - inherited proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
         }
-        else
+        else if (!wasMovingWhenProcced) // if bomb was not moving, then proccer is the parent bomb's triggering player
         {
+
+
             // The trigger player of the parent (root) bomb is the proccing player
             this.proccingPlayer = parentBomb.triggeringPlayer;
 
             Debug.Log("EarlyProc - set proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
+        } else
+        {
+            Debug.Log("EarlyProc - moving bomb, this is the new proccer " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
         }
 
         if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");

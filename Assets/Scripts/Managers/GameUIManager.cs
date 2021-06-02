@@ -52,7 +52,7 @@ public class GameUIManager : NetworkBehaviour
         eventManager.EventStartRound += ServerStartRound;
         eventManager.EventEndRound += ServerEndRound;
 
-        eventManager.EventPlayerTookDamage += RpcOnKillEvent;
+        eventManager.EventPlayerTookDamage += OnKillEvent;
 		eventManager.EventMultikill += RpcOnMultikillEvent;
     }
 
@@ -116,10 +116,17 @@ public class GameUIManager : NetworkBehaviour
 
     #region MessageFeed
 
-    [ClientRpc]
-    public void RpcOnKillEvent(int newLives, GameObject bomb, GameObject player)
+    [Server]
+    public void OnKillEvent(int newLives, GameObject bomb, GameObject player)
     {
-        messageFeed.OnKillEvent(bomb, player);
+        GameObject killer = bomb.GetComponent<ComboObject>().GetKillerPlayer(player);
+        RpcOnKillEvent(newLives, bomb, player, killer);
+    }
+
+    [ClientRpc]
+    public void RpcOnKillEvent(int newLives, GameObject bomb, GameObject player, GameObject killer)
+    {
+        messageFeed.OnKillEvent(bomb, player, killer);
     }
 
 	[ClientRpc]

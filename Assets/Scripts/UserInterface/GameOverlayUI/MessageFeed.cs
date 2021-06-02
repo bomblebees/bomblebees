@@ -84,11 +84,9 @@ public class MessageFeed : MonoBehaviour
 
     #region Message Types
 
-    public void OnKillEvent(GameObject bomb, GameObject killedPlayer)
+    public void OnKillEvent(GameObject bomb, GameObject killedPlayer, GameObject killer)
     {
         // string killtext = " died to " + GetBombText(bomb) + "!";
-
-		GameObject killer = bomb.GetComponent<ComboObject>().GetKillerPlayer(killedPlayer);
 
         string killtext;
         if (killer == killedPlayer)
