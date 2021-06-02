@@ -124,7 +124,7 @@ public class TickObject : ComboObject
             Debug.Log("EarlyProc - set proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
         } else
         {
-            Debug.Log("EarlyProc - moving bomb, this is the new proccer " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
+            Debug.Log("EarlyProc - moving bomb, this is the new proccer");
         }
 
         if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
