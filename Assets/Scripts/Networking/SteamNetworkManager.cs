@@ -13,7 +13,7 @@ public class SteamNetworkManager : NetworkRoomManagerExt
         {
             FindObjectOfType<FatalErrorScreen>().Show(
                 "Steam API was not found", 
-                "Please make sure steam is running and you are logged in to an account.");
+                "Please make sure Steam is running and you are logged into an account.");
         }
     }
 
