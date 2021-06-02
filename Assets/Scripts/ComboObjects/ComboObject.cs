@@ -175,7 +175,6 @@ public class ComboObject : NetworkBehaviour
         isMoving = false;
     }
 
-    [Server]
     protected virtual bool FindCenter()
     {
         bool foundNew = false;
@@ -188,25 +187,25 @@ public class ComboObject : NetworkBehaviour
             // var result = GetComponent<Transform>().position;
             if (nearestCenter != result) foundNew = true;
             nearestCenter = result;
-            RpcFindCenter(result, this.gameObject.transform.position);
+            //RpcFindCenter(result, this.gameObject.transform.position);
         }
         return foundNew;
     }
     
-    // Tell all clients the nearest center as calculated by the server
-    [ClientRpc]
-    protected virtual void RpcFindCenter(Vector3 centerPos, Vector3 pos)
-    {
-        var objectRay = new Ray(pos, Vector3.down);
-            RaycastHit tileUnderneathHit;
-            if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
-            {
-                tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
-                var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
-                nearestCenter = result;
-            }
-        // nearestCenter = centerPos;
-    }
+    //// Tell all clients the nearest center as calculated by the server
+    //[ClientRpc]
+    //protected virtual void RpcFindCenter(Vector3 centerPos, Vector3 pos)
+    //{
+    //    var objectRay = new Ray(pos, Vector3.down);
+    //        RaycastHit tileUnderneathHit;
+    //        if (Physics.Raycast(objectRay, out tileUnderneathHit, 1000f, 1 << LayerMask.NameToLayer("BaseTiles")))
+    //        {
+    //            tileUnderneath = tileUnderneathHit.transform.gameObject.GetComponentInParent<HexCell>();
+    //            var result = tileUnderneathHit.transform.gameObject.GetComponent<Transform>().position;
+    //            nearestCenter = result;
+    //        }
+    //    // nearestCenter = centerPos;
+    //}
     
     protected virtual Vector3 FindCenterBelowOther(GameObject origin) 
     {
@@ -256,21 +255,21 @@ public class ComboObject : NetworkBehaviour
         return dist;
     }
 
-    [Server]
+    //[Server]
     protected virtual void GoToCenter()
     {
         isMoving = false;
         this.gameObject.transform.position = nearestCenter;
-        RpcGoToCenter(nearestCenter);
+        //RpcGoToCenter(nearestCenter);
     }
 
-    // Tell all clients to move their bomb to the center
-    [ClientRpc]
-    protected virtual void RpcGoToCenter(Vector3 centerPos)
-    {
-        isMoving = false;
-        this.gameObject.transform.position = centerPos;
-    }
+    //// Tell all clients to move their bomb to the center
+    //[ClientRpc]
+    //protected virtual void RpcGoToCenter(Vector3 centerPos)
+    //{
+    //    isMoving = false;
+    //    this.gameObject.transform.position = centerPos;
+    //}
 
     protected virtual void NotifyOccupiedTile(bool val)
     {
@@ -350,6 +349,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
     {
+        LeanTween.cancel(moveTweenId);
         bool result = false;
         var rigidBody = this.GetComponent<Rigidbody>();
         if (!rigidBody)
