@@ -46,6 +46,8 @@ public class ComboObject : NetworkBehaviour
     // player who triggered the bomb
 	[SyncVar]
     public GameObject triggeringPlayer;
+    [SyncVar] 
+    public GameObject triggeringPlayerBefore;
     protected bool canHitTriggeringPlayer = true;
 
     // the player who last interacted with the proccing bomb that blew this bomb up
@@ -343,6 +345,7 @@ public class ComboObject : NetworkBehaviour
     protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, int newTravelDistance)
     {
         this.travelDistanceInHexes = newTravelDistance;
+        this.triggeringPlayerBefore = this.triggeringPlayer;
         this.triggeringPlayer = triggeringPlayer;
         Push(edgeIndex, triggeringPlayer);
     }
@@ -439,6 +442,7 @@ public class ComboObject : NetworkBehaviour
             if (this is TickObject || (this is TriggerObject && !this.GetComponent<TriggerObject>().wasHit))
             {
                 // Update "owner" of bomb (the player who kicked it last)
+                triggeringPlayerBefore = triggeringPlayer;
                 triggeringPlayer = other.transform.parent.gameObject;
 
                 // Adjust travel distance based on spin power

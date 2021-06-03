@@ -146,6 +146,7 @@ public class PlayerBombPlace : NetworkBehaviour
 		bombComponent.ownerPlayer = this.gameObject;
 
 		// Set the initial triggered player as this player
+        bombComponent.triggeringPlayerBefore = this.gameObject;
 		bombComponent.triggeringPlayer = this.gameObject;
 
 		// Spawn the object on the server
