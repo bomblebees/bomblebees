@@ -13,11 +13,16 @@ public class PreloaderManager : MonoBehaviour
     public GameObject lobbyUI;
 
     [Header("Configurations")]
+    [Tooltip("Controls whether to play through the splash screen animation or not.")]
+    public bool playSplashScreen = true;
+
     [Tooltip("If enabled, will use the steam lobby and steam connection transport. If disabled, will use room network manager.")]
     public bool useSteamLobbyNetworkManager = true;
 
     private void Awake()
     {
+        mainMenuUI.GetComponent<MainMenu_UI>().playSplashScreen = playSplashScreen;
+
         if (useSteamLobbyNetworkManager)
         {
             steamNetworkManager.SetActive(true);
@@ -37,6 +42,7 @@ public class PreloaderManager : MonoBehaviour
 
     private void Preload()
     {
+
 
         // Anything that needs to persist past Preload scene goes 
         DontDestroyOnLoad(sessionLogger);

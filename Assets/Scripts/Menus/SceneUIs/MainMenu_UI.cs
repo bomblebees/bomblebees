@@ -19,6 +19,9 @@ public class MainMenu_UI : MonoBehaviour
     [Header("Network Manager GameObject")]
     [SerializeField] private GameObject steamNetworkManagerGameObject;
     [SerializeField] private GameObject kcpNetworkManagerGameObject;
+    [Header("Canvases")]
+    [SerializeField] public Canvas menuCanvas;
+    [SerializeField] public Canvas splashCanvas;
     [Header("Screen")]
     [SerializeField] private GameObject screenMainMenu;
     [SerializeField] private GameObject screenConnectWithSteam;
@@ -38,13 +41,33 @@ public class MainMenu_UI : MonoBehaviour
 
     public static MainMenu_UI singleton;
 
+    public bool playSplashScreen;
+
     private void Awake()
     {
         singleton = this;
     }
 
+    void Start()
+    {
+        if (playSplashScreen)
+        {
+            splashCanvas.enabled = true;
+        }
+        else
+        {
+            splashCanvas.gameObject.SetActive(false);
+
+            menuCanvas.GetComponent<FadeCanvas>().duration = 0;
+            menuCanvas.GetComponent<FadeCanvas>().delay = 0;
+            menuCanvas.GetComponent<FadeCanvas>().StartFadeIn();
+
+            //GameObject.Find("Main Camera").transform.localRotation = Quaternion.Euler(-30, 0, 0);
+        }
+    }
+
     #region Continous
-    
+
     public void Quit()
     {
         Application.Quit();
