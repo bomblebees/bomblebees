@@ -175,6 +175,7 @@ public class TickObject : ComboObject
         if (!didEarlyEffects)
         {
             Debug.Log("regular bomb kill");
+            LastCheck(playerThatWasKilled);
             return triggeringPlayer;
         }
 
@@ -182,13 +183,21 @@ public class TickObject : ComboObject
         if (wasMovingWhenProcced && triggeringPlayer != playerThatWasKilled)
         {
             Debug.Log("moving bomb kill");
+            LastCheck(playerThatWasKilled);
             return triggeringPlayer;
         }
 
         Debug.Log("proc bias kill");
 
         // else the killer must be the proccer
+        LastCheck(playerThatWasKilled);
         return proccingPlayer;
+    }
+
+    private void LastCheck(GameObject playerThatWasKilled)
+    {
+        if (triggeringPlayer.Equals(playerThatWasKilled)) triggeringPlayer = triggeringPlayerBefore;
+        if (proccingPlayer.Equals(playerThatWasKilled)) proccingPlayer = proccingPlayerBefore;
     }
 
 }
