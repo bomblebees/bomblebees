@@ -392,7 +392,7 @@ public class ComboObject : NetworkBehaviour
 
                 moveTweenId = LeanTween.move(this.gameObject, targetPosition, 0.25f)
                     .setEase(movementCurve)
-                    .setOnComplete(() => isMoving = false)
+                    .setOnComplete(() => { isMoving = false; FindCenter(); NotifyOccupiedTile(true); })
                     .id;
 
                 this.isMoving = true; 
