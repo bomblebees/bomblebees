@@ -343,8 +343,8 @@ public class ComboObject : NetworkBehaviour
     protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, int newTravelDistance)
     {
         this.travelDistanceInHexes = newTravelDistance;
-        this.triggeringPlayer = triggeringPlayer;  // Testing for client assignment
-		Push(edgeIndex, triggeringPlayer);
+        this.triggeringPlayer = triggeringPlayer;
+        Push(edgeIndex, triggeringPlayer);
     }
 
     protected virtual bool Push(int edgeIndex, GameObject triggeringPlayer)
@@ -433,18 +433,26 @@ public class ComboObject : NetworkBehaviour
                 }
             }
 
-			// Update "owner" of bomb (the player who kicked it last)
-            triggeringPlayer = other.transform.parent.gameObject;
 
-            // Adjust travel distance based on spin power
-            int power = triggeringPlayer.GetComponent<PlayerSpin>().spinPower;
-            //Debug.Log("power: " + power);
 
-            int newTravelDistanceInHexes = power + 1;
+            // if this is a bomb, or if this is a deployable that was not already activated
+            if (this is TickObject || (this is TriggerObject && !this.GetComponent<TriggerObject>().wasHit))
+            {
+                // Update "owner" of bomb (the player who kicked it last)
+                triggeringPlayer = other.transform.parent.gameObject;
+
+                // Adjust travel distance based on spin power
+                int power = triggeringPlayer.GetComponent<PlayerSpin>().spinPower;
+                //Debug.Log("power: " + power);
+
+                int newTravelDistanceInHexes = power + 1;
+
+                RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
+            }
 
             // Update occupation status of tile
             // Push(edgeIndex, triggeringPlayer); // Push for server too
-            RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
+            
 
             // Set spin hit on player, for event logger
             //triggeringPlayer.GetComponent<Player>().spinHit = this.gameObject;
