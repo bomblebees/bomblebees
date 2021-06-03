@@ -443,10 +443,7 @@ public class ComboObject : NetworkBehaviour
             if (this is TickObject || (this is TriggerObject && !this.GetComponent<TriggerObject>().wasHit))
             {
                 // Update "owner" of bomb (the player who kicked it last)
-                if (triggeringPlayerBefore != triggeringPlayer) // TODO: This always calls true
-                {
-                    triggeringPlayerBefore = triggeringPlayer;
-                }
+                triggeringPlayerBefore = triggeringPlayer; // TODO: Only call this when triggeringPlayerBefore != triggeringPlayer
                 triggeringPlayer = other.transform.parent.gameObject;
 
                 // Adjust travel distance based on spin power
