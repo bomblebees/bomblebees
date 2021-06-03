@@ -343,10 +343,10 @@ public class ComboObject : NetworkBehaviour
     }
 
     [ClientRpc]
-    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, int newTravelDistance)
+    protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, GameObject triggeringPlayerBefore,int newTravelDistance)
     {
         this.travelDistanceInHexes = newTravelDistance;
-        if (!this.triggeringPlayer.Equals(triggeringPlayerBefore)) this.triggeringPlayerBefore = this.triggeringPlayer;
+        this.triggeringPlayerBefore = triggeringPlayerBefore;
         this.triggeringPlayer = triggeringPlayer;
         Push(edgeIndex, triggeringPlayer);
     }
@@ -443,7 +443,10 @@ public class ComboObject : NetworkBehaviour
             if (this is TickObject || (this is TriggerObject && !this.GetComponent<TriggerObject>().wasHit))
             {
                 // Update "owner" of bomb (the player who kicked it last)
-                if (!triggeringPlayer.Equals(triggeringPlayerBefore)) triggeringPlayerBefore = triggeringPlayer;
+                if (triggeringPlayerBefore != triggeringPlayer) // TODO: This always calls true
+                {
+                    triggeringPlayerBefore = triggeringPlayer;
+                }
                 triggeringPlayer = other.transform.parent.gameObject;
 
                 // Adjust travel distance based on spin power
@@ -452,7 +455,7 @@ public class ComboObject : NetworkBehaviour
 
                 int newTravelDistanceInHexes = power + 1;
 
-                RpcPush(edgeIndex, triggeringPlayer, newTravelDistanceInHexes);
+                RpcPush(edgeIndex, triggeringPlayer, triggeringPlayerBefore, newTravelDistanceInHexes);
             }
 
             // Update occupation status of tile
