@@ -346,7 +346,7 @@ public class ComboObject : NetworkBehaviour
     protected virtual void RpcPush(int edgeIndex, GameObject triggeringPlayer, int newTravelDistance)
     {
         this.travelDistanceInHexes = newTravelDistance;
-        this.triggeringPlayerBefore = this.triggeringPlayer;
+        if (!this.triggeringPlayer.Equals(triggeringPlayerBefore)) this.triggeringPlayerBefore = this.triggeringPlayer;
         this.triggeringPlayer = triggeringPlayer;
         Push(edgeIndex, triggeringPlayer);
     }
@@ -443,7 +443,7 @@ public class ComboObject : NetworkBehaviour
             if (this is TickObject || (this is TriggerObject && !this.GetComponent<TriggerObject>().wasHit))
             {
                 // Update "owner" of bomb (the player who kicked it last)
-                triggeringPlayerBefore = triggeringPlayer;
+                if (!triggeringPlayer.Equals(triggeringPlayerBefore)) triggeringPlayerBefore = triggeringPlayer;
                 triggeringPlayer = other.transform.parent.gameObject;
 
                 // Adjust travel distance based on spin power
