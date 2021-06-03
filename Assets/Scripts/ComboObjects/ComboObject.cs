@@ -52,6 +52,7 @@ public class ComboObject : NetworkBehaviour
 
     // the player who last interacted with the proccing bomb that blew this bomb up
     public GameObject proccingPlayer;
+    public GameObject proccingPlayerBefore;
     public bool wasProcced = false;
     public bool wasMovingWhenProcced = false;
 

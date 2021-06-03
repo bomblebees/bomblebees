@@ -112,6 +112,7 @@ public class TickObject : ComboObject
             // if parent bomb was moving, then proccer is the parent bomb's triggering player
             // regardless of if the parent has a proccing player or not (this is the new proccer)
 
+            this.proccingPlayerBefore = parentBomb.triggeringPlayerBefore;
             this.proccingPlayer = parentBomb.triggeringPlayer;
 
             Debug.Log("EarlyProc - parent was moving bomb");
@@ -119,6 +120,7 @@ public class TickObject : ComboObject
         else if (parentBomb.proccingPlayer != null) // If parent bomb has proc
         {
             // Inherit the proccing player from the parent
+            this.proccingPlayerBefore = parentBomb.proccingPlayerBefore;
             this.proccingPlayer = parentBomb.proccingPlayer;
 
             Debug.Log("EarlyProc - inherited proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
@@ -126,6 +128,7 @@ public class TickObject : ComboObject
         else // if parent bomb was not moving and had no proc, then the parent bomb is the proccer
         {
             // The trigger player of the parent (root) bomb is the proccing player
+            this.proccingPlayerBefore = parentBomb.triggeringPlayerBefore;
             this.proccingPlayer = parentBomb.triggeringPlayer;
 
             Debug.Log("EarlyProc - set proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
