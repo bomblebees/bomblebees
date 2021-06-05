@@ -14,17 +14,55 @@ public class TutorialDialog : MonoBehaviour
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private Image progressBar;
 
+    // private GameObject gameUIManager;
+    private GameObject player;
     // UI Elements to enable/disable
-    [SerializeField] private GameObject[] swapUI = new GameObject[3];
-    [SerializeField] private GameObject[] bombUI = new GameObject[4];
-    [SerializeField] private GameObject[] spinUI = new GameObject[3];
-    [SerializeField] private GameObject[] pointsUI = new GameObject[2];
-    [SerializeField] private GameObject[] popupsUI = new GameObject[5];
+    [SerializeField] private Canvas[] swapUI = new Canvas[3];
+    [SerializeField] private Canvas[] bombUI = new Canvas[4];
+    [SerializeField] private Canvas[] spinUI = new Canvas[3];
+    [SerializeField] private Canvas[] pointsUI = new Canvas[2];
+    [SerializeField] private Canvas[] popupsUI = new Canvas[5];
+
+    // 1.2 UI
+    // hotbar_canvas        : helper buttons
+    // roundtimer_canvas    : disable completely
+    // lives_canvas         : points
+    // ammodisplay_canvas   : radial inven
+
+    // PLAYER UI
+    // PlayerName                   : disable completely
+    // HexTile                      : held tile
+    // Spin                         : bar
+    // StackInventorySingleRadial   : current bomb
+
+    // Bomb UI elements
+    private Canvas inventory;
+    private CanvasGroup selectedBomb;
+    // Points UI elements
+    private Canvas points;
 
     // The current tutorial section we are on
     public int section = 0;
 
     private bool cameraInitalized = false;
+
+    public void LoadReferences()
+    {
+        // Disable Timer and PlayerName
+        GameObject.Find("RoundTimer_Canvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("PlayerName").GetComponent<TMPro.TextMeshProUGUI>().enabled = false;
+
+        // Cache and disable Bomb UI elements
+        inventory = GameObject.Find("AmmoDisplay_Canvas").GetComponent<Canvas>();
+        inventory.enabled = false;
+        selectedBomb = GameObject.Find("StackInventorySingleRadial").GetComponent<CanvasGroup>();
+        selectedBomb.alpha = 0;
+
+        // Cache and disable Points UI elements
+        points = GameObject.Find("Lives_Canvas").GetComponent<Canvas>();
+        points.enabled = false;
+        // foreach (Canvas element in pointsUI) if (element) element.enabled = false;
+    }
 
     // Update is called once per frame
     void Update()
