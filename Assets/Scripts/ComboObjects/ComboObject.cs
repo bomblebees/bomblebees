@@ -405,7 +405,7 @@ public class ComboObject : NetworkBehaviour
         }
     }
 
-    [ServerCallback]
+    [Server]
     protected virtual void OnTriggerEnter(Collider other)
     {
         if (!isServer) return; // The calculations should be validated on server side, return if not server
@@ -443,7 +443,7 @@ public class ComboObject : NetworkBehaviour
             if (this is TickObject || (this is TriggerObject && !this.GetComponent<TriggerObject>().wasHit))
             {
                 // Update "owner" of bomb (the player who kicked it last)
-                triggeringPlayerBefore = triggeringPlayer; // TODO: Only call this when triggeringPlayerBefore != triggeringPlayer
+                if (!triggeringPlayer.Equals(other.transform.parent.gameObject)) triggeringPlayerBefore = triggeringPlayer;
                 triggeringPlayer = other.transform.parent.gameObject;
 
                 // Adjust travel distance based on spin power
