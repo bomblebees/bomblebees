@@ -14,6 +14,13 @@ public class TutorialDialog : MonoBehaviour
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private Image progressBar;
 
+    // UI Elements to enable/disable
+    [SerializeField] private GameObject[] swapUI = new GameObject[3];
+    [SerializeField] private GameObject[] bombUI = new GameObject[4];
+    [SerializeField] private GameObject[] spinUI = new GameObject[3];
+    [SerializeField] private GameObject[] pointsUI = new GameObject[2];
+    [SerializeField] private GameObject[] popupsUI = new GameObject[5];
+
     // The current tutorial section we are on
     public int section = 0;
 
@@ -30,7 +37,7 @@ public class TutorialDialog : MonoBehaviour
                 FindObjectOfType<CameraFollow>().InitCameraFollow();
             }
 
-            if (dialog.cutscenePosition == 4 && dialog.enablePass)
+            if (dialog.cutscenePosition == 3 && dialog.enablePass)
             {
                 dialog.enablePass = false;
                 nextText.enabled = false;
