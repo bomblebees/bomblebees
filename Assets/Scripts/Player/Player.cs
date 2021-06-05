@@ -227,7 +227,7 @@ public class Player : NetworkBehaviour
     [ClientCallback] private void OnChangeSludged(bool prevEffect, bool newEffect)
     {
 		this.GetComponent<PlayerInterface>().ToggleNameToSludged();
-		Debug.Log("isSludge changed");
+		// Debug.Log("isSludge changed");
         if (newEffect) // If the player is now sludged
         {
             // Turn on the sludge VFX
@@ -253,7 +253,7 @@ public class Player : NetworkBehaviour
 			sludgeParticles.SetParticles(currentParticles);
 			sludgeParticles.Stop();
 
-			Debug.Log("Sludge ending/stopped");
+			// Debug.Log("Sludge ending/stopped");
 			// Reset speed to normal
 			this.GetComponent<PlayerMovement>().sludgedScalar = 1;
 			// Slowly tween the VFX down until it is gone

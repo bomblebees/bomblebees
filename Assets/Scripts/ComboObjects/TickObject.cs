@@ -115,7 +115,7 @@ public class TickObject : ComboObject
             this.proccingPlayerBefore = parentBomb.triggeringPlayerBefore;
             this.proccingPlayer = parentBomb.triggeringPlayer;
 
-            Debug.Log("EarlyProc - parent was moving bomb");
+            // Debug.Log("EarlyProc - parent was moving bomb");
         }
         else if (parentBomb.proccingPlayer != null) // If parent bomb has proc
         {
@@ -123,7 +123,7 @@ public class TickObject : ComboObject
             this.proccingPlayerBefore = parentBomb.proccingPlayerBefore;
             this.proccingPlayer = parentBomb.proccingPlayer;
 
-            Debug.Log("EarlyProc - inherited proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
+            // Debug.Log("EarlyProc - inherited proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
         }
         else // if parent bomb was not moving and had no proc, then the parent bomb is the proccer
         {
@@ -131,7 +131,7 @@ public class TickObject : ComboObject
             this.proccingPlayerBefore = parentBomb.triggeringPlayerBefore;
             this.proccingPlayer = parentBomb.triggeringPlayer;
 
-            Debug.Log("EarlyProc - set proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
+            // Debug.Log("EarlyProc - set proccing player: " + proccingPlayer.GetComponent<Player>().playerRoomIndex);
         }
 
         if (isLocalPlayer) FindObjectOfType<AudioManager>().StopPlaying("bombBeep");
@@ -174,18 +174,18 @@ public class TickObject : ComboObject
         // If regular bomb kill, just get last interactor
         if (!didEarlyEffects)
         {
-            Debug.Log("regular bomb kill");
+            // Debug.Log("regular bomb kill");
             return triggeringPlayer.Equals(playerThatWasKilled) ? triggeringPlayerBefore : triggeringPlayer;
         }
 
         // If bomb was moving, award the kill to the triggering player of this bomb
         if (wasMovingWhenProcced && triggeringPlayer != playerThatWasKilled)
         {
-            Debug.Log("moving bomb kill");
+            // Debug.Log("moving bomb kill");
             return triggeringPlayer.Equals(playerThatWasKilled) ? triggeringPlayerBefore : triggeringPlayer;
         }
 
-        Debug.Log("proc bias kill");
+        // Debug.Log("proc bias kill");
 
         // else the killer must be the proccer
         return proccingPlayer.Equals(playerThatWasKilled) ? proccingPlayerBefore : proccingPlayer;

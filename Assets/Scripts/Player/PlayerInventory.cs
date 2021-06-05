@@ -184,7 +184,7 @@ public class PlayerInventory : NetworkBehaviour
                     // Add conditional so that inventory add UI doesn't get displayed if inventory is already full
                     this.GetComponent<PlayerInterface>().DisplayInventoryAdd(idx, amt - fullInvOverflowValue);
                 }
-                Debug.Log(fullInvOverflowValue);
+                // Debug.Log(fullInvOverflowValue);
 
             }
             else        // Otherwise simply add the amount to inv, don't drop anything

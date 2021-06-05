@@ -80,7 +80,7 @@ public class GroundItem : NetworkBehaviour
 	private void AddToInventory(Collider collider, PlayerInventory inventory)
 	{
 		// if the parent of the collider (the Player object) exists:
-		Debug.Log("GroundItem calls addtoinventory on server");
+		// Debug.Log("GroundItem calls addtoinventory on server");
 		
 
 		// if inventory of player it collided with is already full, don't add

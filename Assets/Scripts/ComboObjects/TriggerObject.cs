@@ -103,7 +103,7 @@ public class TriggerObject : ComboObject
         if (ownerIsQueen) yield return new WaitForSeconds(queenStartupDelay - queenStartupDelay * fillShaderRatio);
         else yield return new WaitForSeconds(startupDelay - startupDelay * fillShaderRatio);
 
-		Debug.Log("proccing triggerobject");
+		// Debug.Log("proccing triggerobject");
 		
         canBeTriggered = false; // To stop it from being triggered twice
         timeTriggered = timeAlive;
@@ -194,7 +194,7 @@ public class TriggerObject : ComboObject
         // if the laser has already been procced when the breakdown happens, stop the proc prematurely before destroying
         if (procCoroutine != null)
         {
-            Debug.Log("Stopping Proc coroutine");
+            // Debug.Log("Stopping Proc coroutine");
             StopCoroutine(procCoroutine);
         }
 

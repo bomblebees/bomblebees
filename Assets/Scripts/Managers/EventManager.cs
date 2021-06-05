@@ -167,7 +167,7 @@ public class EventManager : NetworkBehaviour
 		}
 		else
 		{
-			Debug.Log("Player took damage from own bomb");
+			// Debug.Log("Player took damage from own bomb");
 		}
 		
 

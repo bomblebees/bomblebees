@@ -94,7 +94,7 @@ public class Health : NetworkBehaviour
     {
         if (newLives == maxLives) return;
 
-        Debug.Log("lives changed from " + oldLives + " to " + newLives);
+        // Debug.Log("lives changed from " + oldLives + " to " + newLives);
 
         FindObjectOfType<AudioManager>().PlaySound("playerDeath");
 
@@ -270,7 +270,7 @@ public class Health : NetworkBehaviour
 		*/
 		if (objRootName == "Sludge Object(Clone)")
         {
-            Debug.Log("triggered");
+            // Debug.Log("triggered");
 
             var sludge = obj.root.GetComponent<SludgeObject>();
             playerScript.ApplySludgeSlow(sludge.slowRate, sludge.slowDuration);
@@ -279,7 +279,7 @@ public class Health : NetworkBehaviour
         {
 			// if hit/life is taken, drop the player's stuff
 			CmdDropItems();
-			Debug.Log("hit by damaging ability");
+			// Debug.Log("hit by damaging ability");
             playerScript.canBeHit = false; // might remove later. this is for extra security
             this.CmdTakeDamage(1, other.gameObject.transform.root.gameObject, playerScript.gameObject);
         }

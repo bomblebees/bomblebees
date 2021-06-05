@@ -76,7 +76,7 @@ public class ComboObject : NetworkBehaviour
     /// </summary>
     public virtual GameObject GetKillerPlayer(GameObject playerThatWasKilled)
     {
-        Debug.Log("GetKillerPlayer(): was this bomb moving? ans = " + wasMovingWhenProcced);
+        // Debug.Log("GetKillerPlayer(): was this bomb moving? ans = " + wasMovingWhenProcced);
         return triggeringPlayer;
     }
 
@@ -298,7 +298,7 @@ public class ComboObject : NetworkBehaviour
 
     protected virtual IEnumerator EnableSFX()
     {
-		Debug.Log("starting sound");
+		// Debug.Log("starting sound");
         if (SFX) {
             SFX.SetActive(true);
             yield return new WaitForSeconds(sfxDuration);

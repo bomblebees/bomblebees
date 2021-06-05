@@ -78,7 +78,7 @@ public class LaserObject : TriggerObject
     // Note: this is when THIS object enters a collision
     protected override void OnTriggerEnter(Collider other)
     {
-		Debug.Log("Collision occurred in laserobject");
+		// Debug.Log("Collision occurred in laserobject");
         base.OnTriggerEnter(other);
         var gameObjHit = other.gameObject;
         if (gameObjHit.CompareTag("InterObjectHitbox") && this.tag == "ComboObject")
