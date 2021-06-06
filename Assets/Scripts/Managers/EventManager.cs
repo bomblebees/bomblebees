@@ -161,9 +161,9 @@ public class EventManager : NetworkBehaviour
 
 		// The killer is stored in the bomb object, so get the player component there and call the method on that player
 		// if not self destruct, count towards multikill: 
-		if (!ReferenceEquals(bomb.GetComponent<ComboObject>().triggeringPlayer, player))
+		if (!ReferenceEquals(bomb.GetComponent<ComboObject>().GetKillerPlayer(player), player))
 		{
-			bomb.GetComponent<ComboObject>().triggeringPlayer.GetComponent<Player>().TrackMultiKill(NetworkTime.time);
+            bomb.GetComponent<ComboObject>().GetKillerPlayer(player).GetComponent<Player>().TrackMultiKill(NetworkTime.time);
 		}
 		else
 		{
