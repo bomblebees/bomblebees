@@ -34,6 +34,7 @@ public class MainMenu_UI : MonoBehaviour
     [SerializeField] public GameObject screenCredits;
     [SerializeField] public GameObject screenControls;
 	[SerializeField] public GameObject screenHowToPlay;
+	[SerializeField] public GameObject screenShowcase;
 	[Header("Other")]
     [SerializeField] private SteamLobby steamLobby;
     [SerializeField] private TMP_InputField customIPAddress;
@@ -232,6 +233,20 @@ public class MainMenu_UI : MonoBehaviour
     public void ToggleCredits()
     {
         screenCredits.SetActive(!screenCredits.activeSelf);
+    }
+
+    #endregion
+
+    #region Screen: Showcase
+
+    public void OnClickButtonShowcase()
+    {
+        screenShowcase.SetActive(true);
+    }
+
+    public void OnClickButtonExitShowcase()
+    {
+        screenShowcase.SetActive(false);
     }
 
     #endregion
