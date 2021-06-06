@@ -44,6 +44,7 @@ public class TutorialDialog : MonoBehaviour
             {
                 // Enable Swap UI elements
                 heldTile.alpha = 1;
+                swapTutText.alpha = 1;
             }
             // Re-enable swap action
             if (dialog.cutscenePosition == 3 && dialog.enablePass)
@@ -64,12 +65,19 @@ public class TutorialDialog : MonoBehaviour
             if (!dialog.enablePass) Assess_Swapping();
         } else if (section == 2) // placing
         {
+            // Disable Held Tut Text
+            if (dialog.cutscenePosition == 1 && dialog.enablePass)
+            {
+                swapTutText.alpha = 0;
+            }
             // Re-enable Bombs UI
             if (dialog.cutscenePosition == 2 && dialog.enablePass)
             {
                 inventory.enabled = true;
                 selectedBomb.alpha = 1;
                 inventoryRotateHelper.alpha = 1;
+                selectedBombTutText.alpha = 1;
+                inventoryTutText.alpha = 1;
             }
             // Re-enable Bomb placing
             if (dialog.cutscenePosition == 3 && dialog.enablePass)
@@ -89,6 +97,12 @@ public class TutorialDialog : MonoBehaviour
             if (!dialog.enablePass) Assess_Placing();
         } else if (section == 3) // spinning
         {
+            // Disable Bomb Tut Text
+            if (dialog.cutscenePosition == 1 && dialog.enablePass)
+            {
+                selectedBombTutText.alpha = 0;
+                inventoryTutText.alpha = 0;
+            }
             // Re-enable Spin UI
             if (dialog.cutscenePosition == 3 && dialog.enablePass)
             {
@@ -268,6 +282,7 @@ public class TutorialDialog : MonoBehaviour
     // Swap UI elements
     private CanvasGroup heldTile;
     private CanvasGroup swapTileHelper;
+    private CanvasGroup swapTutText;
 
     // Bomb UI elements
     private Canvas inventory;
@@ -276,6 +291,8 @@ public class TutorialDialog : MonoBehaviour
     private CanvasGroup inventoryRotateHelper;
     private CanvasGroup placeBombHelper;
     private Canvas warningFeed;
+    private CanvasGroup selectedBombTutText;
+    private CanvasGroup inventoryTutText;
 
     // Spin UI elements
     private CanvasGroup chargeSpinHelper;
@@ -293,6 +310,8 @@ public class TutorialDialog : MonoBehaviour
         heldTile.alpha = 0;
         swapTileHelper = GameObject.Find("Hotbar_Canvas/Swap").GetComponent<CanvasGroup>();
         swapTileHelper.alpha = 0;
+        swapTutText = GameObject.Find("heldTile_tut").GetComponent<CanvasGroup>();
+        swapTutText.alpha = 0;
 
         // Cache and disable Bomb UI elements
         inventory = GameObject.Find("AmmoDisplay_Canvas").GetComponent<Canvas>();
@@ -307,6 +326,10 @@ public class TutorialDialog : MonoBehaviour
         placeBombHelper.alpha = 0;
         warningFeed = GameObject.Find("WarningFeed_Canvas").GetComponent<Canvas>();
         warningFeed.enabled = false;
+        selectedBombTutText = GameObject.Find("selectedBomb_tut").GetComponent<CanvasGroup>();
+        selectedBombTutText.alpha = 0;
+        inventoryTutText = GameObject.Find("inventory_tut").GetComponent<CanvasGroup>();
+        inventoryTutText.alpha = 0;
 
         // Cache and disable Spin UI elements
         chargeSpinHelper = GameObject.Find("Hotbar_Canvas/Spin").GetComponent<CanvasGroup>();
