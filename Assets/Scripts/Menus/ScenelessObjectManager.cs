@@ -4,13 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class ScenelessObjectManager : MonoBehaviour
 {
-    [Header("Scene")] 
-    [Scene] [SerializeField] public string roomScene;
+    [Header("Scene")] [Scene] [SerializeField]
+    public string roomScene;
+
     [Scene] [SerializeField] public string gameScene;
-    
-    [Header("Misc.")]
-    [SerializeField] private GameObject globalSettings;
-    // [SerializeField] private GameObject settingsButton;
+
+    [Header("Misc.")] [SerializeField] private GameObject globalSettings;
     [SerializeField] private GameObject pingDisplay;
 
     private void OnEnable()
@@ -29,7 +28,7 @@ public class ScenelessObjectManager : MonoBehaviour
         {
             // settingsButton.SetActive(false);
             pingDisplay.SetActive(true);
-        } 
+        }
         else if (scene.path.Equals(roomScene))
         {
             // settingsButton.SetActive(false);
@@ -41,7 +40,7 @@ public class ScenelessObjectManager : MonoBehaviour
             pingDisplay.SetActive(false);
         }
     }
-    
+
     private void Update()
     {
         if (Input.GetKeyUp(KeyCode.Escape))
@@ -52,6 +51,7 @@ public class ScenelessObjectManager : MonoBehaviour
 
     public void ToggleSettingsScreen()
     {
+        globalSettings.GetComponentInParent<GlobalSettings>().CheckFullScreenMode();
         globalSettings.SetActive(!globalSettings.gameObject.activeSelf);
     }
 }

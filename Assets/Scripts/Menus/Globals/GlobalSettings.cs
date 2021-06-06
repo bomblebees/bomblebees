@@ -28,7 +28,7 @@ public class GlobalSettings : MonoBehaviour
 
     #region FullScreenMode
 
-    private void CheckFullScreenMode()
+    public void CheckFullScreenMode()
     {
         _fullScreenModeIndex = (int) Screen.fullScreenMode;
         UpdateFullScreenText();
