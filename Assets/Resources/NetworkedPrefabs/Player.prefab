@@ -30968,6 +30968,7 @@ GameObject:
   - component: {fileID: 8374832444882719219}
   - component: {fileID: 4832761372184862780}
   - component: {fileID: 8717215131224562673}
+  - component: {fileID: 1668891522085958035}
   m_Layer: 24
   m_Name: HexTile
   m_TagString: Untagged
@@ -31051,6 +31052,18 @@ MonoBehaviour:
   easeOutTime: 0.15
   easeIn: 6
   easeOut: 18
+--- !u!225 &1668891522085958035
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4641252242114371567}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &4849357194100230548
 GameObject:
   m_ObjectHideFlags: 0

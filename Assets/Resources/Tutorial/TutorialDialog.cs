@@ -35,9 +35,20 @@ public class TutorialDialog : MonoBehaviour
     // Spin                         : bar
     // StackInventorySingleRadial   : current bomb
 
+    // Swap UI elements
+    private CanvasGroup heldTile;
+    private CanvasGroup swapTileHelper;
+
     // Bomb UI elements
     private Canvas inventory;
     private CanvasGroup selectedBomb;
+    private TMPro.TextMeshProUGUI selectedBombText;
+    private CanvasGroup inventoryRotateHelper;
+    private CanvasGroup placeBombHelper;
+
+    // Spin UI elements
+    private CanvasGroup chargeSpinHelper;
+
     // Points UI elements
     private Canvas points;
 
@@ -46,23 +57,6 @@ public class TutorialDialog : MonoBehaviour
 
     private bool cameraInitalized = false;
 
-    public void LoadReferences()
-    {
-        // Disable Timer and PlayerName
-        GameObject.Find("RoundTimer_Canvas").GetComponent<Canvas>().enabled = false;
-        GameObject.Find("PlayerName").GetComponent<TMPro.TextMeshProUGUI>().enabled = false;
-
-        // Cache and disable Bomb UI elements
-        inventory = GameObject.Find("AmmoDisplay_Canvas").GetComponent<Canvas>();
-        inventory.enabled = false;
-        selectedBomb = GameObject.Find("StackInventorySingleRadial").GetComponent<CanvasGroup>();
-        selectedBomb.alpha = 0;
-
-        // Cache and disable Points UI elements
-        points = GameObject.Find("Lives_Canvas").GetComponent<Canvas>();
-        points.enabled = false;
-        // foreach (Canvas element in pointsUI) if (element) element.enabled = false;
-    }
 
     // Update is called once per frame
     void Update()
@@ -85,6 +79,13 @@ public class TutorialDialog : MonoBehaviour
             if (!dialog.enablePass) Assess_Movement();
         } else if (section == 1) // swapping 
         {
+            // Re-enable UI
+            if (dialog.cutscenePosition == 2 && dialog.enablePass)
+            {
+                // Enable Swap UI elements
+                heldTile.alpha = 1;
+                swapTileHelper.alpha = 1;
+            }
             if (dialog.cutscenePosition == 5 && dialog.enablePass)
             {
                 // Reset the value for assessment
@@ -97,6 +98,14 @@ public class TutorialDialog : MonoBehaviour
             if (!dialog.enablePass) Assess_Swapping();
         } else if (section == 2) // placing
         {
+            // Re-enable Bombs UI
+            if (dialog.cutscenePosition == 1 && dialog.enablePass)
+            {
+                inventory.enabled = true;
+                selectedBomb.alpha = 1;
+                inventoryRotateHelper.alpha = 1;
+                placeBombHelper.alpha = 1;
+            }
             if (dialog.cutscenePosition == 4 && dialog.enablePass)
             {
                 // Reset the value for assessment
@@ -109,6 +118,11 @@ public class TutorialDialog : MonoBehaviour
             if (!dialog.enablePass) Assess_Placing();
         } else if (section == 3) // spinning
         {
+            // Re-enable Spin UI
+            if (dialog.cutscenePosition == 1 && dialog.enablePass)
+            {
+                chargeSpinHelper.alpha = 1;
+            }
             if (dialog.cutscenePosition == 4 && dialog.enablePass)
             {
                 // Reset the value for assessment
@@ -262,5 +276,42 @@ public class TutorialDialog : MonoBehaviour
             dialog.enablePass = true;
             nextText.enabled = true;
         }
+    }
+
+    // <summary>
+    //  Resets UI elements for the start of the tutorial
+    // <summary>
+
+    public void ConfigureInitialUI()
+    {
+        // Disable Timer and PlayerName
+        GameObject.Find("RoundTimer_Canvas").GetComponent<Canvas>().enabled = false;
+        GameObject.Find("PlayerName").GetComponent<TMPro.TextMeshProUGUI>().enabled = false;
+
+        // Cache and disable Swap UI elements
+        heldTile = GameObject.Find("PlayerHUD/HexTile").GetComponent<CanvasGroup>();
+        heldTile.alpha = 0;
+        swapTileHelper = GameObject.Find("Hotbar_Canvas/Swap").GetComponent<CanvasGroup>();
+        swapTileHelper.alpha = 0;
+
+        // Cache and disable Bomb UI elements
+        inventory = GameObject.Find("AmmoDisplay_Canvas").GetComponent<Canvas>();
+        inventory.enabled = false;
+        selectedBomb = GameObject.Find("StackInventorySingleRadial").GetComponent<CanvasGroup>();
+        selectedBomb.alpha = 0;
+        selectedBombText = GameObject.Find("SelectedBombText").GetComponent<TMPro.TextMeshProUGUI>();
+        selectedBombText.enabled = false;
+        inventoryRotateHelper = GameObject.Find("Hotbar_Canvas/Rotate").GetComponent<CanvasGroup>();
+        inventoryRotateHelper.alpha = 0;
+        placeBombHelper = GameObject.Find("Hotbar_Canvas/Place").GetComponent<CanvasGroup>();
+        placeBombHelper.alpha = 0;
+
+        // Cache and disable Spin UI elements
+        chargeSpinHelper = GameObject.Find("Hotbar_Canvas/Spin").GetComponent<CanvasGroup>();
+        chargeSpinHelper.alpha = 0;
+
+        // Cache and disable Points UI elements
+        points = GameObject.Find("Lives_Canvas").GetComponent<Canvas>();
+        points.enabled = false;
     }
 }
