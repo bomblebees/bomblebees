@@ -39,6 +39,7 @@ public class TutorialDialog : MonoBehaviour
     private TMPro.TextMeshProUGUI selectedBombText;
     private CanvasGroup inventoryRotateHelper;
     private CanvasGroup placeBombHelper;
+    private Canvas warningFeed;
 
     // Spin UI elements
     private CanvasGroup chargeSpinHelper;
@@ -79,6 +80,9 @@ public class TutorialDialog : MonoBehaviour
                 // Enable Swap UI elements
                 heldTile.alpha = 1;
                 swapTileHelper.alpha = 1;
+                player.GetComponent<PlayerSwap>().canSwap = true;
+                player.GetComponent<PlayerBombPlace>().canPlaceBombs = true;
+                player.GetComponent<PlayerSpin>().canSpin = true;
             }
             if (dialog.cutscenePosition == 5 && dialog.enablePass)
             {
@@ -273,6 +277,18 @@ public class TutorialDialog : MonoBehaviour
     }
 
     // <summary>
+    //  Resets Player ability for the start of the tutorial
+    // <summary>
+
+    public void ConfigureAbilityLock()
+    {
+        player = GameObject.Find("LocalPlayer");
+        player.GetComponent<PlayerSwap>().canSwap = false;
+        player.GetComponent<PlayerBombPlace>().canPlaceBombs = false;
+        player.GetComponent<PlayerSpin>().canSpin = false;
+    }
+
+    // <summary>
     //  Resets UI elements for the start of the tutorial
     // <summary>
 
@@ -299,6 +315,8 @@ public class TutorialDialog : MonoBehaviour
         inventoryRotateHelper.alpha = 0;
         placeBombHelper = GameObject.Find("Hotbar_Canvas/Place").GetComponent<CanvasGroup>();
         placeBombHelper.alpha = 0;
+        warningFeed = GameObject.Find("WarningFeed_Canvas").GetComponent<Canvas>();
+        warningFeed.enabled = false;
 
         // Cache and disable Spin UI elements
         chargeSpinHelper = GameObject.Find("Hotbar_Canvas/Spin").GetComponent<CanvasGroup>();

@@ -23,7 +23,9 @@ public class TutorialScreen : MonoBehaviour
 
         tutorial.dialog.enabled = true;
         tutorial.canvas.SetActive(true);
+
         tutorial.ConfigureInitialUI();
+        tutorial.ConfigureAbilityLock();
 
         UnshowTutorialScreen();
     }
