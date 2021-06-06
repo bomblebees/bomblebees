@@ -18,7 +18,7 @@ public class RoundStartEnd : MonoBehaviour
             titleText.text = "All players loaded!";
             yield return new WaitForSeconds(1);
             FindObjectOfType<AudioManager>().PlaySound("startCountdown");
-            titleText.text = "Game Starting in";
+            titleText.text = "Get Ready!";
             timerText.gameObject.SetActive(true);
 
             for (int i = freezetime; i > 0; i--)
