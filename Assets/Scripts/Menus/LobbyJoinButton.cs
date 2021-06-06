@@ -21,6 +21,7 @@ public class LobbyJoinButton : MonoBehaviour
 
     public void DeactivateButton()
     {
+        if (_button == null) return;
         _button.interactable = false;
         _globalButtonSettings.DeactivateButtonOpacity(_canvasRenderers);
         if (!(_buttonHoverTween is null))
@@ -32,6 +33,7 @@ public class LobbyJoinButton : MonoBehaviour
 
     public void ActivateButton()
     {
+        if (_button == null) return;
         _button.interactable = true;
         _globalButtonSettings.ActivateButtonOpacity(_canvasRenderers);
         if (!(_buttonHoverTween is null))
