@@ -70,8 +70,9 @@ public class ComboCondition : WinCondition
                 Debug.Log(p.playerRoomIndex + " overtook " + leader.playerRoomIndex);
 
                 leader = p; // leader is now that top player
+                string coloredName = GetPlayerText(p);
 
-                FindObjectOfType<GameUIManager>().Announce(leader.steamName + " has taken the lead!");
+                FindObjectOfType<GameUIManager>().Announce(coloredName + " has taken the lead!");
             }
 
             // Check if player has reached the combos
@@ -92,5 +93,12 @@ public class ComboCondition : WinCondition
                     + (toCombos - playerCombos) + "</size>  points remaining!");
             }
         }
+    }
+
+    // Copypasta'd from message feed
+    private string GetPlayerText(Player player)
+    {
+        Player p = player.GetComponent<Player>();
+        return "<b><color=#" + ColorUtility.ToHtmlStringRGB(p.playerColor) + ">" + p.steamName + "</color></b>";
     }
 }
