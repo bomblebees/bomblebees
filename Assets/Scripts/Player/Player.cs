@@ -99,31 +99,15 @@ public class Player : NetworkBehaviour
 
         // -- Any update code for the player can go here --
 
-        if (debugMode) ListenForDebugInput();
+        // if (debugMode) ListenForDebugInput(); 
+        // Move all cheats to DebugCheats.cs
     }
 
     #region Debug
 
-    [Header("Debug Mode")]
-    public bool debugMode = false;
-    public string debugSpawnBomble = "7";
-    public string debugSpawnSludge = "8";
-    public string debugSpawnLaser = "9";
-    public string debugSpawnPlasma = "0";
-    public string debugSpawnGroundItem = "g";
-
     private void ListenForDebugInput()
     {
-        if (Input.GetKeyDown(debugSpawnBomble))
-            this.GetComponent<PlayerBombPlace>().CmdSpawnBomb('r');
-        if (Input.GetKeyDown(debugSpawnSludge))
-            this.GetComponent<PlayerBombPlace>().CmdSpawnBomb('p');
-        if (Input.GetKeyDown(debugSpawnLaser))
-            this.GetComponent<PlayerBombPlace>().CmdSpawnBomb('y');
-        if (Input.GetKeyDown(debugSpawnPlasma))
-            this.GetComponent<PlayerBombPlace>().CmdSpawnBomb('g');
-        if (Input.GetKeyDown(debugSpawnGroundItem))
-            this.GetComponent<Health>().CmdDropItems();
+        // Move all cheats to DebugCheats.cs
     }
 
     #endregion

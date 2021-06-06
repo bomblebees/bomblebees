@@ -19,6 +19,16 @@ public class DebugCheats : MonoBehaviour
     {
         // Cheat for increasing inventory size
         if (Input.GetKeyDown(KeyCode.Alpha1)) FindObjectOfType<RoundManager>().IncreaseGlobalLivesAmt();
+        // Player cheats
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+            GameObject.Find("LocalPlayer").GetComponent<PlayerBombPlace>().CmdSpawnBomb('r');
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+            GameObject.Find("LocalPlayer").GetComponent<PlayerBombPlace>().CmdSpawnBomb('p');
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+            GameObject.Find("LocalPlayer").GetComponent<PlayerBombPlace>().CmdSpawnBomb('y');
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+            GameObject.Find("LocalPlayer").GetComponent<PlayerBombPlace>().CmdSpawnBomb('g');
+        if (Input.GetKeyDown(KeyCode.Alpha0)) GameObject.Find("LocalPlayer").GetComponent<Health>().CmdDropItems();
     }
 
     private void CCheats()
