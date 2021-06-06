@@ -13,41 +13,6 @@ public class TutorialDialog : MonoBehaviour
     [SerializeField] private TMP_Text nextText;
     [SerializeField] private TMP_Text progressText;
     [SerializeField] private Image progressBar;
-
-    // private GameObject gameUIManager;
-    private GameObject player;
-
-    // 1.2 UI
-    // hotbar_canvas        : helper buttons
-    // roundtimer_canvas    : disable completely
-    // lives_canvas         : points
-    // ammodisplay_canvas   : radial inven
-
-    // PLAYER UI
-    // PlayerName                   : disable completely
-    // HexTile                      : held tile
-    // Spin                         : bar
-    // StackInventorySingleRadial   : current bomb
-
-    // Swap UI elements
-    private CanvasGroup heldTile;
-    private CanvasGroup swapTileHelper;
-
-    // Bomb UI elements
-    private Canvas inventory;
-    private CanvasGroup selectedBomb;
-    private TMPro.TextMeshProUGUI selectedBombText;
-    private CanvasGroup inventoryRotateHelper;
-    private CanvasGroup placeBombHelper;
-    private Canvas warningFeed;
-
-    // Spin UI elements
-    private CanvasGroup chargeSpinHelper;
-
-    // Points UI elements
-    private Canvas points;
-
-    // The current tutorial section we are on
     public int section = 0;
 
     private bool cameraInitalized = false;
@@ -74,15 +39,18 @@ public class TutorialDialog : MonoBehaviour
             if (!dialog.enablePass) Assess_Movement();
         } else if (section == 1) // swapping 
         {
-            // Re-enable UI
+            // Re-enable Swap UI
             if (dialog.cutscenePosition == 2 && dialog.enablePass)
             {
                 // Enable Swap UI elements
                 heldTile.alpha = 1;
+            }
+            // Re-enable swap action
+            if (dialog.cutscenePosition == 3 && dialog.enablePass)
+            {
+                // Enable Swap UI elements
                 swapTileHelper.alpha = 1;
                 player.GetComponent<PlayerSwap>().canSwap = true;
-                player.GetComponent<PlayerBombPlace>().canPlaceBombs = true;
-                player.GetComponent<PlayerSpin>().canSpin = true;
             }
             if (dialog.cutscenePosition == 5 && dialog.enablePass)
             {
@@ -97,12 +65,17 @@ public class TutorialDialog : MonoBehaviour
         } else if (section == 2) // placing
         {
             // Re-enable Bombs UI
-            if (dialog.cutscenePosition == 1 && dialog.enablePass)
+            if (dialog.cutscenePosition == 2 && dialog.enablePass)
             {
                 inventory.enabled = true;
                 selectedBomb.alpha = 1;
                 inventoryRotateHelper.alpha = 1;
+            }
+            // Re-enable Bomb placing
+            if (dialog.cutscenePosition == 3 && dialog.enablePass)
+            {
                 placeBombHelper.alpha = 1;
+                player.GetComponent<PlayerBombPlace>().canPlaceBombs = true;
             }
             if (dialog.cutscenePosition == 4 && dialog.enablePass)
             {
@@ -117,9 +90,10 @@ public class TutorialDialog : MonoBehaviour
         } else if (section == 3) // spinning
         {
             // Re-enable Spin UI
-            if (dialog.cutscenePosition == 1 && dialog.enablePass)
+            if (dialog.cutscenePosition == 3 && dialog.enablePass)
             {
                 chargeSpinHelper.alpha = 1;
+                player.GetComponent<PlayerSpin>().canSpin = true;
             }
             if (dialog.cutscenePosition == 4 && dialog.enablePass)
             {
@@ -279,7 +253,7 @@ public class TutorialDialog : MonoBehaviour
     // <summary>
     //  Resets Player ability for the start of the tutorial
     // <summary>
-
+    private GameObject player;
     public void ConfigureAbilityLock()
     {
         player = GameObject.Find("LocalPlayer");
@@ -291,7 +265,23 @@ public class TutorialDialog : MonoBehaviour
     // <summary>
     //  Resets UI elements for the start of the tutorial
     // <summary>
+    // Swap UI elements
+    private CanvasGroup heldTile;
+    private CanvasGroup swapTileHelper;
 
+    // Bomb UI elements
+    private Canvas inventory;
+    private CanvasGroup selectedBomb;
+    private TMPro.TextMeshProUGUI selectedBombText;
+    private CanvasGroup inventoryRotateHelper;
+    private CanvasGroup placeBombHelper;
+    private Canvas warningFeed;
+
+    // Spin UI elements
+    private CanvasGroup chargeSpinHelper;
+
+    // Points UI elements
+    private Canvas points;
     public void ConfigureInitialUI()
     {
         // Disable Timer and PlayerName
@@ -327,3 +317,8 @@ public class TutorialDialog : MonoBehaviour
         points.enabled = false;
     }
 }
+
+// TO-DO
+
+// "Current Held Tile"
+//
