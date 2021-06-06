@@ -16,12 +16,6 @@ public class TutorialDialog : MonoBehaviour
 
     // private GameObject gameUIManager;
     private GameObject player;
-    // UI Elements to enable/disable
-    [SerializeField] private Canvas[] swapUI = new Canvas[3];
-    [SerializeField] private Canvas[] bombUI = new Canvas[4];
-    [SerializeField] private Canvas[] spinUI = new Canvas[3];
-    [SerializeField] private Canvas[] pointsUI = new Canvas[2];
-    [SerializeField] private Canvas[] popupsUI = new Canvas[5];
 
     // 1.2 UI
     // hotbar_canvas        : helper buttons
