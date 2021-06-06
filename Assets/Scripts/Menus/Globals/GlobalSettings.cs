@@ -4,23 +4,23 @@ using Mirror;
 
 public class GlobalSettings : MonoBehaviour
 {
-    [Header("Canvas")]
-    [SerializeField] private Canvas mainCanvas;
+    [Header("Canvas")] [SerializeField] private Canvas mainCanvas;
     [SerializeField] private Canvas keyBindings;
 
-    [Header("Settings")]
-    public bool cameraEffects = true;
+    [Header("Settings")] public bool cameraEffects = true;
 
-    [Header("Others")]
-    [SerializeField] private TMP_Text textFullscreen;
-    
+    [Header("Others")] [SerializeField] private TMP_Text textFullscreen;
+
     private int _fullScreenModeIndex;
-    private readonly FullScreenMode[] _fullScreenModes = {
-        FullScreenMode.Windowed, 
-        FullScreenMode.MaximizedWindow, 
-        FullScreenMode.ExclusiveFullScreen, 
-        FullScreenMode.FullScreenWindow};
-    
+
+    private readonly FullScreenMode[] _fullScreenModes =
+    {
+        FullScreenMode.Windowed,
+        FullScreenMode.MaximizedWindow,
+        FullScreenMode.ExclusiveFullScreen,
+        FullScreenMode.FullScreenWindow
+    };
+
     private void Start()
     {
         CheckFullScreenMode();
@@ -46,20 +46,20 @@ public class GlobalSettings : MonoBehaviour
         switch (_fullScreenModeIndex)
         {
             case 0:
-                textFullscreen.text = "Fullscreen: Windowed";
+                textFullscreen.text = "Windowed";
                 break;
             case 1:
-                textFullscreen.text = "Fullscreen: Maximized Window";
+                textFullscreen.text = "Maximized Window";
                 break;
             case 2:
-                textFullscreen.text = "Fullscreen: Exclusive Fullscreen";
+                textFullscreen.text = "Exclusive Fullscreen";
                 break;
             case 3:
-                textFullscreen.text = "Fullscreen: Fullscreen Window";
+                textFullscreen.text = "Fullscreen Window";
                 break;
         }
     }
-    
+
     #endregion
 
     public void ToggleKeyBindingsCanvas()
@@ -92,4 +92,3 @@ public class GlobalSettings : MonoBehaviour
         Application.Quit();
     }
 }
-
