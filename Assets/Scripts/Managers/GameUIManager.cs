@@ -13,6 +13,7 @@ public class GameUIManager : NetworkBehaviour
     [SerializeField] public Hotbar hotbar;
     [SerializeField] public Announcer announcer;
     [SerializeField] public MultiKillAnnouncer multiKillAnnouncer;
+    [SerializeField] public AmmoDisplay ammoDisplay;
 
     private GameObject localPlayer;
 
@@ -24,6 +25,17 @@ public class GameUIManager : NetworkBehaviour
     private RoundManager roundManager;
     private EventManager eventManager;
     private LobbySettings lobbySettings;
+
+    public void ToggleUI(bool enabled)
+    {
+        roundStartEnd.GetComponent<Canvas>().enabled = enabled;
+        roundTimer.GetComponent<Canvas>().enabled = enabled;
+        livesUI.GetComponent<Canvas>().enabled = enabled;
+        messageFeed.GetComponent<Canvas>().enabled = enabled;
+        warningFeed.GetComponent<Canvas>().enabled = enabled;
+        hotbar.GetComponent<Canvas>().enabled = enabled;
+        ammoDisplay.GetComponent<Canvas>().enabled = enabled;
+    }
 
     private void Awake()
     {

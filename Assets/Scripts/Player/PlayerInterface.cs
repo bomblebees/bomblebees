@@ -15,6 +15,7 @@ public class PlayerInterface : NetworkBehaviour
     //public GameObject playerModelsAndVfx;
 
     [Header("Player HUD")]
+    [SerializeField] public Canvas hudCanvas;
     [SerializeField] private TMP_Text playerName;
 
     [SerializeField] private Image hexUI;

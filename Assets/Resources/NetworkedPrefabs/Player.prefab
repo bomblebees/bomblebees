@@ -5164,12 +5164,6 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 0, a: 0}
   - {r: 0, g: 1, b: 0, a: 0}
   sludgeParticles: {fileID: 2768441798302757408}
-  debugMode: 1
-  debugSpawnBomble: 6
-  debugSpawnSludge: 7
-  debugSpawnLaser: 8
-  debugSpawnPlasma: 9
-  debugSpawnGroundItem: g
   isSludged: 0
 --- !u!114 &5463513637451450348
 MonoBehaviour:
@@ -5325,6 +5319,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   playerObject: {fileID: 728363404677404264}
+  hudCanvas: {fileID: 576993572615881957}
   playerName: {fileID: 7547700562281231254}
   hexUI: {fileID: 4832761372184862780}
   hexUIIcon: {fileID: 3342379257447167940}

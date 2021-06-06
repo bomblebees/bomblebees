@@ -4,6 +4,9 @@ public class DebugCheats : MonoBehaviour
 {
     [SerializeField] private bool enableCheats;
 
+    private bool uiToggled = true;
+    private bool playerUIToggled = true;
+
     private void Start()
     {
         if (enableCheats.Equals(false)) Destroy(gameObject);
@@ -43,5 +46,21 @@ public class DebugCheats : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha6)) FindObjectOfType<RoundManager>().ChooseReturnToLobby();
         if (Input.GetKeyDown(KeyCode.Alpha7))
             FindObjectOfType<RoundManager>().StartCoroutine(FindObjectOfType<RoundManager>().ServerEndRound());
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            uiToggled = !uiToggled;
+            FindObjectOfType<GameUIManager>().ToggleUI(uiToggled);
+            FindObjectOfType<PingDisplay>().GetComponent<Canvas>().enabled = uiToggled;
+            GameObject.Find("Global Settings Button").GetComponent<Canvas>().enabled = false;
+        }
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            playerUIToggled = !playerUIToggled;
+            PlayerInterface[] interfaces = FindObjectsOfType<PlayerInterface>();
+            foreach (PlayerInterface i in interfaces)
+            {
+                i.hudCanvas.enabled = playerUIToggled;
+            }
+        }
     }
 }
