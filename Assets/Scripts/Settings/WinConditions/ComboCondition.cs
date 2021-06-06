@@ -83,13 +83,17 @@ public class ComboCondition : WinCondition
             {
                 tenPlayed = true;
 
-                FindObjectOfType<GameUIManager>().Announce(p.steamName + " has <size=150%>"
+                string coloredName = GetPlayerText(p);
+
+                FindObjectOfType<GameUIManager>().Announce(coloredName + " has <size=150%>"
                     + (toCombos - playerCombos) + "</size>  points remaining!");
             } else if (playerCombos >= toCombos - 30 && !thirtyPlayed)
             {
                 thirtyPlayed = true;
 
-                FindObjectOfType<GameUIManager>().Announce(p.steamName + " has <size=150%>"
+                string coloredName = GetPlayerText(p);
+
+                FindObjectOfType<GameUIManager>().Announce(coloredName + " has <size=150%>"
                     + (toCombos - playerCombos) + "</size>  points remaining!");
             }
         }
