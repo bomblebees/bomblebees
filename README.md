@@ -2,11 +2,11 @@
 **Bomblebees** is a competitive action party game that fuses the classic top-down combat of *Bomberman* with match-three puzzle solving from games like *Bejeweled*.
 
 ### Team
-- Terence So - Producer, Lead Artist, Gameplay Designer
-- Ari Iramanesh - Lead Programmer
-- Wai Chun Leung - Gameplay/UI Programmer
-- Jason Mamesah - Network/UI Programmer
-- Yooha Kim - Audio Designer, Gameplay Designer, 3D Artist
+- Terence So - Producer, Art Lead, Gameplay Designer
+- Yooha Kim - Audio Lead, 3D Artist, Gameplay Designer
+- Wai Chun Leung - Programming Lead, Gameplay/UI Programmer
+- Ari Iramanesh - Programming Co-Lead, Gameplay Programmer
+- Jason Mamesah - UI/UX Lead, Network/UI Programmer
 - Jacob Penland - UI Artist (External Collaborator)
  
 ## Release
