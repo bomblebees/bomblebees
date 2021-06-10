@@ -6,23 +6,22 @@ using UnityEngine.SceneManagement;
 
 public class NetworkRoomPlayerExt : NetworkRoomPlayer
 {
-    [Header("SyncVars")]
-    [SyncVar] public ulong steamId;
+    [Header("SyncVars")] [SyncVar] public ulong steamId;
     [SyncVar] public string steamUsername = "Username";
     [SyncVar] public int steamAvatarId;
     [SyncVar] public Color playerColor;
 
     /// <summary>The ping of the player</summary>
-    [SyncVar(hook=nameof(PingChanged))] public string ping;
+    [SyncVar(hook = nameof(PingChanged))] public string ping;
 
     /// <summary>The selected character/color</summary>
-    [SyncVar(hook = nameof(CharacterChanged))] public int characterCode;
+    [SyncVar(hook = nameof(CharacterChanged))]
+    public int characterCode;
 
     /// <summary>The selected team</summary>
     [SyncVar(hook = nameof(TeamChanged))] public int teamIndex;
 
-    [Header("Required")]
-    [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab;
+    [Header("Required")] [SerializeField] private PlayerLobbyCard playerLobbyCardPrefab;
     private PingDisplay _pingDisplay;
     private NetworkManager _networkManager;
     private CharacterSelectionInfo _characterSelectionInfo;
@@ -35,7 +34,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     private PlayerLobbyCard _playerCard;
 
     // Temp list of player colors
-    private readonly List<Color> _listColors = new List<Color> {
+    private readonly List<Color> _listColors = new List<Color>
+    {
         Color.red,
         Color.blue,
         Color.yellow,
@@ -70,7 +70,6 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-
     /// <summary>
     /// Called when the client disconnects from the lobby
     /// </summary>
@@ -102,7 +101,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     #region Update Loop
 
-    private bool gameStarted = false;
+    private bool gameStarted;
 
     private void Update()
     {
@@ -132,7 +131,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// Updates certain elements of the lobby every frame.
     /// <para>Only updates that cannot be updated using SyncVar hooks should be implemented here.</para>
     /// </summary>
-    [Client] private void UpdateLobby()
+    [Client]
+    private void UpdateLobby()
     {
         // For local lobby buttons
         if (isLocalPlayer)
@@ -175,7 +175,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                     }
                 }
             }
-            
+
             // Enable/disable the ready button
             if (!readyToBegin && !_characterSelectionInfo.characterAvailable[characterCode])
             {
@@ -215,7 +215,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Sets up the lobby for this player
     /// </summary>
-    [Client] private void SetupLobby()
+    [Client]
+    private void SetupLobby()
     {
         // Exit if lobby is already setup
         if (!_playerCard)
@@ -225,15 +226,16 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             CreatePlayerCard();
             InitPlayerCard();
         }
-        
+
         _room.ReadyStatusChanged();
         _lobbySettings.SetGamemodeText();
     }
-    
+
     /// <summary>
     /// Initializes lobby room variables
     /// </summary>
-    [Client] private bool InitRequiredVars()
+    [Client]
+    private bool InitRequiredVars()
     {
         // Only init if we are in the room scene
         if (SceneManager.GetActiveScene().name != "Room") return false;
@@ -257,14 +259,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             if (!_roomUI) Debug.LogError("room not found");
         }
 
-        if (_characterSelectionInfo && _room && _roomUI) return true;
-        else return false;
+        return _characterSelectionInfo && _room && _roomUI;
     }
 
     /// <summary>
     /// Initializes lobby room buttons
     /// </summary>
-    [Client] private void InitLobbyButtons()
+    [Client]
+    private void InitLobbyButtons()
     {
         // Exit if we are not the local player
         if (!isLocalPlayer) return;
@@ -276,7 +278,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Creates and instantiates the player card game object
     /// </summary>
-    [Client] private void CreatePlayerCard()
+    [Client]
+    private void CreatePlayerCard()
     {
         // if the card is already created, do not create again
         if (_playerCard) return;
@@ -288,14 +291,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             Quaternion.identity,
             _roomUI.playerCardsParent.transform);
 
-
         // add button event listeners for the local player
         if (isLocalPlayer)
         {
             _playerCard.changeCharacterButton.onClick.AddListener(OnCharacterClicked);
             _playerCard.changeTeamButton.onClick.AddListener(OnTeamClicked);
         }
-        
+
         // set the transform of the card
         SetCardPosition();
     }
@@ -303,7 +305,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Initializes the player card that was created
     /// </summary>
-    [Client] private void InitPlayerCard()
+    [Client]
+    private void InitPlayerCard()
     {
         // enable the character portrait
         _playerCard.characterPortrait.enabled = true;
@@ -347,11 +350,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Sets the position of this player's lobby player to a position based on the player's index in the lobby.
     /// </summary>
-    [Client] private void SetCardPosition()
+    [Client]
+    private void SetCardPosition()
     {
         if (!_playerCard)
         {
-            Debug.LogWarning("Player Card not initialized in SetCardPosition()!"); 
+            Debug.LogWarning("Player Card not initialized in SetCardPosition()!");
             return;
         }
 
@@ -361,11 +365,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Sets the ready status of this player based on their current ready status
     /// </summary>
-    [Client] private void SetCardReadyStatus()
+    [Client]
+    private void SetCardReadyStatus()
     {
         if (!_playerCard)
         {
-            Debug.LogWarning("Player Card not initialized in SetCardReadyStatus()!"); 
+            Debug.LogWarning("Player Card not initialized in SetCardReadyStatus()!");
             return;
         }
 
@@ -379,11 +384,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// Sets the character portrait of this player based on their current selected character code
     /// </summary>
-    [Client] private void SetCardCharacterPortrait()
+    [Client]
+    private void SetCardCharacterPortrait()
     {
         if (!_playerCard)
         {
-            Debug.LogWarning("Player Card not initialized in SetCardCharacterPortrait()!"); 
+            Debug.LogWarning("Player Card not initialized in SetCardCharacterPortrait()!");
             return;
         }
 
@@ -405,7 +411,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     {
         if (!_playerCard)
         {
-            Debug.LogWarning("Player Card not initialized in SetCardTeamButton()!"); 
+            Debug.LogWarning("Player Card not initialized in SetCardTeamButton()!");
             return;
         }
 
@@ -417,11 +423,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// Sets the card buttons for this player.
     /// <para>Card specific buttons should only be interactable by the local player.</para>
     /// </summary>
-    [Client] private void SetCardButtons()
+    [Client]
+    private void SetCardButtons()
     {
         if (!_playerCard)
         {
-            Debug.LogWarning("Player Card not initialized in SetCardButtons()!"); 
+            Debug.LogWarning("Player Card not initialized in SetCardButtons()!");
             return;
         }
 
@@ -440,11 +447,12 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         }
     }
 
-    [Client] private void SetCardHostCrown()
+    [Client]
+    private void SetCardHostCrown()
     {
         if (!_playerCard)
         {
-            Debug.LogWarning("Player Card not initialized in SetCardHostCrown()!"); 
+            Debug.LogWarning("Player Card not initialized in SetCardHostCrown()!");
             return;
         }
 
@@ -464,23 +472,27 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         InvokeRepeating(nameof(SetPing), float.Epsilon, _pingDisplay.updateInterval);
     }
 
-    [Client] private void SetPing()
+    [Client]
+    private void SetPing()
     {
         CmdSetPing(_pingDisplay.myPingDisplay);
         UpdatePingDisplay();
     }
 
-    [Command] private void CmdSetPing(string newPing)
+    [Command]
+    private void CmdSetPing(string newPing)
     {
         ping = newPing;
     }
 
-    [ClientCallback] private void PingChanged(string prevPing, string newPing)
+    [ClientCallback]
+    private void PingChanged(string prevPing, string newPing)
     {
         UpdatePingDisplay();
     }
 
-    [Client] private void UpdatePingDisplay()
+    [Client]
+    private void UpdatePingDisplay()
     {
         if (_playerCard == null) return;
 
@@ -494,7 +506,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// SyncVar hook for the index of the lobby player
     /// </summary>
-    [ClientCallback] public override void IndexChanged(int prevIndex, int newIndex)
+    [ClientCallback]
+    public override void IndexChanged(int prevIndex, int newIndex)
     {
         // Prevent updating card before it is created (this function may be fired on join)
         if (!InitRequiredVars() || _playerCard == null) return;
@@ -507,7 +520,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// SyncVar hook for the ready status of the lobby player
     /// </summary>
-    [ClientCallback] public override void ReadyStateChanged(bool prevReadyState, bool newReadyState)
+    [ClientCallback]
+    public override void ReadyStateChanged(bool prevReadyState, bool newReadyState)
     {
         // Prevent updating card before it is created (this function may be fired on join)
         if (!InitRequiredVars() || _playerCard == null) return;
@@ -515,7 +529,7 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         // Propagate updates to the player card
         SetCardReadyStatus();
         SetCardButtons();
-        
+
         _room.ReadyStatusChanged();
 
         if (isLocalPlayer)
@@ -536,13 +550,13 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
                     _roomUI.buttonSettings.GetComponent<ButtonDisable>().EnableButton();
             }
         }
-
     }
 
     /// <summary>
     /// SyncVar hook for the variable characterCode
     /// </summary>
-    [ClientCallback] private void CharacterChanged(int prevCharCode, int newCharCode)
+    [ClientCallback]
+    private void CharacterChanged(int prevCharCode, int newCharCode)
     {
         // Prevent updating card before it is created (this function may be fired on join)
         if (!InitRequiredVars() || _playerCard == null) return;
@@ -554,7 +568,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     /// <summary>
     /// SyncVar hook for the variable teamIndex
     /// </summary>
-    [ClientCallback] private void TeamChanged(int prevTeamIdx, int newTeamIdx)
+    [ClientCallback]
+    private void TeamChanged(int prevTeamIdx, int newTeamIdx)
     {
         // Prevent updating card before it is created (this function may be fired on join)
         if (!InitRequiredVars() || _playerCard == null) return;
@@ -568,7 +583,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     #region Button Click Events
 
     // Called by the local host player when the start button is clicked
-    [Client] private void OnStartButtonClick()
+    [Client]
+    private void OnStartButtonClick()
     {
         _room.showStartButton = false;
 
@@ -579,23 +595,27 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
     }
 
     // Called by the local player when ready button is clicked
-    [Client] private void OnReadyButtonClick()
+    [Client]
+    private void OnReadyButtonClick()
     {
         if (!readyToBegin)
         {
             _audioManager.PlayReady();
         }
+
         CmdChangeReadyState(!readyToBegin);
     }
 
     // Called by the local player when the character card is pressed
-    [Client] private void OnCharacterClicked()
+    [Client]
+    private void OnCharacterClicked()
     {
         CmdChangeCharacterCode(GetNextAvailableCharacter());
     }
 
     // Called by the local player when the team button is pressed
-    [Client] private void OnTeamClicked()
+    [Client]
+    private void OnTeamClicked()
     {
         var newTeam = (teamIndex + 1) % FindObjectOfType<TeamsGamemode>().teams;
 
@@ -605,7 +625,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
 
     #endregion
 
-    [Client] private int GetNextAvailableCharacter()
+    [Client]
+    private int GetNextAvailableCharacter()
     {
         var nextCode = -1;
 
@@ -625,12 +646,14 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
         return nextCode;
     }
 
-    [Command] private void CmdChangeCharacterCode(int code)
+    [Command]
+    private void CmdChangeCharacterCode(int code)
     {
         characterCode = code;
     }
 
-    [Command] private void CmdChangeTeams(int idx)
+    [Command]
+    private void CmdChangeTeams(int idx)
     {
         teamIndex = idx;
     }
