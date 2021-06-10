@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public static class Helper
+﻿public static class Helper
 {
     public static int GetIndexInArray(int index, int length)
     {

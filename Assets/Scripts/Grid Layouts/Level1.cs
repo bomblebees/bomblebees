@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Level1 : HexArray
+﻿public class Level1 : HexArray
 {
     private int width = 16;
     private int height = 11;

@@ -1,11 +1,8 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using TMPro;
-using Steamworks;
-using System.Collections.Generic;
 
 public class PlayerInterface : NetworkBehaviour
 {

@@ -1,13 +1,11 @@
 ﻿// Performance Optimization Possibilities (POP):
 //     @0 Double check everything passes by ref
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HexGrid : NetworkBehaviour

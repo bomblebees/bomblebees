@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.XR;
 using Mirror;
 
 public class HexCell : NetworkBehaviour

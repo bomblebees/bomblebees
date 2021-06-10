@@ -1,7 +1,6 @@
 ﻿using Mirror;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Room_UI : MonoBehaviour
 {

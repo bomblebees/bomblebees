@@ -1,6 +1,4 @@
-﻿using System;
-using Mirror;
-using TMPro;
+﻿using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

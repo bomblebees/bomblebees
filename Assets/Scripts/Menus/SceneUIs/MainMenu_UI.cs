@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Mirror;
-using Mirror.Authenticators;
-using Steamworks;
+﻿using Mirror;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class MainMenu_UI : MonoBehaviour
 {

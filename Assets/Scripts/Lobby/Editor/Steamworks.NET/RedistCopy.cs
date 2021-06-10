@@ -16,7 +16,6 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using Steamworks;
 using System.IO;
 
 public class RedistCopy {

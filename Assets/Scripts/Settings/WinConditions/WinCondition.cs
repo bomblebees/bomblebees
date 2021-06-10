@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Mirror;
+﻿using Mirror;
 
 /// <summary>
 /// A server-only object that specifies a win condition of the game.

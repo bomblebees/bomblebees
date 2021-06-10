@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class EmptyHex : HexCell
+﻿public class EmptyHex : HexCell
 {
     // Empty on purpose
 }

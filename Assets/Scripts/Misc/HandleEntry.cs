@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-//using System.Net.Configuration;
-using Mirror;
+﻿//using System.Net.Configuration;
 using UnityEngine;
 
 public class HandleEntry : MonoBehaviour
