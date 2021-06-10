@@ -8,39 +8,37 @@ public class Room_UI : MonoBehaviour
     private MainMenu_UI _mainMenuUI;
     private Matchmaking _matchmaker;
 
-    [Header("Screen")]
-    [SerializeField] private GameObject screenHowToPlay;
-    [SerializeField] private GameObject screenControls;
-    [SerializeField] private GameObject screenLeavePopup;
+    [Header("Screen")] [SerializeField] private GameObject screenLeavePopup;
 
-    [Header("Buttons")]
-    [SerializeField] public GameObject buttonStart;
+    [Header("Buttons")] [SerializeField] public GameObject buttonStart;
     [SerializeField] public GameObject buttonReady;
     [SerializeField] public GameObject buttonLeave;
     [SerializeField] public GameObject buttonSettings;
 
-    [Header("Helper Text")] 
-    [SerializeField] private TMP_Text readyHelperText;
+    [Header("Helper Text")] [SerializeField]
+    private TMP_Text readyHelperText;
+
     [SerializeField] private TMP_Text startHelperText;
     [SerializeField] private TMP_Text gameModeHelperText;
     private CanvasRenderer _readyHelperTextCanvasRenderer;
     private CanvasRenderer _startHelperTextCanvasRenderer;
-    
-    [Header("Misc.")]
-    [SerializeField] public GameObject playerCardsParent;
+
+    [Header("Misc.")] [SerializeField] public GameObject playerCardsParent;
     [SerializeField] public TMP_Text lobbyName;
 
     // events
     public delegate void ReadyClickDelegate();
     public delegate void StartClickDelegate();
+
     public event ReadyClickDelegate EventReadyButtonClicked;
     public event StartClickDelegate EventStartButtonClicked;
 
     public static Room_UI Singleton;
+
     private void Awake()
     {
         Singleton = this;
-        
+
         // Helper texts
         _readyHelperTextCanvasRenderer = readyHelperText.gameObject.GetComponent<CanvasRenderer>();
         _startHelperTextCanvasRenderer = startHelperText.gameObject.GetComponent<CanvasRenderer>();
@@ -55,7 +53,6 @@ public class Room_UI : MonoBehaviour
         if (_mainMenuUI.screenLoading.activeSelf)
         {
             _mainMenuUI.screenLoading.SetActive(false);
-
         }
 
         if (!_mainMenuUI.screenNavigation.activeSelf)
@@ -123,7 +120,7 @@ public class Room_UI : MonoBehaviour
 
         _startHelperTextCanvasRenderer.SetAlpha(1f);
     }
-    
+
     public void ActivateReadyButton()
     {
         buttonReady.GetComponent<ButtonDisable>().EnableButton();
@@ -142,12 +139,12 @@ public class Room_UI : MonoBehaviour
     {
         readyHelperText.text = helperText;
     }
-    
+
     public void SetStartHelperText(string helperText)
     {
         startHelperText.text = helperText;
     }
-    
+
     public void SetGameModeHelperText(string helperText)
     {
         gameModeHelperText.text = helperText;
@@ -157,22 +154,4 @@ public class Room_UI : MonoBehaviour
     {
         FindObjectOfType<LobbySettings>().OnClickOpenSettings();
     }
-
-    #region Screen: HOW TO PLAY
-
-    public void ToggleScreenHowToPlay()
-    {
-        screenHowToPlay.SetActive(!screenHowToPlay.activeSelf);
-    }
-
-    #endregion
-
-    #region Screen: BOMB LIST
-
-    public void ToggleScreenControls()
-    {
-        screenControls.SetActive(!screenControls.activeSelf);
-    }
-    
-    #endregion
 }
