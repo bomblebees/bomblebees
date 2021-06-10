@@ -4,43 +4,29 @@ using UnityEngine;
 
 public class MainMenu_UI : MonoBehaviour
 {
-    [Scene][SerializeField] private string mainMenuScene;
-    [Header("MainMenu_UI GameObject")]
-    [SerializeField] private GameObject mainMenuUIGameObject;
-    [Header("Network Manager")]
-    [SerializeField] private NetworkManager steamNetworkManager;
-    [SerializeField] private NetworkManager kcpNetworkManager;
-    [Header("Network Manager GameObject")]
-    [SerializeField] private GameObject steamNetworkManagerGameObject;
-    [SerializeField] private GameObject kcpNetworkManagerGameObject;
-    [Header("Canvases")]
-    [SerializeField] public Canvas menuCanvas;
+    [Header("Network Manager")] [SerializeField]
+    private NetworkManager kcpNetworkManager;
+
+    [Header("Canvas")] [SerializeField] public Canvas menuCanvas;
     [SerializeField] public Canvas splashCanvas;
-    [Header("Screen")]
-    [SerializeField] private GameObject screenMainMenu;
-    [SerializeField] private GameObject screenConnectWithSteam;
+    [Header("Screen")] [SerializeField] private GameObject screenMainMenu;
     [SerializeField] private GameObject screenLocal;
-    [SerializeField] private GameObject screenOptions;
     [SerializeField] private GameObject screenLobbyList;
     [SerializeField] public GameObject screenNavigation;
     [SerializeField] public GameObject screenLoading;
-    [SerializeField] public GameObject screenError;
     [SerializeField] public GameObject screenCredits;
-    [SerializeField] public GameObject screenControls;
-	[SerializeField] public GameObject screenHowToPlay;
-	[SerializeField] public GameObject screenShowcase;
-	[Header("Other")]
-    [SerializeField] private SteamLobby steamLobby;
+    [SerializeField] public GameObject screenHowToPlay;
+    [SerializeField] public GameObject screenShowcase;
     [SerializeField] private TMP_InputField customIPAddress;
     [SerializeField] private GameObject backButton;
 
-    public static MainMenu_UI singleton;
+    public static MainMenu_UI Singleton;
 
     public bool playSplashScreen;
 
     private void Awake()
     {
-        singleton = this;
+        Singleton = this;
     }
 
     void Start()
@@ -56,8 +42,6 @@ public class MainMenu_UI : MonoBehaviour
             menuCanvas.GetComponent<FadeCanvas>().duration = 0;
             menuCanvas.GetComponent<FadeCanvas>().delay = 0;
             menuCanvas.GetComponent<FadeCanvas>().StartFadeIn();
-
-            //GameObject.Find("Main Camera").transform.localRotation = Quaternion.Euler(-30, 0, 0);
         }
     }
 
@@ -70,13 +54,6 @@ public class MainMenu_UI : MonoBehaviour
 
     public void Back()
     {
-        if (screenOptions.activeSelf)
-        {
-            screenOptions.SetActive(false);
-            screenMainMenu.SetActive(true);
-            backButton.SetActive(false);
-        }
-
         if (screenLobbyList && screenLobbyList.activeSelf)
         {
             screenLobbyList.SetActive(false);
@@ -91,7 +68,7 @@ public class MainMenu_UI : MonoBehaviour
             backButton.SetActive(false);
         }
     }
-    
+
     #endregion
 
     #region Screen: Main Menu
@@ -105,82 +82,36 @@ public class MainMenu_UI : MonoBehaviour
         {
             // Enable steam lobby UI
             screenLobbyList.SetActive(true);
-        } else
+        }
+        else
         {
             screenLocal.SetActive(true);
         }
-        
+
         // Enable back button
         backButton.SetActive(true);
     }
 
-    public void OnClickButtonOptions()
-    {
-        // Disable main menu screen
-        screenMainMenu.SetActive(false);
-
-        // Enable options screen
-        screenOptions.SetActive(true);
-        
-    }
-
-    public void OnClickButtonControls()
-    {
-        // Disable main menu screen
-        screenMainMenu.SetActive(false);
-
-        // Enable controls screen
-        screenControls.SetActive(true);
-    }
-
     #endregion
 
-    #region Screen: Controls
+    #region Screen: How To Play
 
-    public void OnClickButtonExitControls()
+    public void OnClickButtonHowToPlay()
+    {
+        // Disable main menu screen
+        screenMainMenu.SetActive(false);
+
+        // Enable How To Play screen
+        screenHowToPlay.SetActive(true);
+    }
+
+    public void OnClickButtonExitHowToPlay()
     {
         // Enable main menu screen
         screenMainMenu.SetActive(true);
 
-        // Disable controls screen
-        screenControls.SetActive(false);
-    }
-
-	#endregion
-
-	#region Screen: How To Play
-
-	public void OnClickButtonHowToPlay()
-	{
-		// Disable main menu screen
-		screenMainMenu.SetActive(false);
-
-		// Enable How To Play screen
-		screenHowToPlay.SetActive(true);
-	}
-
-	public void OnClickButtonExitHowToPlay()
-	{
-		// Enable main menu screen
-		screenMainMenu.SetActive(true);
-
-		// Disable How To Play screen
-		screenHowToPlay.SetActive(false);
-	}
-
-	#endregion
-
-	#region Screen: Connect with Steam
-
-	public void HostSteamLobby()
-    {
-        steamLobby.HostLobby();
-    }
-
-    public void JoinFriendsLobby()
-    {
-        screenConnectWithSteam.SetActive(false);
-        screenLobbyList.SetActive(true);
+        // Disable How To Play screen
+        screenHowToPlay.SetActive(false);
     }
 
     #endregion
@@ -201,23 +132,7 @@ public class MainMenu_UI : MonoBehaviour
 
     public void JoinWithIPAddress()
     {
-        
         kcpNetworkManager.StartClient();
-    }
-    
-    public void Options()
-    {
-        if (steamNetworkManagerGameObject.activeSelf)
-        {
-            screenConnectWithSteam.SetActive(false);
-            screenOptions.SetActive(true);
-        }
-
-        if (kcpNetworkManagerGameObject.activeSelf)
-        {
-            screenLocal.SetActive(false);
-            screenOptions.SetActive(true);
-        }
     }
 
     #endregion

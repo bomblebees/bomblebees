@@ -48,7 +48,7 @@ public class NetworkRoomManagerExt : NetworkRoomManager
         if (mm) mm.uiLeaveLobby();
 
         // re-enable the main menu ui
-        MainMenu_UI mainMenuUI = MainMenu_UI.singleton;
+        MainMenu_UI mainMenuUI = MainMenu_UI.Singleton;
         if (mainMenuUI) mainMenuUI.gameObject.SetActive(true);
 
         base.OnRoomStopClient();

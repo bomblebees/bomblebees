@@ -8,19 +8,20 @@ public class SteamNetworkManager : NetworkRoomManagerExt
     public override void Start()
     {
         base.Start();
-        
+
         if (SteamAPI.Init().Equals(false))
         {
             FindObjectOfType<FatalErrorScreen>().Show(
-                "Steam API not found", 
+                "Steam API not found",
                 "Please make sure Steam is running and you are logged into an account.");
         }
     }
 
     // Temp list of player colors
-    private Color[] listColors = { Color.red, Color.blue, Color.yellow, Color.green };
+    private Color[] listColors = {Color.red, Color.blue, Color.yellow, Color.green};
 
-    public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
+    public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer,
+        GameObject gamePlayer)
     {
         return base.OnRoomServerSceneLoadedForPlayer(conn, roomPlayer, gamePlayer);
     }
@@ -32,7 +33,8 @@ public class SteamNetworkManager : NetworkRoomManagerExt
         if (conn.address == "localhost")
         {
             AssignRoomPlayerSteamInfo(newRoomGameObject, SteamUser.GetSteamID().m_SteamID);
-        } else
+        }
+        else
         {
             AssignRoomPlayerSteamInfo(newRoomGameObject, UInt64.Parse(conn.address));
         }
@@ -65,12 +67,10 @@ public class SteamNetworkManager : NetworkRoomManagerExt
 
     public override void OnClientDisconnect(NetworkConnection conn)
     {
-        MainMenu_UI menu = MainMenu_UI.singleton;
+        MainMenu_UI menu = MainMenu_UI.Singleton;
 
         menu.screenLoading.SetActive(false);
         menu.screenNavigation.SetActive(true);
-        //menu.screenError.SetActive(true);
-
 
         base.OnClientDisconnect(conn);
     }

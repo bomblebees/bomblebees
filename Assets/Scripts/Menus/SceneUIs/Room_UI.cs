@@ -49,7 +49,7 @@ public class Room_UI : MonoBehaviour
     public void Start()
     {
         _networkManager = NetworkManager.singleton;
-        _mainMenuUI = MainMenu_UI.singleton;
+        _mainMenuUI = MainMenu_UI.Singleton;
         _matchmaker = Matchmaking.Singleton;
 
         if (_mainMenuUI.screenLoading.activeSelf)

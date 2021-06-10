@@ -101,7 +101,7 @@ public class Matchmaking : MonoBehaviour
         networkManager.networkAddress = hostAddress;
         networkManager.StartClient();
 
-        MainMenu_UI menu = MainMenu_UI.singleton;
+        MainMenu_UI menu = MainMenu_UI.Singleton;
         menu.screenLoading.SetActive(true);
         menu.screenNavigation.SetActive(false);
     }
@@ -180,7 +180,7 @@ public class Matchmaking : MonoBehaviour
         currentLobby = new CSteamID();
 
         LobbyCanvas.SetActive(true);
-        MainMenu_UI menu = MainMenu_UI.singleton;
+        MainMenu_UI menu = MainMenu_UI.Singleton;
         menu.gameObject.SetActive(true);
 
         PresentLobbies(); // refresh lobbies
