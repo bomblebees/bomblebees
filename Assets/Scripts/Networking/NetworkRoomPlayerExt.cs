@@ -525,6 +525,8 @@ public class NetworkRoomPlayerExt : NetworkRoomPlayer
             {
                 _roomUI.buttonLeave.GetComponent<ButtonDisable>().DisableButton();
                 _roomUI.buttonSettings.GetComponent<ButtonDisable>().DisableButton();
+                // Exclude helper text from opacity reduction
+                _roomUI.gameModeHelperTextCanvasRenderer.SetAlpha(1f);
             }
             else
             {

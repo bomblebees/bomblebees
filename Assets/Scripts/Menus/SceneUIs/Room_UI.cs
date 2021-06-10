@@ -22,12 +22,14 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private TMP_Text gameModeHelperText;
     private CanvasRenderer _readyHelperTextCanvasRenderer;
     private CanvasRenderer _startHelperTextCanvasRenderer;
+    public CanvasRenderer gameModeHelperTextCanvasRenderer;
 
     [Header("Misc.")] [SerializeField] public GameObject playerCardsParent;
     [SerializeField] public TMP_Text lobbyName;
 
     // events
     public delegate void ReadyClickDelegate();
+
     public delegate void StartClickDelegate();
 
     public event ReadyClickDelegate EventReadyButtonClicked;
@@ -42,6 +44,7 @@ public class Room_UI : MonoBehaviour
         // Helper texts
         _readyHelperTextCanvasRenderer = readyHelperText.gameObject.GetComponent<CanvasRenderer>();
         _startHelperTextCanvasRenderer = startHelperText.gameObject.GetComponent<CanvasRenderer>();
+        gameModeHelperTextCanvasRenderer = gameModeHelperText.gameObject.GetComponent<CanvasRenderer>();
     }
 
     public void Start()
