@@ -22,7 +22,7 @@ public class Room_UI : MonoBehaviour
     [SerializeField] private TMP_Text gameModeHelperText;
     private CanvasRenderer _readyHelperTextCanvasRenderer;
     private CanvasRenderer _startHelperTextCanvasRenderer;
-    public CanvasRenderer gameModeHelperTextCanvasRenderer;
+    [HideInInspector] public CanvasRenderer gameModeHelperTextCanvasRenderer;
 
     [Header("Misc.")] [SerializeField] public GameObject playerCardsParent;
     [SerializeField] public TMP_Text lobbyName;
